@@ -58,7 +58,7 @@ constant R1 : std_logic_vector(2 downto 0) := "001";
 constant R2 : std_logic_vector(2 downto 0) := "010";
 constant R3 : std_logic_vector(2 downto 0) := "011";
 
-signal   state       : state_t;
+signal   state        : state_t;
 signal   rwSig,
          brstOnSig,
          i2cBusyOld,
@@ -67,25 +67,12 @@ signal   rwSig,
          lastBrstOld,
          lastBrstRise,
          lastLeft,
-         lastByte    : std_logic;
-signal   brstByteNum : std_logic_vector(13 downto 0);
-signal   leftBNum    : std_logic_vector(1 downto 0);
-signal   brstCnt     : unsigned(brstByteNum'left+1 downto 0); --adding 1 for lastBrst signal
-signal   leftBCnt    : unsigned(2 downto 0);
-signal   bytesCnt    : unsigned(bitsNum(devDataBytes) downto 0);
-
-attribute MARK_DEBUG : string;
-attribute MARK_DEBUG of state     : signal is "true";
-attribute MARK_DEBUG of addr      : signal is "true";
-attribute MARK_DEBUG of dataIn    : signal is "true";
-attribute MARK_DEBUG of dataOut   : signal is "true";
-attribute MARK_DEBUG of i2cEna    : signal is "true";
-attribute MARK_DEBUG of i2cAddr   : signal is "true";
-attribute MARK_DEBUG of i2cRw     : signal is "true";
-attribute MARK_DEBUG of i2cDataWr : signal is "true";
-attribute MARK_DEBUG of i2cBusy   : signal is "true";
-attribute MARK_DEBUG of i2cDataRd : signal is "true";
-attribute MARK_DEBUG of exec      : signal is "true";
+         lastByte     : std_logic;
+signal   brstByteNum  : std_logic_vector(13 downto 0);
+signal   leftBNum     : std_logic_vector(1 downto 0);
+signal   brstCnt      : unsigned(brstByteNum'left+1 downto 0); --adding 1 for lastBrst signal
+signal   leftBCnt     : unsigned(2 downto 0);
+signal   bytesCnt     : unsigned(bitsNum(devDataBytes) downto 0);
 
 begin
 

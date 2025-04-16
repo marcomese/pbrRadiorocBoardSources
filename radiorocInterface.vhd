@@ -66,10 +66,6 @@ signal   dataOut    : devData_t;
 
 signal   dataIn     : devData_t;
 
-attribute MARK_DEBUG : string;
-attribute MARK_DEBUG of state     : signal is "true";
-attribute MARK_DEBUG of dataReady : signal is "true";
-
 begin
 
 radioFSM: process(clk, rst, devExec)

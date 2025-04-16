@@ -191,51 +191,16 @@ begin
                         state <= readBytes;
                     end if;
 
---                when rwByte =>
---                    if rwSig = writeCmd then
---                        if lastWByte = '0' and i2cBusyRise = '1' then
---                            i2cRw     <= rwSig;
---                            i2cDataWr <= dataBytes(to_integer(bytesCnt));
---                            bytesCnt  <= bytesCnt - 1;
-    
---                            state     <= rwByte;
---                        elsif lastWByte = '1' and i2cBusyRise = '1' then
---                            i2cEna    <= '0';
---                            bytesCnt  <= to_unsigned(bytesNum-1, bytesCnt'length);
-    
---                            state     <= transEnd;
---                        else
---                            state <= rwByte;
---                        end if;
---                    elsif rwSig = readCmd then
---                        rI := to_integer(bytesCnt(bitsNum(bytesNum)-2 downto 0));
-
---                        if lastRByte = '0' and i2cBusyFall = '1' then
---                            i2cRw          <= rwSig;
---                            dataBytes(rI)  <= i2cDataRd;
---                            bytesCnt       <= bytesCnt - 1;
-    
---                            state          <= rwByte;
---                        elsif lastRByte = '1' then
---                            i2cEna    <= '0';
---                            bytesCnt  <= to_unsigned(bytesNum-1, bytesCnt'length);
-    
---                            state     <= transEnd;
---                        else
---                            state <= rwByte;
---                        end if;
---                    end if;
-
                 when transEnd =>
                     if rwSig = readCmd and i2cBusyFall = '1' then
                         busy      <= '0';
-                        dataReady <= '1';--rwSig;
+                        dataReady <= '1';
                         dataOut   <= i2cDataRd & dataBytes(1) & dataBytes(2) & dataBytes(3);
 
                         state     <= idle;
                     elsif rwSig = writeCmd and i2cBusyFall = '1' then
                         busy      <= '0';
-                        dataReady <= '1';--rwSig;
+                        dataReady <= '1';
                         dataOut   <= (others => '0');
 
                         state     <= idle;
