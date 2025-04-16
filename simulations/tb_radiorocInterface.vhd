@@ -297,7 +297,7 @@ begin
     wait for clkPeriod;
     testDataIn <= x"00";
     wait for clkPeriod;
-    testDataIn <= x"04"; -- send 0xNN bytes in burst mode
+    testDataIn <= x"18"; -- send 0xNN bytes in burst mode
     wait for clkPeriod;
 
     testDataIn <= x"22";
@@ -331,10 +331,28 @@ begin
     wait for clkPeriod;
     testDataIn <= x"7E";
     wait for clkPeriod;
---    testDataIn <= x"AB";
---    wait for clkPeriod;
---    testDataIn <= x"CD";
---    wait for clkPeriod;
+    testDataIn <= x"AB";
+    wait for clkPeriod;
+    testDataIn <= x"CD";
+    wait for clkPeriod;
+
+    testDataIn <= x"40";
+    wait for clkPeriod;
+    testDataIn <= x"20";
+    wait for clkPeriod;
+    testDataIn <= x"10";
+    wait for clkPeriod;
+    testDataIn <= x"80";
+    wait for clkPeriod;
+
+    testDataIn <= x"08";
+    wait for clkPeriod;
+    testDataIn <= x"04";
+    wait for clkPeriod;
+    testDataIn <= x"02";
+    wait for clkPeriod;
+    testDataIn <= x"01";
+    wait for clkPeriod;
 
     testTxWrite <= '0';
 

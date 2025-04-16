@@ -600,7 +600,8 @@ port map(
 
 radInterfInst: entity work.radiorocInterface
 generic map(
-    chipID     => chipID
+    chipID     => chipID,
+    maxBrstLen => 125
 )
 port map(
     clk        => clk_100M,
