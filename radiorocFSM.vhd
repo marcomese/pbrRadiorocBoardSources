@@ -58,6 +58,8 @@ constant R1 : std_logic_vector(2 downto 0) := "001";
 constant R2 : std_logic_vector(2 downto 0) := "010";
 constant R3 : std_logic_vector(2 downto 0) := "011";
 
+constant maxBrstSlv : std_logic_vector(bitsNum(maxBrstLen)-1 downto 0) := std_logic_vector(to_unsigned(maxBrstLen, bitsNum(maxBrstLen)));
+
 signal   state        : state_t;
 signal   rwSig,
          brstOnSig,
@@ -68,7 +70,8 @@ signal   rwSig,
          lastBrstRise,
          lastLeft,
          lastByte     : std_logic;
-signal   brstByteNum  : std_logic_vector(13 downto 0);
+signal   dataInVec    : std_logic_vector(devDataBytes*8-1 downto 0);
+signal   brstByteNum  : std_logic_vector(maxBrstSlv'left-2 downto 0);
 signal   leftBNum     : std_logic_vector(1 downto 0);
 signal   brstCnt      : unsigned(brstByteNum'left+1 downto 0); --adding 1 for lastBrst signal
 signal   leftBCnt     : unsigned(2 downto 0);
@@ -88,9 +91,25 @@ lastByte     <= bytesCnt(bytesCnt'left);
 
 lastLeft     <= leftBCnt(leftBCnt'left);
 
-brstByteNum  <= dataIn(1) & dataIn(0)(7 downto 2);
+dataInVec    <= devDataToSlv(dataIn);
 
-leftBNum     <= dataIn(0)(1 downto 0);
+brstBytesProc: process(clk, rst)
+begin
+    if rising_edge(clk) then
+        if rst = '1' then
+            brstByteNum <= (others => '0');
+            leftBNum    <= (others => '0');
+        else
+            if unsigned(dataInVec) > maxBrstLen then
+                brstByteNum <= maxBrstSlv(maxBrstSlv'left downto 2);
+                leftBNum    <= maxBrstSlv(1 downto 0);
+            else
+                brstByteNum  <= dataInVec(brstByteNum'left+2 downto 2);
+                leftBNum     <= dataInVec(1 downto 0);
+            end if;
+        end if;
+    end if;
+end process;
 
 radioFSM: process(clk, rst, exec)
     variable i : integer range 0 to devDataBytes-1 := 0;

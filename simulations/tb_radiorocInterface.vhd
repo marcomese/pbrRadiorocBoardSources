@@ -147,7 +147,7 @@ constant readCmd        : std_logic_vector(3 downto 0) := x"A";
 constant writeCmd       : std_logic_vector(3 downto 0) := x"5";
 constant burstWrCmd     : std_logic_vector(3 downto 0) := x"3";
 constant burstRdCmd     : std_logic_vector(3 downto 0) := x"B";
-constant maxBrstLen     : natural                      := 677;
+constant maxBrstLen     : natural                      := 40;--677;
 
 signal   clk            : std_logic                    := '1';
 signal   rst            : std_logic                    := '0';
@@ -297,7 +297,7 @@ begin
     wait for clkPeriod;
     testDataIn <= x"00";
     wait for clkPeriod;
-    testDataIn <= x"18"; -- send 0xNN bytes in burst mode
+    testDataIn <= x"09"; -- send 0xNN bytes in burst mode
     wait for clkPeriod;
 
     testDataIn <= x"22";
@@ -352,6 +352,33 @@ begin
     testDataIn <= x"02";
     wait for clkPeriod;
     testDataIn <= x"01";
+    wait for clkPeriod;
+
+    testDataIn <= x"A8";
+    wait for clkPeriod;
+    testDataIn <= x"A4";
+    wait for clkPeriod;
+    testDataIn <= x"A2";
+    wait for clkPeriod;
+    testDataIn <= x"A1";
+    wait for clkPeriod;
+
+    testDataIn <= x"D8";
+    wait for clkPeriod;
+    testDataIn <= x"D4";
+    wait for clkPeriod;
+    testDataIn <= x"D2";
+    wait for clkPeriod;
+    testDataIn <= x"D1";
+    wait for clkPeriod;
+
+    testDataIn <= x"E8";
+    wait for clkPeriod;
+    testDataIn <= x"E4";
+    wait for clkPeriod;
+    testDataIn <= x"E2";
+    wait for clkPeriod;
+    testDataIn <= x"E1";
     wait for clkPeriod;
 
     testTxWrite <= '0';
