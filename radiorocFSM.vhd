@@ -53,12 +53,11 @@ type state_t is (idle,
                  burstWrite,
                  transEnd);
 
-constant R0         : std_logic_vector(2 downto 0) := "000";
-constant R1         : std_logic_vector(2 downto 0) := "001";
-constant R2         : std_logic_vector(2 downto 0) := "010";
-constant R3         : std_logic_vector(2 downto 0) := "011";
-
-constant maxBrstSlv : std_logic_vector(bitsNum(maxBrstLen)-1 downto 0) := std_logic_vector(to_unsigned(maxBrstLen, bitsNum(maxBrstLen)));
+constant R0           : std_logic_vector(2 downto 0) := "000";
+constant R1           : std_logic_vector(2 downto 0) := "001";
+constant R2           : std_logic_vector(2 downto 0) := "010";
+constant R3           : std_logic_vector(2 downto 0) := "011";
+constant maxBrstSlv   : std_logic_vector(bitsNum(maxBrstLen)-1 downto 0) := std_logic_vector(to_unsigned(maxBrstLen, bitsNum(maxBrstLen)));
 
 signal   state        : state_t;
 signal   rwSig,
