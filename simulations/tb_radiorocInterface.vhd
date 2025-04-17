@@ -56,6 +56,7 @@ port(
     txWrAck    : in  std_logic;
     devId      : out devices_t;
     devReady   : in  devReady_t;
+    devBusy    : in  devBusy_t;
     devRw      : out std_logic;
     devBurst   : out std_logic;
     devAddr    : out devAddr_t;
@@ -163,6 +164,7 @@ signal   dataToDev,
          dataFromRad    : devData_t                    := (others => (others => '0'));
 signal   devDataInVec   : devDataVec_t                 := (others => (others => (others => '0')));
 signal   devReadyVec    : devReady_t                   := (others => '0');
+signal   devBusyVec     : devBusy_t                    := (others => '0');
 signal   error          : std_logic_vector(1 downto 0) := "00";
 signal   rxRead         : std_logic                    := '0';
 signal   rxPresent      : std_logic                    := '0';
@@ -405,7 +407,7 @@ port map(
     devDataIn  => dataToDev,
     devDataOut => dataFromRad,
     devReady   => devReadyRad,
-    busy       => RadBusy,
+    busy       => radBusy,
     i2cEnClk   => i2cEnClk,
     i2cEna     => i2cEna,
     i2cAddr    => i2cAddr,
@@ -415,8 +417,9 @@ port map(
     i2cDataRd  => testData--i2cDataRd
 );
 
-devDataInVec(radioroc)   <= dataFromRad;
-devReadyVec(radioroc)    <= devReadyRad;
+devDataInVec(radioroc) <= dataFromRad;
+devReadyVec(radioroc)  <= devReadyRad;
+devBusyVec(radioroc)   <= radBusy;
 
 devInterfInst: deviceInterface
 generic map(
@@ -439,6 +442,7 @@ port map(
     txWrAck    => txWrAck,
     devId      => devId,
     devReady   => devReadyVec,
+    devBusy    => devBusyVec,
     devRw      => devRw,
     devBurst   => devBurst,
     devAddr    => devAddr,

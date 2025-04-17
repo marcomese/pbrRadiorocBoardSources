@@ -187,6 +187,7 @@ signal   dataToDev,
          dataFromRadioroc  : devData_t;
 signal   devDataInVec      : devDataVec_t;
 signal   devReadyVec       : devReady_t;
+signal   devBusyVec        : devBusy_t;
 
 signal   devId          : devices_t;
 signal   devReadyPGen,
@@ -197,6 +198,9 @@ signal   devReadyPGen,
          devExec,
          pgenBusy,
          hvTmpBusy,
+         devBusyPGen,
+         devBusyHvTmp,
+         devBusyRadioroc,
          devIntBusy     : std_logic;
 signal   devAddr        : devAddr_t;
 
@@ -392,24 +396,6 @@ port map(
     scl       => sc_scl
 );
 
---	i2c : entity xil_defaultlib.i2c_master
---	port map (
---	n_reset    => n_reset_i2c,
---	clk        => clk_10M,
---	ck_usb     => clk_25M,
---	sda_i      => sda_i,
---	sda_o      => sda_o,
---	sda_oen    => sda_oen,
---	scl        => sc_scl,
---	end_seq    => end_i2c,
---	spy        => spy_i2c,
---	i2c_in     => i2c_in,
---	i2c_set    => i2c_set,
---	wr_i2c     => wr_i2c,
---	rd55       => rd55,
---	q          => q
---	);
-
 	sc_clk_sm <= clk_10M when (en_clki2c = '1') else '0';
 
 	adc : entity xil_defaultlib.adc
@@ -591,7 +577,7 @@ port map(
     devDataIn    => dataToDev,
     devDataOut   => dataFromPGen,
     devExec      => devExec,
-    busy         => pgenBusy,
+    busy         => devBusyPGen,
     pulse        => pulse,
     dacSDI       => dacSDI,
     dacSCLK      => dacSCLK,
@@ -614,7 +600,7 @@ port map(
     devDataIn  => dataToDev,
     devDataOut => dataFromRadioroc,
     devReady   => devReadyRadioroc,
-    busy       => hvTmpBusy,
+    busy       => devBusyRadioroc,
     i2cEnClk   => en_clki2c,
     i2cEna     => i2cEnaRad,
     i2cAddr    => i2cAddrRad,
@@ -641,7 +627,7 @@ port map(
     devDataIn  => dataToDev,
     devDataOut => dataFromHvTmp,
     devReady   => devReadyHvTmp,
-    busy       => hvTmpBusy,
+    busy       => devBusyHvTmp,
     i2cEna     => i2cEna,
     i2cAddr    => i2cAddr,
     i2cRw      => i2cRw,
@@ -659,6 +645,11 @@ devReadyVec(pulseGen)  <= devReadyPGen;
 devReadyVec(tmp275)    <= devReadyHvTmp;
 devReadyVec(a7585d)    <= devReadyHvTmp;
 devReadyVec(radioroc)  <= devReadyRadioroc;
+
+devBusyVec(pulseGen)   <= devBusyPGen;
+devBusyVec(tmp275)     <= devBusyHvTmp;
+devBusyVec(a7585d)     <= devBusyHvTmp;
+devBusyVec(radioroc)   <= devBusyRadioroc;
 
 devInterfInst: entity work.deviceInterface
 generic map(
@@ -681,6 +672,7 @@ port map(
     txWrAck    => txWrAck,
     devId      => devId,
     devReady   => devReadyVec,
+    devBusy    => devBusyVec,
     devRw      => devRw,
     devBurst   => devBurst,
     devAddr    => devAddr,
