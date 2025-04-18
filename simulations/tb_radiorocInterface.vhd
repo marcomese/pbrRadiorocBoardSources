@@ -299,7 +299,7 @@ begin
     wait for clkPeriod;
     testDataIn <= x"00";
     wait for clkPeriod;
-    testDataIn <= x"09"; -- send 0xNN bytes in burst mode
+    testDataIn <= x"05"; -- send 0xNN bytes in burst mode
     wait for clkPeriod;
 
     testDataIn <= x"22";
@@ -313,78 +313,113 @@ begin
 
     testDataIn <= x"66";
     wait for clkPeriod;
-    testDataIn <= x"77";
-    wait for clkPeriod;
-    testDataIn <= x"88";
-    wait for clkPeriod;
-    testDataIn <= x"99";
-    wait for clkPeriod;
+--    testDataIn <= x"77";
+--    wait for clkPeriod;
+--    testDataIn <= x"88";
+--    wait for clkPeriod;
+--    testDataIn <= x"99";
+--    wait for clkPeriod;
 
-    testDataIn <= x"AA";
-    wait for clkPeriod;
-    testDataIn <= x"3E";
-    wait for clkPeriod;
-    testDataIn <= x"C3";
-    wait for clkPeriod;
-    testDataIn <= x"54";
-    wait for clkPeriod;
+--    testDataIn <= x"AA";
+--    wait for clkPeriod;
+--    testDataIn <= x"3E";
+--    wait for clkPeriod;
+--    testDataIn <= x"C3";
+--    wait for clkPeriod;
+--    testDataIn <= x"54";
+--    wait for clkPeriod;
 
-    testDataIn <= x"F3";
-    wait for clkPeriod;
-    testDataIn <= x"7E";
-    wait for clkPeriod;
-    testDataIn <= x"AB";
-    wait for clkPeriod;
-    testDataIn <= x"CD";
-    wait for clkPeriod;
+--    testDataIn <= x"F3";
+--    wait for clkPeriod;
+--    testDataIn <= x"7E";
+--    wait for clkPeriod;
+--    testDataIn <= x"AB";
+--    wait for clkPeriod;
+--    testDataIn <= x"CD";
+--    wait for clkPeriod;
 
-    testDataIn <= x"40";
-    wait for clkPeriod;
-    testDataIn <= x"20";
-    wait for clkPeriod;
-    testDataIn <= x"10";
-    wait for clkPeriod;
-    testDataIn <= x"80";
-    wait for clkPeriod;
+--    testDataIn <= x"40";
+--    wait for clkPeriod;
+--    testDataIn <= x"20";
+--    wait for clkPeriod;
+--    testDataIn <= x"10";
+--    wait for clkPeriod;
+--    testDataIn <= x"80";
+--    wait for clkPeriod;
 
-    testDataIn <= x"08";
-    wait for clkPeriod;
-    testDataIn <= x"04";
-    wait for clkPeriod;
-    testDataIn <= x"02";
-    wait for clkPeriod;
-    testDataIn <= x"01";
-    wait for clkPeriod;
+--    testDataIn <= x"08";
+--    wait for clkPeriod;
+--    testDataIn <= x"04";
+--    wait for clkPeriod;
+--    testDataIn <= x"02";
+--    wait for clkPeriod;
+--    testDataIn <= x"01";
+--    wait for clkPeriod;
 
-    testDataIn <= x"A8";
-    wait for clkPeriod;
-    testDataIn <= x"A4";
-    wait for clkPeriod;
-    testDataIn <= x"A2";
-    wait for clkPeriod;
-    testDataIn <= x"A1";
-    wait for clkPeriod;
+--    testDataIn <= x"A8";
+--    wait for clkPeriod;
+--    testDataIn <= x"A4";
+--    wait for clkPeriod;
+--    testDataIn <= x"A2";
+--    wait for clkPeriod;
+--    testDataIn <= x"A1";
+--    wait for clkPeriod;
 
-    testDataIn <= x"D8";
-    wait for clkPeriod;
-    testDataIn <= x"D4";
-    wait for clkPeriod;
-    testDataIn <= x"D2";
-    wait for clkPeriod;
-    testDataIn <= x"D1";
-    wait for clkPeriod;
+--    testDataIn <= x"D8";
+--    wait for clkPeriod;
+--    testDataIn <= x"D4";
+--    wait for clkPeriod;
+--    testDataIn <= x"D2";
+--    wait for clkPeriod;
+--    testDataIn <= x"D1";
+--    wait for clkPeriod;
 
-    testDataIn <= x"E8";
-    wait for clkPeriod;
-    testDataIn <= x"E4";
-    wait for clkPeriod;
-    testDataIn <= x"E2";
-    wait for clkPeriod;
-    testDataIn <= x"E1";
-    wait for clkPeriod;
+--    testDataIn <= x"E8";
+--    wait for clkPeriod;
+--    testDataIn <= x"E4";
+--    wait for clkPeriod;
+--    testDataIn <= x"E2";
+--    wait for clkPeriod;
+--    testDataIn <= x"E1";
+--    wait for clkPeriod;
 
     testTxWrite <= '0';
 
+    wait until radBusy = '0';
+
+    wait for clkPeriod*5;
+
+    testRxRead <= '1';
+
+    testDataIn <= x"A3";
+    wait for clkPeriod;
+    testTxWrite <= '1';
+    wait for clkPeriod;
+    testDataIn <= x"BA";
+    wait for clkPeriod;
+    testDataIn <= x"12";
+    wait for clkPeriod;
+    testDataIn <= x"0A";
+    wait for clkPeriod;
+    testDataIn <= x"00";
+    wait for clkPeriod;
+    testDataIn <= x"00";
+    wait for clkPeriod;
+    testDataIn <= x"00";
+    wait for clkPeriod;
+    testTxWrite <= '0';
+
+    wait until i2cBusy = '0';
+
+    wait until i2cBusy = '0';
+
+    wait until i2cBusy = '0';
+
+    wait until i2cBusy = '0';
+    
+    testData <= x"BB";
+
+    wait for 10 us;
 
     wait;
 end process;

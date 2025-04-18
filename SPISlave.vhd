@@ -76,11 +76,11 @@ signal sclkRise,
        sclkFall,
        csRise,
        txPres,
-       loadBit,
        loadTxFifo,
        loadRxFifo,
-       rxEna      : std_logic;
-signal bitCount   : integer range 0 to 8;
+       rxEna,
+       lastBit    : std_logic;
+signal bitCount   : unsigned(3 downto 0);
 signal buffIn,
        buffOut,
        txFifoDout : std_logic_vector(7 downto 0);
@@ -95,11 +95,11 @@ tx_present <= txPres;
 
 miso       <= buffOut(7);
 
-loadBit    <= '1' when bitCount = 8 else '0';
+lastBit    <= bitCount(bitCount'left);
 
-loadRxFifo <= loadBit and rxEna;
+loadRxFifo <= lastBit and rxEna;
 
-loadTxFifo <= loadBit;
+loadTxFifo <= lastBit;
 
 sclkRiseInst: entity work.edgeDetector
 generic map(
@@ -164,7 +164,7 @@ begin
     if rising_edge(clk) then
         if rst = '1' then
             buffOut <= (others => '0');
-        elsif bitCount = 0 and txPres = '1' then
+        elsif lastBit = '1' and txPres = '1' then
             buffOut <= txFifoDout;
         elsif cs = '0' and sclkFall = '1' then
             buffOut <= buffOut(6 downto 0) & '0';
@@ -175,10 +175,10 @@ end process;
 bitCounterInst: process(clk, rst, sclkRise, cs)
 begin
     if rising_edge(clk) then
-        if rst = '1' or bitCount = 8 or cs = '1' then
-            bitCount <= 0;
+        if rst = '1' or lastBit = '1' or cs = '1' then
+            bitCount <= to_unsigned(7, bitCount'length);
         elsif sclkRise = '1' then
-            bitCount <= bitCount + 1;
+            bitCount <= bitCount - 1;
         end if;
     end if;
 end process;

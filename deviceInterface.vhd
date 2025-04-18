@@ -225,6 +225,14 @@ begin
                         devDataOut(i) <= dataIn;
 
                         state         <= getData;
+                    elsif rxPresent = '0' and devBrstSig = '1' and devReady(devIdSig) = '1' then
+                        devExec <= '0';
+                        rxEna   <= '1';
+                        busy    <= '0';
+                        error   <= (others => '0');
+                        byteCnt <= to_unsigned(devAddrBytes-1, byteCnt'length);
+       
+                        state   <= idle;
                     elsif tOutSig = '1' then
                         tOutRst <= '1';
                         rxRdSig <= '0';
@@ -295,19 +303,11 @@ begin
                         byteCnt <= to_unsigned(devAddrBytes-1, byteCnt'length);
        
                         state   <= idle;
-                    elsif devBrstSig = '1' and devReady(devIdSig) = '1' and devBusy(devIdSig) = '1' then
+                    elsif devBrstSig = '1' and devReady(devIdSig) = '1' then
                         rxRdSig <= '1';
                         byteCnt <= to_unsigned(devDataBytes-1, byteCnt'length);
 
                         state   <= getData;
-                    elsif devBrstSig = '1' and devReady(devIdSig) = '1' and devBusy(devIdSig) = '0' then
-                        devExec <= not devRwSig;
-                        rxEna   <= '1';
-                        busy    <= '0';
-                        error   <= (others => '0');
-                        byteCnt <= to_unsigned(devAddrBytes-1, byteCnt'length);
-       
-                        state   <= idle;
                     else
                         devExec <= '0';
 

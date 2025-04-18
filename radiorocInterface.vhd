@@ -97,6 +97,7 @@ begin
 
                         state    <= waitReady;
                     else
+                        brst     <= '0';
                         devReady <= '0';
                         busy     <= '0';
                         i2cEnClk <= '0';

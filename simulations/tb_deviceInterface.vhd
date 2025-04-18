@@ -25,15 +25,16 @@ port(
     rxRead     : out std_logic;
     rxPresent  : in  std_logic;
     txWrite    : out std_logic;
-    rxEna      : out std_logic;
     txWrAck    : in  std_logic;
+    rxEna      : out std_logic;
     devId      : out devices_t;
     devReady   : in  devReady_t;
+    devBusy    : in  devBusy_t;
     devRw      : out std_logic;
     devBurst   : out std_logic;
     devAddr    : out devAddr_t;
-    devDataOut : out devData_t;
     devDataIn  : in  devDataVec_t;
+    devDataOut : out devData_t;
     devExec    : out std_logic;
     busy       : out std_logic;
     error      : out std_logic_vector(1 downto 0)
@@ -60,6 +61,7 @@ port(
     tx_full      : out std_logic;
     rx_reset     : in  std_logic;
     tx_reset     : in  std_logic;
+    read_rq      : in  std_logic;
     cs           : out std_logic;
     sclk         : out std_logic;
     miso         : in  std_logic;
@@ -108,11 +110,13 @@ signal   dataFromDevInt  : std_logic_vector(7 downto 0) := (others => '0');
 signal   dataToDevInt    : std_logic_vector(7 downto 0);
 signal   rxRead     : std_logic;
 signal   rxPresent  : std_logic    := '0';
+signal   readRq     : std_logic    := '0';
 signal   txWrite    : std_logic;
 signal   txWrAck    : std_logic    := '0';
 signal   devId      : devices_t;
 signal   devDataIn  : devDataVec_t := (others => (others => (others => '0')));
 signal   devReady   : devReady_t   := (others => '0');
+signal   devBusy    : devBusy_t    := (others => '0');
 signal   devRw      : std_logic;
 signal   devBurst   : std_logic;
 signal   devAddr    : devAddr_t;
@@ -152,7 +156,7 @@ begin
 
     testRxRead <= '1';
 
-    testDataIn <= x"84";
+    testDataIn <= x"A4";
     wait for clkPeriod;
     testTxWrite <= '1';
     wait for clkPeriod;
@@ -168,7 +172,7 @@ begin
     wait for clkPeriod;
     devReady(pulseGen) <= '0';
 
-    testDataIn <= x"05";
+    testDataIn <= x"55";
     wait for clkPeriod;
     testTxWrite <= '1';
     wait for clkPeriod;
@@ -215,6 +219,7 @@ port map(
     devId      => devId,
     devDataOut => devDataOut,
     devReady   => devReady,
+    devBusy    => devBusy,
     devBurst   => devBurst,
     devRw      => devRw,
     devAddr    => devAddr,
@@ -236,7 +241,7 @@ port map(
     rx_half_full => open,
     rx_full      => open,
     tx_write     => txWrite,
-    tx_present   => open,
+    tx_present   => readRq,
     tx_half_full => open,
     tx_full      => open,
     tx_wr_ack    => txWrAck,
@@ -268,6 +273,7 @@ port map(
     tx_full      => open,
     rx_reset     => rst,
     tx_reset     => rst,
+    read_rq      => readRq,
     cs           => cs,
     sclk         => sclk,
     miso         => miso,

@@ -272,12 +272,14 @@ begin
 
                 when transEnd =>
                     if i2cBusy = '0' and rwSig = devRead then
+                        busy      <= '0';
                         dataReady <= '1';
                         dataOut   <= (0      => i2cDataRd,
                                       others => (others => '0'));
 
                         state     <= idle;
                     elsif i2cBusy = '0' and rwSig = devWrite then
+                        busy      <= '0';
                         dataReady <= '1';
                         dataOut   <= (others => (others => '0'));
 
