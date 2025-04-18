@@ -173,6 +173,7 @@ begin
                         i2cEna    <= '1';
                         i2cAddr   <= chipID & R2;
                         i2cRw     <= rwSig;
+                        i2cDataWr <= dataIn(0);
                         brstOnSig <= brst;
                         brstCnt   <= resize(unsigned(brstByteNum), brstCnt'length);
                         leftBCnt  <= resize(unsigned(leftBNum), leftBCnt'length);

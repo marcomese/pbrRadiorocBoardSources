@@ -289,32 +289,32 @@ begin
     wait for clkPeriod;
     testTxWrite <= '1';
     wait for clkPeriod;
-    testDataIn <= x"1A";
-    wait for clkPeriod;
-    testDataIn <= x"2B";
-    wait for clkPeriod;
     testDataIn <= x"00";
     wait for clkPeriod;
     testDataIn <= x"00";
     wait for clkPeriod;
     testDataIn <= x"00";
     wait for clkPeriod;
-    testDataIn <= x"05"; -- send 0xNN bytes in burst mode
+    testDataIn <= x"00";
+    wait for clkPeriod;
+    testDataIn <= x"00";
+    wait for clkPeriod;
+    testDataIn <= x"06"; -- send 0xNN bytes in burst mode
     wait for clkPeriod;
 
-    testDataIn <= x"22";
+    testDataIn <= x"84";
     wait for clkPeriod;
-    testDataIn <= x"33";
+    testDataIn <= x"a4";
     wait for clkPeriod;
-    testDataIn <= x"44";
+    testDataIn <= x"48"; --0x33 0x00 0x00 0x00 0x00 0x00 0x06 0x84 0xa4 0x48 0x15 0x03 0x04
     wait for clkPeriod;
-    testDataIn <= x"55";
+    testDataIn <= x"15";
     wait for clkPeriod;
 
-    testDataIn <= x"66";
+    testDataIn <= x"03";
     wait for clkPeriod;
---    testDataIn <= x"77";
---    wait for clkPeriod;
+    testDataIn <= x"04";
+    wait for clkPeriod;
 --    testDataIn <= x"88";
 --    wait for clkPeriod;
 --    testDataIn <= x"99";
@@ -383,11 +383,11 @@ begin
 --    testDataIn <= x"E1";
 --    wait for clkPeriod;
 
-    testTxWrite <= '0';
+   testTxWrite <= '0';
 
     wait until radBusy = '0';
 
-    wait for clkPeriod*5;
+    wait for 150 us;
 
     testRxRead <= '1';
 
@@ -395,9 +395,9 @@ begin
     wait for clkPeriod;
     testTxWrite <= '1';
     wait for clkPeriod;
-    testDataIn <= x"BA";
+    testDataIn <= x"00";
     wait for clkPeriod;
-    testDataIn <= x"12";
+    testDataIn <= x"01";
     wait for clkPeriod;
     testDataIn <= x"0A";
     wait for clkPeriod;

@@ -154,23 +154,23 @@ begin
         (x"AB",x"CD",x"EF",x"78")
     );
 
-    testRxRead <= '1';
+--    testRxRead <= '1';
 
-    testDataIn <= x"A4";
-    wait for clkPeriod;
-    testTxWrite <= '1';
-    wait for clkPeriod;
-    testDataIn <= x"A1";
-    wait for clkPeriod;
-    testDataIn <= x"B2";
-    wait for clkPeriod;
-    testTxWrite <= '0';
+--    testDataIn <= x"A4";
+--    wait for clkPeriod;
+--    testTxWrite <= '1';
+--    wait for clkPeriod;
+--    testDataIn <= x"A1";
+--    wait for clkPeriod;
+--    testDataIn <= x"B2";
+--    wait for clkPeriod;
+--    testTxWrite <= '0';
 
-    wait for 1.6 us;
+--    wait for 1.6 us;
     
-    devReady(pulseGen) <= '1';
-    wait for clkPeriod;
-    devReady(pulseGen) <= '0';
+--    devReady(pulseGen) <= '1';
+--    wait for clkPeriod;
+--    devReady(pulseGen) <= '0';
 
     testDataIn <= x"55";
     wait for clkPeriod;
