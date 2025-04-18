@@ -12,6 +12,7 @@
 ----------------------------------------------------------------------------------
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.STD_LOGIC_MISC.ALL;
 use IEEE.NUMERIC_STD.ALL;
 
 entity SPISlave is
@@ -75,7 +76,9 @@ end component;
 signal sclkRise,
        sclkFall,
        csRise,
+       csFall,
        txPres,
+       loadBuff,
        loadTxFifo,
        loadRxFifo,
        rxEna,
@@ -91,15 +94,26 @@ attribute MARK_DEBUG of buffOut : signal is "true";
 
 begin
 
-tx_present <= txPres;
-
 miso       <= buffOut(7);
 
 lastBit    <= bitCount(bitCount'left);
 
+loadBuff   <= and_reduce(std_logic_vector(bitCount(2 downto 0)));
+
 loadRxFifo <= lastBit and rxEna;
 
 loadTxFifo <= lastBit;
+
+txPresInst: process(clk, rst, txPres)
+begin
+    if rising_edge(clk) then
+        if rst = '1' then
+            tx_present <= '0';
+        else
+            tx_present <= txPres;
+        end if;
+    end if;
+end process;
 
 sclkRiseInst: entity work.edgeDetector
 generic map(
@@ -164,7 +178,7 @@ begin
     if rising_edge(clk) then
         if rst = '1' then
             buffOut <= (others => '0');
-        elsif lastBit = '1' and txPres = '1' then
+        elsif loadBuff = '1' and txPres = '1' then
             buffOut <= txFifoDout;
         elsif cs = '0' and sclkFall = '1' then
             buffOut <= buffOut(6 downto 0) & '0';

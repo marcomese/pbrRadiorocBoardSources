@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="tb_deviceInterface_behav.wdb" id="1">
+         <top_modules>
+            <top_module name="devicespkg" />
+            <top_module name="glbl" />
+            <top_module name="tb_deviceInterface" />
+            <top_module name="utilspkg" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <zoom_setting>
+      <ZoomStartTime time="1,628.000 ns"></ZoomStartTime>
+      <ZoomEndTime time="2,442.001 ns"></ZoomEndTime>
+      <Cursor1Time time="1,790.000 ns"></Cursor1Time>
+   </zoom_setting>
+   <column_width_setting>
+      <NameColumnWidth column_width="142"></NameColumnWidth>
+      <ValueColumnWidth column_width="58"></ValueColumnWidth>
+   </column_width_setting>
+   <WVObjectSize size="43" />
+   <wvobject fp_name="/tb_deviceInterface/clk" type="logic">
+      <obj_property name="ElementShortName">clk</obj_property>
+      <obj_property name="ObjectShortName">clk</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_deviceInterface/rst" type="logic">
+      <obj_property name="ElementShortName">rst</obj_property>
+      <obj_property name="ObjectShortName">rst</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_deviceInterface/dataFromDevInt" type="array">
+      <obj_property name="ElementShortName">dataFromDevInt[7:0]</obj_property>
+      <obj_property name="ObjectShortName">dataFromDevInt[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_deviceInterface/dataToDevInt" type="array">
+      <obj_property name="ElementShortName">dataToDevInt[7:0]</obj_property>
+      <obj_property name="ObjectShortName">dataToDevInt[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_deviceInterface/rxRead" type="logic">
+      <obj_property name="ElementShortName">rxRead</obj_property>
+      <obj_property name="ObjectShortName">rxRead</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_deviceInterface/rxPresent" type="logic">
+      <obj_property name="ElementShortName">rxPresent</obj_property>
+      <obj_property name="ObjectShortName">rxPresent</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_deviceInterface/readRq" type="logic">
+      <obj_property name="ElementShortName">readRq</obj_property>
+      <obj_property name="ObjectShortName">readRq</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_deviceInterface/txWrite" type="logic">
+      <obj_property name="ElementShortName">txWrite</obj_property>
+      <obj_property name="ObjectShortName">txWrite</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_deviceInterface/txWrAck" type="logic">
+      <obj_property name="ElementShortName">txWrAck</obj_property>
+      <obj_property name="ObjectShortName">txWrAck</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_deviceInterface/devId" type="other">
+      <obj_property name="ElementShortName">devId</obj_property>
+      <obj_property name="ObjectShortName">devId</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_deviceInterface/devDataIn" type="array">
+      <obj_property name="ElementShortName">devDataIn[0:6][3:0][7:0]</obj_property>
+      <obj_property name="ObjectShortName">devDataIn[0:6][3:0][7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_deviceInterface/devReady" type="array">
+      <obj_property name="ElementShortName">devReady[0:6]</obj_property>
+      <obj_property name="ObjectShortName">devReady[0:6]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_deviceInterface/devBusy" type="array">
+      <obj_property name="ElementShortName">devBusy[0:6]</obj_property>
+      <obj_property name="ObjectShortName">devBusy[0:6]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_deviceInterface/devRw" type="logic">
+      <obj_property name="ElementShortName">devRw</obj_property>
+      <obj_property name="ObjectShortName">devRw</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_deviceInterface/devBurst" type="logic">
+      <obj_property name="ElementShortName">devBurst</obj_property>
+      <obj_property name="ObjectShortName">devBurst</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_deviceInterface/devAddr" type="array">
+      <obj_property name="ElementShortName">devAddr[1:0][7:0]</obj_property>
+      <obj_property name="ObjectShortName">devAddr[1:0][7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_deviceInterface/devDataOut" type="array">
+      <obj_property name="ElementShortName">devDataOut[3:0][7:0]</obj_property>
+      <obj_property name="ObjectShortName">devDataOut[3:0][7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_deviceInterface/devExec" type="logic">
+      <obj_property name="ElementShortName">devExec</obj_property>
+      <obj_property name="ObjectShortName">devExec</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_deviceInterface/busy" type="logic">
+      <obj_property name="ElementShortName">busy</obj_property>
+      <obj_property name="ObjectShortName">busy</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_deviceInterface/error" type="array">
+      <obj_property name="ElementShortName">error[1:0]</obj_property>
+      <obj_property name="ObjectShortName">error[1:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_deviceInterface/mosi" type="logic">
+      <obj_property name="ElementShortName">mosi</obj_property>
+      <obj_property name="ObjectShortName">mosi</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_deviceInterface/rxEna" type="logic">
+      <obj_property name="ElementShortName">rxEna</obj_property>
+      <obj_property name="ObjectShortName">rxEna</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_deviceInterface/cs" type="logic">
+      <obj_property name="ElementShortName">cs</obj_property>
+      <obj_property name="ObjectShortName">cs</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_deviceInterface/spiSlaveInst/bitCount" type="array">
+      <obj_property name="ElementShortName">bitCount[3:0]</obj_property>
+      <obj_property name="ObjectShortName">bitCount[3:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_deviceInterface/sclk" type="logic">
+      <obj_property name="ElementShortName">sclk</obj_property>
+      <obj_property name="ObjectShortName">sclk</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_deviceInterface/spiSlaveInst/sclkRise" type="logic">
+      <obj_property name="ElementShortName">sclkRise</obj_property>
+      <obj_property name="ObjectShortName">sclkRise</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_deviceInterface/spiSlaveInst/sclkFall" type="logic">
+      <obj_property name="ElementShortName">sclkFall</obj_property>
+      <obj_property name="ObjectShortName">sclkFall</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_deviceInterface/miso" type="logic">
+      <obj_property name="ElementShortName">miso</obj_property>
+      <obj_property name="ObjectShortName">miso</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_deviceInterface/spiSlaveInst/txPres" type="logic">
+      <obj_property name="ElementShortName">txPres</obj_property>
+      <obj_property name="ObjectShortName">txPres</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_deviceInterface/spiSlaveInst/loadTxFifo" type="logic">
+      <obj_property name="ElementShortName">loadTxFifo</obj_property>
+      <obj_property name="ObjectShortName">loadTxFifo</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_deviceInterface/testRxPresent" type="logic">
+      <obj_property name="ElementShortName">testRxPresent</obj_property>
+      <obj_property name="ObjectShortName">testRxPresent</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_deviceInterface/spiSlaveInst/loadRxFifo" type="logic">
+      <obj_property name="ElementShortName">loadRxFifo</obj_property>
+      <obj_property name="ObjectShortName">loadRxFifo</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_deviceInterface/spiSlaveInst/rxEna" type="logic">
+      <obj_property name="ElementShortName">rxEna</obj_property>
+      <obj_property name="ObjectShortName">rxEna</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_deviceInterface/spiSlaveInst/lastBit" type="logic">
+      <obj_property name="ElementShortName">lastBit</obj_property>
+      <obj_property name="ObjectShortName">lastBit</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_deviceInterface/testTxWrite" type="logic">
+      <obj_property name="ElementShortName">testTxWrite</obj_property>
+      <obj_property name="ObjectShortName">testTxWrite</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_deviceInterface/testRxRead" type="logic">
+      <obj_property name="ElementShortName">testRxRead</obj_property>
+      <obj_property name="ObjectShortName">testRxRead</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_deviceInterface/spiInst/read_rq" type="logic">
+      <obj_property name="ElementShortName">read_rq</obj_property>
+      <obj_property name="ObjectShortName">read_rq</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_deviceInterface/spiSlaveInst/buffIn" type="array">
+      <obj_property name="ElementShortName">buffIn[7:0]</obj_property>
+      <obj_property name="ObjectShortName">buffIn[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_deviceInterface/spiSlaveInst/buffOut" type="array">
+      <obj_property name="ElementShortName">buffOut[7:0]</obj_property>
+      <obj_property name="ObjectShortName">buffOut[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_deviceInterface/testDataIn" type="array">
+      <obj_property name="ElementShortName">testDataIn[7:0]</obj_property>
+      <obj_property name="ObjectShortName">testDataIn[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_deviceInterface/testDataOut" type="array">
+      <obj_property name="ElementShortName">testDataOut[7:0]</obj_property>
+      <obj_property name="ObjectShortName">testDataOut[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_deviceInterface/spiInst/loadRxFifo" type="logic">
+      <obj_property name="ElementShortName">loadRxFifo</obj_property>
+      <obj_property name="ObjectShortName">loadRxFifo</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_deviceInterface/spiInst/buffIn" type="array">
+      <obj_property name="ElementShortName">buffIn[7:0]</obj_property>
+      <obj_property name="ObjectShortName">buffIn[7:0]</obj_property>
+   </wvobject>
+</wave_config>

@@ -149,7 +149,7 @@ begin
         (x"AB",x"CD",x"EF",x"23"),
         (x"AB",x"CD",x"EF",x"34"),
         (x"AB",x"CD",x"EF",x"45"),
-        (x"AB",x"CD",x"EF",x"56"),
+        (x"AB",x"31",x"74",x"15"),
         (x"AB",x"CD",x"EF",x"67"),
         (x"AB",x"CD",x"EF",x"78")
     );
