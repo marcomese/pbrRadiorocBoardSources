@@ -88,10 +88,6 @@ signal buffIn,
        buffOut,
        txFifoDout : std_logic_vector(7 downto 0);
 
-attribute MARK_DEBUG : string;
-attribute MARK_DEBUG of buffIn  : signal is "true";
-attribute MARK_DEBUG of buffOut : signal is "true";
-
 begin
 
 miso       <= buffOut(7);
