@@ -18,29 +18,30 @@ use work.utilsPkg.bitsNum;
 
 entity shiftReg is
 generic(
-    direction  : string;
-    dataInLen  : integer;
-    dataOutLen : integer
+    direction : string;
+    regLen    : integer;
+    shiftLen  : integer
 );
 port(
-    clk     : in  std_logic;
-    rst     : in  std_logic;
-    load    : in  std_logic;
-    shift   : in  std_logic;
-    dataIn  : in  std_logic_vector(dataInLen-1 downto 0);
-    empty   : out std_logic;
-    last    : out std_logic;
-    dataOut : out std_logic_vector(dataOutLen-1 downto 0)
+    clk       : in  std_logic;
+    rst       : in  std_logic;
+    load      : in  std_logic;
+    shift     : in  std_logic;
+    serDataIn : in  std_logic_vector(shiftLen-1 downto 0);
+    parDataIn : in  std_logic_vector(regLen-1 downto 0);
+    empty     : out std_logic;
+    last      : out std_logic;
+    dataOut   : out std_logic_vector(regLen-1 downto 0)
 );
 end shiftReg;
 
 architecture Behavioral of shiftReg is
 
-constant shiftNum : integer := integer(dataInLen/dataOutLen);
+constant shiftNum : integer := integer(regLen/shiftLen);
 
 signal   shiftCnt : unsigned(bitsNum(shiftNum) downto 0); -- most significant bit used for empty signal
 
-signal   buffInt  : std_logic_vector(dataInLen-1 downto 0);
+signal   buffInt  : std_logic_vector(regLen-1 downto 0);
 
 begin
 
@@ -50,7 +51,7 @@ last  <= not or_reduce(std_logic_vector(shiftCnt));
 
 leftShiftGen: if direction = "left" generate
 begin
-    dataOut <= buffInt(buffInt'left downto buffInt'left-dataOutLen+1);
+    dataOut <= buffInt(buffInt'left downto buffInt'left-regLen+1);
 
     buffIntInst: process(clk, rst)
     begin
@@ -58,10 +59,10 @@ begin
             if rst = '1' then
                 buffInt <= (others => '0');
             elsif load = '1' then
-                buffInt <= dataIn;
+                buffInt <= parDataIn;
             elsif shift = '1' then
-                buffInt(buffInt'left downto dataOutLen) <= buffInt(buffInt'left-dataOutLen downto 0);
-                buffInt(dataOutLen-1 downto 0)          <= (others => '0');
+                buffInt(buffInt'left downto shiftLen) <= buffInt(buffInt'left-shiftLen downto 0);
+                buffInt(shiftLen-1 downto 0)          <= serDataIn;
             end if;
         end if;
     end process;
@@ -69,7 +70,7 @@ end generate;
 
 rightShiftGen: if direction = "right" generate
 begin
-    dataOut <= buffInt(dataOutLen-1 downto 0);
+    dataOut <= buffInt(regLen-1 downto 0);
 
     buffIntInst: process(clk, rst)
     begin
@@ -77,10 +78,10 @@ begin
             if rst = '1' then
                 buffInt <= (others => '0');
             elsif load = '1' then
-                buffInt <= dataIn;
+                buffInt <= parDataIn;
             elsif shift = '1' then
-                buffInt(buffInt'left downto buffInt'left-dataOutLen+1) <= (others => '0');
-                buffInt(buffInt'left-dataOutLen downto 0)              <= buffInt(buffInt'left downto dataOutLen);
+                buffInt(buffInt'left downto buffInt'left-shiftLen+1) <= serDataIn;
+                buffInt(buffInt'left-shiftLen downto 0)              <= buffInt(buffInt'left downto shiftLen);
             end if;
         end if;
     end process;

@@ -71,7 +71,7 @@ signal   rwSig,
          lastBrst,
          lastLeft     : std_logic;
 signal   dataInVec    : std_logic_vector(devDataBytes*8-1 downto 0);
-signal   dataOutBuff  : std_logic_vector(7 downto 0);
+signal   dataOutBuff  : std_logic_vector(dataInVec'left downto 0);
 signal   brstByteNum  : std_logic_vector(maxBrstSlv'left-2 downto 0);
 signal   leftBNum     : std_logic_vector(1 downto 0);
 signal   brstCnt      : unsigned(brstByteNum'left+1 downto 0); --adding 1 for lastBrst signal
@@ -268,7 +268,7 @@ begin
 --                    end if;
 ----------------------------------------------------------------------------
                 when burstWrite =>
-                    i2cDataWr <= dataOutBuff;
+                    i2cDataWr <= dataOutBuff(dataOutBuff'left downto dataOutBuff'left-7);
 
                     if exec = '1' then
                         i2cEna    <= '1';
@@ -355,18 +355,19 @@ end process;
 shiftBuffInst: entity work.shiftReg
 generic map(
     direction  => "left",
-    dataInLen  => dataInVec'length,
-    dataOutLen => 8
+    regLen     => dataInVec'length,
+    shiftLen   => 8
 )
 port map(
-    clk     => clk,
-    rst     => rst,
-    load    => loadBuff,
-    shift   => shiftBuff,
-    empty   => emptyBuff,
-    last    => lastBuff,
-    dataIn  => dataInVec,
-    dataOut => dataOutBuff
+    clk        => clk,
+    rst        => rst,
+    load       => loadBuff,
+    shift      => shiftBuff,
+    empty      => emptyBuff,
+    last       => lastBuff,
+    parDataIn  => dataInVec,
+    serDataIn  => i2cDataRd,
+    dataOut    => dataOutBuff
 );
 
 end Behavioral;
