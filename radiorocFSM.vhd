@@ -64,17 +64,18 @@ signal   rwSig,
          brstOnSig,
          i2cBusyOld,
          i2cBusyRise,
+         loadBuff,
+         shiftBuff,
+         emptyBuff,
+         lastBuff,
          lastBrst,
-         lastBrstOld,
-         lastBrstRise,
-         lastLeft,
-         lastByte     : std_logic;
+         lastLeft     : std_logic;
 signal   dataInVec    : std_logic_vector(devDataBytes*8-1 downto 0);
+signal   dataOutBuff  : std_logic_vector(7 downto 0);
 signal   brstByteNum  : std_logic_vector(maxBrstSlv'left-2 downto 0);
 signal   leftBNum     : std_logic_vector(1 downto 0);
 signal   brstCnt      : unsigned(brstByteNum'left+1 downto 0); --adding 1 for lastBrst signal
 signal   leftBCnt     : unsigned(2 downto 0);
-signal   bytesCnt     : unsigned(bitsNum(devDataBytes) downto 0);
 
 begin
 
@@ -82,11 +83,7 @@ brstOn       <= brstOnSig;
 
 i2cBusyRise  <= (not i2cBusyOld) and i2cBusy;
 
-lastBrstRise <= (not lastBrstOld) and lastBrst;
-
 lastBrst     <= brstCnt(brstCnt'left);
-
-lastByte     <= bytesCnt(bytesCnt'left);
 
 lastLeft     <= leftBCnt(leftBCnt'left);
 
@@ -111,7 +108,6 @@ begin
 end process;
 
 radioFSM: process(clk, rst, exec)
-    variable i : integer range 0 to devDataBytes-1 := 0;
 begin
     if rising_edge(clk) then
         if rst = '1' then
@@ -127,13 +123,12 @@ begin
             dataOut       <= (others => (others => '0'));
             brstCnt       <= (others => '0');
             leftBCnt      <= (others => '0');
-            bytesCnt      <= (others => '0');
+            loadBuff      <= '0';
+            shiftBuff     <= '0';
 
             state         <= idle;
         else
             i2cBusyOld  <= i2cBusy;
-            
-            lastBrstOld <= lastBrst;
 
             case state is
                 when idle =>
@@ -177,7 +172,6 @@ begin
                         brstOnSig <= brst;
                         brstCnt   <= resize(unsigned(brstByteNum), brstCnt'length);
                         leftBCnt  <= resize(unsigned(leftBNum), leftBCnt'length);
-                        bytesCnt  <= to_unsigned(devDataBytes-1, bytesCnt'length);
 
                         state     <= waitBusy;
                     elsif i2cBusy = '0' then
@@ -227,113 +221,100 @@ begin
                     end if;
 --------------------------------------------------------------
                 when burstRead =>
-                    i := to_integer(bytesCnt);
+--                    if exec = '1' and lastBrst = '0' then
+--                        i2cEna    <= '1';
+--                        i2cDataWr <= dataIn(i);
 
-                    if exec = '1' and lastBrst = '0' then
-                        i2cEna    <= '1';
-                        i2cDataWr <= dataIn(i);
-                        bytesCnt  <= bytesCnt - 1;
+--                        state     <= burstWrite;
+--                    elsif exec = '1' and lastBrst = '1' then
+--                        i2cDataWr <= dataIn(i);
 
-                        state     <= burstWrite;
-                    elsif exec = '1' and lastBrst = '1' then
-                        i2cDataWr <= dataIn(i);
+--                        state     <= burstWrite;
+--                    elsif lastBrstRise = '1' and i2cBusyRise = '0' then
+--                        dataReady <= '0';
 
-                        state     <= burstWrite;
-                    elsif lastBrstRise = '1' and i2cBusyRise = '0' then
-                        dataReady <= '0';
-                        bytesCnt  <= to_unsigned(devDataBytes-1, bytesCnt'length);
+--                        state     <= burstWrite;
+--                    elsif lastBrst = '1' and lastLeft = '1' then
+--                        i2cEna    <= '0';
+--                        dataReady <= '0';
+--                        brstOnSig <= '0';
+--                        brstCnt   <= resize(unsigned(brstByteNum), brstCnt'length);
+--                        leftBCnt  <= resize(unsigned(leftBNum), leftBCnt'length);
 
-                        state     <= burstWrite;
-                    elsif lastBrst = '1' and lastLeft = '1' then
-                        i2cEna    <= '0';
-                        dataReady <= '0';
-                        brstOnSig <= '0';
-                        brstCnt   <= resize(unsigned(brstByteNum), brstCnt'length);
-                        leftBCnt  <= resize(unsigned(leftBNum), leftBCnt'length);
-                        bytesCnt  <= to_unsigned(devDataBytes-1, bytesCnt'length);
+--                        state     <= transEnd;
+--                    elsif lastBrst = '1' and lastLeft = '0' and i2cBusyRise = '1' then
+--                        i2cDataWr <= dataIn(i);
+--                        leftBCnt  <= leftBCnt - 1;
 
-                        state     <= transEnd;
-                    elsif lastBrst = '1' and lastLeft = '0' and i2cBusyRise = '1' then
-                        i2cDataWr <= dataIn(i);
-                        bytesCnt  <= bytesCnt - 1;
-                        leftBCnt  <= leftBCnt - 1;
+--                        state     <= burstWrite;
+--                    elsif lastBrst = '1' and lastLeft = '0' and i2cBusyRise = '0' then
+--                        i2cDataWr <= dataIn(i);
 
-                        state     <= burstWrite;
-                    elsif lastBrst = '1' and lastLeft = '0' and i2cBusyRise = '0' then
-                        i2cDataWr <= dataIn(i);
+--                        state     <= burstWrite;
+--                    elsif lastByte = '0' and i2cBusyRise = '1' then
+--                        i2cDataWr <= dataIn(i);
+--                        dataReady <= '0';
 
-                        state     <= burstWrite;
-                    elsif lastByte = '0' and i2cBusyRise = '1' then
-                        i2cDataWr <= dataIn(i);
-                        dataReady <= '0';
-                        bytesCnt  <= bytesCnt - 1;
+--                        state     <= burstWrite;
+--                    elsif lastByte = '1' and i2cBusyRise = '1' then
+--                        dataReady <= '1';
+--                        brstCnt   <= brstCnt - 1;
 
-                        state     <= burstWrite;
-                    elsif lastByte = '1' and i2cBusyRise = '1' then
-                        dataReady <= '1';
-                        brstCnt   <= brstCnt - 1;
-                        bytesCnt  <= to_unsigned(devDataBytes-1, bytesCnt'length);
+--                        state     <= burstWrite;
+--                    else
+--                        dataReady <= '0';
 
-                        state     <= burstWrite;
-                    else
-                        dataReady <= '0';
-
-                        state     <= burstWrite;
-                    end if;
+--                        state     <= burstWrite;
+--                    end if;
 ----------------------------------------------------------------------------
                 when burstWrite =>
-                    i := to_integer(bytesCnt);
+                    i2cDataWr <= dataOutBuff;
 
-                    if exec = '1' and lastBrst = '0' then
+                    if exec = '1' then
                         i2cEna    <= '1';
-                        i2cDataWr <= dataIn(i);
-                        bytesCnt  <= bytesCnt - 1;
+                        loadBuff  <= '1';
 
                         state     <= burstWrite;
-                    elsif exec = '1' and lastBrst = '1' then
-                        i2cDataWr <= dataIn(i);
+                    elsif lastBrst = '0' then
+                        if i2cBusyRise = '1' and lastBuff = '0' then
+                            shiftBuff <= '1';
 
-                        state     <= burstWrite;
-                    elsif lastBrstRise = '1' and i2cBusyRise = '0' then
-                        dataReady <= '0';
-                        bytesCnt  <= to_unsigned(devDataBytes-1, bytesCnt'length);
+                            state     <= burstWrite;
+                        elsif i2cBusyRise = '1' and lastBuff = '1' then
+                            dataReady <= '1';
+                            brstCnt   <= brstCnt - 1;
 
-                        state     <= burstWrite;
-                    elsif lastBrst = '1' and lastLeft = '1' then
-                        i2cEna    <= '0';
-                        dataReady <= '0';
-                        brstOnSig <= '0';
-                        brstCnt   <= resize(unsigned(brstByteNum), brstCnt'length);
-                        leftBCnt  <= resize(unsigned(leftBNum), leftBCnt'length);
-                        bytesCnt  <= to_unsigned(devDataBytes-1, bytesCnt'length);
+                            state     <= burstWrite;
+                        else
+                            dataReady <= '0';
+                            loadBuff  <= '0';
+                            shiftBuff <= '0';
+    
+                            state     <= burstWrite;
+                        end if;
+                    elsif lastBrst = '1' then
+                        if i2cBusyRise = '1' and lastLeft = '0' then
+                            dataReady <= '0';
+                            shiftBuff <= '1';
+                            leftBCnt  <= leftBCnt - 1;
 
-                        state     <= transEnd;
-                    elsif lastBrst = '1' and lastLeft = '0' and i2cBusyRise = '1' then
-                        i2cDataWr <= dataIn(i);
-                        bytesCnt  <= bytesCnt - 1;
-                        leftBCnt  <= leftBCnt - 1;
+                            state     <= burstWrite;
+                        elsif lastLeft = '1' then
+                            i2cEna    <= '0';
+                            dataReady <= '0';
+                            brstOnSig <= '0';
+                            brstCnt   <= resize(unsigned(brstByteNum), brstCnt'length);
+                            leftBCnt  <= resize(unsigned(leftBNum), leftBCnt'length);
+                            shiftBuff <= '0';
 
-                        state     <= burstWrite;
-                    elsif lastBrst = '1' and lastLeft = '0' and i2cBusyRise = '0' then
-                        i2cDataWr <= dataIn(i);
-
-                        state     <= burstWrite;
-                    elsif lastByte = '0' and i2cBusyRise = '1' then
-                        i2cDataWr <= dataIn(i);
-                        dataReady <= '0';
-                        bytesCnt  <= bytesCnt - 1;
-
-                        state     <= burstWrite;
-                    elsif lastByte = '1' and i2cBusyRise = '1' then
-                        dataReady <= '1';
-                        brstCnt   <= brstCnt - 1;
-                        bytesCnt  <= to_unsigned(devDataBytes-1, bytesCnt'length);
-
-                        state     <= burstWrite;
-                    else
-                        dataReady <= '0';
-
-                        state     <= burstWrite;
+                            state     <= transEnd;
+                        else
+                            dataReady <= '0';
+                            loadBuff  <= '0';
+                            shiftBuff <= '0';
+    
+                            state     <= burstWrite;
+                        end if;
                     end if;
 
                 when transEnd =>
@@ -370,5 +351,22 @@ begin
         end if;
     end if;
 end process;
+
+shiftBuffInst: entity work.shiftReg
+generic map(
+    direction  => "left",
+    dataInLen  => dataInVec'length,
+    dataOutLen => 8
+)
+port map(
+    clk     => clk,
+    rst     => rst,
+    load    => loadBuff,
+    shift   => shiftBuff,
+    empty   => emptyBuff,
+    last    => lastBuff,
+    dataIn  => dataInVec,
+    dataOut => dataOutBuff
+);
 
 end Behavioral;

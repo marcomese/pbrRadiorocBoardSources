@@ -18,6 +18,8 @@ port(
     rst     : in  std_logic;
     load    : in  std_logic;
     shift   : in  std_logic;
+    empty   : out std_logic;
+    last    : out std_logic;
     dataIn  : in  std_logic_vector(dataInLen-1 downto 0);
     dataOut : out std_logic_vector(dataOutLen-1 downto 0)
 );
@@ -26,12 +28,14 @@ end component;
 constant clkPeriod  : time    := 10 ns;
 constant direction  : string  := "right";
 constant dataInLen  : integer := 32;
-constant dataOutLen : integer := 2;
+constant dataOutLen : integer := 8;
 
 signal clk     : std_logic := '1';
 signal rst     : std_logic := '0';
 signal load    : std_logic := '0';
 signal shift   : std_logic := '0';
+signal empty   : std_logic;
+signal last    : std_logic;
 signal dataIn  : std_logic_vector(dataInLen-1 downto 0)  := (others => '0');
 signal dataOut : std_logic_vector(dataOutLen-1 downto 0);
 
@@ -87,6 +91,13 @@ begin
     
     wait for clkPeriod*5;
 
+    dataIn <= x"FFEEDDCC";
+    load   <= '1';
+    wait for clkPeriod;
+    load   <= '0';
+
+    wait for clkPeriod*5;
+
     shift <= '1';
     wait for clkPeriod;
     shift <= '0';
@@ -121,6 +132,8 @@ port map(
     rst     => rst,
     load    => load,
     shift   => shift,
+    empty   => empty,
+    last    => last,
     dataIn  => dataIn,
     dataOut => dataOut
 );

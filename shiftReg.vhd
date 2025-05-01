@@ -13,6 +13,8 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.ALL;
+use IEEE.STD_LOGIC_MISC.ALL;
+use work.utilsPkg.bitsNum;
 
 entity shiftReg is
 generic(
@@ -26,15 +28,25 @@ port(
     load    : in  std_logic;
     shift   : in  std_logic;
     dataIn  : in  std_logic_vector(dataInLen-1 downto 0);
+    empty   : out std_logic;
+    last    : out std_logic;
     dataOut : out std_logic_vector(dataOutLen-1 downto 0)
 );
 end shiftReg;
 
 architecture Behavioral of shiftReg is
 
-signal buffInt : std_logic_vector(dataInLen-1 downto 0);
+constant shiftNum : integer := integer(dataInLen/dataOutLen);
+
+signal   shiftCnt : unsigned(bitsNum(shiftNum) downto 0); -- most significant bit used for empty signal
+
+signal   buffInt  : std_logic_vector(dataInLen-1 downto 0);
 
 begin
+
+empty <= shiftCnt(shiftCnt'left);
+
+last  <= not or_reduce(std_logic_vector(shiftCnt));
 
 leftShiftGen: if direction = "left" generate
 begin
@@ -73,5 +85,18 @@ begin
         end if;
     end process;
 end generate;
+
+shiftCntInst: process(clk, rst)
+begin
+    if rising_edge(clk) then
+        if rst = '1' then
+            shiftCnt <= (others => '1');
+        elsif load = '1' then
+            shiftCnt <= to_unsigned(shiftNum-1, shiftCnt'length);
+        elsif shift = '1' then
+            shiftCnt <= shiftCnt - 1;
+        end if;
+    end if;
+end process;
 
 end Behavioral;
