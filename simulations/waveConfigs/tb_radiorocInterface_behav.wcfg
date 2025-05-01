@@ -13,15 +13,15 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="0.000 ns"></ZoomStartTime>
-      <ZoomEndTime time="5,350.001 ns"></ZoomEndTime>
-      <Cursor1Time time="2,830.000 ns"></Cursor1Time>
+      <ZoomStartTime time="0.000000 us"></ZoomStartTime>
+      <ZoomEndTime time="360.000001 us"></ZoomEndTime>
+      <Cursor1Time time="360.000000 us"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
-      <NameColumnWidth column_width="130"></NameColumnWidth>
+      <NameColumnWidth column_width="126"></NameColumnWidth>
       <ValueColumnWidth column_width="58"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="54" />
+   <WVObjectSize size="53" />
    <wvobject fp_name="/tb_radiorocInterface/clk" type="logic">
       <obj_property name="ElementShortName">clk</obj_property>
       <obj_property name="ObjectShortName">clk</obj_property>
@@ -85,10 +85,6 @@
    <wvobject fp_name="/tb_radiorocInterface/txWrAck" type="logic">
       <obj_property name="ElementShortName">txWrAck</obj_property>
       <obj_property name="ObjectShortName">txWrAck</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_radiorocInterface/uut/radioFSMInst/lastBrstRise" type="logic">
-      <obj_property name="ElementShortName">lastBrstRise</obj_property>
-      <obj_property name="ObjectShortName">lastBrstRise</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_radiorocInterface/i2cEnClk" type="logic">
       <obj_property name="ElementShortName">i2cEnClk</obj_property>
@@ -202,10 +198,6 @@
       <obj_property name="ElementShortName">lastBrst</obj_property>
       <obj_property name="ObjectShortName">lastBrst</obj_property>
    </wvobject>
-   <wvobject fp_name="/tb_radiorocInterface/uut/radioFSMInst/lastBrstRise" type="logic">
-      <obj_property name="ElementShortName">lastBrstRise</obj_property>
-      <obj_property name="ObjectShortName">lastBrstRise</obj_property>
-   </wvobject>
    <wvobject fp_name="/tb_radiorocInterface/uut/radioFSMInst/lastLeft" type="logic">
       <obj_property name="ElementShortName">lastLeft</obj_property>
       <obj_property name="ObjectShortName">lastLeft</obj_property>
@@ -245,5 +237,9 @@
    <wvobject fp_name="/tb_radiorocInterface/i2cDataWr" type="array">
       <obj_property name="ElementShortName">i2cDataWr[7:0]</obj_property>
       <obj_property name="ObjectShortName">i2cDataWr[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_radiorocInterface/uut/radioFSMInst/dataOutBuff" type="array">
+      <obj_property name="ElementShortName">dataOutBuff[31:0]</obj_property>
+      <obj_property name="ObjectShortName">dataOutBuff[31:0]</obj_property>
    </wvobject>
 </wave_config>
