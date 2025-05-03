@@ -99,6 +99,9 @@ begin
             if unsigned(dataInVec) > maxBrstLen then
                 brstByteNum <= maxBrstSlv(maxBrstSlv'left downto 2);
                 leftBNum    <= maxBrstSlv(1 downto 0);
+            elsif unsigned(dataInVec) < 4 then
+                brstByteNum <= (others => '0');
+                leftBNum    <= dataInVec(1 downto 0);
             else
                 brstByteNum  <= dataInVec(brstByteNum'left+2 downto 2);
                 leftBNum     <= dataInVec(1 downto 0);

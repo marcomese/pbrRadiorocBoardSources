@@ -71,6 +71,7 @@ signal   tOutRst,
          rwSig,
          rxRdSig,
          brstSig,
+         validSig,
          devRwSig,
          devBrstSig,
          endCnt,
@@ -92,20 +93,25 @@ devRwDecProc: process(clk, rst, dataIn(7 downto 4))
 begin
     case dataIn(7 downto 4) is
         when readCmd =>
-            rwSig   <= '1';
-            brstSig <= '0';
+            rwSig    <= '1';
+            brstSig  <= '0';
+            validSig <= '1';
         when writeCmd =>
-            rwSig   <= '0';
-            brstSig <= '0';
+            rwSig    <= '0';
+            brstSig  <= '0';
+            validSig <= '1';
         when burstRdCmd =>
-            rwSig   <= '1';
-            brstSig <= '1';
+            rwSig    <= '1';
+            brstSig  <= '1';
+            validSig <= '1';
         when burstWrCmd =>
-            rwSig   <= '0';
-            brstSig <= '1';
+            rwSig    <= '0';
+            brstSig  <= '1';
+            validSig <= '1';
         when others =>
-            rwSig   <= '1';
-            brstSig <= '0';
+            rwSig    <= '1';
+            brstSig  <= '0';
+            validSig <= '0';
     end case;
 end process;
 
@@ -134,7 +140,7 @@ begin
         else
             case state is
                 when idle =>
-                    if rxPresent = '1' then
+                    if rxPresent = '1' and validSig = '1' then
                         tOutRst    <= '1';
                         rxRdSig    <= '1';
                         devRwSig   <= rwSig;
@@ -308,7 +314,15 @@ begin
                         byteCnt <= to_unsigned(devAddrBytes-1, byteCnt'length);
        
                         state   <= idle;
-                    elsif devBrstSig = '1' and devReady(devIdSig) = '1' then
+                    elsif devBrstSig = '1' and devReady(devIdSig) = '1' and devBusy(devIdSig) = '0' then
+                        devExec <= '0';
+                        rxEna   <= '1';
+                        busy    <= '0';
+                        error   <= (others => '0');
+                        byteCnt <= to_unsigned(devAddrBytes-1, byteCnt'length);
+       
+                        state   <= idle;
+                    elsif devBrstSig = '1' and devReady(devIdSig) = '1' and devBusy(devIdSig) = '1' then
                         rxRdSig    <= '1';
                         byteCnt    <= to_unsigned(devDataBytes-1, byteCnt'length);
                         brstGetSig <= '1';
