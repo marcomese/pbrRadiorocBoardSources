@@ -150,6 +150,11 @@ begin
                         error      <= (others => '0');
 
                         state      <= getDev;
+                    elsif rxPresent = '1' and validSig = '0' then
+                        tOutRst    <= '1';
+                        rxRdSig    <= '1';
+
+                        state      <= idle;
                     else
                         tOutRst <= '1';
                         busy    <= '0';
