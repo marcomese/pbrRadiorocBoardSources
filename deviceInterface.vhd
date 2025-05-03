@@ -72,11 +72,12 @@ signal   tOutRst,
          rxRdSig,
          brstSig,
          devRwSig,
-         devBrstSig : std_logic;
+         devBrstSig,
+         endCnt,
+         brstGetSig : std_logic;
 signal   devIdSig   : devices_t;
 signal   tOutCnt    : unsigned(bitsNum(tOut) downto 0);
 signal   byteCnt    : unsigned(bitsNum(bytesNum) downto 0);
-signal   endCnt     : std_logic;
 
 begin
 
@@ -125,6 +126,7 @@ begin
             devAddr     <= (others => (others => '0'));
             devDataOut  <= (others => (others => '0'));
             devExec     <= '0';
+            brstGetSig  <= '0';
             busy        <= '0';
             error       <= (others => '0');
 
@@ -151,8 +153,6 @@ begin
                     end if;
 
                 when getDev =>
-                    i := to_integer(byteCnt);
-
                     if devIdSig = none then
                         tOutRst <= '1';
                         rxRdSig <= '0';
@@ -225,6 +225,11 @@ begin
                         devDataOut(i) <= dataIn;
 
                         state         <= getData;
+                    elsif rxPresent = '0' and brstGetSig = '1' then
+                        devExec    <= '1';
+                        brstGetSig <= '0';
+
+                        state      <= getData;
                     elsif rxPresent = '0' and devBrstSig = '1' and devReady(devIdSig) = '1' then
                         devExec <= '0';
                         rxEna   <= '1';
@@ -304,10 +309,11 @@ begin
        
                         state   <= idle;
                     elsif devBrstSig = '1' and devReady(devIdSig) = '1' then
-                        rxRdSig <= '1';
-                        byteCnt <= to_unsigned(devDataBytes-1, byteCnt'length);
+                        rxRdSig    <= '1';
+                        byteCnt    <= to_unsigned(devDataBytes-1, byteCnt'length);
+                        brstGetSig <= '1';
 
-                        state   <= getData;
+                        state      <= getData;
                     else
                         devExec <= '0';
 

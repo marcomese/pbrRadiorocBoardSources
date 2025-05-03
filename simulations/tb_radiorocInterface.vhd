@@ -205,18 +205,18 @@ begin
     rst <= '0';
     wait for clkPeriod*5;
 
-    wait for clkPeriod*5;
+--    wait for clkPeriod*5;
 
-    testRxRead <= '1';
+--    testRxRead <= '1';
 
-    testDataIn <= x"A3";
-    wait for clkPeriod;
-    testTxWrite <= '1';
-    wait for clkPeriod;
-    testDataIn <= x"BA";
-    wait for clkPeriod;
-    testDataIn <= x"12";
-    wait for clkPeriod;
+--    testDataIn <= x"A3";
+--    wait for clkPeriod;
+--    testTxWrite <= '1';
+--    wait for clkPeriod;
+--    testDataIn <= x"BA";
+--    wait for clkPeriod;
+--    testDataIn <= x"12";
+--    wait for clkPeriod;
 --    testDataIn <= x"0A";
 --    wait for clkPeriod;
 --    testDataIn <= x"00";
@@ -225,19 +225,19 @@ begin
 --    wait for clkPeriod;
 --    testDataIn <= x"00";
 --    wait for clkPeriod;
-    testTxWrite <= '0';
+--    testTxWrite <= '0';
 
-    wait until i2cBusy = '0';
+--    wait until i2cBusy = '0';
 
-    wait until i2cBusy = '0';
+--    wait until i2cBusy = '0';
 
-    wait until i2cBusy = '0';
+--    wait until i2cBusy = '0';
 
-    wait until i2cBusy = '0';
+--    wait until i2cBusy = '0';
     
-    testData <= x"BB";
+--    testData <= x"BB";
 
-    wait for 10 us;
+--    wait for 10 us;
 
 --    testDataIn <= x"A3";
 --    wait for clkPeriod;
@@ -299,7 +299,7 @@ begin
     wait for clkPeriod;
     testDataIn <= x"00";
     wait for clkPeriod;
-    testDataIn <= x"06"; -- send 0xNN bytes in burst mode
+    testDataIn <= x"08"; -- send 0xNN bytes in burst mode
     wait for clkPeriod;
 
     testDataIn <= x"84";
@@ -315,10 +315,10 @@ begin
     wait for clkPeriod;
     testDataIn <= x"04";
     wait for clkPeriod;
---    testDataIn <= x"88";
---    wait for clkPeriod;
---    testDataIn <= x"99";
---    wait for clkPeriod;
+    testDataIn <= x"88";
+    wait for clkPeriod;
+    testDataIn <= x"99";
+    wait for clkPeriod;
 
 --    testDataIn <= x"AA";
 --    wait for clkPeriod;
