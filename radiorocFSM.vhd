@@ -62,6 +62,7 @@ constant maxBrstSlv   : std_logic_vector(bitsNum(maxBrstLen)-1 downto 0) := std_
 signal   state        : state_t;
 signal   rwSig,
          brstOnSig,
+         brstVal,
          i2cBusyOld,
          i2cBusyRise,
          loadBuff,
@@ -95,16 +96,24 @@ begin
         if rst = '1' then
             brstByteNum <= (others => '0');
             leftBNum    <= (others => '0');
+            brstVal     <= '0';
         else
-            if unsigned(dataInVec) > maxBrstLen then
+            if unsigned(dataInVec) = 0 then
+                brstByteNum <= (others => '0');
+                leftBNum    <= (others => '0');
+                brstVal     <= '0';
+            elsif unsigned(dataInVec) > maxBrstLen then
                 brstByteNum <= maxBrstSlv(maxBrstSlv'left downto 2);
                 leftBNum    <= maxBrstSlv(1 downto 0);
+                brstVal     <= '1';
             elsif unsigned(dataInVec) < 4 then
                 brstByteNum <= (others => '0');
                 leftBNum    <= dataInVec(1 downto 0);
+                brstVal     <= '1';
             else
                 brstByteNum  <= dataInVec(brstByteNum'left+2 downto 2);
                 leftBNum     <= dataInVec(1 downto 0);
+                brstVal     <= '1';
             end if;
         end if;
     end if;
@@ -172,7 +181,7 @@ begin
                         i2cAddr   <= chipID & R2;
                         i2cRw     <= rwSig;
                         i2cDataWr <= dataIn(0);
-                        brstOnSig <= brst;
+                        brstOnSig <= brst and brstVal;
                         brstCnt   <= resize(unsigned(brstByteNum), brstCnt'length);
                         leftBCnt  <= resize(unsigned(leftBNum), leftBCnt'length);
 
