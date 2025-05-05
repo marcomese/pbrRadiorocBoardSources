@@ -299,7 +299,7 @@ begin
     wait for clkPeriod;
     testDataIn <= x"00";
     wait for clkPeriod;
-    testDataIn <= x"00"; -- send 0xNN bytes in burst mode
+    testDataIn <= x"17"; -- send 0xNN bytes in burst mode
     wait for clkPeriod;
 
     testDataIn <= x"84";
@@ -415,8 +415,6 @@ begin
 
     wait until i2cBusy = '0';
 
-    wait until i2cBusy = '0';
-    
     testData <= x"BB";
 
     wait for 10 us;

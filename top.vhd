@@ -14,19 +14,9 @@ use work.devicesPkg.all;
 entity radioroc_fw is
 	port
 	(
-		CLK_100M_p : in std_logic;
-		CLK_100M_n : in std_logic;
---		Input_clk1 : out std_logic;
---		Input_clk2 : in std_logic;
-		npwr_reset : in std_logic;
-
-		usb_rxf  : in    std_logic;
-		usb_txe  : in    std_logic;
-		usb      : inout std_logic_vector(7 downto 0);
-		usb_rd   : out   std_logic;
-		usb_wr   : out   std_logic;
-		usb_noe  : in    std_logic;
-		usb_siwu : out   std_logic;
+		CLK_100M_p    : in std_logic;
+		CLK_100M_n    : in std_logic;
+		npwr_reset    : in std_logic;
 
 		sc_scl        : inout std_logic;
 		sc_sda        : inout std_logic;
@@ -46,47 +36,36 @@ entity radioroc_fw is
 		sc_NORT1      : in    std_logic;
 		sc_NORTQ      : in    std_logic;
 
-		T_p : in std_logic_vector(63 downto 0);
-		T_n : in std_logic_vector(63 downto 0);
+		T_p           : in std_logic_vector(63 downto 0);
+		T_n           : in std_logic_vector(63 downto 0);
 
-		ADC_SCKHG_p : out std_logic;
-		ADC_SCKHG_n : out std_logic;
-		ADC_SCKLG_p : out std_logic;
-		ADC_SCKLG_n : out std_logic;
-		ADC_HG_p    : in std_logic;
-		ADC_HG_n    : in std_logic;
-		ADC_LG_p    : in std_logic;
-		ADC_LG_n    : in std_logic;
-		nCNV        : out std_logic;
-		nCMOS       : out std_logic;
+		ADC_SCKHG_p   : out std_logic;
+		ADC_SCKHG_n   : out std_logic;
+		ADC_SCKLG_p   : out std_logic;
+		ADC_SCKLG_n   : out std_logic;
+		ADC_HG_p      : in std_logic;
+		ADC_HG_n      : in std_logic;
+		ADC_LG_p      : in std_logic;
+		ADC_LG_n      : in std_logic;
+		nCNV          : out std_logic;
+		nCMOS         : out std_logic;
 
-		SCL_275 : inout std_logic;
-		SDA_275 : inout std_logic;
+		SCL_275       : inout std_logic;
+		SDA_275       : inout std_logic;
 
-        uartRx   : in  std_logic;
-        uartTx   : out std_logic;
+        pulse         : out std_logic;
+        dacSDI        : out std_logic;
+        dacSCLK       : out std_logic;
+        dacCS         : out std_logic;
 
-        initDone : out std_logic;
-        busy     : out std_logic;
-        running  : out std_logic;
+        readRq        : out std_logic;
+        cs            : in  std_logic;
+        sclk          : in  std_logic;
+        mosi          : in  std_logic;
+        miso          : out std_logic;
 
-        pulse    : out std_logic;
-        dacSDI   : out std_logic;
-        dacSCLK  : out std_logic;
-        dacCS    : out std_logic;
-
-        readRq : out std_logic;
-        cs     : in  std_logic;
-        sclk   : in  std_logic;
-        mosi   : in  std_logic;
-        miso   : out std_logic;
-
---		BP0     : in    std_logic;
---		BP1     : in    std_logic;
-		IO_FPGA : out std_logic_vector(5 downto 0);
-		extTrg : in std_logic;
-		--test    : out   std_logic_vector(5 downto 0);
-		LED     : out   std_logic
+		IO_FPGA       : out std_logic_vector(5 downto 0);
+		extTrg        : in std_logic
 	);
 end entity;
 

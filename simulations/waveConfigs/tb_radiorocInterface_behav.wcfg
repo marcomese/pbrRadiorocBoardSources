@@ -13,15 +13,15 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="202,154.000 ns"></ZoomStartTime>
-      <ZoomEndTime time="202,485.201 ns"></ZoomEndTime>
-      <Cursor1Time time="202,340.000 ns"></Cursor1Time>
+      <ZoomStartTime time="0.000000 us"></ZoomStartTime>
+      <ZoomEndTime time="1,600.000001 us"></ZoomEndTime>
+      <Cursor1Time time="958.710000 us"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
-      <NameColumnWidth column_width="114"></NameColumnWidth>
-      <ValueColumnWidth column_width="58"></ValueColumnWidth>
+      <NameColumnWidth column_width="176"></NameColumnWidth>
+      <ValueColumnWidth column_width="93"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="56" />
+   <WVObjectSize size="60" />
    <wvobject fp_name="/tb_radiorocInterface/clk" type="logic">
       <obj_property name="ElementShortName">clk</obj_property>
       <obj_property name="ObjectShortName">clk</obj_property>
@@ -57,6 +57,18 @@
    <wvobject fp_name="/tb_radiorocInterface/devIntBusy" type="logic">
       <obj_property name="ElementShortName">devIntBusy</obj_property>
       <obj_property name="ObjectShortName">devIntBusy</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_radiorocInterface/spiInst/cs" type="logic">
+      <obj_property name="ElementShortName">cs</obj_property>
+      <obj_property name="ObjectShortName">cs</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_radiorocInterface/spiInst/sclk" type="logic">
+      <obj_property name="ElementShortName">sclk</obj_property>
+      <obj_property name="ObjectShortName">sclk</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_radiorocInterface/spiInst/miso" type="logic">
+      <obj_property name="ElementShortName">miso</obj_property>
+      <obj_property name="ObjectShortName">miso</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_radiorocInterface/dataToDev" type="array">
       <obj_property name="ElementShortName">dataToDev[3:0][7:0]</obj_property>
@@ -109,7 +121,6 @@
    <wvobject fp_name="/tb_radiorocInterface/devBusyVec" type="array">
       <obj_property name="ElementShortName">devBusyVec[0:6]</obj_property>
       <obj_property name="ObjectShortName">devBusyVec[0:6]</obj_property>
-      <obj_property name="isExpanded"></obj_property>
    </wvobject>
    <wvobject fp_name="/tb_radiorocInterface/uut/busyRad" type="logic">
       <obj_property name="ElementShortName">busyRad</obj_property>
@@ -172,6 +183,10 @@
    <wvobject fp_name="/tb_radiorocInterface/uut/radioFSMInst/i2cBusyRise" type="logic">
       <obj_property name="ElementShortName">i2cBusyRise</obj_property>
       <obj_property name="ObjectShortName">i2cBusyRise</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_radiorocInterface/testData" type="array">
+      <obj_property name="ElementShortName">testData[7:0]</obj_property>
+      <obj_property name="ObjectShortName">testData[7:0]</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_radiorocInterface/i2cDataRd" type="array">
       <obj_property name="ElementShortName">i2cDataRd[7:0]</obj_property>
