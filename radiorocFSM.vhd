@@ -78,6 +78,14 @@ signal   leftBNum     : std_logic_vector(1 downto 0);
 signal   brstCnt      : unsigned(brstByteNum'left+1 downto 0); --adding 1 for lastBrst signal
 signal   leftBCnt     : unsigned(2 downto 0);
 
+attribute mark_debug : string;
+attribute mark_debug of state       : signal is "true";
+attribute mark_debug of i2cDataWr   : signal is "true";
+attribute mark_debug of i2cDataRd   : signal is "true";
+attribute mark_debug of dataOutBuff : signal is "true";
+attribute mark_debug of loadBuff    : signal is "true";
+attribute mark_debug of shiftBuff   : signal is "true";
+
 begin
 
 brstOn       <= brstOnSig;
@@ -281,8 +289,6 @@ begin
                     end if;
 
                 when burstWrite =>
-                    i2cDataWr <= dataOutBuff(dataOutBuff'left downto dataOutBuff'left-7);
-
                     if exec = '1' then
                         i2cEna    <= '1';
                         loadBuff  <= '1';
@@ -299,6 +305,7 @@ begin
 
                             state     <= burstWrite;
                         else
+                            i2cDataWr <= dataOutBuff(dataOutBuff'left downto dataOutBuff'left-7);
                             dataReady <= '0';
                             loadBuff  <= '0';
                             shiftBuff <= '0';
@@ -322,6 +329,7 @@ begin
 
                             state     <= transEnd;
                         else
+                            i2cDataWr <= dataOutBuff(dataOutBuff'left downto dataOutBuff'left-7);
                             dataReady <= '0';
                             loadBuff  <= '0';
                             shiftBuff <= '0';
