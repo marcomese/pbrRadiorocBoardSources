@@ -1,8 +1,3 @@
-## Timing constraints
-
-set_property CLOCK_DEDICATED_ROUTE FALSE [get_nets usb_txe_IBUF]
-set_property CLOCK_DEDICATED_ROUTE FALSE [get_nets usb_rxf_IBUF]
-
 ## PHYSICAL CONSTRAINTS
 # IO standards
 

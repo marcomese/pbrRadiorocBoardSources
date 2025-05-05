@@ -233,8 +233,6 @@ begin
                     end if;
 
                 when burstRead =>
-                    dataOutBuff(7 downto 0) <= i2cDataRd;
-
                     if exec = '1' then
                         i2cEna    <= '1';
                         loadBuff  <= '1';

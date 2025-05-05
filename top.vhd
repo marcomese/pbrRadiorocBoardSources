@@ -220,15 +220,17 @@ begin
 
 	nCMOS <= '1';
 
+extTrg <= extTrgSig;
+
 testOutInst: process(reset, clk_10M)
 begin
     if rising_edge(clk_10M) then
         if reset = '1' then
-            extTrg  <= '0';
-            testCnt <= to_unsigned(testCount, testCnt'length);
+            extTrgSig  <= '0';
+            testCnt    <= to_unsigned(testCount, testCnt'length);
         elsif testCnt(testCnt'left) = '1' then
-            extTrg  <= not extTrg;
-            testCnt <= to_unsigned(testCount, testCnt'length);
+            extTrgSig  <= not extTrgSig;
+            testCnt    <= to_unsigned(testCount, testCnt'length);
         else
             testCnt <= testCnt - 1;
         end if;
@@ -598,7 +600,5 @@ port map(
     busy       => devIntBusy,
     error      => error
 );
-
-LED      <= not (locked_1 and locked_2 and locked_3);
 
 end arch;
