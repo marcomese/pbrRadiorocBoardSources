@@ -58,11 +58,18 @@ entity radioroc_fw is
         dacSCLK       : out std_logic;
         dacCS         : out std_logic;
 
-        readRq        : out std_logic;
-        cs            : in  std_logic;
-        sclk          : in  std_logic;
-        mosi          : in  std_logic;
-        miso          : out std_logic;
+        readRq_p      : out std_logic;
+        readRq_n      : out std_logic;
+        cs_p          : in  std_logic;
+        cs_n          : in  std_logic;
+        sclk_p        : in  std_logic;
+        sclk_n        : in  std_logic;
+        mosi_p        : in  std_logic;
+        mosi_n        : in  std_logic;
+        miso_p        : out std_logic;
+        miso_n        : out std_logic;
+
+        dbgOut        : out std_logic_vector(7 downto 0);
 
 		extTrg        : out std_logic -- in std_logic
 	);
@@ -148,7 +155,7 @@ constant pwrOnTime      : real      := 20.0e-6;
 constant settlingTime   : real      := 5.0e-6;
 constant readPeriod     : real      := 1.0;
 ----debug
-constant testCount      : integer   := 10000000;
+constant testCount      : integer   := 100;
 
 constant tmpAddr        : std_logic_vector(6 downto 0) := "1001000";
 constant sipmHvAddr     : std_logic_vector(6 downto 0) := "1110011";
@@ -212,6 +219,12 @@ signal   dataToMaster,
 
 signal extTrgFF, extTrgSig : std_logic;
 
+signal readRq,
+       cs,
+       sclk,
+       mosi,
+       miso    : std_logic;
+
 signal testCnt : unsigned(bitsNum(testCount) downto 0);
 
 begin
@@ -266,7 +279,22 @@ end process;
         ADC_HG_n    => ADC_HG_n,
         ADC_LG_p => ADC_LG_p,
         ADC_LG_n => ADC_LG_n,
-        T       => T
+        T       => T,
+        readRq   => readRq,
+        readRq_p => readRq_p,
+        readRq_n => readRq_n,
+        cs       => cs,
+        cs_p     => cs_p,
+        cs_n     => cs_n,
+        sclk     => sclk,
+        sclk_p   => sclk_p,
+        sclk_n   => sclk_n,
+        mosi     => mosi,
+        mosi_p   => mosi_p,
+        mosi_n   => mosi_n,
+        miso     => miso,
+        miso_p   => miso_p,
+        miso_n   => miso_n
     );
 
 	pll1 : PLL_RADIOROC_1
@@ -393,6 +421,8 @@ port map(
 );
 
 	sc_clk_sm <= clk_10M when (en_clki2c = '1') else '0';
+
+    dbgOut <= dout_acq;
 
 	adc : entity xil_defaultlib.adc
 	Port map (
