@@ -299,7 +299,7 @@ begin
     wait for clkPeriod;
     testDataIn <= x"00";
     wait for clkPeriod;
-    testDataIn <= x"00"; -- send 0xNN bytes in burst mode
+    testDataIn <= x"06"; -- send 0xNN bytes in burst mode
     wait for clkPeriod;
 
     testDataIn <= x"84";
