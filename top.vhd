@@ -64,8 +64,7 @@ entity radioroc_fw is
         mosi          : in  std_logic;
         miso          : out std_logic;
 
-		IO_FPGA       : out std_logic_vector(5 downto 0);
-		extTrg        : in std_logic
+		extTrg        : out std_logic -- in std_logic
 	);
 end entity;
 
@@ -141,16 +140,16 @@ architecture arch of radioroc_fw is
 
 -- CONSTANTS for deviceInterface, sipmHvTmpCtrl and PulseGentCtrl
 
-constant clkPeriod      : time      := 10 ns;
-constant dacClkPeriod   : time      := 100 ns;
 constant clkFreq        : real      := 100.0e6;
 constant sclkFreq       : real      := 25.0e6;
 constant timeout        : real      := 1.0;
 constant sleepOnPwrOn   : boolean   := True;
 constant pwrOnTime      : real      := 20.0e-6;
 constant settlingTime   : real      := 5.0e-6;
-
 constant readPeriod     : real      := 1.0;
+----debug
+constant testCount      : integer   := 10000000;
+
 constant tmpAddr        : std_logic_vector(6 downto 0) := "1001000";
 constant sipmHvAddr     : std_logic_vector(6 downto 0) := "1110011";
 constant chipID         : std_logic_vector(3 downto 0) := "0000";
@@ -213,24 +212,41 @@ signal   dataToMaster,
 
 signal extTrgFF, extTrgSig : std_logic;
 
+signal testCnt : unsigned(bitsNum(testCount) downto 0);
+
 begin
 
 	reset <= not(npwr_reset);
 
 	nCMOS <= '1';
 
-    extTrgSync: process(reset, clk_200M)
-    begin
-        if rising_edge(clk_200M) then
-            if reset = '1' then
-                extTrgFF  <= '0';
-                extTrgSig <= '0';
-            else
-                extTrgFF  <= extTrg;
-                extTrgSig <= extTrgFF;
-            end if;
+testOutInst: process(reset, clk_10M)
+begin
+    if rising_edge(clk_10M) then
+        if reset = '1' then
+            extTrg  <= '0';
+            testCnt <= to_unsigned(testCount, testCnt'length);
+        elsif testCnt(testCnt'left) = '1' then
+            extTrg  <= not extTrg;
+            testCnt <= to_unsigned(testCount, testCnt'length);
+        else
+            testCnt <= testCnt - 1;
         end if;
-    end process;
+    end if;
+end process;
+
+--    extTrgSync: process(reset, clk_200M)
+--    begin
+--        if rising_edge(clk_200M) then
+--            if reset = '1' then
+--                extTrgFF  <= '0';
+--                extTrgSig <= '0';
+--            else
+--                extTrgFF  <= extTrg;
+--                extTrgSig <= extTrgFF;
+--            end if;
+--        end if;
+--    end process;
 
 	IOs : entity xil_defaultlib.IO
     Port map(
@@ -308,8 +324,7 @@ begin
 		sc_outd_probe => sc_outd_probe,
 		sel_trigger   => sel_trigger(5 downto 0),
 		sel           => sel_io(17 downto 0),
-		test_daq      => test_daq,
-		IO_FPGA       => IO_FPGA
+		test_daq      => test_daq
     );
 
 	process (rst_staircase, Scurve_trigger)
@@ -436,84 +451,6 @@ port map(
 );
 
    rst_tdc <= reset or rst_tdc_sft;
-
-	hi : entity xil_defaultlib.host_interface
-    generic map(
-        G_FIFO_AW     => 16,
-        G_IRQ_SUPPORT => false,
-        G_FW_VER      => x"0D"
-    )
-    port map (
-    -- USB
-    usb_d     => usb,
-    usb_rd_n  => usb_rd,
-    usb_wr_n  => usb_wr,
-    usb_rxf_n => usb_rxf,
-    usb_txe_n => usb_txe,
-    usb_siwu  => usb_siwu,
-    -- RADIOROC
-    val_evt  => sc_val_evt,
-    rstb_i2c => sc_rstb_i2c,
-    rstb_read_sft => rstb_read_sft,
-    reset_n_sft => reset_n_sft,
-    rstb_sc => sc_rstb_sc,
-    -- I2C
-    end_i2c   => end_i2c,
-    i2c_in    => i2c_in,
-    i2c_set   => i2c_set,
-    wr_i2c    => wr_i2c,
-    rd55      => rd55,
-    en_clki2c => open,--en_clki2c,
-    q         => q,
-    -- Mux
-    sel_trigger => sel_trigger,
-    sel_io      => sel_io,
-    -- Scurves
-    en_test_Scurve => en_test_Scurve,
-    rstb_Scurve    => rstb_Scurve,
-    on_edge        => on_edge,
-    clk_S          => clk_S,
-    nb_scurve      => nb_scurve,
-    sel_chn_scurve => sel_chn_scurve,
-    P_cnt          => P_cnt,
-    T_cnt          => T_cnt,
-    --Staircases
-    rst_staircase => rst_staircase,
-    enable_stair  => enable_stair,
-    data32b       => testair,
-    --Probe
-    rstb_probe => sc_rstb_probe,
-    -- ADC
-    reset_acq => reset_acq,
-    start_acq => start_acq,
-    rd_acq => rd_acq,
-    end_acq => end_acq,
-    nb_acq => nb_acq,
-    sel_adc => sel_adc,
-    dout_acq => dout_acq,
-    empty_acq => empty_acq,
-    rd_data_count_acq => rd_data_count_acq,
-    -- TDC
-    fifo_in        => fifo_in,
-    fifo_wr        => fifo_wr,
-    en_tdc     => en_tdc,
-    rst_tdc_sft => rst_tdc_sft,
-    coincidence_on => coincidence_on,
-    coincidence_delay => coincidence_delay,
-    coincidence_width => coincidence_width,
-    master => master,
-    en_l_tdc => en_l_tdc,
-    --Temprature
-    temp_cfg => temp_cfg,
-    temp_ctrl => temp_ctrl,
-    temperature => temperature,
-    --clocks and reset
-    clk_25M => clk_25M,
-    clk_50M => clk_50M,
-    rst     => reset,
-    rst_tdc => rst_tdc,
-    spy     => spy_hi
-    );
 
 spiSlaveInst: entity work.SPISlave
 port map(
