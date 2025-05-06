@@ -80,6 +80,17 @@ signal   devIdSig   : devices_t;
 signal   tOutCnt    : unsigned(bitsNum(tOut) downto 0);
 signal   byteCnt    : unsigned(bitsNum(bytesNum) downto 0);
 
+attribute mark_debug : string;
+attribute mark_debug of state     : signal is "true";
+attribute mark_debug of error     : signal is "true";
+attribute mark_debug of dataIn    : signal is "true";
+attribute mark_debug of rxRead    : signal is "true";
+attribute mark_debug of rxPresent : signal is "true";
+attribute mark_debug of txWrite   : signal is "true";
+attribute mark_debug of txWrAck   : signal is "true";
+attribute mark_debug of rxEna     : signal is "true";
+
+
 begin
 
 rxRead   <= rxRdSig and not endCnt;

@@ -286,30 +286,62 @@ begin
     testRxRead <= '1';
 
     testDataIn <= x"33";
-    wait for clkPeriod;
+    wait for clkPeriod*50000;
     testTxWrite <= '1';
     wait for clkPeriod;
+    testTxWrite <= '0';
+    wait for clkPeriod*50000;
     testDataIn <= x"00";
+    testTxWrite <= '1';
     wait for clkPeriod;
+    testTxWrite <= '0';
+    wait for clkPeriod*50000;
     testDataIn <= x"00";
+    testTxWrite <= '1';
     wait for clkPeriod;
+    testTxWrite <= '0';
+    wait for clkPeriod*50000;
     testDataIn <= x"00";
+    testTxWrite <= '1';
     wait for clkPeriod;
+    testTxWrite <= '0';
+    wait for clkPeriod*50000;
     testDataIn <= x"00";
+    testTxWrite <= '1';
     wait for clkPeriod;
+    testTxWrite <= '0';
+    wait for clkPeriod*50000;
     testDataIn <= x"00";
+    testTxWrite <= '1';
     wait for clkPeriod;
+    testTxWrite <= '0';
+    wait for clkPeriod*50000;
     testDataIn <= x"06"; -- send 0xNN bytes in burst mode
+    testTxWrite <= '1';
     wait for clkPeriod;
+    testTxWrite <= '0';
+    wait for clkPeriod*50000;
 
     testDataIn <= x"84";
+    testTxWrite <= '1';
     wait for clkPeriod;
+    testTxWrite <= '0';
+    wait for clkPeriod*50000;
     testDataIn <= x"c4";
+    testTxWrite <= '1';
     wait for clkPeriod;
+    testTxWrite <= '0';
+    wait for clkPeriod*50000;
     testDataIn <= x"48"; --0x33 0x00 0x00 0x00 0x00 0x00 0x06 0x84 0xc4 0x48 0x15 0x03 0x04
+    testTxWrite <= '1';
     wait for clkPeriod;
+    testTxWrite <= '0';
+    wait for clkPeriod*50000;
     testDataIn <= x"15";
+    testTxWrite <= '1';
     wait for clkPeriod;
+    testTxWrite <= '0';
+    wait for clkPeriod*50000;
 
     testDataIn <= x"03";
     wait for clkPeriod;
