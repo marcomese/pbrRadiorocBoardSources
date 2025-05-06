@@ -344,76 +344,76 @@ begin
     wait for clkPeriod*50000;
 
     testDataIn <= x"03";
-    wait for clkPeriod;
+    wait for clkPeriod*50000;
     testDataIn <= x"04";
-    wait for clkPeriod;
+    wait for clkPeriod*50000;
     testDataIn <= x"88";
-    wait for clkPeriod;
+    wait for clkPeriod*50000;
     testDataIn <= x"99";
-    wait for clkPeriod;
+    wait for clkPeriod*50000;
 
     testDataIn <= x"cA";
-    wait for clkPeriod;
+    wait for clkPeriod*50000;
     testDataIn <= x"4E";
-    wait for clkPeriod;
+    wait for clkPeriod*50000;
     testDataIn <= x"C3";
-    wait for clkPeriod;
+    wait for clkPeriod*50000;
     testDataIn <= x"64";
-    wait for clkPeriod;
+    wait for clkPeriod*50000;
 
     testDataIn <= x"F3";
-    wait for clkPeriod;
+    wait for clkPeriod*50000;
     testDataIn <= x"7E";
-    wait for clkPeriod;
+    wait for clkPeriod*50000;
     testDataIn <= x"cB";
-    wait for clkPeriod;
+    wait for clkPeriod*50000;
     testDataIn <= x"CD";
-    wait for clkPeriod;
+    wait for clkPeriod*50000;
 
     testDataIn <= x"40";
-    wait for clkPeriod;
+    wait for clkPeriod*50000;
     testDataIn <= x"20";
-    wait for clkPeriod;
+    wait for clkPeriod*50000;
     testDataIn <= x"10";
-    wait for clkPeriod;
+    wait for clkPeriod*50000;
     testDataIn <= x"80";
-    wait for clkPeriod;
+    wait for clkPeriod*50000;
 
     testDataIn <= x"08";
-    wait for clkPeriod;
+    wait for clkPeriod*50000;
     testDataIn <= x"04";
-    wait for clkPeriod;
+    wait for clkPeriod*50000;
     testDataIn <= x"02";
-    wait for clkPeriod;
+    wait for clkPeriod*50000;
     testDataIn <= x"01";
-    wait for clkPeriod;
+    wait for clkPeriod*50000;
 
     testDataIn <= x"c8";
-    wait for clkPeriod;
+    wait for clkPeriod*50000;
     testDataIn <= x"c4";
-    wait for clkPeriod;
+    wait for clkPeriod*50000;
     testDataIn <= x"c2";
-    wait for clkPeriod;
+    wait for clkPeriod*50000;
     testDataIn <= x"c1";
-    wait for clkPeriod;
+    wait for clkPeriod*50000;
 
     testDataIn <= x"D8";
-    wait for clkPeriod;
+    wait for clkPeriod*50000;
     testDataIn <= x"D4";
-    wait for clkPeriod;
+    wait for clkPeriod*50000;
     testDataIn <= x"D2";
-    wait for clkPeriod;
+    wait for clkPeriod*50000;
     testDataIn <= x"D1";
-    wait for clkPeriod;
+    wait for clkPeriod*50000;
 
     testDataIn <= x"E8";
-    wait for clkPeriod;
+    wait for clkPeriod*50000;
     testDataIn <= x"E4";
-    wait for clkPeriod;
+    wait for clkPeriod*50000;
     testDataIn <= x"E2";
-    wait for clkPeriod;
+    wait for clkPeriod*50000;
     testDataIn <= x"E1";
-    wait for clkPeriod;
+    wait for clkPeriod*50000;
 
    testTxWrite <= '0';
 
