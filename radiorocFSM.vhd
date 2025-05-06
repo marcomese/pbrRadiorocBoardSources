@@ -85,6 +85,7 @@ attribute mark_debug of i2cDataRd   : signal is "true";
 attribute mark_debug of dataOutBuff : signal is "true";
 attribute mark_debug of loadBuff    : signal is "true";
 attribute mark_debug of shiftBuff   : signal is "true";
+attribute mark_debug of dataInVec   : signal is "true";
 
 begin
 
