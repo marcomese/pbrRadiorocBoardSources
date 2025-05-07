@@ -40,6 +40,8 @@ package devicesPkg is
 
     function slvToDev(s: std_logic_vector) return devices_t;
 
+    function slvToDevData(s: std_logic_vector) return devData_t;
+
     function devAddrToSlv(a: devAddr_t) return std_logic_vector;
 
     function devAddrToInt(a: devAddr_t) return integer;
@@ -67,6 +69,16 @@ package body devicesPkg is
             
         return devices_t'val(sInt);
     end function slvToDev;
+
+    function slvToDevData(s: std_logic_vector) return devData_t is
+        variable dData : devData_t;
+    begin
+        for i in 0 to devDataBytes-1 loop
+            dData(i) := s(8*i+7 downto 8*i);
+        end loop;
+
+        return dData;
+    end function slvToDevData;
 
     function devAddrToSlv(a: devAddr_t) return std_logic_vector is
         variable sAddr : std_logic_vector(devAddrBytes*8-1 downto 0);

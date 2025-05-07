@@ -18,8 +18,7 @@ use work.devicesPkg.all;
 
 entity radiorocInterface is
 generic(
-    chipID     : std_logic_vector(3 downto 0);
-    maxBrstLen : natural
+    chipID     : std_logic_vector(3 downto 0)
 );
 port(
     clk        : in  std_logic;
@@ -55,7 +54,6 @@ signal   state      : state_t;
 
 signal   dataReady,
          rw,
-         brst,
          brstOn,
          exec,
          busyRad    : std_logic;
@@ -74,7 +72,6 @@ begin
         if rst = '1' then
             exec       <= '0';
             rw         <= readCmd;
-            brst       <= '0';
             rAddr      <= (others => (others => '0'));
             devReady   <= '0';
             busy       <= '0';
@@ -88,7 +85,6 @@ begin
                     if devExec = '1' and devId = radioroc and busyRad = '0' then
                         exec     <= '1';
                         rw       <= devRw;
-                        brst     <= devBurst;
                         rAddr    <= devAddr;
                         dataIn   <= devDataIn;
                         devReady <= '0';
@@ -97,7 +93,6 @@ begin
 
                         state    <= waitReady;
                     else
-                        brst     <= '0';
                         devReady <= '0';
                         busy     <= '0';
                         i2cEnClk <= '0';
@@ -139,7 +134,6 @@ begin
                 when others =>
                     exec     <= '0';
                     rw       <= readCmd;
-                    brst     <= '0';
                     rAddr    <= (others => (others => '0'));
                     devReady <= '0';
                     busy     <= '0';
@@ -154,15 +148,14 @@ end process;
 
 radioFSMInst: entity work.radiorocFSM
 generic map(
-    chipID     => chipID,
-    maxBrstLen => maxBrstLen
+    chipID     => chipID
 )
 port map(
     clk          => clk,
     rst          => rst,      
     exec         => exec,
     rw           => rw,
-    brst         => brst,
+    brst         => devBurst,
     addr         => rAddr,
     dataIn       => dataIn,
     dataOut      => dataOut,

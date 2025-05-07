@@ -19,8 +19,7 @@ use work.utilsPkg.all;
 
 entity radiorocFSM is
 generic(
-    chipID     : std_logic_vector(3 downto 0);
-    maxBrstLen : natural -- maximum number of bytes to read/write in burst mode
+    chipID     : std_logic_vector(3 downto 0)
 );
 port(
     clk       : in  std_logic;
@@ -51,31 +50,28 @@ type state_t is (idle,
                  waitBusy,
                  burstRead,
                  burstWrite,
+                 lastBytesLoad,
                  transEnd);
 
 constant R0           : std_logic_vector(2 downto 0) := "000";
 constant R1           : std_logic_vector(2 downto 0) := "001";
 constant R2           : std_logic_vector(2 downto 0) := "010";
 constant R3           : std_logic_vector(2 downto 0) := "011";
-constant maxBrstSlv   : std_logic_vector(bitsNum(maxBrstLen)-1 downto 0) := std_logic_vector(to_unsigned(maxBrstLen, bitsNum(maxBrstLen)));
 
 signal   state        : state_t;
 signal   rwSig,
          brstOnSig,
-         brstVal,
          i2cBusyOld,
          i2cBusyRise,
          loadBuff,
          shiftBuff,
          emptyBuff,
          lastBuff,
-         lastBrst,
-         lastLeft     : std_logic;
+         lastLeft,
+         brstOld,
+         brstFall     : std_logic;
 signal   dataInVec    : std_logic_vector(devDataBytes*8-1 downto 0);
 signal   dataOutBuff  : std_logic_vector(dataInVec'left downto 0);
-signal   brstByteNum  : std_logic_vector(maxBrstSlv'left-2 downto 0);
-signal   leftBNum     : std_logic_vector(1 downto 0);
-signal   brstCnt      : unsigned(brstByteNum'left+1 downto 0); --adding 1 for lastBrst signal
 signal   leftBCnt     : unsigned(2 downto 0);
 
 attribute mark_debug : string;
@@ -93,40 +89,11 @@ brstOn       <= brstOnSig;
 
 i2cBusyRise  <= (not i2cBusyOld) and i2cBusy;
 
-lastBrst     <= brstCnt(brstCnt'left);
+dataInVec    <= devDataToSlv(dataIn);
 
 lastLeft     <= leftBCnt(leftBCnt'left);
 
-dataInVec    <= devDataToSlv(dataIn);
-
-brstBytesProc: process(clk, rst)
-begin
-    if rising_edge(clk) then
-        if rst = '1' then
-            brstByteNum <= (others => '0');
-            leftBNum    <= (others => '0');
-            brstVal     <= '0';
-        else
-            if unsigned(dataInVec) = 0 then
-                brstByteNum <= (others => '0');
-                leftBNum    <= (others => '0');
-                brstVal     <= '0';
-            elsif unsigned(dataInVec) > maxBrstLen then
-                brstByteNum <= maxBrstSlv(maxBrstSlv'left downto 2);
-                leftBNum    <= maxBrstSlv(1 downto 0);
-                brstVal     <= '1';
-            elsif unsigned(dataInVec) < 4 then
-                brstByteNum <= (others => '0');
-                leftBNum    <= dataInVec(1 downto 0);
-                brstVal     <= '1';
-            else
-                brstByteNum  <= dataInVec(brstByteNum'left+2 downto 2);
-                leftBNum     <= dataInVec(1 downto 0);
-                brstVal     <= '1';
-            end if;
-        end if;
-    end if;
-end process;
+brstFall     <= brstOld and not brst;
 
 radioFSM: process(clk, rst, exec)
 begin
@@ -139,17 +106,18 @@ begin
             i2cBusyOld    <= '0';
             rwSig         <= '0';
             brstOnSig     <= '0';
+            brstOld       <= '0';
             busy          <= '0';
             dataReady     <= '0';
             dataOut       <= (others => (others => '0'));
-            brstCnt       <= (others => '0');
-            leftBCnt      <= (others => '0');
             loadBuff      <= '0';
             shiftBuff     <= '0';
+            leftBCnt      <= (others => '0');
 
             state         <= idle;
         else
             i2cBusyOld  <= i2cBusy;
+            brstOld     <= brst;
 
             case state is
                 when idle =>
@@ -190,9 +158,7 @@ begin
                         i2cAddr   <= chipID & R2;
                         i2cRw     <= rwSig;
                         i2cDataWr <= dataIn(0);
-                        brstOnSig <= brst and brstVal;
-                        brstCnt   <= resize(unsigned(brstByteNum), brstCnt'length);
-                        leftBCnt  <= resize(unsigned(leftBNum), leftBCnt'length);
+                        brstOnSig <= brst;
 
                         state     <= waitBusy;
                     elsif i2cBusy = '0' then
@@ -206,33 +172,27 @@ begin
                     end if;
 
                 when waitBusy =>
-                    if i2cBusyRise = '1' and brstOnSig = '0' then
+                    if i2cBusyRise = '1' and brst = '0' then
                         i2cEna    <= '0';
                         busy      <= '0';
 
                         state     <= transEnd;
-                    elsif i2cBusy = '0' and brstOnSig = '0' then
+                    elsif i2cBusy = '0' and brst = '0' then
                         i2cEna <= '1';
 
                         state  <= waitBusy;
-                    elsif i2cBusy = '0' and brstOnSig = '1' and rwSig = devWrite then
+                    elsif i2cBusy = '0' and brst = '1' and rwSig = devWrite then
                         i2cEna    <= '0';
                         i2cAddr   <= chipID & R3;
                         i2cRw     <= rwSig;
                         dataReady <= '1';
-                        brstOnSig <= '1';
-                        brstCnt   <= brstCnt - 1;
-                        leftBCnt  <= leftBCnt - 1;
 
                         state     <= burstWrite;
-                    elsif i2cBusy = '0' and brstOnSig = '1' and rwSig = devRead then
+                    elsif i2cBusy = '0' and brst = '1' and rwSig = devRead then
                         i2cEna    <= '1';
                         i2cAddr   <= chipID & R3;
                         i2cRw     <= devWrite;
                         dataReady <= '0';
-                        brstOnSig <= '1';
-                        brstCnt   <= brstCnt - 1;
-                        leftBCnt  <= leftBCnt - 1;
 
                         state     <= burstRead;
                     else
@@ -241,94 +201,47 @@ begin
                         state  <= waitBusy;
                     end if;
 
-                when burstRead =>
-                    if exec = '1' then
-                        i2cEna    <= '1';
-                        loadBuff  <= '1';
-
-                        state     <= burstWrite;
-                    elsif lastBrst = '0' then
-                        if i2cBusyRise = '1' and lastBuff = '0' then
-                            shiftBuff <= '1';
-
-                            state     <= burstWrite;
-                        elsif i2cBusyRise = '1' and lastBuff = '1' then
-                            dataReady <= '1';
-                            brstCnt   <= brstCnt - 1;
-
-                            state     <= burstWrite;
-                        else
-                            dataReady <= '0';
-                            loadBuff  <= '0';
-                            shiftBuff <= '0';
-    
-                            state     <= burstWrite;
-                        end if;
-                    elsif lastBrst = '1' then
-                        if i2cBusyRise = '1' and lastLeft = '0' then
-                            dataReady <= '0';
-                            shiftBuff <= '1';
-                            leftBCnt  <= leftBCnt - 1;
-
-                            state     <= burstWrite;
-                        elsif lastLeft = '1' then
-                            i2cEna    <= '0';
-                            dataReady <= '0';
-                            brstOnSig <= '0';
-                            brstCnt   <= resize(unsigned(brstByteNum), brstCnt'length);
-                            leftBCnt  <= resize(unsigned(leftBNum), leftBCnt'length);
-                            shiftBuff <= '0';
-
-                            state     <= transEnd;
-                        else
-                            dataReady <= '0';
-                            loadBuff  <= '0';
-                            shiftBuff <= '0';
-    
-                            state     <= burstWrite;
-                        end if;
-                    end if;
-
                 when burstWrite =>
-                    if exec = '1' then
+                    if brstFall = '1' then
+                        state     <= lastBytesLoad;
+                    elsif exec = '1' then
                         i2cEna    <= '1';
                         loadBuff  <= '1';
 
                         state     <= burstWrite;
-                    elsif lastBrst = '0' then
-                        if i2cBusyRise = '1' and lastBuff = '0' then
+                    else
+                        if brst = '0' then
+                            if i2cBusyRise = '1' and lastLeft = '0' then
+                                loadBuff  <= '0';
+                                shiftBuff <= '1';
+                                dataReady <= '0';
+                                leftBCnt  <= leftBCnt - 1;
+                                i2cDataWr <= dataOutBuff(dataOutBuff'left downto dataOutBuff'left-7);
+
+                                state     <= burstWrite;
+                            elsif i2cBusyRise = '1' and lastLeft = '1' then
+                                loadBuff  <= '0';
+                                i2cEna    <= '0';
+                                dataReady <= '0';
+                                brstOnSig <= '0';
+
+                                state     <= transEnd;
+                            else
+                                loadBuff  <= '0';
+                                shiftBuff <= '0';
+                                dataReady <= '0';
+                                i2cDataWr <= dataOutBuff(dataOutBuff'left downto dataOutBuff'left-7);
+
+                                state     <= burstWrite;
+                            end if;
+                        elsif i2cBusyRise = '1' and lastBuff = '0' then
                             shiftBuff <= '1';
 
                             state     <= burstWrite;
                         elsif i2cBusyRise = '1' and lastBuff = '1' then
                             dataReady <= '1';
-                            brstCnt   <= brstCnt - 1;
 
                             state     <= burstWrite;
-                        else
-                            i2cDataWr <= dataOutBuff(dataOutBuff'left downto dataOutBuff'left-7);
-                            dataReady <= '0';
-                            loadBuff  <= '0';
-                            shiftBuff <= '0';
-    
-                            state     <= burstWrite;
-                        end if;
-                    elsif lastBrst = '1' then
-                        if i2cBusyRise = '1' and lastLeft = '0' then
-                            dataReady <= '0';
-                            shiftBuff <= '1';
-                            leftBCnt  <= leftBCnt - 1;
-
-                            state     <= burstWrite;
-                        elsif lastLeft = '1' then
-                            i2cEna    <= '0';
-                            dataReady <= '0';
-                            brstOnSig <= '0';
-                            brstCnt   <= resize(unsigned(brstByteNum), brstCnt'length);
-                            leftBCnt  <= resize(unsigned(leftBNum), leftBCnt'length);
-                            shiftBuff <= '0';
-
-                            state     <= transEnd;
                         else
                             i2cDataWr <= dataOutBuff(dataOutBuff'left downto dataOutBuff'left-7);
                             dataReady <= '0';
@@ -338,23 +251,34 @@ begin
                             state     <= burstWrite;
                         end if;
                     end if;
+
+                when lastBytesLoad =>
+                        loadBuff  <= '1';
+                        leftBCnt  <= unsigned(dataIn(0)(2 downto 0))-1;
+
+                        state     <= burstWrite;
 
                 when transEnd =>
                     if i2cBusy = '0' and rwSig = devRead then
+                        brstOnSig <= '0';
                         busy      <= '0';
                         dataReady <= '1';
+                        shiftBuff <= '0';
                         dataOut   <= (0      => i2cDataRd,
                                       others => (others => '0'));
 
                         state     <= idle;
                     elsif i2cBusy = '0' and rwSig = devWrite then
+                        brstOnSig <= '0';
                         busy      <= '0';
                         dataReady <= '1';
+                        shiftBuff <= '0';
                         dataOut   <= (others => (others => '0'));
 
                         state     <= idle;
                     else
                         dataReady <= '0';
+                        shiftBuff <= '0';
 
                         state     <= transEnd;
                     end if;
