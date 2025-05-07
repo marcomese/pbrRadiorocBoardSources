@@ -180,6 +180,7 @@ constant readCmd    : std_logic_vector(3 downto 0) := x"A";
 constant writeCmd   : std_logic_vector(3 downto 0) := x"5";
 constant burstWrCmd : std_logic_vector(3 downto 0) := x"3";
 constant burstRdCmd : std_logic_vector(3 downto 0) := x"B";
+constant maxBrstLen : integer                      := 125;
 
 signal   dataToDev,
          dataFromPGen,
@@ -205,7 +206,7 @@ signal   devReadyPGen,
 signal   devAddr        : devAddr_t;
 
 -- SIGNALS FOR spiSlave --
-signal   error          : std_logic_vector(1 downto 0);
+signal   error          : std_logic_vector(2 downto 0);
 signal   dataIn         : std_logic_vector(7 downto 0);
 signal   dataOut        : std_logic_vector(7 downto 0);
 signal   rxRead         : std_logic;
@@ -586,8 +587,7 @@ port map(
 
 radInterfInst: entity work.radiorocInterface
 generic map(
-    chipID     => chipID,
-    maxBrstLen => 125
+    chipID     => chipID
 )
 port map(
     clk        => clk_100M,
@@ -653,12 +653,13 @@ devBusyVec(radioroc)   <= devBusyRadioroc;
 
 devInterfInst: entity work.deviceInterface
 generic map(
-    clkFreq    => clkFreq,
-    timeout    => timeout,
-    readCmd    => readCmd,
-    writeCmd   => writeCmd,
-    burstWrCmd => burstWrCmd,
-    burstRdCmd => burstRdCmd
+    clkFreq      => clkFreq,
+    timeout      => timeout,
+    readCmd      => readCmd,
+    writeCmd     => writeCmd,
+    burstWrCmd   => burstWrCmd,
+    burstRdCmd   => burstRdCmd,
+    maxBrstLen   => maxBrstLen
 )
 port map(
     clk        => clk_100M,
