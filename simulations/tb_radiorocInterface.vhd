@@ -320,7 +320,7 @@ begin
     wait for clkPeriod;
     testTxWrite <= '0';
     wait for clkPeriod*delay;
-    testDataIn <= x"05"; -- send 0xNN bytes in burst mode
+    testDataIn <= x"08"; -- send 0xNN bytes in burst mode
     testTxWrite <= '1';
     wait for clkPeriod;
     testTxWrite <= '0';
