@@ -67,6 +67,8 @@ signal   rwSig,
          shiftBuff,
          emptyBuff,
          lastBuff,
+         lastBuffOld,
+         lastBuffFall,
          lastLeft,
          brstOld,
          brstFall,
@@ -97,6 +99,8 @@ lastLeft     <= leftBCnt(leftBCnt'left);
 
 brstFall     <= brstOld and not brst;
 
+lastBuffFall <= lastBuffOld and not lastBuff;
+
 radioFSM: process(clk, rst, exec)
 begin
     if rising_edge(clk) then
@@ -122,6 +126,7 @@ begin
         else
             i2cBusyOld  <= i2cBusy;
             brstOld     <= brst;
+            lastBuffOld <= lastBuff;
 
             case state is
                 when idle =>
@@ -230,13 +235,12 @@ begin
 
                         state      <= burstRead;
                     elsif reading = '1' then
-                        if i2cBusyRise = '1' and lastBuff = '0' then
+                        if i2cBusyRise = '1' then
                             dataReady <= '0';
                             shiftBuff <= exec;
-                            i2cRw     <= rwSig;
 
                             state     <= burstRead;
-                        elsif i2cBusyRise = '1' and lastBuff = '1' then
+                        elsif lastBuffFall = '1' then
                             dataReady <= '1';
                             loadBuff  <= '1';
                             shiftBuff <= '0';

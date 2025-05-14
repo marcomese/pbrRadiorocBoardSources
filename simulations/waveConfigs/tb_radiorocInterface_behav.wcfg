@@ -13,13 +13,13 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="296.600000 us"></ZoomStartTime>
-      <ZoomEndTime time="363.400001 us"></ZoomEndTime>
-      <Cursor1Time time="361.700000 us"></Cursor1Time>
+      <ZoomStartTime time="0.000000 us"></ZoomStartTime>
+      <ZoomEndTime time="500.000001 us"></ZoomEndTime>
+      <Cursor1Time time="272.060000 us"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="186"></NameColumnWidth>
-      <ValueColumnWidth column_width="79"></ValueColumnWidth>
+      <ValueColumnWidth column_width="75"></ValueColumnWidth>
    </column_width_setting>
    <WVObjectSize size="59" />
    <wvobject fp_name="/tb_radiorocInterface/clk" type="logic">
@@ -113,10 +113,6 @@
    <wvobject fp_name="/tb_radiorocInterface/uut/i2cDataRd" type="array">
       <obj_property name="ElementShortName">i2cDataRd[7:0]</obj_property>
       <obj_property name="ObjectShortName">i2cDataRd[7:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_radiorocInterface/devInterfInst/brstByteOdd" type="array">
-      <obj_property name="ElementShortName">brstByteOdd[1:0]</obj_property>
-      <obj_property name="ObjectShortName">brstByteOdd[1:0]</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_radiorocInterface/devInterfInst/brstReadBNum" type="array">
       <obj_property name="ElementShortName">brstReadBNum[1:0]</obj_property>
@@ -221,6 +217,10 @@
    <wvobject fp_name="/tb_radiorocInterface/uut/radioFSMInst/lastBuff" type="logic">
       <obj_property name="ElementShortName">lastBuff</obj_property>
       <obj_property name="ObjectShortName">lastBuff</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_radiorocInterface/uut/radioFSMInst/lastBuffFall" type="logic">
+      <obj_property name="ElementShortName">lastBuffFall</obj_property>
+      <obj_property name="ObjectShortName">lastBuffFall</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_radiorocInterface/uut/radioFSMInst/emptyBuff" type="logic">
       <obj_property name="ElementShortName">emptyBuff</obj_property>
