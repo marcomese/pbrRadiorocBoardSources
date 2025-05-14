@@ -45,8 +45,6 @@ signal   buffInt  : std_logic_vector(regLen-1 downto 0);
 
 begin
 
-empty <= shiftCnt(shiftCnt'left);
-
 last  <= not or_reduce(std_logic_vector(shiftCnt));
 
 leftShiftGen: if direction = "left" generate
@@ -91,11 +89,14 @@ shiftCntInst: process(clk, rst)
 begin
     if rising_edge(clk) then
         if rst = '1' then
-            shiftCnt <= (others => '1');
+            shiftCnt <= to_unsigned(shiftNum-1, shiftCnt'length);
+            empty    <= '1';
         elsif load = '1' then
             shiftCnt <= to_unsigned(shiftNum-1, shiftCnt'length);
+            empty    <= '0';
         elsif shift = '1' then
             shiftCnt <= shiftCnt - 1;
+            empty    <= shiftCnt(shiftCnt'left);
         end if;
     end if;
 end process;
