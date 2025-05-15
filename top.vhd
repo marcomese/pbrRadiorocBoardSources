@@ -75,11 +75,16 @@ entity radioroc_fw is
         dacSCLK  : out std_logic;
         dacCS    : out std_logic;
 
-        readRq : out std_logic;
-        cs     : in  std_logic;
-        sclk   : in  std_logic;
-        mosi   : in  std_logic;
-        miso   : out std_logic;
+        readRq_p : out std_logic;
+        readRq_n : out std_logic;
+        cs_p     : in  std_logic;
+        cs_n     : in  std_logic;
+        sclk_p   : in  std_logic;
+        sclk_n   : in  std_logic;
+        mosi_p   : in  std_logic;
+        mosi_n   : in  std_logic;
+        miso_p   : out std_logic;
+        miso_n   : out std_logic;
 
 --		BP0     : in    std_logic;
 --		BP1     : in    std_logic;
