@@ -63,13 +63,6 @@ entity radioroc_fw is
 		SCL_275 : inout std_logic;
 		SDA_275 : inout std_logic;
 
-        uartRx   : in  std_logic;
-        uartTx   : out std_logic;
-
-        initDone : out std_logic;
-        busy     : out std_logic;
-        running  : out std_logic;
-
         pulse    : out std_logic;
         dacSDI   : out std_logic;
         dacSCLK  : out std_logic;
@@ -240,6 +233,12 @@ signal   dataToMaster,
 
 signal extTrgFF, extTrgSig : std_logic;
 
+signal readRq,
+       cs,
+       sclk,
+       mosi,
+       miso    : std_logic;
+
 begin
 
 	reset <= not(npwr_reset);
@@ -275,7 +274,22 @@ begin
         ADC_HG_n    => ADC_HG_n,
         ADC_LG_p => ADC_LG_p,
         ADC_LG_n => ADC_LG_n,
-        T       => T
+        T       => T,
+        readRq   => readRq,
+        readRq_p => readRq_p,
+        readRq_n => readRq_n,
+        cs       => cs,
+        cs_p     => cs_p,
+        cs_n     => cs_n,
+        sclk     => sclk,
+        sclk_p   => sclk_p,
+        sclk_n   => sclk_n,
+        mosi     => mosi,
+        mosi_p   => mosi_p,
+        mosi_n   => mosi_n,
+        miso     => miso,
+        miso_p   => miso_p,
+        miso_n   => miso_n
     );
 
 	pll1 : PLL_RADIOROC_1

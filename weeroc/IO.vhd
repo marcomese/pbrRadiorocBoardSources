@@ -21,7 +21,22 @@ entity IO is
     ADC_HG_n    : in std_logic;
     ADC_LG_p : in std_logic;
     ADC_LG_n : in std_logic;
-    T : out std_logic_vector(63 downto 0)
+    T : out std_logic_vector(63 downto 0);
+    readRq   : in std_logic;
+    readRq_p : out std_logic;
+    readRq_n : out std_logic;
+    cs       : out std_logic;
+    cs_p     : in std_logic;
+    cs_n     : in std_logic;
+    sclk     : out std_logic;
+    sclk_p   : in std_logic;
+    sclk_n   : in std_logic;
+    mosi     : out std_logic;
+    mosi_p   : in std_logic;
+    mosi_n   : in std_logic;
+    miso     : in std_logic;
+    miso_p   : out std_logic;
+    miso_n   : out std_logic
   );
 end IO;
 
@@ -74,5 +89,49 @@ Port map (
     I => ADC_LG_p,
     IB => ADC_LG_n
     );
+
+readRqOBUF: OBUFDS
+port map(
+    I  => readRq,
+    O  => readRq_p,
+    OB => readRq_n
+);
+
+csIBUF: IBUFDS
+generic map(
+    DIFF_TERM => TRUE
+)
+port map(
+    O  => cs,
+    I  => cs_p,
+    IB => cs_n
+);
+
+sclkIBUF: IBUFDS
+generic map(
+    DIFF_TERM => TRUE
+)
+port map(
+    O  => sclk,
+    I  => sclk_p,
+    IB => sclk_n
+);
+
+mosiIBUF: IBUFDS
+generic map(
+    DIFF_TERM => TRUE
+)
+port map(
+    O  => mosi,
+    I  => mosi_p,
+    IB => mosi_n
+);
+
+misoOBUF: OBUFDS
+port map(
+    I  => miso,
+    O  => miso_p,
+    OB => miso_n
+);
 
 end Behavioral;
