@@ -74,15 +74,6 @@ signal   dataInVec    : std_logic_vector(devDataBytes*8-1 downto 0);
 signal   dataOutBuff  : std_logic_vector(dataInVec'left downto 0);
 signal   leftBCnt     : unsigned(2 downto 0);
 
-attribute mark_debug : string;
-attribute mark_debug of state       : signal is "true";
-attribute mark_debug of i2cDataWr   : signal is "true";
-attribute mark_debug of i2cDataRd   : signal is "true";
-attribute mark_debug of dataOutBuff : signal is "true";
-attribute mark_debug of loadBuff    : signal is "true";
-attribute mark_debug of shiftBuff   : signal is "true";
-attribute mark_debug of dataInVec   : signal is "true";
-
 begin
 
 brstOn       <= brstOnSig;

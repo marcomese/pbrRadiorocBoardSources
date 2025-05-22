@@ -93,17 +93,6 @@ signal   brstByteNum   : unsigned(bitsNum(bytesNum)-1 downto 0);
 signal   brstBuff      : brstBuff_t;
 signal   devDataOutSig : devData_t;
 
-attribute mark_debug : string;
-attribute mark_debug of state     : signal is "true";
-attribute mark_debug of error     : signal is "true";
-attribute mark_debug of dataIn    : signal is "true";
-attribute mark_debug of rxRead    : signal is "true";
-attribute mark_debug of rxPresent : signal is "true";
-attribute mark_debug of txWrite   : signal is "true";
-attribute mark_debug of txWrAck   : signal is "true";
-attribute mark_debug of rxEna     : signal is "true";
-
-
 begin
 
 rxRead     <= rxRdSig and not endCnt;
