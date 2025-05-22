@@ -239,6 +239,29 @@ signal readRq,
        mosi,
        miso    : std_logic;
 
+attribute mark_debug : string;
+attribute mark_debug of readRq,
+                        cs,
+                        sclk,
+                        mosi,
+                        miso,
+                        dataFromMaster,
+                        dataToMaster,
+                        rxPresent,
+                        txWrite,
+                        txWrAck,
+                        devExec,
+                        devId,
+                        devRw,
+                        devBurst,
+                        devAddr,
+                        dataToDev,
+                        dataFromRadioroc,
+                        devReadyRadioroc,
+                        devBusyRadioroc,
+                        i2cDataWrRad,
+                        i2cDataRdRad      : signal is "true";
+
 begin
 
 	reset <= not(npwr_reset);
