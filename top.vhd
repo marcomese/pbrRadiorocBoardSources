@@ -155,7 +155,7 @@ constant pwrOnTime      : real      := 20.0e-6;
 constant settlingTime   : real      := 5.0e-6;
 constant readPeriod     : real      := 1.0;
 ----debug
-constant testCount      : integer   := 100;
+constant testCount      : integer   := 50;
 
 constant tmpAddr        : std_logic_vector(6 downto 0) := "1001000";
 constant sipmHvAddr     : std_logic_vector(6 downto 0) := "1110011";
