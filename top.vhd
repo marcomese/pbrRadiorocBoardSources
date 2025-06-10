@@ -167,6 +167,8 @@ constant burstWrCmd : std_logic_vector(3 downto 0) := x"3";
 constant burstRdCmd : std_logic_vector(3 downto 0) := x"B";
 constant maxBrstLen : integer                      := 125;
 
+constant rstRadI2CLen : integer := 5;
+
 signal   dataToDev,
          dataFromPGen,
          dataFromHvTmp,
@@ -227,6 +229,13 @@ signal readRq,
        miso    : std_logic;
 
 signal testCnt : unsigned(bitsNum(testCount) downto 0);
+
+signal rstI2CCnt : unsigned(bitsNum(rstRadI2CLen) downto 0);
+
+attribute MARK_DEBUG : string;
+attribute MARK_DEBUG of dataFromMaster : signal is "TRUE";
+attribute MARK_DEBUG of dataToMaster   : signal is "TRUE";
+attribute MARK_DEBUG of rxPresent      : signal is "TRUE";
 
 begin
 
@@ -458,8 +467,22 @@ port map(
 		test => test_daq
 	);
 
-	sc_reset_n <= reset_n_sft and reset_n_acq;
+	sc_reset_n   <= reset_n_sft and reset_n_acq;
+
 	sc_rstn_read <= rstb_read_sft and rstn_read_acq;
+
+    sc_rstb_i2c  <= not rstI2CCnt(rstI2CCnt'left);
+
+    radiorocI2CRst: process(clk_100M, npwr_reset, rstI2CCnt)
+    begin
+        if rising_edge(clk_100M) then
+            if npwr_reset = '1' then
+                rstI2CCnt <= to_unsigned(rstRadI2CLen-1, rstI2CCnt'length);
+            elsif rstI2CCnt(rstI2CCnt'left) = '0' then
+                rstI2CCnt <= rstI2CCnt - 1;
+            end if;
+        end if;
+    end process;
 
 	ADC_SCKHG <= adc_sck;
 	ADC_SCKLG <= adc_sck;
