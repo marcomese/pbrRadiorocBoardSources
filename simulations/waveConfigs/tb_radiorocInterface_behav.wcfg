@@ -13,15 +13,15 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="0.000000 us"></ZoomStartTime>
-      <ZoomEndTime time="1,600.000001 us"></ZoomEndTime>
-      <Cursor1Time time="958.710000 us"></Cursor1Time>
+      <ZoomStartTime time="468,655.000 ns"></ZoomStartTime>
+      <ZoomEndTime time="471,821.001 ns"></ZoomEndTime>
+      <Cursor1Time time="472,170.000 ns"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="176"></NameColumnWidth>
-      <ValueColumnWidth column_width="93"></ValueColumnWidth>
+      <ValueColumnWidth column_width="69"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="60" />
+   <WVObjectSize size="78" />
    <wvobject fp_name="/tb_radiorocInterface/clk" type="logic">
       <obj_property name="ElementShortName">clk</obj_property>
       <obj_property name="ObjectShortName">clk</obj_property>
@@ -58,17 +58,9 @@
       <obj_property name="ElementShortName">devIntBusy</obj_property>
       <obj_property name="ObjectShortName">devIntBusy</obj_property>
    </wvobject>
-   <wvobject fp_name="/tb_radiorocInterface/spiInst/cs" type="logic">
-      <obj_property name="ElementShortName">cs</obj_property>
-      <obj_property name="ObjectShortName">cs</obj_property>
-   </wvobject>
    <wvobject fp_name="/tb_radiorocInterface/spiInst/sclk" type="logic">
       <obj_property name="ElementShortName">sclk</obj_property>
       <obj_property name="ObjectShortName">sclk</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_radiorocInterface/spiInst/miso" type="logic">
-      <obj_property name="ElementShortName">miso</obj_property>
-      <obj_property name="ObjectShortName">miso</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_radiorocInterface/dataToDev" type="array">
       <obj_property name="ElementShortName">dataToDev[3:0][7:0]</obj_property>
@@ -87,8 +79,8 @@
       <obj_property name="ObjectShortName">devReadyVec[0:6]</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_radiorocInterface/error" type="array">
-      <obj_property name="ElementShortName">error[1:0]</obj_property>
-      <obj_property name="ObjectShortName">error[1:0]</obj_property>
+      <obj_property name="ElementShortName">error[2:0]</obj_property>
+      <obj_property name="ObjectShortName">error[2:0]</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_radiorocInterface/rxRead" type="logic">
       <obj_property name="ElementShortName">rxRead</obj_property>
@@ -141,10 +133,6 @@
    <wvobject fp_name="/tb_radiorocInterface/devInterfInst/devBrstSig" type="logic">
       <obj_property name="ElementShortName">devBrstSig</obj_property>
       <obj_property name="ObjectShortName">devBrstSig</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_radiorocInterface/devInterfInst/brstGetSig" type="logic">
-      <obj_property name="ElementShortName">brstGetSig</obj_property>
-      <obj_property name="ObjectShortName">brstGetSig</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_radiorocInterface/devInterfInst/state" type="other">
       <obj_property name="ElementShortName">state</obj_property>
@@ -293,5 +281,62 @@
    <wvobject fp_name="/tb_radiorocInterface/uut/state" type="other">
       <obj_property name="ElementShortName">state</obj_property>
       <obj_property name="ObjectShortName">state</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_radiorocInterface/spiInst/cs" type="logic">
+      <obj_property name="ElementShortName">cs</obj_property>
+      <obj_property name="ObjectShortName">cs</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_radiorocInterface/spiInst/sclkShift" type="array">
+      <obj_property name="ElementShortName">sclkShift[4:0]</obj_property>
+      <obj_property name="ObjectShortName">sclkShift[4:0]</obj_property>
+      <obj_property name="Radix">BINARYRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_radiorocInterface/spiInst/sclk" type="logic">
+      <obj_property name="ElementShortName">sclk</obj_property>
+      <obj_property name="ObjectShortName">sclk</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_radiorocInterface/spiInst/miso" type="logic">
+      <obj_property name="ElementShortName">miso</obj_property>
+      <obj_property name="ObjectShortName">miso</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_radiorocInterface/spiInst/mosi" type="logic">
+      <obj_property name="ElementShortName">mosi</obj_property>
+      <obj_property name="ObjectShortName">mosi</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_radiorocInterface/spiInst/sendBit" type="logic">
+      <obj_property name="ElementShortName">sendBit</obj_property>
+      <obj_property name="ObjectShortName">sendBit</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_radiorocInterface/spiInst/loadBit" type="logic">
+      <obj_property name="ElementShortName">loadBit</obj_property>
+      <obj_property name="ObjectShortName">loadBit</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_radiorocInterface/spiInst/bitCount" type="array">
+      <obj_property name="ElementShortName">bitCount[3:0]</obj_property>
+      <obj_property name="ObjectShortName">bitCount[3:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_radiorocInterface/spiInst/buffOut" type="array">
+      <obj_property name="ElementShortName">buffOut[7:0]</obj_property>
+      <obj_property name="ObjectShortName">buffOut[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_radiorocInterface/spiInst/sclkLen" type="other">
+      <obj_property name="ElementShortName">sclkLen</obj_property>
+      <obj_property name="ObjectShortName">sclkLen</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_radiorocInterface/spiSlaveInst/buffIn" type="array">
+      <obj_property name="ElementShortName">buffIn[7:0]</obj_property>
+      <obj_property name="ObjectShortName">buffIn[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_radiorocInterface/spiSlaveInst/loadRxFifo" type="logic">
+      <obj_property name="ElementShortName">loadRxFifo</obj_property>
+      <obj_property name="ObjectShortName">loadRxFifo</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_radiorocInterface/spiSlaveInst/sclkFall" type="logic">
+      <obj_property name="ElementShortName">sclkFall</obj_property>
+      <obj_property name="ObjectShortName">sclkFall</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_radiorocInterface/spiSlaveInst/sclkRise" type="logic">
+      <obj_property name="ElementShortName">sclkRise</obj_property>
+      <obj_property name="ObjectShortName">sclkRise</obj_property>
    </wvobject>
 </wave_config>

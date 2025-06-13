@@ -78,16 +78,14 @@ end component;
 
 constant sclkPeriod : real    := floor(clkFreq/sclkFreq);
 constant sclkLen    : integer := integer(sclkPeriod);
-constant sclkHalf   : integer := integer(ceil(sclkPeriod/2.0));
-constant lBSliceL   : integer := integer(floor(sclkPeriod/2.0)+ceil(sclkPeriod/4.0)-1.0);
-constant lBSliceR   : integer := integer(ceil(sclkPeriod/4.0));
-constant sBSliceL   : integer := integer(ceil(sclkPeriod/2.0)+floor(sclkPeriod/4.0)-1.0);
-constant sBSliceR   : integer := integer(floor(sclkPeriod/4.0));
+constant sclkHalfC  : integer := integer(ceil(sclkPeriod/2.0));
+constant sclkHalfF  : integer := integer(floor(sclkPeriod/2.0));
 
 signal sclkSig,
        loadBit,
        sendBit,
        csSig,
+       transEn,
        txPres,
        loadTxFifo,
        loadRxFifo : std_logic;
@@ -113,13 +111,11 @@ tx_present <= txPres;
 
 sclkSig    <= sclkShift(0);
 
-sendBit    <= (not or_reduce(sclkShift(sclkShift'left downto lBSliceL+1))) and 
-              and_reduce(sclkShift(lBSliceL downto lBSliceR)) and
-              (not or_reduce(sclkShift(lBSliceR-1 downto 0)));
+sendBit    <= transEn and (not or_reduce(sclkShift(sclkShift'left downto sclkHalfF)) and
+                           and_reduce(sclkShift(sclkHalfF-1 downto 0)));
 
-loadBit    <= (and_reduce(sclkShift(sclkShift'left downto sBSliceL+1))) and 
-              not or_reduce(sclkShift(sBSliceL downto sBSliceR)) and
-              (and_reduce(sclkShift(sBSliceR-1 downto 0)));
+loadBit    <= transEn and (and_reduce(sclkShift(sclkShift'left downto sclkHalfC)) and
+                           not or_reduce(sclkShift(sclkHalfC-1 downto 0)));
 
 shiftRegInInst: process(clk, rst, csSig, loadBit)
 begin
@@ -158,11 +154,24 @@ begin
     end if;
 end process;
 
+transEnGen: process(clk, rst, csSig)
+begin
+    if rising_edge(clk) then
+        if rst = '1' then
+            transEn <= '0';
+        elsif csSig = '0' then
+            transEn <= '1';
+        else
+            transEn <= '0';
+        end if;
+    end if;
+end process;
+
 sclkGen: process(clk, rst, csSig)
 begin
     if rising_edge(clk) then
         if rst = '1' or csSig = '1' then
-            sclkShift <= (sclkShift'left downto sclkHalf => '1',
+            sclkShift <= (sclkShift'left downto sclkHalfC => '1',
                           others => '0');
         elsif csSig = '0' then
             sclkShift <= sclkShift(0) & sclkShift(sclkShift'left downto 1);

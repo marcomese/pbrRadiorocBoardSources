@@ -158,25 +158,25 @@ begin
     end if;
 end process;
 
-shiftRegInInst: process(clk, rst, sclkRise, cs)
+shiftRegInInst: process(clk, rst, sclkFall, cs)
 begin
     if rising_edge(clk) then
         if rst = '1' then
             buffIn <= (others => '0');
-        elsif cs = '0' and sclkRise = '1' then
+        elsif cs = '0' and sclkFall = '1' then
             buffIn <= buffIn(6 downto 0) & mosi;
         end if;
     end if;
 end process;
 
-shiftRegOutInst: process(clk, rst, sclkFall, txPres, bitCount)
+shiftRegOutInst: process(clk, rst, sclkRise, txPres, bitCount)
 begin
     if rising_edge(clk) then
         if rst = '1' then
             buffOut <= (others => '0');
         elsif loadBuff = '1' and txPres = '1' then
             buffOut <= txFifoDout;
-        elsif cs = '0' and sclkFall = '1' then
+        elsif cs = '0' and sclkRise = '1' then
             buffOut <= buffOut(6 downto 0) & '0';
         end if;
     end if;
@@ -187,7 +187,7 @@ begin
     if rising_edge(clk) then
         if rst = '1' or lastBit = '1' or cs = '1' then
             bitCount <= to_unsigned(7, bitCount'length);
-        elsif sclkRise = '1' then
+        elsif sclkFall = '1' then
             bitCount <= bitCount - 1;
         end if;
     end if;

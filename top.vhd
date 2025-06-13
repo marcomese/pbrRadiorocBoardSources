@@ -232,10 +232,15 @@ signal testCnt : unsigned(bitsNum(testCount) downto 0);
 
 signal rstI2CCnt : unsigned(bitsNum(rstRadI2CLen) downto 0);
 
-attribute MARK_DEBUG : string;
-attribute MARK_DEBUG of dataFromMaster : signal is "TRUE";
-attribute MARK_DEBUG of dataToMaster   : signal is "TRUE";
-attribute MARK_DEBUG of rxPresent      : signal is "TRUE";
+attribute mark_debug : string;
+attribute mark_debug of readRq,
+                        cs,
+                        sclk,
+                        mosi,
+                        miso,
+                        dataFromMaster,
+                        dataToMaster,
+                        rxPresent      : signal is "true";
 
 begin
 
@@ -471,7 +476,9 @@ port map(
 
 	sc_rstn_read <= rstb_read_sft and rstn_read_acq;
 
-    sc_rstb_i2c  <= not rstI2CCnt(rstI2CCnt'left);
+    sc_rstb_i2c  <= rstI2CCnt(rstI2CCnt'left);
+
+    sc_rstb_sc  <= rstI2CCnt(rstI2CCnt'left);
 
     radiorocI2CRst: process(clk_100M, npwr_reset, rstI2CCnt)
     begin
