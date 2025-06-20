@@ -523,7 +523,7 @@ begin
 
     testRxRead <= '1';
 
-    testDataIn <= x"A3";
+    testDataIn <= x"B3";
     wait for clkPeriod;
     testTxWrite <= '1';
     wait for clkPeriod;
@@ -531,14 +531,14 @@ begin
     wait for clkPeriod;
     testDataIn <= x"01";
     wait for clkPeriod;
---    testDataIn <= x"0A";
---    wait for clkPeriod;
---    testDataIn <= x"00";
---    wait for clkPeriod;
---    testDataIn <= x"00";
---    wait for clkPeriod;
---    testDataIn <= x"00";
---    wait for clkPeriod;
+    testDataIn <= x"00";
+    wait for clkPeriod;
+    testDataIn <= x"00";
+    wait for clkPeriod;
+    testDataIn <= x"00";
+    wait for clkPeriod;
+    testDataIn <= x"04";
+    wait for clkPeriod;
     testTxWrite <= '0';
 
     wait until i2cBusy = '0';
