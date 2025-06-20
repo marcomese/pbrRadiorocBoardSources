@@ -238,6 +238,8 @@ attribute mark_debug of readRq,
                         sclk,
                         mosi,
                         miso,
+                        sc_rstb_i2c,
+                        sc_rstb_sc,
                         dataFromMaster,
                         dataToMaster,
                         rxPresent      : signal is "true";
@@ -480,10 +482,10 @@ port map(
 
     sc_rstb_sc  <= rstI2CCnt(rstI2CCnt'left);
 
-    radiorocI2CRst: process(clk_100M, npwr_reset, rstI2CCnt)
+    radiorocI2CRst: process(clk_100M, reset, rstI2CCnt)
     begin
         if rising_edge(clk_100M) then
-            if npwr_reset = '1' then
+            if reset = '1' then
                 rstI2CCnt <= to_unsigned(rstRadI2CLen-1, rstI2CCnt'length);
             elsif rstI2CCnt(rstI2CCnt'left) = '0' then
                 rstI2CCnt <= rstI2CCnt - 1;
