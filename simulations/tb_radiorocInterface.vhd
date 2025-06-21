@@ -547,7 +547,19 @@ begin
 
     wait until i2cBusy = '0';
 
-    testData <= x"80";
+    testData <= x"AA";
+    
+    wait until i2cBusy = '0';
+
+    testData <= x"BB";
+
+    wait until i2cBusy = '0';
+
+    testData <= x"CC";
+
+    wait until i2cBusy = '0';
+
+    testData <= x"DD";
 
     wait for 10 us;
 
