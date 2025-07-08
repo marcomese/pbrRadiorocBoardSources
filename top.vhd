@@ -71,7 +71,7 @@ entity radioroc_fw is
 
         dbgOut        : out std_logic_vector(7 downto 0);
 
-		extTrg        : out std_logic -- in std_logic
+		extTrg        : in std_logic
 	);
 end entity;
 
@@ -154,8 +154,6 @@ constant sleepOnPwrOn   : boolean   := True;
 constant pwrOnTime      : real      := 20.0e-6;
 constant settlingTime   : real      := 5.0e-6;
 constant readPeriod     : real      := 1.0;
-----debug
-constant testCount      : integer   := 50;
 
 constant tmpAddr        : std_logic_vector(6 downto 0) := "1001000";
 constant sipmHvAddr     : std_logic_vector(6 downto 0) := "1110011";
@@ -228,8 +226,6 @@ signal readRq,
        mosi,
        miso    : std_logic;
 
-signal testCnt : unsigned(bitsNum(testCount) downto 0);
-
 signal rstI2CCnt : unsigned(bitsNum(rstRadI2CLen) downto 0);
 
 attribute mark_debug : string;
@@ -250,35 +246,18 @@ begin
 
 	nCMOS <= '1';
 
-extTrg <= extTrgSig;
-
-testOutInst: process(reset, clk_10M)
+extTrgSync: process(reset, clk_200M)
 begin
-    if rising_edge(clk_10M) then
+    if rising_edge(clk_200M) then
         if reset = '1' then
-            extTrgSig  <= '0';
-            testCnt    <= to_unsigned(testCount, testCnt'length);
-        elsif testCnt(testCnt'left) = '1' then
-            extTrgSig  <= not extTrgSig;
-            testCnt    <= to_unsigned(testCount, testCnt'length);
+            extTrgFF  <= '0';
+            extTrgSig <= '0';
         else
-            testCnt <= testCnt - 1;
+            extTrgFF  <= extTrg;
+            extTrgSig <= extTrgFF;
         end if;
     end if;
 end process;
-
---    extTrgSync: process(reset, clk_200M)
---    begin
---        if rising_edge(clk_200M) then
---            if reset = '1' then
---                extTrgFF  <= '0';
---                extTrgSig <= '0';
---            else
---                extTrgFF  <= extTrg;
---                extTrgSig <= extTrgFF;
---            end if;
---        end if;
---    end process;
 
 	IOs : entity xil_defaultlib.IO
     Port map(

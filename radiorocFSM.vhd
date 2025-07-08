@@ -63,6 +63,7 @@ signal   rwSig,
          brstOnSig,
          i2cBusyOld,
          i2cBusyRise,
+         rstBuff,
          loadBuff,
          shiftBuff,
          emptyBuff,
@@ -102,6 +103,7 @@ begin
             busy          <= '0';
             dataReady     <= '0';
             dataOut       <= (others => (others => '0'));
+            rstBuff       <= '1';
             loadBuff      <= '0';
             shiftBuff     <= '0';
             leftBCnt      <= (others => '0');
@@ -122,11 +124,13 @@ begin
                         rwSig     <= rw;
                         busy      <= '1';
                         dataReady <= '0';
+                        rstBuff   <= '0';
 
                         state     <= writeSubAddr;
                     else
                         i2cEna    <= '0';
                         dataReady <= '0';
+                        rstBuff   <= '1';
 
                         state     <= idle;
                     end if;
@@ -186,7 +190,7 @@ begin
                         i2cAddr   <= chipID & R3;
                         i2cRw     <= devWrite;
                         dataReady <= '0';
-                        loadBuff  <= '1';
+                        rstBuff   <= '1';
 
                         state     <= burstRead;
                     else
@@ -290,6 +294,7 @@ begin
                             state     <= burstRead;
                         else
                             dataReady <= '0';
+                            rstBuff   <= '0';
                             loadBuff  <= '0';
                             shiftBuff <= '0';
                             i2cRw     <= devRead;
@@ -352,7 +357,7 @@ generic map(
 )
 port map(
     clk        => clk,
-    rst        => rst,
+    rst        => rstBuff,
     load       => loadBuff,
     shift      => shiftBuff,
     empty      => emptyBuff,

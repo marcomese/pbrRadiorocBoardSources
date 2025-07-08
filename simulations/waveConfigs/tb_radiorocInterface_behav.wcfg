@@ -13,15 +13,15 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="508.600000 us"></ZoomStartTime>
-      <ZoomEndTime time="829.200001 us"></ZoomEndTime>
-      <Cursor1Time time="646.600000 us"></Cursor1Time>
+      <ZoomStartTime time="0.000000 us"></ZoomStartTime>
+      <ZoomEndTime time="1,500.000001 us"></ZoomEndTime>
+      <Cursor1Time time="1,500.000000 us"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
-      <NameColumnWidth column_width="167"></NameColumnWidth>
+      <NameColumnWidth column_width="163"></NameColumnWidth>
       <ValueColumnWidth column_width="58"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="85" />
+   <WVObjectSize size="86" />
    <wvobject fp_name="/tb_radiorocInterface/clk" type="logic">
       <obj_property name="ElementShortName">clk</obj_property>
       <obj_property name="ObjectShortName">clk</obj_property>
@@ -202,10 +202,6 @@
       <obj_property name="ElementShortName">lastBuff</obj_property>
       <obj_property name="ObjectShortName">lastBuff</obj_property>
    </wvobject>
-   <wvobject fp_name="/tb_radiorocInterface/uut/radioFSMInst/state" type="other">
-      <obj_property name="ElementShortName">state</obj_property>
-      <obj_property name="ObjectShortName">state</obj_property>
-   </wvobject>
    <wvobject fp_name="/tb_radiorocInterface/uut/radioFSMInst/shiftBuff" type="logic">
       <obj_property name="ElementShortName">shiftBuff</obj_property>
       <obj_property name="ObjectShortName">shiftBuff</obj_property>
@@ -297,6 +293,14 @@
    <wvobject fp_name="/tb_radiorocInterface/uut/radioFSMInst/brstFall" type="logic">
       <obj_property name="ElementShortName">brstFall</obj_property>
       <obj_property name="ObjectShortName">brstFall</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_radiorocInterface/uut/radioFSMInst/shiftBuffInst/shiftCnt" type="array">
+      <obj_property name="ElementShortName">shiftCnt[3:0]</obj_property>
+      <obj_property name="ObjectShortName">shiftCnt[3:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_radiorocInterface/uut/radioFSMInst/shiftBuff" type="logic">
+      <obj_property name="ElementShortName">shiftBuff</obj_property>
+      <obj_property name="ObjectShortName">shiftBuff</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_radiorocInterface/uut/radioFSMInst/dataOutBuff" type="array">
       <obj_property name="ElementShortName">dataOutBuff[31:0]</obj_property>

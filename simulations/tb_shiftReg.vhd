@@ -51,10 +51,10 @@ begin
     wait for clkPeriod*5;
 
     serDataIn <= x"55";
-    parDataIn <= x"ABCDEF12";
-    load   <= '1';
-    wait for clkPeriod;
-    load   <= '0';
+--    parDataIn <= x"ABCDEF12";
+--    load   <= '1';
+--    wait for clkPeriod;
+--    load   <= '0';
 
     wait for clkPeriod*5;
 

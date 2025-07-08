@@ -20,6 +20,15 @@ package utilsPkg is
 
     function max(a,b: integer) return integer;
 
+    function ones(size: integer) return std_logic_vector;
+
+    function zeroes(size: integer) return std_logic_vector;
+
+    function ones(size: integer) return unsigned;
+
+    function zeroes(size: integer) return unsigned;
+
+
     function initSlv(lenSlv: integer; beginSlvVal: integer; endSlvVal: integer; slvVal: std_logic_vector; othSlv: std_logic) return std_logic_vector;
 end package utilsPkg;
 
@@ -79,6 +88,31 @@ package body utilsPkg is
 
         return b;
     end max;
+
+    function ones(size: integer) return std_logic_vector is
+        variable slv : std_logic_vector(size-1 downto 0) := (others => '1');
+    begin
+        return slv;
+    end ones;
+
+    function zeroes(size: integer) return std_logic_vector is
+        variable slv : std_logic_vector(size-1 downto 0) := (others => '0');
+    begin
+        return slv;
+    end zeroes;
+
+    function ones(size: integer) return unsigned is
+        variable slv : unsigned(size-1 downto 0) := (others => '1');
+    begin
+        return slv;
+    end ones;
+
+    function zeroes(size: integer) return unsigned is
+        variable slv : unsigned(size-1 downto 0) := (others => '0');
+    begin
+        return slv;
+    end zeroes;
+
 
     function initSlv(lenSlv: integer; beginSlvVal: integer; endSlvVal: integer; slvVal: std_logic_vector; othSlv: std_logic) return std_logic_vector is
         variable slv : std_logic_vector(lenSlv-1 downto 0);
