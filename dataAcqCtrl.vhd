@@ -38,13 +38,32 @@ port(
     selAdc     : out std_logic;
     doutAcq    : in  std_logic_vector(7 downto 0);
     emptyAcq   : in  std_logic;
-    rdDCntAcq  : in  std_logic
+    rdDCntAcq  : in  std_logic_vector(15 downto 0)
 );
 end dataAcqCtrl;
 
 architecture Behavioral of dataAcqCtrl is
 
+type state_t is (idle,
+                 getEvtNum,
+                 waitData,
+                 sendData,
+                 acqEnd);
+
+signal state   : state_t;
+
+signal evtNum  : unsigned(32 downto 0); -- msb used for lastEvt
+
+signal dataOut : devData_t;
+
+signal dataIn  : devData_t;
+
+signal exec,
+       lastEvt : std_logic;
+
 begin
+
+lastEvt <= evtNum(evtNum'left);
 
 FSM: process(clk, rst, devExec)
 begin
@@ -53,6 +72,7 @@ begin
             exec       <= '0';
             devReady   <= '0';
             busy       <= '0';
+            evtNum     <= (others => '0');
             devDataOut <= (others => (others => '0'));
 
             state      <= idle;
@@ -65,7 +85,7 @@ begin
                         devReady <= '0';
                         busy     <= '1';
 
-                        state    <= waitReady;
+                        state    <= getEvtNum;
                     else
                         devReady <= '0';
                         busy     <= '0';
@@ -73,44 +93,33 @@ begin
                         state    <= idle;
                     end if;
 
-                when waitReady =>
-                    if dataReady = '1' then
-                        exec  <= '0';
+                when getEvtNum =>
+                    evtNum <= devDataToUnsigned(dataIn);
 
-                        state <= store;
-                    elsif dataReady = '1' and brstOn = '1' then
-                        exec     <= '0';
-                        devReady <= '1';
+                    state <= waitData;
 
-                        state    <= waitReady;
-                    elsif brstOn = '0' then
-                        exec     <= '0';
-                        devReady <= '0';
-
-                        state    <= waitReady;
-                    elsif brstOn = '1' then
-                        exec     <= devExec;
-                        devReady <= '0';
-                        dataIn   <= devDataIn;
-
-                        state    <= waitReady;
+                when waitData =>
+                    if lastEvt = '0' and unsigned(rdDCntAcq) > 0 then
+                        state <= sendData;
+                    elsif lastEvt = '1' then
+                        state <= acqEnd;
+                    else
                     end if;
 
-                when store =>
+                when sendData =>
+
+                when acqEnd =>
                     devReady   <= '1';
                     busy       <= '0';
-                    i2cEnClk   <= '0';
                     devDataOut <= dataOut;
 
                     state      <= idle;
 
                 when others =>
                     exec     <= '0';
-                    rw       <= readCmd;
                     rAddr    <= (others => (others => '0'));
                     devReady <= '0';
                     busy     <= '0';
-                    i2cEnClk <= '0';
 
                     state    <= idle;
             end case;

@@ -49,6 +49,8 @@ package devicesPkg is
     function devDataToSlv(d: devData_t) return std_logic_vector;
 
     function devDataToSlice(d: devData_t; left: integer; right: integer) return std_logic_vector;
+
+    function devDataToUnsigned(d: devData_t) return unsigned;
 end package devicesPkg;
 
 package body devicesPkg is
@@ -120,5 +122,15 @@ package body devicesPkg is
         
         return sData(left downto right);
     end function devDataToSlice;
+
+    function devDataToUnsigned(d: devData_t) return unsigned is
+        variable sData : std_logic_vector(devDataBytes*8-1 downto 0);
+    begin
+        for i in 0 to devDataBytes-1 loop
+            sData(8*i+7 downto 8*i) := d(i);
+        end loop;
+        
+        return unsigned(sData);
+    end function devDataToUnsigned;
 
 end package body;
