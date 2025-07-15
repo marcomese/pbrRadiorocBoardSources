@@ -10,6 +10,7 @@ architecture Behavioral of tb_dataAcqCtrl is
 
 component dataAcqCtrl is
 port(
+    clk100M    : in  std_logic;
     clk25M     : in  std_logic;
     rst        : in  std_logic;
     devExec    : in  std_logic;
@@ -183,6 +184,7 @@ constant writeCmd      : std_logic_vector(3 downto 0) := x"5";
 constant burstWrCmd    : std_logic_vector(3 downto 0) := x"3";
 constant burstRdCmd    : std_logic_vector(3 downto 0) := x"B";
 constant maxBrstLen    : natural                      := 40;
+constant delay         : natural                      := 1;--50000;
 
 signal rst               : std_logic := '0';
 signal clk_100M          : std_logic := '1';
@@ -225,12 +227,66 @@ signal dataToDev,
 signal devDataInVec      : devDataVec_t := (others => (others => (others => '0')));
 signal devReadyVec       : devReady_t   := (others => '0');
 signal devBusyVec        : devBusy_t    := (others => '0');
+signal acqBusy           : std_logic    := '0';
+signal error             : std_logic_vector(2 downto 0) := "000";
+signal rxRead            : std_logic                    := '0';
+signal rxPresent         : std_logic                    := '0';
+signal txWrite           : std_logic                    := '0';
+signal txWrAck           : std_logic                    := '0';
+signal flushRxFifo       : std_logic                    := '0';
+signal rxEna             : std_logic                    := '1';
+signal readRq,
+       cs,
+       sclk,
+       miso,
+       mosi,
+       testTxWrite,
+       testRxRead,
+       testRxPresent,
+       devIntBusy     : std_logic                    := '0';
+signal dataToMaster,
+       testDataIn,
+       testDataOut,
+       testData,
+       dataFromMaster : std_logic_vector(7 downto 0) := (others => '0');
 
 begin
+
+stimProc: process
+begin
+    rst <= '1';
+    wait for clkPeriod100M*5;
+    rst <= '0';
+    wait for clkPeriod100M*5;
+
+    wait for 350 ns;
+
+    testRxRead <= '1';
+
+    testDataIn <= x"a6";
+    wait for clkPeriod100M*delay;
+    testTxWrite <= '1';
+    wait for clkPeriod100M;
+    testTxWrite <= '0';
+    wait for clkPeriod100M*delay;
+    testDataIn <= x"00";
+    testTxWrite <= '1';
+    wait for clkPeriod100M;
+    testTxWrite <= '0';
+    wait for clkPeriod100M*delay;
+    testDataIn <= x"00";
+    testTxWrite <= '1';
+    wait for clkPeriod100M;
+    testTxWrite <= '0';
+    wait for clkPeriod100M*delay;
+
+    wait;
+end process;
 
 dataAcqCtrlInst : dataAcqCtrl
 port map(
     clk25M     => clk_25M,
+    clk100M    => clk_100M,
     rst        => rst,
     devExec    => devExec,
     devId      => devId,

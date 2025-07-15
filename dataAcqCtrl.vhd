@@ -17,8 +17,12 @@ use IEEE.NUMERIC_STD.ALL;
 use work.utilsPkg.all;
 use work.devicesPkg.all;
 
+library xpm;
+use xpm.vcomponents.all;
+
 entity dataAcqCtrl is
 port(
+    clk100M    : in  std_logic;
     clk25M     : in  std_logic;
     rst        : in  std_logic;
     devExec    : in  std_logic;
@@ -51,52 +55,79 @@ type state_t is (idle,
                  sendData,
                  acqEnd);
 
-signal state    : state_t;
+signal state          : state_t;
 
-signal dataOut  : devData_t;
+signal dataOut        : devData_t;
 
-signal dataIn   : devData_t;
+signal dataIn         : devData_t;
 
-signal byteCnt  : unsigned(2 downto 0);
+signal byteCnt        : unsigned(2 downto 0);
 
 signal swTrg,
-       lastByte : std_logic;
+       lastByte,
+       resetAcqSig,
+       startAcqSig,
+       rdAcqSig       : std_logic;
 
-signal nbAcqSig : std_logic_vector(7 downto 0);
+signal nbAcqSig       : std_logic_vector(7 downto 0);
+
+signal sync100to25In,
+       sync100to25Out : std_logic_vector(2 downto 0);
 
 begin
 
 -- DEBUG --
-selAdc <= "00011001" &
-          "00000000" &
-          "00000010" &
-          "00000000" &
-          "01110100" &
-          "00000001" &
-          "00000000" &
-          swTrg &"0000000";
+selAdc        <= "00011001" &
+                 "00000000" &
+                 "00000010" &
+                 "00000000" &
+                 "01110100" &
+                 "00000001" &
+                 "00000000" &
+                 swTrg &"0000000";
 -----------
 
-nbAcq    <= nbAcqSig;
+nbAcq         <= nbAcqSig;
 
-lastByte <= byteCnt(byteCnt'left);
+lastByte      <= byteCnt(byteCnt'left);
 
-dataAcqCtrlFSM: process(clk25M, rst, devExec)
+resetAcq      <= sync100to25Out(2);
+startAcq      <= sync100to25Out(1);
+rdAcq         <= sync100to25Out(0);
+
+sync100to25In <= resetAcqSig & startAcqSig & rdAcqSig;
+
+syncPulsesInst: xpm_cdc_array_single
+generic map (
+    DEST_SYNC_FF   => 1,
+    INIT_SYNC_FF   => 0,
+    SIM_ASSERT_CHK => 0,
+    SRC_INPUT_REG  => 1,
+    WIDTH          => 3
+)
+port map (
+    src_clk  => clk100M,
+    dest_clk => clk25M,
+    src_in   => sync100to25In,
+    dest_out => sync100to25Out
+);
+
+dataAcqCtrlFSM: process(clk100M, rst, devExec)
     variable i : integer := 0;
 begin
-    if rising_edge(clk25M) then
+    if rising_edge(clk100M) then
         if rst = '1' then
-            devReady   <= '0';
-            busy       <= '0';
-            resetAcq   <= '0';
-            startAcq   <= '0';
-            rdAcq      <= '0';
-            nbAcqSig   <= (others => '0');
-            devDataOut <= (others => (others => '0'));
-            swTrg      <= '0';
-            byteCnt    <= to_unsigned(3, byteCnt'length);
+            devReady    <= '0';
+            busy        <= '0';
+            resetAcqSig <= '0';
+            startAcqSig <= '0';
+            rdAcqSig    <= '0';
+            nbAcqSig    <= (others => '0');
+            devDataOut  <= (others => (others => '0'));
+            swTrg       <= '0';
+            byteCnt     <= to_unsigned(3, byteCnt'length);
 
-            state      <= idle;
+            state       <= idle;
         else
             case state is
                 when idle =>
@@ -114,38 +145,38 @@ begin
                     end if;
 
                 when getNbAcq =>
-                    nbAcqSig <= devAddrToSlv(devAddr);
-                    resetAcq <= '1';
+                    nbAcqSig    <= devAddr(0);
+                    resetAcqSig <= '1';
 
-                    state    <= sendRstAcq;
+                    state       <= sendRstAcq;
 
                 when sendRstAcq =>
-                    if nbAcqSig = x"0000" then
-                        resetAcq <= '0';
-                        swTrg    <= '1';
+                    if nbAcqSig = x"00" then
+                        resetAcqSig <= '0';
+                        swTrg       <= '1';
 
-                        state    <= waitData;
+                        state       <= waitData;
                     else
-                        resetAcq <= '0';
-                        startAcq <= '1';
+                        resetAcqSig <= '0';
+                        startAcqSig <= '1';
     
-                        state    <= sendStartAcq;
+                        state       <= sendStartAcq;
                     end if;
 
                 when sendStartAcq =>
-                    startAcq <= '0';
+                    startAcqSig <= '0';
 
-                    state    <= waitData;
+                    state       <= waitData;
 
                 when waitData =>
                     if emptyAcq = '0' then
-                        rdAcq    <= '1';
+                        rdAcqSig <= '1';
                         swTrg    <= '0';
                         devReady <= '0';
 
                         state    <= readFifo;
                     else
-                        rdAcq    <= '0';
+                        rdAcqSig <= '0';
                         swTrg    <= '0';
                         devReady <= '0';
 
@@ -156,7 +187,7 @@ begin
                     i := to_integer(byteCnt);
 
                     if lastByte = '1' or emptyAcq = '1' then
-                        rdAcq      <= '0';
+                        rdAcqSig   <= '0';
                         devDataOut <= dataOut;
 
                         state      <= sendData;
@@ -172,13 +203,13 @@ begin
                         devReady   <= '1';
                         devDataOut <= dataOut;
 
-                        byteCnt  <= to_unsigned(3, byteCnt'left);
+                        byteCnt  <= to_unsigned(3, byteCnt'length);
 
                         state    <= acqEnd;
                     else
                         devReady   <= '1';
                         devDataOut <= dataOut;
-                        byteCnt    <= to_unsigned(3, byteCnt'left);
+                        byteCnt    <= to_unsigned(3, byteCnt'length);
 
                         state      <= waitData;
                     end if;
@@ -197,6 +228,5 @@ begin
         end if;
     end if;
 end process;
-
 
 end Behavioral;
