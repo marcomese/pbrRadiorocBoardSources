@@ -19,7 +19,7 @@ use work.devicesPkg.all;
 
 entity dataAcqCtrl is
 port(
-    clk        : in  std_logic;
+    clk25M     : in  std_logic;
     rst        : in  std_logic;
     devExec    : in  std_logic;
     devId      : in  devices_t;
@@ -33,59 +33,79 @@ port(
     resetAcq   : out std_logic;
     startAcq   : out std_logic;
     rdAcq      : out std_logic;
-    endAcq     : in  std_logic;
-    nbAcq      : out std_logic;
-    selAdc     : out std_logic;
-    doutAcq    : in  std_logic_vector(7 downto 0);
     emptyAcq   : in  std_logic;
-    rdDCntAcq  : in  std_logic_vector(15 downto 0)
+    nbAcq      : out std_logic_vector(7 downto 0);
+    selAdc     : out std_logic_vector(63 downto 0);
+    doutAcq    : in  std_logic_vector(7 downto 0)
 );
 end dataAcqCtrl;
 
 architecture Behavioral of dataAcqCtrl is
 
 type state_t is (idle,
-                 getEvtNum,
+                 getNbAcq,
+                 sendRstAcq,
+                 sendStartAcq,
                  waitData,
+                 readFifo,
                  sendData,
                  acqEnd);
 
-signal state   : state_t;
+signal state    : state_t;
 
-signal evtNum  : unsigned(32 downto 0); -- msb used for lastEvt
+signal dataOut  : devData_t;
 
-signal dataOut : devData_t;
+signal dataIn   : devData_t;
 
-signal dataIn  : devData_t;
+signal byteCnt  : unsigned(2 downto 0);
 
-signal exec,
-       lastEvt : std_logic;
+signal swTrg,
+       lastByte : std_logic;
+
+signal nbAcqSig : std_logic_vector(7 downto 0);
 
 begin
 
-lastEvt <= evtNum(evtNum'left);
+-- DEBUG --
+selAdc <= "00011001" &
+          "00000000" &
+          "00000010" &
+          "00000000" &
+          "01110100" &
+          "00000001" &
+          "00000000" &
+          swTrg &"0000000";
+-----------
 
-FSM: process(clk, rst, devExec)
+nbAcq    <= nbAcqSig;
+
+lastByte <= byteCnt(byteCnt'left);
+
+dataAcqCtrlFSM: process(clk25M, rst, devExec)
+    variable i : integer := 0;
 begin
-    if rising_edge(clk) then
+    if rising_edge(clk25M) then
         if rst = '1' then
-            exec       <= '0';
             devReady   <= '0';
             busy       <= '0';
-            evtNum     <= (others => '0');
+            resetAcq   <= '0';
+            startAcq   <= '0';
+            rdAcq      <= '0';
+            nbAcqSig   <= (others => '0');
             devDataOut <= (others => (others => '0'));
+            swTrg      <= '0';
+            byteCnt    <= to_unsigned(3, byteCnt'length);
 
             state      <= idle;
         else
             case state is
                 when idle =>
                     if devExec = '1' and devId = acqSystem then
-                        exec     <= '1';
                         dataIn   <= devDataIn;
                         devReady <= '0';
                         busy     <= '1';
 
-                        state    <= getEvtNum;
+                        state    <= getNbAcq;
                     else
                         devReady <= '0';
                         busy     <= '0';
@@ -93,31 +113,82 @@ begin
                         state    <= idle;
                     end if;
 
-                when getEvtNum =>
-                    evtNum <= devDataToUnsigned(dataIn);
+                when getNbAcq =>
+                    nbAcqSig <= devAddrToSlv(devAddr);
+                    resetAcq <= '1';
 
-                    state <= waitData;
+                    state    <= sendRstAcq;
+
+                when sendRstAcq =>
+                    if nbAcqSig = x"0000" then
+                        resetAcq <= '0';
+                        swTrg    <= '1';
+
+                        state    <= waitData;
+                    else
+                        resetAcq <= '0';
+                        startAcq <= '1';
+    
+                        state    <= sendStartAcq;
+                    end if;
+
+                when sendStartAcq =>
+                    startAcq <= '0';
+
+                    state    <= waitData;
 
                 when waitData =>
-                    if lastEvt = '0' and unsigned(rdDCntAcq) > 0 then
-                        state <= sendData;
-                    elsif lastEvt = '1' then
-                        state <= acqEnd;
+                    if emptyAcq = '0' then
+                        rdAcq    <= '1';
+                        swTrg    <= '0';
+                        devReady <= '0';
+
+                        state    <= readFifo;
                     else
+                        rdAcq    <= '0';
+                        swTrg    <= '0';
+                        devReady <= '0';
+
+                        state    <= waitData;
+                    end if;
+
+                when readFifo =>
+                    i := to_integer(byteCnt);
+
+                    if lastByte = '1' or emptyAcq = '1' then
+                        rdAcq      <= '0';
+                        devDataOut <= dataOut;
+
+                        state      <= sendData;
+                    else
+                        dataOut(i) <= doutAcq;
+                        byteCnt    <= byteCnt - 1;
+
+                        state      <= readFifo;
                     end if;
 
                 when sendData =>
+                    if emptyAcq = '1' then
+                        devReady   <= '1';
+                        devDataOut <= dataOut;
+
+                        byteCnt  <= to_unsigned(3, byteCnt'left);
+
+                        state    <= acqEnd;
+                    else
+                        devReady   <= '1';
+                        devDataOut <= dataOut;
+                        byteCnt    <= to_unsigned(3, byteCnt'left);
+
+                        state      <= waitData;
+                    end if;
 
                 when acqEnd =>
-                    devReady   <= '1';
                     busy       <= '0';
-                    devDataOut <= dataOut;
 
                     state      <= idle;
 
                 when others =>
-                    exec     <= '0';
-                    rAddr    <= (others => (others => '0'));
                     devReady <= '0';
                     busy     <= '0';
 

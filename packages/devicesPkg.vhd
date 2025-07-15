@@ -44,6 +44,8 @@ package devicesPkg is
 
     function devAddrToSlv(a: devAddr_t) return std_logic_vector;
 
+    function devAddrToUnsigned(a: devAddr_t) return unsigned;
+
     function devAddrToInt(a: devAddr_t) return integer;
 
     function devDataToSlv(d: devData_t) return std_logic_vector;
@@ -91,6 +93,16 @@ package body devicesPkg is
         
         return sAddr;
     end function devAddrToSlv;
+
+    function devAddrToUnsigned(a: devAddr_t) return unsigned is
+        variable sAddr : std_logic_vector(devAddrBytes*8-1 downto 0);
+    begin
+        for i in 0 to devAddrBytes-1 loop
+            sAddr(8*i+7 downto 8*i) := a(i);
+        end loop;
+        
+        return unsigned(sAddr);
+    end devAddrToUnsigned;
 
     function devAddrToInt(a: devAddr_t) return integer is
         variable sAddr : std_logic_vector(devAddrBytes*8-1 downto 0);
