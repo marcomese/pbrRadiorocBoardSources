@@ -67,7 +67,9 @@ signal swTrg,
        lastByte,
        resetAcqSig,
        startAcqSig,
-       rdAcqSig       : std_logic;
+       rdAcqSig,
+       emptyAcqFall,
+       emptyAcqRise   : std_logic;
 
 signal nbAcqSig       : std_logic_vector(7 downto 0);
 
@@ -99,7 +101,7 @@ sync100to25In <= resetAcqSig & startAcqSig & rdAcqSig;
 
 syncPulsesInst: xpm_cdc_array_single
 generic map (
-    DEST_SYNC_FF   => 1,
+    DEST_SYNC_FF   => 2,
     INIT_SYNC_FF   => 0,
     SIM_ASSERT_CHK => 0,
     SRC_INPUT_REG  => 1,
@@ -110,6 +112,30 @@ port map (
     dest_clk => clk25M,
     src_in   => sync100to25In,
     dest_out => sync100to25Out
+);
+
+emptyAcqRiseInst: entity work.edgeDetector
+generic map(
+    clockEdge => "falling",
+    edge      => "rising"
+)
+port map(
+    clk       => clk100M,
+    rst       => rst,
+    signalIn  => emptyAcq,
+    signalOut => emptyAcqRise
+);
+
+emptyAcqFallInst: entity work.edgeDetector
+generic map(
+    clockEdge => "falling",
+    edge      => "falling"
+)
+port map(
+    clk       => clk100M,
+    rst       => rst,
+    signalIn  => emptyAcq,
+    signalOut => emptyAcqFall
 );
 
 dataAcqCtrlFSM: process(clk100M, rst, devExec)
@@ -169,7 +195,7 @@ begin
                     state       <= waitData;
 
                 when waitData =>
-                    if emptyAcq = '0' then
+                    if emptyAcqFall = '1' then
                         rdAcqSig <= '1';
                         swTrg    <= '0';
                         devReady <= '0';
@@ -186,7 +212,7 @@ begin
                 when readFifo =>
                     i := to_integer(byteCnt);
 
-                    if lastByte = '1' or emptyAcq = '1' then
+                    if lastByte = '1' or emptyAcqRise = '1' then
                         rdAcqSig   <= '0';
                         devDataOut <= dataOut;
 
@@ -199,7 +225,7 @@ begin
                     end if;
 
                 when sendData =>
-                    if emptyAcq = '1' then
+                    if emptyAcqRise = '1' then
                         devReady   <= '1';
                         devDataOut <= dataOut;
 

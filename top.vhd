@@ -170,7 +170,8 @@ constant rstRadI2CLen : integer := 5;
 signal   dataToDev,
          dataFromPGen,
          dataFromHvTmp,
-         dataFromRadioroc  : devData_t;
+         dataFromRadioroc,
+         dataFromAcq       : devData_t;
 signal   devDataInVec      : devDataVec_t;
 signal   devReadyVec       : devReady_t;
 signal   devBusyVec        : devBusy_t;
@@ -179,6 +180,7 @@ signal   devId          : devices_t;
 signal   devReadyPGen,
          devReadyHvTmp,
          devReadyRadioroc,
+         devReadyAcq,
          devRw,
          devBurst,
          devExec,
@@ -187,6 +189,7 @@ signal   devReadyPGen,
          devBusyPGen,
          devBusyHvTmp,
          devBusyRadioroc,
+         devBusyAcq,
          devIntBusy     : std_logic;
 signal   devAddr        : devAddr_t;
 
@@ -238,7 +241,16 @@ attribute mark_debug of readRq,
                         sc_rstb_sc,
                         dataFromMaster,
                         dataToMaster,
-                        rxPresent      : signal is "true";
+                        rxPresent,
+                        dataFromAcq,
+                        devReadyAcq,
+                        devBusyAcq, 
+                        reset_acq,  
+                        start_acq,  
+                        rd_acq,     
+                        empty_acq,  
+                        nb_acq,     
+                        dout_acq          : signal is "true";
 
 begin
 
@@ -453,6 +465,29 @@ port map(
 		test => test_daq
 	);
 
+dataAcqCtrlInst : entity work.dataAcqCtrl
+port map(
+    clk25M     => clk_25M,
+    clk100M    => clk_100M,
+    rst        => reset,
+    devExec    => devExec,
+    devId      => devId,
+    devRw      => devRw,
+    devBurst   => devBurst,
+    devAddr    => devAddr,
+    devDataIn  => dataToDev,
+    devDataOut => dataFromAcq,
+    devReady   => devReadyAcq,
+    busy       => devBusyAcq,
+    resetAcq   => reset_acq,
+    startAcq   => start_acq,
+    rdAcq      => rd_acq,
+    emptyAcq   => empty_acq,
+    nbAcq      => nb_acq,
+    selAdc     => sel_adc,
+    doutAcq    => dout_acq
+);
+
 	sc_reset_n   <= reset_n_sft and reset_n_acq;
 
 	sc_rstn_read <= rstb_read_sft and rstn_read_acq;
@@ -595,20 +630,23 @@ port map(
     i2cDataRd  => i2cDataRd
 );
 
-devDataInVec(pulseGen) <= dataFromPGen;
-devDataInVec(tmp275)   <= dataFromHvTmp;
-devDataInVec(a7585d)   <= dataFromHvTmp;
-devDataInVec(radioroc) <= dataFromRadioroc;
+devDataInVec(pulseGen)  <= dataFromPGen;
+devDataInVec(tmp275)    <= dataFromHvTmp;
+devDataInVec(a7585d)    <= dataFromHvTmp;
+devDataInVec(radioroc)  <= dataFromRadioroc;
+devDataInVec(acqSystem) <= dataFromAcq;
 
-devReadyVec(pulseGen)  <= devReadyPGen;
-devReadyVec(tmp275)    <= devReadyHvTmp;
-devReadyVec(a7585d)    <= devReadyHvTmp;
-devReadyVec(radioroc)  <= devReadyRadioroc;
+devReadyVec(pulseGen)   <= devReadyPGen;
+devReadyVec(tmp275)     <= devReadyHvTmp;
+devReadyVec(a7585d)     <= devReadyHvTmp;
+devReadyVec(radioroc)   <= devReadyRadioroc;
+devReadyVec(acqSystem)  <= devReadyAcq;
 
-devBusyVec(pulseGen)   <= devBusyPGen;
-devBusyVec(tmp275)     <= devBusyHvTmp;
-devBusyVec(a7585d)     <= devBusyHvTmp;
-devBusyVec(radioroc)   <= devBusyRadioroc;
+devBusyVec(pulseGen)    <= devBusyPGen;
+devBusyVec(tmp275)      <= devBusyHvTmp;
+devBusyVec(a7585d)      <= devBusyHvTmp;
+devBusyVec(radioroc)    <= devBusyRadioroc;
+devBusyVec(acqSystem)   <= devBusyAcq;
 
 devInterfInst: entity work.deviceInterface
 generic map(
