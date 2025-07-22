@@ -37,6 +37,7 @@ entity adc is
 		trig_ext : out std_logic;
 		trig_out : out std_logic;
 		extTrg : in std_logic;
+		endAcq : out std_logic;
 		test : out std_logic
 	);
 end adc;
@@ -89,7 +90,9 @@ architecture Behavioral of adc is
     signal cd : std_logic_vector(10 downto 0);
     
     signal trigger_shrunk, trigger_sft_shrunk, trigger_latched, trigger_sft_latched, trigger_latched2,  trigger_sft_latched2: std_logic;
-    
+
+    signal endAcqSig, endAcqOut : std_logic_vector(0 downto 0);
+
 	attribute fsm_encoding : string;
     attribute fsm_encoding of next_state : signal is "gray";
     attribute fsm_encoding of current_state : signal is "gray";
@@ -99,6 +102,19 @@ begin
     clk_200M_n <= not clk_200M;
     clk_25M_n <= not clk_25M;
     trig_out <= trigger_sft;
+
+endAcqSig(0) <= end_acq;
+endAcq       <= endAcqOut(0);
+
+clkSyncInst: entity work.pulseExtender
+port map(
+    clkOrig => clk_200M,
+    rstOrig => rst,
+    clkDest => clk_100M,
+    rstDest => rst,
+    sigOrig => endAcqSig,
+    sigDest => endAcqOut
+);
 
     NORT_FPGA <= t(63) and t(62) and t(61) and t(60) and t(59) and t(58) and t(57) and t(56)
             and t(55) and t(54) and t(53) and t(52) and t(51) and t(50) and t(49) and t(48)

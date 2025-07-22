@@ -24,6 +24,7 @@ port(
     busy       : out std_logic;
     resetAcq   : out std_logic;
     startAcq   : out std_logic;
+    endAcq     : in  std_logic;
     rdAcq      : out std_logic;
     emptyAcq   : in  std_logic;
     nbAcq      : out std_logic_vector(7 downto 0);
@@ -62,6 +63,7 @@ component adc is
   trig_ext : out std_logic;
   trig_out : out std_logic;
   extTrg : in std_logic;
+  endAcq : out std_logic;
   test : out std_logic
  );
 end component;
@@ -215,6 +217,7 @@ signal hold_ext          : std_logic := '0';
 signal trig_ext          : std_logic := '0';
 signal trig_out          : std_logic := '0';
 signal extTrg            : std_logic := '0';
+signal endAcq            : std_logic := '0';
 signal test              : std_logic := '0';
 signal devId             : devices_t    := none;
 signal devReadyAcq       : std_logic    := '0';
@@ -280,6 +283,63 @@ begin
     testTxWrite <= '0';
     wait for clkPeriod100M*delay;
 
+    wait for 40 us;
+
+    testDataIn <= x"a6";
+    wait for clkPeriod100M*delay;
+    testTxWrite <= '1';
+    wait for clkPeriod100M;
+    testTxWrite <= '0';
+    wait for clkPeriod100M*delay;
+    testDataIn <= x"00";
+    testTxWrite <= '1';
+    wait for clkPeriod100M;
+    testTxWrite <= '0';
+    wait for clkPeriod100M*delay;
+    testDataIn <= x"FF";
+    testTxWrite <= '1';
+    wait for clkPeriod100M;
+    testTxWrite <= '0';
+    wait for clkPeriod100M*delay;
+
+    wait for 40 us;
+
+    testDataIn <= x"a6";
+    wait for clkPeriod100M*delay;
+    testTxWrite <= '1';
+    wait for clkPeriod100M;
+    testTxWrite <= '0';
+    wait for clkPeriod100M*delay;
+    testDataIn <= x"00";
+    testTxWrite <= '1';
+    wait for clkPeriod100M;
+    testTxWrite <= '0';
+    wait for clkPeriod100M*delay;
+    testDataIn <= x"FF";
+    testTxWrite <= '1';
+    wait for clkPeriod100M;
+    testTxWrite <= '0';
+    wait for clkPeriod100M*delay;
+    
+    wait for 40 us;
+
+    testDataIn <= x"a6";
+    wait for clkPeriod100M*delay;
+    testTxWrite <= '1';
+    wait for clkPeriod100M;
+    testTxWrite <= '0';
+    wait for clkPeriod100M*delay;
+    testDataIn <= x"00";
+    testTxWrite <= '1';
+    wait for clkPeriod100M;
+    testTxWrite <= '0';
+    wait for clkPeriod100M*delay;
+    testDataIn <= x"FF";
+    testTxWrite <= '1';
+    wait for clkPeriod100M;
+    testTxWrite <= '0';
+    wait for clkPeriod100M*delay;
+
     wait;
 end process;
 
@@ -299,6 +359,7 @@ port map(
     busy       => acqBusy,
     resetAcq   => resetAcq,
     startAcq   => start,
+    endAcq     => endAcq,
     rdAcq      => rd_en,
     emptyAcq   => empty_acq,
     nbAcq      => nb_acq,
@@ -336,6 +397,7 @@ port map(
     trig_ext          => trig_ext,
     trig_out          => trig_out,
     extTrg            => extTrg,
+    endAcq            => endAcq,
     test              => test
 );
 

@@ -36,6 +36,7 @@ port(
     busy       : out std_logic;
     resetAcq   : out std_logic;
     startAcq   : out std_logic;
+    endAcq     : in  std_logic;
     rdAcq      : out std_logic;
     emptyAcq   : in  std_logic;
     nbAcq      : out std_logic_vector(7 downto 0);
@@ -50,7 +51,9 @@ type state_t is (idle,
                  getNbAcq,
                  sendRstAcq,
                  sendStartAcq,
+                 sendSftTrg,
                  waitData,
+                 collectData,
                  readFifo,
                  sendData,
                  acqEnd);
@@ -68,18 +71,19 @@ signal swTrg,
        resetAcqSig,
        startAcqSig,
        rdAcqSig,
-       emptyAcqFall,
-       emptyAcqRise   : std_logic;
+       readSent       : std_logic;
 
 signal nbAcqSig       : std_logic_vector(7 downto 0);
 
+signal selAdcSig      : std_logic_vector(63 downto 0);
+
 signal sync100to25In,
-       sync100to25Out : std_logic_vector(2 downto 0);
+       sync100to25Out : std_logic_vector(66 downto 0);
 
 begin
 
 -- DEBUG --
-selAdc        <= "00011001" &
+selAdcSig     <= "00011001" &
                  "00000000" &
                  "00000010" &
                  "00000000" &
@@ -93,28 +97,27 @@ nbAcq         <= nbAcqSig;
 
 lastByte      <= byteCnt(byteCnt'left);
 
+selAdc        <= sync100to25Out(66 downto 3);
 resetAcq      <= sync100to25Out(2);
 startAcq      <= sync100to25Out(1);
 rdAcq         <= sync100to25Out(0);
 
-sync100to25In <= resetAcqSig & startAcqSig & rdAcqSig;
+sync100to25In <= selAdcSig & resetAcqSig & startAcqSig & rdAcqSig;
 
-syncPulsesInst: xpm_cdc_array_single
-generic map (
-    DEST_SYNC_FF   => 2,
-    INIT_SYNC_FF   => 0,
-    SIM_ASSERT_CHK => 0,
-    SRC_INPUT_REG  => 1,
-    WIDTH          => 3
+clkSyncInst: entity work.pulseExtender
+generic map(
+    width => 67
 )
-port map (
-    src_clk  => clk100M,
-    dest_clk => clk25M,
-    src_in   => sync100to25In,
-    dest_out => sync100to25Out
+port map(
+    clkOrig => clk100M,
+    rstOrig => rst,
+    clkDest => clk25M,
+    rstDest => rst,
+    sigOrig => sync100to25In,
+    sigDest => sync100to25Out
 );
 
-emptyAcqRiseInst: entity work.edgeDetector
+sclkRiseInst: entity work.edgeDetector
 generic map(
     clockEdge => "falling",
     edge      => "rising"
@@ -122,20 +125,8 @@ generic map(
 port map(
     clk       => clk100M,
     rst       => rst,
-    signalIn  => emptyAcq,
-    signalOut => emptyAcqRise
-);
-
-emptyAcqFallInst: entity work.edgeDetector
-generic map(
-    clockEdge => "falling",
-    edge      => "falling"
-)
-port map(
-    clk       => clk100M,
-    rst       => rst,
-    signalIn  => emptyAcq,
-    signalOut => emptyAcqFall
+    signalIn  => sync100to25Out(0),
+    signalOut => readSent
 );
 
 dataAcqCtrlFSM: process(clk100M, rst, devExec)
@@ -145,7 +136,7 @@ begin
         if rst = '1' then
             devReady    <= '0';
             busy        <= '0';
-            resetAcqSig <= '0';
+            resetAcqSig <= '1';
             startAcqSig <= '0';
             rdAcqSig    <= '0';
             nbAcqSig    <= (others => '0');
@@ -161,32 +152,53 @@ begin
                         dataIn   <= devDataIn;
                         devReady <= '0';
                         busy     <= '1';
+                        swTrg    <= '0';
+                        resetAcqSig <= '0';
 
                         state    <= getNbAcq;
                     else
                         devReady <= '0';
                         busy     <= '0';
+                        swTrg    <= '0';
+                        resetAcqSig <= '0';
 
                         state    <= idle;
                     end if;
 
                 when getNbAcq =>
                     nbAcqSig    <= devAddr(0);
-                    resetAcqSig <= '1';
 
                     state       <= sendRstAcq;
 
                 when sendRstAcq =>
                     if nbAcqSig = x"00" then
-                        resetAcqSig <= '0';
-                        swTrg       <= '1';
+                        resetAcqSig <= '1';
 
-                        state       <= waitData;
+                        state       <= sendSftTrg;
+                    elsif nbAcqSig = x"FF" then
+                        resetAcqSig <= '0';
+                        rdAcqSig <= '1';
+                        byteCnt    <= byteCnt - 1;
+
+                        state       <= readFifo;
                     else
                         resetAcqSig <= '0';
                         startAcqSig <= '1';
     
                         state       <= sendStartAcq;
+                    end if;
+
+                when sendSftTrg =>
+                    if sync100to25Out(2) = '1' then
+                        resetAcqSig <= '0';
+                        swTrg    <= '1';
+                        devReady <= '1';
+
+                        state <= idle;
+                    else
+                        resetAcqSig <= '0';
+
+                        state <= sendSftTrg;
                     end if;
 
                 when sendStartAcq =>
@@ -195,37 +207,50 @@ begin
                     state       <= waitData;
 
                 when waitData =>
-                    if emptyAcqFall = '1' then
+                    if endAcq = '1' then
+                        swTrg <= '0';
+
+                        state <= collectData;
+                    else
+                        swTrg <= '0';
+
+                        state <= waitData;
+                    end if;
+
+                when collectData =>
+                    if emptyAcq = '0' then
                         rdAcqSig <= '1';
-                        swTrg    <= '0';
                         devReady <= '0';
 
                         state    <= readFifo;
                     else
                         rdAcqSig <= '0';
-                        swTrg    <= '0';
                         devReady <= '0';
 
-                        state    <= waitData;
+                        state    <= acqEnd; -- add error state
                     end if;
 
                 when readFifo =>
                     i := to_integer(byteCnt);
 
-                    if lastByte = '1' or emptyAcqRise = '1' then
+                    if lastByte = '1' or emptyAcq = '1' then
                         rdAcqSig   <= '0';
                         devDataOut <= dataOut;
 
                         state      <= sendData;
-                    else
+                    elsif readSent = '1' then
+                        rdAcqSig   <= '1';
                         dataOut(i) <= doutAcq;
                         byteCnt    <= byteCnt - 1;
 
                         state      <= readFifo;
+                    else
+                        rdAcqSig   <= '0';
+                        state <= readFifo;
                     end if;
 
                 when sendData =>
-                    if emptyAcqRise = '1' then
+                    if emptyAcq = '1' then
                         devReady   <= '1';
                         devDataOut <= dataOut;
 
@@ -237,7 +262,7 @@ begin
                         devDataOut <= dataOut;
                         byteCnt    <= to_unsigned(3, byteCnt'length);
 
-                        state      <= waitData;
+                        state      <= acqEnd;--collectData;
                     end if;
 
                 when acqEnd =>

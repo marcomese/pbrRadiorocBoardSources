@@ -231,6 +231,8 @@ signal readRq,
 
 signal rstI2CCnt : unsigned(bitsNum(rstRadI2CLen) downto 0);
 
+signal endAcq : std_logic;
+
 attribute mark_debug : string;
 attribute mark_debug of readRq,
                         cs,
@@ -462,6 +464,7 @@ port map(
 		trig_ext => sc_trigext,
 		trig_out => trig_out,
 		extTrg => extTrgSig,
+		endAcq => endAcq,
 		test => test_daq
 	);
 
@@ -481,6 +484,7 @@ port map(
     busy       => devBusyAcq,
     resetAcq   => reset_acq,
     startAcq   => start_acq,
+    endAcq     => endAcq,
     rdAcq      => rd_acq,
     emptyAcq   => empty_acq,
     nbAcq      => nb_acq,
