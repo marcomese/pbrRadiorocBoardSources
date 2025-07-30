@@ -37,6 +37,7 @@ port(
     resetAcq   : out std_logic;
     startAcq   : out std_logic;
     endAcq     : in  std_logic;
+    rdValid    : in  std_logic;
     rdAcq      : out std_logic;
     emptyAcq   : in  std_logic;
     nbAcq      : out std_logic_vector(7 downto 0);
@@ -55,6 +56,8 @@ type state_t is (idle,
                  waitData,
                  collectData,
                  readFifo,
+                 waitRdValid,
+                 getLastByte,
                  sendData,
                  acqEnd);
 
@@ -95,7 +98,7 @@ selAdcSig     <= "00011001" &
 
 nbAcq         <= nbAcqSig;
 
-lastByte      <= byteCnt(byteCnt'left);
+lastByte      <= '1' when byteCnt = 0 else '0';
 
 selAdc        <= sync100to25Out(66 downto 3);
 resetAcq      <= sync100to25Out(2);
@@ -143,7 +146,6 @@ begin
             devDataOut  <= (others => (others => '0'));
             swTrg       <= '0';
             byteCnt     <= to_unsigned(3, byteCnt'length);
-
             state       <= idle;
         else
             case state is
@@ -178,7 +180,7 @@ begin
                     elsif nbAcqSig = x"FF" then
                         resetAcqSig <= '0';
                         rdAcqSig <= '1';
-                        byteCnt    <= byteCnt - 1;
+                        --byteCnt    <= byteCnt - 1;
 
                         state       <= readFifo;
                     else
@@ -233,20 +235,39 @@ begin
                 when readFifo =>
                     i := to_integer(byteCnt);
 
-                    if lastByte = '1' or emptyAcq = '1' then
+                    if (lastByte = '1' or emptyAcq = '1') and readSent = '1' then
+                        state <= getLastByte;
+                    elsif readSent = '1' then
+                        rdAcqSig   <= '1';
+
+                        state      <= waitRdValid;
+                    else
                         rdAcqSig   <= '0';
+                        state <= readFifo;
+                    end if;
+
+                when getLastByte =>
+                    if rdValid = '1' then
+                        rdAcqSig   <= '0';
+                        dataOut(i) <= doutAcq;
                         devDataOut <= dataOut;
 
                         state      <= sendData;
-                    elsif readSent = '1' then
-                        rdAcqSig   <= '1';
+                    else
+                        dataOut(i) <= doutAcq;
+                        state <= getLastByte;
+                    end if;
+
+                when waitRdValid =>
+                    if rdValid = '1' then
+                        rdAcqSig   <= '0';
                         dataOut(i) <= doutAcq;
                         byteCnt    <= byteCnt - 1;
 
                         state      <= readFifo;
                     else
                         rdAcqSig   <= '0';
-                        state <= readFifo;
+                        state      <= waitRdValid;
                     end if;
 
                 when sendData =>
@@ -267,6 +288,12 @@ begin
 
                 when acqEnd =>
                     busy       <= '0';
+                    
+                    if emptyAcq = '1' then
+                        resetAcqSig <= '1';
+                    else
+                        resetAcqSig <= '0';
+                    end if;
 
                     state      <= idle;
 
