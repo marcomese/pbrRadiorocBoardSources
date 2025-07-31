@@ -86,7 +86,6 @@ signal sync100to25In,
 
 attribute mark_debug : string;
 attribute mark_debug of state,
-                        swTrg,
                         dataOut,
                         dataIn,
                         byteCnt,
@@ -96,8 +95,7 @@ attribute mark_debug of state,
                         startAcqSig,
                         rdAcqSig,
                         readSent,
-                        nbAcqSig,
-                        selAdcSig   : signal is "true";
+                        nbAcqSig   : signal is "true";
 
 
 begin
@@ -264,16 +262,16 @@ begin
                     end if;
 
                 when getLastByte =>
-                    if rdValid = '1' then
+--                    if rdValid = '1' then
                         rdAcqSig   <= '0';
                         dataOut(i) <= doutAcq;
                         devDataOut <= dataOut;
 
                         state      <= sendData;
-                    else
-                        dataOut(i) <= doutAcq;
-                        state <= getLastByte;
-                    end if;
+--                    else
+--                        dataOut(i) <= doutAcq;
+--                        state <= getLastByte;
+--                    end if;
 
                 when waitRdValid =>
                     if rdValid = '1' then
