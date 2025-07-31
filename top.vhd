@@ -233,27 +233,6 @@ signal rstI2CCnt : unsigned(bitsNum(rstRadI2CLen) downto 0);
 
 signal endAcq, rdValid : std_logic;
 
-attribute mark_debug : string;
-attribute mark_debug of readRq,
-                        cs,
-                        sclk,
-                        mosi,
-                        miso,
-                        sc_rstb_i2c,
-                        sc_rstb_sc,
-                        dataFromMaster,
-                        dataToMaster,
-                        rxPresent,
-                        dataFromAcq,
-                        devReadyAcq,
-                        devBusyAcq, 
-                        reset_acq,  
-                        start_acq,  
-                        rd_acq,     
-                        empty_acq,  
-                        nb_acq,     
-                        dout_acq          : signal is "true";
-
 begin
 
 	reset <= not(npwr_reset);
