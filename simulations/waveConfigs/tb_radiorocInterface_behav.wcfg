@@ -13,15 +13,15 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="0.000000 us"></ZoomStartTime>
-      <ZoomEndTime time="1,500.000001 us"></ZoomEndTime>
-      <Cursor1Time time="1,500.000000 us"></Cursor1Time>
+      <ZoomStartTime time="930.166666 us"></ZoomStartTime>
+      <ZoomEndTime time="1,253.966667 us"></ZoomEndTime>
+      <Cursor1Time time="1,044.340000 us"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
-      <NameColumnWidth column_width="163"></NameColumnWidth>
+      <NameColumnWidth column_width="151"></NameColumnWidth>
       <ValueColumnWidth column_width="58"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="86" />
+   <WVObjectSize size="29" />
    <wvobject fp_name="/tb_radiorocInterface/clk" type="logic">
       <obj_property name="ElementShortName">clk</obj_property>
       <obj_property name="ObjectShortName">clk</obj_property>
@@ -30,261 +30,89 @@
       <obj_property name="ElementShortName">rst</obj_property>
       <obj_property name="ObjectShortName">rst</obj_property>
    </wvobject>
-   <wvobject fp_name="/tb_radiorocInterface/devId" type="other">
-      <obj_property name="ElementShortName">devId</obj_property>
-      <obj_property name="ObjectShortName">devId</obj_property>
+   <wvobject fp_name="/tb_radiorocInterface/uut/radioFSMInst/exec" type="logic">
+      <obj_property name="ElementShortName">exec</obj_property>
+      <obj_property name="ObjectShortName">exec</obj_property>
    </wvobject>
-   <wvobject fp_name="/tb_radiorocInterface/testDataIn" type="array">
-      <obj_property name="ElementShortName">testDataIn[7:0]</obj_property>
-      <obj_property name="ObjectShortName">testDataIn[7:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_radiorocInterface/devInterfInst/dataIn" type="array">
-      <obj_property name="ElementShortName">dataIn[7:0]</obj_property>
-      <obj_property name="ObjectShortName">dataIn[7:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_radiorocInterface/devInterfInst/rxPresent" type="logic">
-      <obj_property name="ElementShortName">rxPresent</obj_property>
-      <obj_property name="ObjectShortName">rxPresent</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_radiorocInterface/devInterfInst/devDataIn" type="array">
-      <obj_property name="ElementShortName">devDataIn[0:6][3:0][7:0]</obj_property>
-      <obj_property name="ObjectShortName">devDataIn[0:6][3:0][7:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_radiorocInterface/devAddr" type="array">
-      <obj_property name="ElementShortName">devAddr[1:0][7:0]</obj_property>
-      <obj_property name="ObjectShortName">devAddr[1:0][7:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_radiorocInterface/devIntBusy" type="logic">
-      <obj_property name="ElementShortName">devIntBusy</obj_property>
-      <obj_property name="ObjectShortName">devIntBusy</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_radiorocInterface/spiInst/sclk" type="logic">
-      <obj_property name="ElementShortName">sclk</obj_property>
-      <obj_property name="ObjectShortName">sclk</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_radiorocInterface/dataToDev" type="array">
-      <obj_property name="ElementShortName">dataToDev[3:0][7:0]</obj_property>
-      <obj_property name="ObjectShortName">dataToDev[3:0][7:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_radiorocInterface/dataFromRad" type="array">
-      <obj_property name="ElementShortName">dataFromRad[3:0][7:0]</obj_property>
-      <obj_property name="ObjectShortName">dataFromRad[3:0][7:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_radiorocInterface/devDataInVec" type="array">
-      <obj_property name="ElementShortName">devDataInVec[0:6][3:0][7:0]</obj_property>
-      <obj_property name="ObjectShortName">devDataInVec[0:6][3:0][7:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_radiorocInterface/devReadyVec" type="array">
-      <obj_property name="ElementShortName">devReadyVec[0:6]</obj_property>
-      <obj_property name="ObjectShortName">devReadyVec[0:6]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_radiorocInterface/error" type="array">
-      <obj_property name="ElementShortName">error[2:0]</obj_property>
-      <obj_property name="ObjectShortName">error[2:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_radiorocInterface/rxRead" type="logic">
-      <obj_property name="ElementShortName">rxRead</obj_property>
-      <obj_property name="ObjectShortName">rxRead</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_radiorocInterface/txWrite" type="logic">
-      <obj_property name="ElementShortName">txWrite</obj_property>
-      <obj_property name="ObjectShortName">txWrite</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_radiorocInterface/txWrAck" type="logic">
-      <obj_property name="ElementShortName">txWrAck</obj_property>
-      <obj_property name="ObjectShortName">txWrAck</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_radiorocInterface/i2cEnClk" type="logic">
-      <obj_property name="ElementShortName">i2cEnClk</obj_property>
-      <obj_property name="ObjectShortName">i2cEnClk</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_radiorocInterface/i2cEna" type="logic">
-      <obj_property name="ElementShortName">i2cEna</obj_property>
-      <obj_property name="ObjectShortName">i2cEna</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_radiorocInterface/i2cAddr" type="array">
-      <obj_property name="ElementShortName">i2cAddr[6:0]</obj_property>
-      <obj_property name="ObjectShortName">i2cAddr[6:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_radiorocInterface/i2cRw" type="logic">
-      <obj_property name="ElementShortName">i2cRw</obj_property>
-      <obj_property name="ObjectShortName">i2cRw</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_radiorocInterface/devBusyVec" type="array">
-      <obj_property name="ElementShortName">devBusyVec[0:6]</obj_property>
-      <obj_property name="ObjectShortName">devBusyVec[0:6]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_radiorocInterface/uut/busyRad" type="logic">
-      <obj_property name="ElementShortName">busyRad</obj_property>
-      <obj_property name="ObjectShortName">busyRad</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_radiorocInterface/radBusy" type="logic">
-      <obj_property name="ElementShortName">radBusy</obj_property>
-      <obj_property name="ObjectShortName">radBusy</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_radiorocInterface/devInterfInst/endCnt" type="logic">
-      <obj_property name="ElementShortName">endCnt</obj_property>
-      <obj_property name="ObjectShortName">endCnt</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_radiorocInterface/devReadyRad" type="logic">
-      <obj_property name="ElementShortName">devReadyRad</obj_property>
-      <obj_property name="ObjectShortName">devReadyRad</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_radiorocInterface/devInterfInst/devBrstSig" type="logic">
-      <obj_property name="ElementShortName">devBrstSig</obj_property>
-      <obj_property name="ObjectShortName">devBrstSig</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_radiorocInterface/devInterfInst/state" type="other">
-      <obj_property name="ElementShortName">state</obj_property>
-      <obj_property name="ObjectShortName">state</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_radiorocInterface/devInterfInst/devExec" type="logic">
-      <obj_property name="ElementShortName">devExec</obj_property>
-      <obj_property name="ObjectShortName">devExec</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_radiorocInterface/uut/radioFSMInst/brstOnSig" type="logic">
-      <obj_property name="ElementShortName">brstOnSig</obj_property>
-      <obj_property name="ObjectShortName">brstOnSig</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_radiorocInterface/uut/radioFSMInst/state" type="other">
-      <obj_property name="DisplayName">label</obj_property>
-      <obj_property name="ElementShortName">state</obj_property>
-      <obj_property name="ObjectShortName">state</obj_property>
-      <obj_property name="label">radioFSMstate</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_radiorocInterface/uut/state" type="other">
-      <obj_property name="DisplayName">label</obj_property>
-      <obj_property name="ElementShortName">state</obj_property>
-      <obj_property name="ObjectShortName">state</obj_property>
-      <obj_property name="label">radioInterfState</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_radiorocInterface/i2cBusy" type="logic">
-      <obj_property name="ElementShortName">i2cBusy</obj_property>
-      <obj_property name="ObjectShortName">i2cBusy</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_radiorocInterface/uut/radioFSMInst/i2cBusyRise" type="logic">
-      <obj_property name="ElementShortName">i2cBusyRise</obj_property>
-      <obj_property name="ObjectShortName">i2cBusyRise</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_radiorocInterface/uut/radioFSMInst/readStarted" type="logic">
-      <obj_property name="ElementShortName">readStarted</obj_property>
-      <obj_property name="ObjectShortName">readStarted</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_radiorocInterface/testData" type="array">
-      <obj_property name="ElementShortName">testData[7:0]</obj_property>
-      <obj_property name="ObjectShortName">testData[7:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_radiorocInterface/i2cDataRd" type="array">
-      <obj_property name="ElementShortName">i2cDataRd[7:0]</obj_property>
-      <obj_property name="ObjectShortName">i2cDataRd[7:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_radiorocInterface/uut/radioFSMInst/dataReady" type="logic">
-      <obj_property name="ElementShortName">dataReady</obj_property>
-      <obj_property name="ObjectShortName">dataReady</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_radiorocInterface/uut/radioFSMInst/i2cDataWr" type="array">
-      <obj_property name="ElementShortName">i2cDataWr[7:0]</obj_property>
-      <obj_property name="ObjectShortName">i2cDataWr[7:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_radiorocInterface/uut/radioFSMInst/lastLeft" type="logic">
-      <obj_property name="ElementShortName">lastLeft</obj_property>
-      <obj_property name="ObjectShortName">lastLeft</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_radiorocInterface/uut/radioFSMInst/leftBCnt" type="array">
-      <obj_property name="ElementShortName">leftBCnt[2:0]</obj_property>
-      <obj_property name="ObjectShortName">leftBCnt[2:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_radiorocInterface/uut/radioFSMInst/i2cRw" type="logic">
-      <obj_property name="ElementShortName">i2cRw</obj_property>
-      <obj_property name="ObjectShortName">i2cRw</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_radiorocInterface/uut/radioFSMInst/lastBuff" type="logic">
-      <obj_property name="ElementShortName">lastBuff</obj_property>
-      <obj_property name="ObjectShortName">lastBuff</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_radiorocInterface/uut/radioFSMInst/shiftBuff" type="logic">
-      <obj_property name="ElementShortName">shiftBuff</obj_property>
-      <obj_property name="ObjectShortName">shiftBuff</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_radiorocInterface/uut/radioFSMInst/shiftBuffInst/serDataIn" type="array">
-      <obj_property name="ElementShortName">serDataIn[7:0]</obj_property>
-      <obj_property name="ObjectShortName">serDataIn[7:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_radiorocInterface/i2cModule/busy" type="logic">
-      <obj_property name="ElementShortName">busy</obj_property>
-      <obj_property name="ObjectShortName">busy</obj_property>
+   <wvobject fp_name="/tb_radiorocInterface/uut/radioFSMInst/rw" type="logic">
+      <obj_property name="ElementShortName">rw</obj_property>
+      <obj_property name="ObjectShortName">rw</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_radiorocInterface/uut/radioFSMInst/brst" type="logic">
       <obj_property name="ElementShortName">brst</obj_property>
       <obj_property name="ObjectShortName">brst</obj_property>
    </wvobject>
-   <wvobject fp_name="/tb_radiorocInterface/i2cModule/state" type="other">
-      <obj_property name="ElementShortName">state</obj_property>
-      <obj_property name="ObjectShortName">state</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_radiorocInterface/i2cModule/sda" type="logic">
-      <obj_property name="ElementShortName">sda</obj_property>
-      <obj_property name="ObjectShortName">sda</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_radiorocInterface/i2cModule/scl" type="logic">
-      <obj_property name="ElementShortName">scl</obj_property>
-      <obj_property name="ObjectShortName">scl</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_radiorocInterface/devInterfInst/brstBuff" type="array">
-      <obj_property name="ElementShortName">brstBuff[39:0][7:0]</obj_property>
-      <obj_property name="ObjectShortName">brstBuff[39:0][7:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_radiorocInterface/devInterfInst/brstSig" type="logic">
-      <obj_property name="ElementShortName">brstSig</obj_property>
-      <obj_property name="ObjectShortName">brstSig</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_radiorocInterface/devInterfInst/validSig" type="logic">
-      <obj_property name="ElementShortName">validSig</obj_property>
-      <obj_property name="ObjectShortName">validSig</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_radiorocInterface/devInterfInst/devRwSig" type="logic">
-      <obj_property name="ElementShortName">devRwSig</obj_property>
-      <obj_property name="ObjectShortName">devRwSig</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_radiorocInterface/devInterfInst/devBrstSig" type="logic">
-      <obj_property name="ElementShortName">devBrstSig</obj_property>
-      <obj_property name="ObjectShortName">devBrstSig</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_radiorocInterface/devInterfInst/brstCollect" type="logic">
-      <obj_property name="ElementShortName">brstCollect</obj_property>
-      <obj_property name="ObjectShortName">brstCollect</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_radiorocInterface/devInterfInst/lastBrst" type="logic">
-      <obj_property name="ElementShortName">lastBrst</obj_property>
-      <obj_property name="ObjectShortName">lastBrst</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_radiorocInterface/devInterfInst/endCnt" type="logic">
-      <obj_property name="ElementShortName">endCnt</obj_property>
-      <obj_property name="ObjectShortName">endCnt</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_radiorocInterface/devInterfInst/byteCnt" type="array">
-      <obj_property name="ElementShortName">byteCnt[6:0]</obj_property>
-      <obj_property name="ObjectShortName">byteCnt[6:0]</obj_property>
+   <wvobject fp_name="/tb_radiorocInterface/uut/radioFSMInst/addr" type="array">
+      <obj_property name="ElementShortName">addr[1:0][7:0]</obj_property>
+      <obj_property name="ObjectShortName">addr[1:0][7:0]</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_radiorocInterface/uut/radioFSMInst/dataIn" type="array">
       <obj_property name="ElementShortName">dataIn[3:0][7:0]</obj_property>
       <obj_property name="ObjectShortName">dataIn[3:0][7:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/tb_radiorocInterface/uut/radioFSMInst/leftBCnt" type="array">
-      <obj_property name="ElementShortName">leftBCnt[2:0]</obj_property>
-      <obj_property name="ObjectShortName">leftBCnt[2:0]</obj_property>
+   <wvobject fp_name="/tb_radiorocInterface/uut/radioFSMInst/dataOut" type="array">
+      <obj_property name="ElementShortName">dataOut[3:0][7:0]</obj_property>
+      <obj_property name="ObjectShortName">dataOut[3:0][7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_radiorocInterface/uut/radioFSMInst/busy" type="logic">
+      <obj_property name="ElementShortName">busy</obj_property>
+      <obj_property name="ObjectShortName">busy</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_radiorocInterface/uut/radioFSMInst/brstOn" type="logic">
+      <obj_property name="ElementShortName">brstOn</obj_property>
+      <obj_property name="ObjectShortName">brstOn</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_radiorocInterface/uut/radioFSMInst/dataReady" type="logic">
+      <obj_property name="ElementShortName">dataReady</obj_property>
+      <obj_property name="ObjectShortName">dataReady</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_radiorocInterface/uut/radioFSMInst/state" type="other">
+      <obj_property name="ElementShortName">state</obj_property>
+      <obj_property name="ObjectShortName">state</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_radiorocInterface/uut/radioFSMInst/rwSig" type="logic">
+      <obj_property name="ElementShortName">rwSig</obj_property>
+      <obj_property name="ObjectShortName">rwSig</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_radiorocInterface/uut/radioFSMInst/brstOnSig" type="logic">
+      <obj_property name="ElementShortName">brstOnSig</obj_property>
+      <obj_property name="ObjectShortName">brstOnSig</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_radiorocInterface/uut/radioFSMInst/i2cBusyOld" type="logic">
+      <obj_property name="ElementShortName">i2cBusyOld</obj_property>
+      <obj_property name="ObjectShortName">i2cBusyOld</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_radiorocInterface/uut/radioFSMInst/i2cBusyRise" type="logic">
+      <obj_property name="ElementShortName">i2cBusyRise</obj_property>
+      <obj_property name="ObjectShortName">i2cBusyRise</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_radiorocInterface/uut/radioFSMInst/rstBuff" type="logic">
+      <obj_property name="ElementShortName">rstBuff</obj_property>
+      <obj_property name="ObjectShortName">rstBuff</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_radiorocInterface/uut/radioFSMInst/loadBuff" type="logic">
       <obj_property name="ElementShortName">loadBuff</obj_property>
       <obj_property name="ObjectShortName">loadBuff</obj_property>
    </wvobject>
+   <wvobject fp_name="/tb_radiorocInterface/uut/radioFSMInst/shiftBuff" type="logic">
+      <obj_property name="ElementShortName">shiftBuff</obj_property>
+      <obj_property name="ObjectShortName">shiftBuff</obj_property>
+   </wvobject>
    <wvobject fp_name="/tb_radiorocInterface/uut/radioFSMInst/emptyBuff" type="logic">
       <obj_property name="ElementShortName">emptyBuff</obj_property>
       <obj_property name="ObjectShortName">emptyBuff</obj_property>
    </wvobject>
-   <wvobject fp_name="/tb_radiorocInterface/uut/radioFSMInst/brst" type="logic">
-      <obj_property name="ElementShortName">brst</obj_property>
-      <obj_property name="ObjectShortName">brst</obj_property>
+   <wvobject fp_name="/tb_radiorocInterface/uut/radioFSMInst/lastBuff" type="logic">
+      <obj_property name="ElementShortName">lastBuff</obj_property>
+      <obj_property name="ObjectShortName">lastBuff</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_radiorocInterface/uut/radioFSMInst/shiftBuffInst/shiftCnt" type="array">
+      <obj_property name="ElementShortName">shiftCnt[2:0]</obj_property>
+      <obj_property name="ObjectShortName">shiftCnt[2:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_radiorocInterface/uut/radioFSMInst/lastLeft" type="logic">
+      <obj_property name="ElementShortName">lastLeft</obj_property>
+      <obj_property name="ObjectShortName">lastLeft</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_radiorocInterface/uut/radioFSMInst/brstOld" type="logic">
       <obj_property name="ElementShortName">brstOld</obj_property>
@@ -294,81 +122,20 @@
       <obj_property name="ElementShortName">brstFall</obj_property>
       <obj_property name="ObjectShortName">brstFall</obj_property>
    </wvobject>
-   <wvobject fp_name="/tb_radiorocInterface/uut/radioFSMInst/shiftBuffInst/shiftCnt" type="array">
-      <obj_property name="ElementShortName">shiftCnt[3:0]</obj_property>
-      <obj_property name="ObjectShortName">shiftCnt[3:0]</obj_property>
+   <wvobject fp_name="/tb_radiorocInterface/uut/radioFSMInst/readStarted" type="logic">
+      <obj_property name="ElementShortName">readStarted</obj_property>
+      <obj_property name="ObjectShortName">readStarted</obj_property>
    </wvobject>
-   <wvobject fp_name="/tb_radiorocInterface/uut/radioFSMInst/shiftBuff" type="logic">
-      <obj_property name="ElementShortName">shiftBuff</obj_property>
-      <obj_property name="ObjectShortName">shiftBuff</obj_property>
+   <wvobject fp_name="/tb_radiorocInterface/uut/radioFSMInst/dataInVec" type="array">
+      <obj_property name="ElementShortName">dataInVec[31:0]</obj_property>
+      <obj_property name="ObjectShortName">dataInVec[31:0]</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_radiorocInterface/uut/radioFSMInst/dataOutBuff" type="array">
       <obj_property name="ElementShortName">dataOutBuff[31:0]</obj_property>
       <obj_property name="ObjectShortName">dataOutBuff[31:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/tb_radiorocInterface/radBusy" type="logic">
-      <obj_property name="ElementShortName">radBusy</obj_property>
-      <obj_property name="ObjectShortName">radBusy</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_radiorocInterface/uut/state" type="other">
-      <obj_property name="ElementShortName">state</obj_property>
-      <obj_property name="ObjectShortName">state</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_radiorocInterface/spiInst/cs" type="logic">
-      <obj_property name="ElementShortName">cs</obj_property>
-      <obj_property name="ObjectShortName">cs</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_radiorocInterface/spiInst/sclkShift" type="array">
-      <obj_property name="ElementShortName">sclkShift[4:0]</obj_property>
-      <obj_property name="ObjectShortName">sclkShift[4:0]</obj_property>
-      <obj_property name="Radix">BINARYRADIX</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_radiorocInterface/spiInst/sclk" type="logic">
-      <obj_property name="ElementShortName">sclk</obj_property>
-      <obj_property name="ObjectShortName">sclk</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_radiorocInterface/spiInst/miso" type="logic">
-      <obj_property name="ElementShortName">miso</obj_property>
-      <obj_property name="ObjectShortName">miso</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_radiorocInterface/spiInst/mosi" type="logic">
-      <obj_property name="ElementShortName">mosi</obj_property>
-      <obj_property name="ObjectShortName">mosi</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_radiorocInterface/spiInst/sendBit" type="logic">
-      <obj_property name="ElementShortName">sendBit</obj_property>
-      <obj_property name="ObjectShortName">sendBit</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_radiorocInterface/spiInst/loadBit" type="logic">
-      <obj_property name="ElementShortName">loadBit</obj_property>
-      <obj_property name="ObjectShortName">loadBit</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_radiorocInterface/spiInst/bitCount" type="array">
-      <obj_property name="ElementShortName">bitCount[3:0]</obj_property>
-      <obj_property name="ObjectShortName">bitCount[3:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_radiorocInterface/spiInst/buffOut" type="array">
-      <obj_property name="ElementShortName">buffOut[7:0]</obj_property>
-      <obj_property name="ObjectShortName">buffOut[7:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_radiorocInterface/spiInst/sclkLen" type="other">
-      <obj_property name="ElementShortName">sclkLen</obj_property>
-      <obj_property name="ObjectShortName">sclkLen</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_radiorocInterface/spiSlaveInst/buffIn" type="array">
-      <obj_property name="ElementShortName">buffIn[7:0]</obj_property>
-      <obj_property name="ObjectShortName">buffIn[7:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_radiorocInterface/spiSlaveInst/loadRxFifo" type="logic">
-      <obj_property name="ElementShortName">loadRxFifo</obj_property>
-      <obj_property name="ObjectShortName">loadRxFifo</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_radiorocInterface/spiSlaveInst/sclkFall" type="logic">
-      <obj_property name="ElementShortName">sclkFall</obj_property>
-      <obj_property name="ObjectShortName">sclkFall</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_radiorocInterface/spiSlaveInst/sclkRise" type="logic">
-      <obj_property name="ElementShortName">sclkRise</obj_property>
-      <obj_property name="ObjectShortName">sclkRise</obj_property>
+   <wvobject fp_name="/tb_radiorocInterface/uut/radioFSMInst/leftBCnt" type="array">
+      <obj_property name="ElementShortName">leftBCnt[2:0]</obj_property>
+      <obj_property name="ObjectShortName">leftBCnt[2:0]</obj_property>
    </wvobject>
 </wave_config>

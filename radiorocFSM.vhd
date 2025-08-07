@@ -284,12 +284,14 @@ begin
                             readStarted <= '1';
 
                             state       <= burstRead;
-                        elsif i2cBusyRise = '1' and lastBuff = '0' then
+                        elsif i2cBusyRise = '1' and emptyBuff = '0' and readStarted = '1' then
                             shiftBuff <= '1';
 
                             state     <= burstRead;
-                        elsif i2cBusyRise = '1' and lastBuff = '1' then
+                        elsif i2cBusyRise = '1' and emptyBuff = '1' and readStarted = '1' then
                             dataReady <= '1';
+                            shiftBuff <= '1';
+                            dataOut   <= slvToDevData(dataOutBuff);
 
                             state     <= burstRead;
                         else
