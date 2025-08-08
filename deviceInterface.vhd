@@ -61,7 +61,7 @@ type state_t is (idle,
                  getAddr,
                  getData,
                  checkBrstPar,
-                 sendBrstToDev,
+                 sendBrst,
                  readDev,
                  sendDevData,
                  done,
@@ -256,7 +256,7 @@ begin
                         brstCollect <= '0';
                         byteCnt     <= resize(brstByteNum, byteCnt'length);
 
-                        state       <= sendBrstToDev;
+                        state       <= sendBrst;
                     elsif rxPresent = '1' and brstCollect = '0' then
                         tOutRst          <= '1';
                         rxRdSig          <= '1';
@@ -301,7 +301,7 @@ begin
                         state        <= getData;
                     end if;
 
-                when sendBrstToDev =>
+                when sendBrst =>
                     i := to_integer(byteCnt);
 
                     if devReady(devIdSig) = '1' and lastBrst = '0' then
@@ -312,13 +312,13 @@ begin
                             devDataOutSig(devDataBytes-j-1) <= brstBuff(i-j);
                         end loop;
 
-                        state <= sendBrstToDev;
+                        state <= sendBrst;
                     elsif devReady(devIdSig) = '1' and lastBrst = '1' and devBrstSig = '1' then
                         devBrstSig    <= '0';
                         devDataOutSig <= (0      => std_logic_vector(resize(brstByteNum(1 downto 0), 8)),
                                           others => (others => '0'));
 
-                        state         <= sendBrstToDev;
+                        state         <= sendBrst;
                     elsif lastBrst = '1' and devBrstSig = '0' then
                         case i is
                             when 0 =>
@@ -346,7 +346,7 @@ begin
                     else
                         devExec <= '0';
 
-                        state   <= sendBrstToDev;
+                        state   <= sendBrst;
                     end if;
 
                 when readDev =>
