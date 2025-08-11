@@ -377,12 +377,19 @@ begin
                 when sendDevData =>
                     i := to_integer(byteCnt);
 
-                    if endCnt = '1' then
+                    if endCnt = '1' and devBrstSig = '0' then
                         rxRdSig <= '0';
                         txWrite <= '0';
                         byteCnt <= to_unsigned(devAddrBytes-1, byteCnt'length);
 
                         state   <= done;
+                    elsif endCnt = '1' and devBrstSig = '1' then
+                        rxRdSig <= '0';
+                        txWrite <= '0';
+                        devExec <= '1';
+                        byteCnt <= to_unsigned(devAddrBytes-1, byteCnt'length);
+
+                        state   <= readDev;
                     elsif txWrAck = '1' then
                         tOutRst <= '0';
                         byteCnt <= byteCnt - 1;

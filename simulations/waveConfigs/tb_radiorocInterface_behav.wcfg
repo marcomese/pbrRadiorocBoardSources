@@ -13,15 +13,15 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="930.166666 us"></ZoomStartTime>
-      <ZoomEndTime time="1,253.966667 us"></ZoomEndTime>
-      <Cursor1Time time="1,044.340000 us"></Cursor1Time>
+      <ZoomStartTime time="120.416666 us"></ZoomStartTime>
+      <ZoomEndTime time="935.916667 us"></ZoomEndTime>
+      <Cursor1Time time="800.000000 us"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
-      <NameColumnWidth column_width="151"></NameColumnWidth>
+      <NameColumnWidth column_width="139"></NameColumnWidth>
       <ValueColumnWidth column_width="58"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="29" />
+   <WVObjectSize size="44" />
    <wvobject fp_name="/tb_radiorocInterface/clk" type="logic">
       <obj_property name="ElementShortName">clk</obj_property>
       <obj_property name="ObjectShortName">clk</obj_property>
@@ -54,6 +54,28 @@
       <obj_property name="ElementShortName">dataOut[3:0][7:0]</obj_property>
       <obj_property name="ObjectShortName">dataOut[3:0][7:0]</obj_property>
    </wvobject>
+   <wvobject fp_name="/tb_radiorocInterface/uut/devDataOut" type="array">
+      <obj_property name="ElementShortName">devDataOut[3:0][7:0]</obj_property>
+      <obj_property name="ObjectShortName">devDataOut[3:0][7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_radiorocInterface/devInterfInst/devDataIn[3]" type="array">
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="ElementShortName">[3][3:0][7:0]</obj_property>
+      <obj_property name="ObjectShortName">[3][3:0][7:0]</obj_property>
+      <obj_property name="label">devDataOut</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_radiorocInterface/devInterfInst/dataOut" type="array">
+      <obj_property name="ElementShortName">dataOut[7:0]</obj_property>
+      <obj_property name="ObjectShortName">dataOut[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_radiorocInterface/devInterfInst/txWrite" type="logic">
+      <obj_property name="ElementShortName">txWrite</obj_property>
+      <obj_property name="ObjectShortName">txWrite</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_radiorocInterface/devInterfInst/txWrAck" type="logic">
+      <obj_property name="ElementShortName">txWrAck</obj_property>
+      <obj_property name="ObjectShortName">txWrAck</obj_property>
+   </wvobject>
    <wvobject fp_name="/tb_radiorocInterface/uut/radioFSMInst/busy" type="logic">
       <obj_property name="ElementShortName">busy</obj_property>
       <obj_property name="ObjectShortName">busy</obj_property>
@@ -66,9 +88,27 @@
       <obj_property name="ElementShortName">dataReady</obj_property>
       <obj_property name="ObjectShortName">dataReady</obj_property>
    </wvobject>
-   <wvobject fp_name="/tb_radiorocInterface/uut/radioFSMInst/state" type="other">
+   <wvobject fp_name="/tb_radiorocInterface/uut/devReady" type="logic">
+      <obj_property name="ElementShortName">devReady</obj_property>
+      <obj_property name="ObjectShortName">devReady</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_radiorocInterface/uut/state" type="other">
+      <obj_property name="DisplayName">label</obj_property>
       <obj_property name="ElementShortName">state</obj_property>
       <obj_property name="ObjectShortName">state</obj_property>
+      <obj_property name="label">stateRadInterf</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_radiorocInterface/uut/radioFSMInst/state" type="other">
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="ElementShortName">state</obj_property>
+      <obj_property name="ObjectShortName">state</obj_property>
+      <obj_property name="label">stateRadFSM</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_radiorocInterface/devInterfInst/state" type="other">
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="ElementShortName">state</obj_property>
+      <obj_property name="ObjectShortName">state</obj_property>
+      <obj_property name="label">stateDevInterf</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_radiorocInterface/uut/radioFSMInst/rwSig" type="logic">
       <obj_property name="ElementShortName">rwSig</obj_property>
@@ -137,5 +177,35 @@
    <wvobject fp_name="/tb_radiorocInterface/uut/radioFSMInst/leftBCnt" type="array">
       <obj_property name="ElementShortName">leftBCnt[2:0]</obj_property>
       <obj_property name="ObjectShortName">leftBCnt[2:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_radiorocInterface/spiSlaveInst/cs" type="logic">
+      <obj_property name="ElementShortName">cs</obj_property>
+      <obj_property name="ObjectShortName">cs</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_radiorocInterface/spiSlaveInst/sclk" type="logic">
+      <obj_property name="ElementShortName">sclk</obj_property>
+      <obj_property name="ObjectShortName">sclk</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_radiorocInterface/spiSlaveInst/miso" type="logic">
+      <obj_property name="ElementShortName">miso</obj_property>
+      <obj_property name="ObjectShortName">miso</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_radiorocInterface/spiSlaveInst/mosi" type="logic">
+      <obj_property name="ElementShortName">mosi</obj_property>
+      <obj_property name="ObjectShortName">mosi</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_radiorocInterface/i2cModule/state" type="other">
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="ElementShortName">state</obj_property>
+      <obj_property name="ObjectShortName">state</obj_property>
+      <obj_property name="label">stateI2C</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_radiorocInterface/i2cModule/sda" type="logic">
+      <obj_property name="ElementShortName">sda</obj_property>
+      <obj_property name="ObjectShortName">sda</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_radiorocInterface/i2cModule/scl" type="logic">
+      <obj_property name="ElementShortName">scl</obj_property>
+      <obj_property name="ObjectShortName">scl</obj_property>
    </wvobject>
 </wave_config>

@@ -66,6 +66,8 @@ signal   dataIn     : devData_t;
 
 begin
 
+devDataOut <= dataOut;
+
 radioFSM: process(clk, rst, devExec)
 begin
     if rising_edge(clk) then
@@ -76,7 +78,6 @@ begin
             devReady   <= '0';
             busy       <= '0';
             i2cEnClk   <= '0';
-            devDataOut <= (others => (others => '0'));
 
             state      <= idle;
         else
@@ -127,7 +128,6 @@ begin
                     devReady   <= '1';
                     busy       <= '0';
                     i2cEnClk   <= '0';
-                    devDataOut <= dataOut;
 
                     state      <= idle;
 
