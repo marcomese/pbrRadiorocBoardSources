@@ -283,7 +283,7 @@ begin
                     end if;
 
                 when checkBrstPar =>
-                   if unsigned(devDataToSlv(devDataOutSig)) = 0 then
+                    if unsigned(devDataToSlv(devDataOutSig)) = 0 then
                         state <= errBrstPar;
                     elsif unsigned(devDataToSlv(devDataOutSig)) > maxBrstLen then
                         rxRdSig     <= '1';
@@ -356,6 +356,7 @@ begin
                         tOutRst <= '1';
                         devExec <= '0';
                         byteCnt <= byteCnt - 1;
+                        brstByteNum <= brstByteNum - 1;
                         dataOut <= devDataIn(devIdSig)(i);
                         txWrite <= '1';
                         rxEna   <= '0';
@@ -387,9 +388,16 @@ begin
                         rxRdSig <= '0';
                         txWrite <= '0';
                         devExec <= '1';
-                        byteCnt <= to_unsigned(devAddrBytes-1, byteCnt'length);
+                        byteCnt <= to_unsigned(devDataBytes-1, byteCnt'length);
 
                         state   <= readDev;
+                    elsif brstByteNum = 0 then
+                        rxRdSig    <= '0';
+                        txWrite    <= '0';
+                        devBrstSig <= '0';
+                        byteCnt    <= to_unsigned(devAddrBytes-1, byteCnt'length);
+
+                        state      <= done;
                     elsif txWrAck = '1' then
                         tOutRst <= '0';
                         byteCnt <= byteCnt - 1;
