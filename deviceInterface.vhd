@@ -350,37 +350,11 @@ begin
                 when readDev =>
                     i := to_integer(byteCnt);
 
-                    if devReady(devIdSig) = '1' and devBrstSig = '0' then
+                    if devReady(devIdSig) = '1' then
                         tOutRst <= '1';
                         devExec <= '0';
                         byteCnt <= byteCnt - 1;
                         dataOut <= devDataIn(devIdSig)(i);
-                        txWrite <= '1';
-                        rxEna   <= '0';
-
-                        state   <= sendDevData;
-                    elsif devReady(devIdSig) = '1' and devBrstSig = '1' and lastBrst = '0' then
-                        tOutRst <= '1';
-                        devExec <= '0';
-                        byteCnt <= byteCnt - devDataBytes;
-
-                        for j in 0 to devDataBytes-1 loop
-                            brstBuff(i-j) <= devDataIn(devIdSig)(devDataBytes-j-1);
-                        end loop;
-
-                        rxEna   <= '0';
-
-                        state   <= readDev;
-                    elsif devReady(devIdSig) = '1' and devBrstSig = '1' and lastBrst = '1' then
-                        tOutRst <= '1';
-                        devExec <= '0';
-                        
-                        for j in 0 to devDataBytes-1 loop
-                            brstBuff(j) <= devDataIn(devIdSig)(j);
-                        end loop;
-
-                        byteCnt <= resize(brstByteNum-1, byteCnt'length);
-                        dataOut <= brstBuff(to_integer(brstByteNum)-1);
                         txWrite <= '1';
                         rxEna   <= '0';
 
