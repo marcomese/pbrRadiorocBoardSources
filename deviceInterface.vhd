@@ -332,27 +332,13 @@ begin
 
                         state         <= sendBrst;
                     elsif lastBrst = '1' and devBrstSig = '0' then
-                        case i is
-                            when 0 =>
-                                devDataOutSig <= (devDataOutSig'left   => brstBuff(0),
-                                                  others               => (others => '0'));
-                            when 1 =>
-                                devDataOutSig <= (devDataOutSig'left   => brstBuff(1),
-                                                  devDataOutSig'left-1 => brstBuff(0),
-                                                  others               => (others => '0'));
-                            when 2 =>
-                                devDataOutSig <= (devDataOutSig'left   => brstBuff(2),
-                                                  devDataOutSig'left-1 => brstBuff(1),
-                                                  devDataOutSig'left-2 => brstBuff(0),
-                                                  others               => (others => '0'));
-                            when 3 =>
-                                devDataOutSig <= (devDataOutSig'left   => brstBuff(3),
-                                                  devDataOutSig'left-1 => brstBuff(2),
-                                                  devDataOutSig'left-2 => brstBuff(1),
-                                                  devDataOutSig'left-3 => brstBuff(0));
-                            when others =>
-                                devDataOutSig <= (others => (others => '0'));
-                        end case;
+                        devDataOutSig <= (others => (others => '0'));
+
+                        for j in 0 to devDataBytes-1 loop
+                            if j <= i then
+                                devDataOutSig(devDataBytes-j-1) <= brstBuff(i-j);
+                            end if;
+                        end loop;
 
                         state <= done;
                     else
