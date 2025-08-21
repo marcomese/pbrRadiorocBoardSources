@@ -537,7 +537,7 @@ begin
     wait for clkPeriod;
     testDataIn <= x"00";
     wait for clkPeriod;
-    testDataIn <= x"07";
+    testDataIn <= x"09";
     wait for clkPeriod;
     testTxWrite <= '0';
 
@@ -560,6 +560,26 @@ begin
     wait until i2cBusy = '0';
 
     testData <= x"DD";
+
+    wait until i2cBusy = '0';
+
+    testData <= x"EE";
+
+    wait until i2cBusy = '0';
+
+    testData <= x"AB";
+    
+    wait until i2cBusy = '0';
+
+    testData <= x"CD";
+
+    wait until i2cBusy = '0';
+
+    testData <= x"EF";
+
+    wait until i2cBusy = '0';
+
+    testData <= x"12";
 
     wait for 10 us;
 

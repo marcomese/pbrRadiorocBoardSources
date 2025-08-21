@@ -218,7 +218,11 @@ begin
                         rxRdSig    <= '0';
                         devExec    <= '1';
 
-                        state      <= readDev;
+                        if devBrstSig = '0' then
+                            state <= readDev;
+                        else
+                            state <= getData;
+                        end if;
                     elsif rxPresent = '1' then
                         tOutRst    <= '1';
                         byteCnt    <= byteCnt - 1;
@@ -291,14 +295,22 @@ begin
                         byteCnt     <= to_unsigned(maxBrstLen-1, byteCnt'length);
                         brstCollect <= '1';
 
-                        state       <= getData;
+                        if devRwSig = devWrite then 
+                            state <= getData;
+                        else
+                            state <= readDev;
+                        end if;
                     else
                         rxRdSig      <= '1';
                         brstByteNum  <= resize(unsigned(devDataToSlv(devDataOutSig))-1, brstByteNum'length);
                         byteCnt      <= resize(unsigned(devDataToSlv(devDataOutSig))-1, byteCnt'length);
                         brstCollect  <= '1';
 
-                        state        <= getData;
+                        if devRwSig = devWrite then
+                            state <= getData;
+                        else
+                            state <= readDev;
+                        end if;
                     end if;
 
                 when sendBrst =>
@@ -352,12 +364,37 @@ begin
                 when readDev =>
                     i := to_integer(byteCnt);
 
-                    if devReady(devIdSig) = '1' then
+                    if devReady(devIdSig) = '1' and devBrstSig = '0' then
                         tOutRst <= '1';
                         devExec <= '0';
                         byteCnt <= byteCnt - 1;
-                        brstByteNum <= brstByteNum - 1;
                         dataOut <= devDataIn(devIdSig)(i);
+                        txWrite <= '1';
+                        rxEna   <= '0';
+
+                        state   <= sendDevData;
+                    elsif devReady(devIdSig) = '1' and devBrstSig = '1' and lastBrst = '0' then
+                        tOutRst <= '1';
+                        devExec <= '0';
+                        byteCnt <= byteCnt - devDataBytes;
+
+                        for j in 0 to devDataBytes-1 loop
+                            brstBuff(i-j) <= devDataIn(devIdSig)(devDataBytes-j-1);
+                        end loop;
+
+                        rxEna   <= '0';
+
+                        state   <= readDev;
+                    elsif devReady(devIdSig) = '1' and devBrstSig = '1' and lastBrst = '1' then
+                        tOutRst <= '1';
+                        devExec <= '0';
+                        
+                        for j in 0 to devDataBytes-1 loop
+                            brstBuff(j) <= devDataIn(devIdSig)(j);
+                        end loop;
+
+                        byteCnt <= resize(brstByteNum-1, byteCnt'length);
+                        dataOut <= brstBuff(to_integer(brstByteNum)-1);
                         txWrite <= '1';
                         rxEna   <= '0';
 
@@ -378,20 +415,7 @@ begin
                 when sendDevData =>
                     i := to_integer(byteCnt);
 
-                    if endCnt = '1' and devBrstSig = '0' then
-                        rxRdSig <= '0';
-                        txWrite <= '0';
-                        byteCnt <= to_unsigned(devAddrBytes-1, byteCnt'length);
-
-                        state   <= done;
-                    elsif endCnt = '1' and devBrstSig = '1' then
-                        rxRdSig <= '0';
-                        txWrite <= '0';
-                        devExec <= '1';
-                        byteCnt <= to_unsigned(devDataBytes-1, byteCnt'length);
-
-                        state   <= readDev;
-                    elsif brstByteNum = 0 then
+                    if endCnt = '1' then
                         rxRdSig    <= '0';
                         txWrite    <= '0';
                         devBrstSig <= '0';
@@ -402,7 +426,7 @@ begin
                         tOutRst <= '0';
                         byteCnt <= byteCnt - 1;
                         txWrite <= '1';
-                        dataOut <= devDataIn(devIdSig)(i);
+                        dataOut <= brstBuff(i);
 
                         state   <= sendDevData;
                     else

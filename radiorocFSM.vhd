@@ -252,7 +252,12 @@ begin
 
                 when burstRead =>
                     if brstFall = '1' then
-                        state     <= lastBytesLoad;
+                        loadBuff  <= '0';
+                        i2cEna    <= '0';
+                        dataReady <= '0';
+                        brstOnSig <= '0';
+
+                        state     <= transEnd;
                     elsif exec = '1' then
                         i2cEna    <= '1';
 
