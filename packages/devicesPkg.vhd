@@ -14,6 +14,7 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.ALL;
+use work.utilsPkg.all;
 
 package devicesPkg is
 
@@ -53,6 +54,10 @@ package devicesPkg is
     function devDataToSlice(d: devData_t; left: integer; right: integer) return std_logic_vector;
 
     function devDataToUnsigned(d: devData_t) return unsigned;
+
+    procedure byteArrCpy(signal   d   : out devData_t;
+                         signal   s   : in  byteArray_t;
+                         constant pos : in  integer);
 end package devicesPkg;
 
 package body devicesPkg is
@@ -144,5 +149,16 @@ package body devicesPkg is
         
         return unsigned(sData);
     end function devDataToUnsigned;
+
+    procedure byteArrCpy(signal   d   : out devData_t;
+                         signal   s   : in  byteArray_t;
+                         constant pos : in  integer) is
+    begin
+        for j in 0 to devDataBytes-1 loop
+            if j <= pos then
+                d(devDataBytes-j-1) <= s(pos-j);
+            end if;
+        end loop;
+    end procedure byteArrCpy;
 
 end package body;

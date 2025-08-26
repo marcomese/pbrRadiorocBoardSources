@@ -16,7 +16,7 @@ use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.STD_LOGIC_MISC.ALL;
 use IEEE.NUMERIC_STD.ALL;
 use work.devicesPkg.all;
-use work.utilsPkg.bitsNum;
+use work.utilsPkg.all;
 
 entity deviceInterface is
 generic(
@@ -69,9 +69,8 @@ type state_t is (idle,
                  errTOut,
                  errBrstPar);
 
-type brstBuff_t is array(maxBrstLen-1 downto 0) of std_logic_vector(7 downto 0);
-
 constant tOut          : integer := integer(clkFreq*timeout);
+constant shiftLen      : integer := 8;
 constant bytesNum      : integer := maxBrstLen;
 
 signal   state         : state_t;
@@ -90,19 +89,27 @@ signal   devIdSig      : devices_t;
 signal   tOutCnt       : unsigned(bitsNum(tOut) downto 0);
 signal   byteCnt       : unsigned(bitsNum(bytesNum) downto 0);
 signal   brstByteNum   : unsigned(bitsNum(bytesNum)-1 downto 0);
-signal   brstBuff      : brstBuff_t;
+signal   brstBuff      : byteArray_t(maxBrstLen-1 downto 0);
 signal   devDataOutSig : devData_t;
+signal   rstBuff       : std_logic;
+signal   loadBuff      : std_logic;
+signal   emptyBuff     : std_logic;
+signal   lastBuff      : std_logic;
+signal   parDataInBuff : std_logic_vector(devDataBytes*shiftLen-1 downto 0);
+signal   dataOutBuff   : std_logic_vector(devDataBytes*shiftLen-1 downto 0);
 
 begin
 
-rxRead     <= rxRdSig and not endCnt;
-devRw      <= devRwSig;
-devBurst   <= devBrstSig;
-devId      <= devIdSig;
-devDataOut <= devDataOutSig;
-endCnt     <= byteCnt(byteCnt'left);
-tOutSig    <= tOutCnt(tOutCnt'left);
-lastBrst   <= not or_reduce(std_logic_vector(byteCnt(byteCnt'left downto 2)));
+rxRead        <= rxRdSig and not endCnt;
+devRw         <= devRwSig;
+devBurst      <= devBrstSig;
+devId         <= devIdSig;
+devDataOut    <= devDataOutSig;
+endCnt        <= byteCnt(byteCnt'left);
+tOutSig       <= tOutCnt(tOutCnt'left);
+lastBrst      <= not or_reduce(std_logic_vector(byteCnt(byteCnt'left downto 2)));
+parDataInBuff <= devDataToSlv(devDataIn(devIdSig));
+dataOut       <= dataOutBuff(dataOutBuff'left downto dataOutBuff'left-shiftLen+1);
 
 devRwDecProc: process(clk, rst, dataIn(7 downto 4))
 begin
@@ -137,7 +144,6 @@ begin
         if rst = '1' then
             tOutRst        <= '0';
             byteCnt        <= to_unsigned(devAddrBytes-1, byteCnt'length);
-            dataOut        <= (others => '0');
             rxRdSig        <= '0';
             txWrite        <= '0';
             rxEna          <= '1';
@@ -152,14 +158,22 @@ begin
             busy           <= '0';
             brstBuff       <= (others => (others => '0'));
             brstCollect    <= '0';
+            rstBuff        <= '1';
+            loadBuff       <= '0';
             error          <= (others => '0');
 
             state          <= idle;
         else
             case state is
                 when idle =>
+                    tOutRst <= '1';
+                    busy    <= '0';
+                    devExec <= '0';
+                    rstBuff <= '0';
+
+                    state   <= idle;
+
                     if rxPresent = '1' and validSig = '1' then
-                        tOutRst    <= '1';
                         rxRdSig    <= '1';
                         devRwSig   <= rwSig;
                         devBrstSig <= brstSig;
@@ -169,19 +183,14 @@ begin
 
                         state      <= getDev;
                     elsif rxPresent = '1' and validSig = '0' then
-                        tOutRst    <= '1';
                         rxRdSig    <= '1';
-
-                        state      <= idle;
-                    else
-                        tOutRst <= '1';
-                        busy    <= '0';
-                        devExec <= '0';
-
-                        state   <= idle;
                     end if;
 
                 when getDev =>
+                    tOutRst <= '0';
+
+                    state   <= getDev;
+
                     if devIdSig = none then
                         tOutRst <= '1';
                         rxRdSig <= '0';
@@ -198,14 +207,14 @@ begin
                         rxRdSig <= '0';
 
                         state   <= errFifo;
-                    else
-                        tOutRst <= '0';
-
-                        state   <= getDev;
                     end if;
 
                 when getAddr =>
                     i := to_integer(byteCnt);
+
+                    tOutRst <= '0';
+
+                    state   <= getAddr;
 
                     if endCnt = '1' and devRwSig = devWrite then
                         tOutRst    <= '1';
@@ -227,21 +236,19 @@ begin
                         tOutRst    <= '1';
                         byteCnt    <= byteCnt - 1;
                         devAddr(i) <= dataIn;
-
-                        state      <= getAddr;
                     elsif tOutSig = '1' then
                         tOutRst <= '1';
                         rxRdSig <= '0';
 
                         state   <= errFifo;
-                    else
-                        tOutRst    <= '0';
-
-                        state      <= getAddr;
                     end if;
 
                 when getData =>
                     i := to_integer(byteCnt);
+
+                    tOutRst <= '0';
+
+                    state   <= getData;
 
                     if endCnt = '1' and devBrstSig = '0' then
                         tOutRst <= '1';
@@ -266,137 +273,106 @@ begin
                         rxRdSig          <= '1';
                         byteCnt          <= byteCnt - 1;
                         devDataOutSig(i) <= dataIn;
-
-                        state            <= getData;
                     elsif rxPresent = '1' and brstCollect = '1' then
                         tOutRst     <= '1';
                         rxRdSig     <= '1';
                         byteCnt     <= byteCnt - 1;
                         brstBuff(i) <= dataIn;
-
-                        state       <= getData;
                     elsif tOutSig = '1' then
                         tOutRst <= '1';
                         rxRdSig <= '0';
 
                         state   <= errTOut;
-                    else
-                        tOutRst <= '0';
-
-                        state   <= getData;
                     end if;
 
                 when checkBrstPar =>
+                    rxRdSig      <= '1';
+                    brstByteNum  <= resize(devDataToUnsigned(devDataOutSig)-1, brstByteNum'length);
+                    byteCnt      <= resize(devDataToUnsigned(devDataOutSig)-1, byteCnt'length);
+                    brstCollect  <= '1';
+
+                    if devRwSig = devWrite then
+                        state <= getData;
+                    else
+                        state <= readDev;
+                    end if;
+
                     if unsigned(devDataToSlv(devDataOutSig)) = 0 then
                         state <= errBrstPar;
                     elsif unsigned(devDataToSlv(devDataOutSig)) > maxBrstLen then
-                        rxRdSig     <= '1';
                         brstByteNum <= to_unsigned(maxBrstLen-1, brstByteNum'length);
                         byteCnt     <= to_unsigned(maxBrstLen-1, byteCnt'length);
-                        brstCollect <= '1';
-
-                        if devRwSig = devWrite then 
-                            state <= getData;
-                        else
-                            state <= readDev;
-                        end if;
-                    else
-                        rxRdSig      <= '1';
-                        brstByteNum  <= resize(unsigned(devDataToSlv(devDataOutSig))-1, brstByteNum'length);
-                        byteCnt      <= resize(unsigned(devDataToSlv(devDataOutSig))-1, byteCnt'length);
-                        brstCollect  <= '1';
-
-                        if devRwSig = devWrite then
-                            state <= getData;
-                        else
-                            state <= readDev;
-                        end if;
                     end if;
 
                 when sendBrst =>
                     i := to_integer(byteCnt);
 
+                    devExec <= '0';
+
+                    state   <= sendBrst;
+
                     if devReady(devIdSig) = '1' and lastBrst = '0' then
                         devExec <= '1';
                         byteCnt <= byteCnt - devDataBytes;
 
-                        for j in 0 to devDataBytes-1 loop
-                            devDataOutSig(devDataBytes-j-1) <= brstBuff(i-j);
-                        end loop;
-
-                        state <= sendBrst;
+                        byteArrCpy(devDataOutSig, brstBuff, i);
                     elsif devReady(devIdSig) = '1' and lastBrst = '1' and devBrstSig = '1' then
                         devBrstSig    <= '0';
                         devDataOutSig <= (0      => std_logic_vector(resize(brstByteNum(1 downto 0), 8)),
                                           others => (others => '0'));
-
-                        state         <= sendBrst;
                     elsif lastBrst = '1' and devBrstSig = '0' then
                         devDataOutSig <= (others => (others => '0'));
 
-                        for j in 0 to devDataBytes-1 loop
-                            if j <= i then
-                                devDataOutSig(devDataBytes-j-1) <= brstBuff(i-j);
-                            end if;
-                        end loop;
+                        byteArrCpy(devDataOutSig, brstBuff, i);
 
                         state <= done;
-                    else
-                        devExec <= '0';
-
-                        state   <= sendBrst;
                     end if;
 
                 when readDev =>
-                    i := to_integer(byteCnt);
+                    tOutRst   <= '0';
+                    devExec   <= '0';
+                    loadBuff  <= '1';
+
+                    state     <= readDev;
 
                     if devReady(devIdSig) = '1' then
-                        tOutRst <= '1';
-                        devExec <= '0';
-                        byteCnt <= byteCnt - 1;
-                        dataOut <= devDataIn(devIdSig)(i);
-                        txWrite <= '1';
-                        rxEna   <= '0';
+                        tOutRst       <= '1';
+                        loadBuff      <= '0';
+                        txWrite       <= '1';
+                        rxEna         <= '0';
 
-                        state   <= sendDevData;
+                        state         <= sendDevData;
                     elsif tOutSig = '1' then
                         tOutRst <= '1';
-                        devExec <= '0';
                         rxEna   <= '1';
 
                         state   <= errTOut;
-                    else
-                        tOutRst <= '0';
-                        devExec <= '0';
-
-                        state   <= readDev;
                     end if;
 
                 when sendDevData =>
-                    i := to_integer(byteCnt);
+                    tOutRst   <= '0';
+                    txWrite   <= '0';
+
+                    state     <= sendDevData;
 
                     if endCnt = '1' then
                         rxRdSig    <= '0';
-                        txWrite    <= '0';
                         devBrstSig <= '0';
                         byteCnt    <= to_unsigned(devAddrBytes-1, byteCnt'length);
 
                         state      <= done;
+                    elsif lastBuff = '1' then
+                        state <= readDev;
                     elsif txWrAck = '1' then
-                        tOutRst <= '0';
-                        byteCnt <= byteCnt - 1;
-                        txWrite <= '1';
-                        dataOut <= brstBuff(i);
-
-                        state   <= sendDevData;
-                    else
-                        tOutRst <= '0';
-                        txWrite <= '0';
-
-                        state   <= sendDevData;
+                        byteCnt   <= byteCnt - 1;
+                        txWrite   <= '1';
                     end if;
 
                 when done =>
+                    devExec <= '0';
+
+                    state   <= done;
+
                     if devBrstSig = '0' then
                         devExec <= not devRwSig;
                         rxEna   <= '1';
@@ -406,23 +382,17 @@ begin
        
                         state   <= idle;
                     elsif devBrstSig = '1' and devReady(devIdSig) = '1' then
-                        devExec <= '0';
                         rxEna   <= '1';
                         busy    <= '0';
                         error   <= (others => '0');
                         byteCnt <= to_unsigned(devAddrBytes-1, byteCnt'length);
        
                         state   <= idle;
-                    else
-                        devExec <= '0';
-
-                        state   <= done;
                     end if;
 
                 when errTOut =>
                     tOutRst       <= '1';
                     byteCnt       <= to_unsigned(devAddrBytes-1, byteCnt'length);
-                    dataOut       <= (others => '0');
                     rxRdSig       <= '0';
                     txWrite       <= '0';
                     rxEna         <= '1';
@@ -440,7 +410,6 @@ begin
                 when errFifo =>
                     tOutRst       <= '1';
                     byteCnt       <= to_unsigned(devAddrBytes-1, byteCnt'length);
-                    dataOut       <= (others => '0');
                     rxRdSig       <= '0';
                     txWrite       <= '0';
                     rxEna         <= '1';
@@ -458,7 +427,6 @@ begin
                 when errBrstPar =>
                     tOutRst       <= '1';
                     byteCnt       <= to_unsigned(devAddrBytes-1, byteCnt'length);
-                    dataOut       <= (others => '0');
                     rxRdSig       <= '0';
                     txWrite       <= '0';
                     rxEna         <= '1';
@@ -476,7 +444,6 @@ begin
                 when others =>
                     tOutRst       <= '1';
                     byteCnt       <= to_unsigned(devAddrBytes-1, byteCnt'length);
-                    dataOut       <= (others => '0');
                     rxRdSig       <= '0';
                     txWrite       <= '0';
                     rxEna         <= '1';
@@ -506,4 +473,21 @@ begin
     end if;
 end process;
 
+brstRdInst: entity work.shiftReg
+generic map(
+    direction  => "left",
+    regLen     => devDataBytes*shiftLen,
+    shiftLen   => shiftLen
+)
+port map(
+    clk        => clk,
+    rst        => rstBuff,
+    load       => loadBuff,
+    shift      => txWrAck,
+    empty      => emptyBuff,
+    last       => lastBuff,
+    parDataIn  => parDataInBuff,
+    serDataIn  => (others => '0'),
+    dataOut    => dataOutBuff
+);
 end Behavioral;

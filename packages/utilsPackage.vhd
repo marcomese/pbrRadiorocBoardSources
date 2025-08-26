@@ -28,7 +28,6 @@ package utilsPkg is
 
     function zeroes(size: integer) return unsigned;
 
-
     function initSlv(lenSlv: integer; beginSlvVal: integer; endSlvVal: integer; slvVal: std_logic_vector; othSlv: std_logic) return std_logic_vector;
 end package utilsPkg;
 
@@ -112,7 +111,6 @@ package body utilsPkg is
     begin
         return slv;
     end zeroes;
-
 
     function initSlv(lenSlv: integer; beginSlvVal: integer; endSlvVal: integer; slvVal: std_logic_vector; othSlv: std_logic) return std_logic_vector is
         variable slv : std_logic_vector(lenSlv-1 downto 0);
