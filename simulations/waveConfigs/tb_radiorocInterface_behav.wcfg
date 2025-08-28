@@ -13,13 +13,13 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="629.470000 us"></ZoomStartTime>
-      <ZoomEndTime time="1,406.470001 us"></ZoomEndTime>
-      <Cursor1Time time="1,152.990000 us"></Cursor1Time>
+      <ZoomStartTime time="0.000000 us"></ZoomStartTime>
+      <ZoomEndTime time="3,001.000001 us"></ZoomEndTime>
+      <Cursor1Time time="1,467.420000 us"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="187"></NameColumnWidth>
-      <ValueColumnWidth column_width="87"></ValueColumnWidth>
+      <ValueColumnWidth column_width="83"></ValueColumnWidth>
    </column_width_setting>
    <WVObjectSize size="69" />
    <wvobject fp_name="/tb_radiorocInterface/clk" type="logic">
@@ -124,12 +124,6 @@
    <wvobject fp_name="/tb_radiorocInterface/devInterfInst/rxRdSig" type="logic">
       <obj_property name="ElementShortName">rxRdSig</obj_property>
       <obj_property name="ObjectShortName">rxRdSig</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_radiorocInterface/devInterfInst/state" type="other">
-      <obj_property name="DisplayName">label</obj_property>
-      <obj_property name="ElementShortName">state</obj_property>
-      <obj_property name="ObjectShortName">state</obj_property>
-      <obj_property name="label">stateDevInterf</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_radiorocInterface/devInterfInst/rxPresent" type="logic">
       <obj_property name="ElementShortName">rxPresent</obj_property>
@@ -255,12 +249,6 @@
          <obj_property name="ObjectShortName">[24]</obj_property>
       </wvobject>
    </wvobject>
-   <wvobject fp_name="/tb_radiorocInterface/uut/state" type="other">
-      <obj_property name="DisplayName">label</obj_property>
-      <obj_property name="ElementShortName">state</obj_property>
-      <obj_property name="ObjectShortName">state</obj_property>
-      <obj_property name="label">stateRadInterf</obj_property>
-   </wvobject>
    <wvobject fp_name="/tb_radiorocInterface/uut/radioFSMInst/rstBuff" type="logic">
       <obj_property name="ElementShortName">rstBuff</obj_property>
       <obj_property name="ObjectShortName">rstBuff</obj_property>
@@ -288,6 +276,18 @@
    <wvobject fp_name="/tb_radiorocInterface/uut/radioFSMInst/readStarted" type="logic">
       <obj_property name="ElementShortName">readStarted</obj_property>
       <obj_property name="ObjectShortName">readStarted</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_radiorocInterface/devInterfInst/state" type="other">
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="ElementShortName">state</obj_property>
+      <obj_property name="ObjectShortName">state</obj_property>
+      <obj_property name="label">stateDevInterf</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_radiorocInterface/uut/state" type="other">
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="ElementShortName">state</obj_property>
+      <obj_property name="ObjectShortName">state</obj_property>
+      <obj_property name="label">stateRadInterf</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_radiorocInterface/uut/radioFSMInst/state" type="other">
       <obj_property name="DisplayName">label</obj_property>

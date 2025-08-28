@@ -83,21 +83,6 @@ signal selAdcSig      : std_logic_vector(63 downto 0);
 signal sync100to25In,
        sync100to25Out : std_logic_vector(66 downto 0);
 
-
-attribute mark_debug : string;
-attribute mark_debug of state,
-                        dataOut,
-                        dataIn,
-                        byteCnt,
-                        swTrg,
-                        lastByte,
-                        resetAcqSig,
-                        startAcqSig,
-                        rdAcqSig,
-                        readSent,
-                        nbAcqSig   : signal is "true";
-
-
 begin
 
 -- DEBUG --
