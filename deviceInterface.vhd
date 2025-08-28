@@ -98,6 +98,9 @@ signal   lastBuff      : std_logic;
 signal   parDataInBuff : std_logic_vector(devDataBytes*shiftLen-1 downto 0);
 signal   dataOutBuff   : std_logic_vector(devDataBytes*shiftLen-1 downto 0);
 
+attribute mark_debug : string;
+attribute mark_debug of state : signal is "true";
+
 begin
 
 rxRead        <= rxRdSig and not endCnt;
