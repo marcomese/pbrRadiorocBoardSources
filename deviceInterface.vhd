@@ -171,6 +171,7 @@ begin
                     busy    <= '0';
                     devExec <= '0';
                     rstBuff <= '0';
+                    rxRdSig <= '0';
 
                     state   <= idle;
 
@@ -218,15 +219,15 @@ begin
                     state   <= getAddr;
 
                     if endCnt = '1' and devRwSig = devWrite then
-                        tOutRst    <= '1';
-                        byteCnt    <= to_unsigned(devDataBytes-1, byteCnt'length);
+                        tOutRst <= '1';
+                        byteCnt <= to_unsigned(devDataBytes-1, byteCnt'length);
 
-                        state      <= getData;
+                        state   <= getData;
                     elsif endCnt = '1' and devRwSig = devRead then
-                        tOutRst    <= '1';
-                        byteCnt    <= to_unsigned(devDataBytes-1, byteCnt'length);
+                        tOutRst <= '1';
+                        byteCnt <= to_unsigned(devDataBytes-1, byteCnt'length);
                         
-                        devExec    <= '1';
+                        devExec <= '1';
 
                         if devBrstSig = '0' then
                             state <= readDev;
