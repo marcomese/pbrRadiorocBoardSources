@@ -209,39 +209,39 @@ begin
     rst <= '0';
     wait for clkPeriod*5;
 
---    wait for clkPeriod*5;
+    wait for clkPeriod*5;
 
---    testRxRead <= '1';
+    testRxRead <= '1';
 
---    testDataIn <= x"A3";
---    wait for clkPeriod;
---    testTxWrite <= '1';
---    wait for clkPeriod;
---    testDataIn <= x"BA";
---    wait for clkPeriod;
---    testDataIn <= x"12";
---    wait for clkPeriod;
---    testDataIn <= x"0A";
---    wait for clkPeriod;
---    testDataIn <= x"00";
---    wait for clkPeriod;
---    testDataIn <= x"00";
---    wait for clkPeriod;
---    testDataIn <= x"00";
---    wait for clkPeriod;
---    testTxWrite <= '0';
+    testDataIn <= x"A3";
+    wait for clkPeriod;
+    testTxWrite <= '1';
+    wait for clkPeriod;
+    testDataIn <= x"BA";
+    wait for clkPeriod;
+    testDataIn <= x"12";
+    wait for clkPeriod;
+    testDataIn <= x"0A";
+    wait for clkPeriod;
+    testDataIn <= x"00";
+    wait for clkPeriod;
+    testDataIn <= x"00";
+    wait for clkPeriod;
+    testDataIn <= x"00";
+    wait for clkPeriod;
+    testTxWrite <= '0';
 
---    wait until i2cBusy = '0';
+    wait until i2cBusy = '0';
 
---    wait until i2cBusy = '0';
+    wait until i2cBusy = '0';
 
---    wait until i2cBusy = '0';
+    wait until i2cBusy = '0';
 
---    wait until i2cBusy = '0';
+    wait until i2cBusy = '0';
     
---    testData <= x"BB";
+    testData <= x"BB";
 
---    wait for 10 us;
+    wait for 10 us;
 
 --    testDataIn <= x"A3";
 --    wait for clkPeriod;
@@ -295,12 +295,12 @@ begin
     wait for clkPeriod;
     testTxWrite <= '0';
     wait for clkPeriod*delay;
-    testDataIn <= x"00";
+    testDataIn <= x"11";
     testTxWrite <= '1';
     wait for clkPeriod;
     testTxWrite <= '0';
     wait for clkPeriod*delay;
-    testDataIn <= x"00";
+    testDataIn <= x"22";
     testTxWrite <= '1';
     wait for clkPeriod;
     testTxWrite <= '0';
@@ -537,7 +537,7 @@ begin
     wait for clkPeriod;
     testDataIn <= x"00";
     wait for clkPeriod;
-    testDataIn <= x"09";
+    testDataIn <= x"0D";
     wait for clkPeriod;
     testTxWrite <= '0';
 

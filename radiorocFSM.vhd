@@ -63,6 +63,7 @@ signal   rwSig,
          brstOnSig,
          i2cBusyOld,
          i2cBusyRise,
+         i2cBusyFall,
          rstBuff,
          loadBuff,
          shiftBuff,
@@ -81,6 +82,8 @@ begin
 brstOn       <= brstOnSig;
 
 i2cBusyRise  <= (not i2cBusyOld) and i2cBusy;
+
+i2cBusyFall <= i2cBusyOld and not i2cBusy;
 
 dataInVec    <= devDataToSlv(dataIn);
 
@@ -241,10 +244,10 @@ begin
                         i2cEna    <= '1';
                     else
                         if brst = '0' then
-                            if i2cBusyRise = '1' and lastLeft = '0' then
+                            if i2cBusyFall = '1' and lastLeft = '0' then
                                 shiftBuff <= '1';
                                 leftBCnt  <= leftBCnt - 1;
-                            elsif i2cBusyRise = '1' and lastLeft = '1' then
+                            elsif i2cBusyFall = '1' and lastLeft = '1' then
                                 i2cEna    <= '0';
                                 brstOnSig <= '0';
 
@@ -252,12 +255,12 @@ begin
                             end if;
                         elsif i2cBusyRise = '1' and readStarted = '0' then
                             readStarted <= '1';
-                        elsif i2cBusyRise = '1' and emptyBuff = '0' and readStarted = '1' then
-                            shiftBuff <= '1';
-                        elsif i2cBusyRise = '1' and emptyBuff = '1' and readStarted = '1' then
-                            dataReady <= '1';
+                        elsif emptyBuff = '1' and readStarted = '1' then
                             rstBuff   <= '1';
+                            dataReady <= '1';
                             dataOut   <= slvToDevData(dataOutBuff);
+                        elsif i2cBusyFall = '1' and readStarted = '1' then
+                            shiftBuff <= '1';
                         end if;
                     end if;
 
