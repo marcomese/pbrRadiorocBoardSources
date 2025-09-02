@@ -78,6 +78,7 @@ begin
             exec       <= '0';
             rw         <= readCmd;
             rAddr      <= (others => (others => '0'));
+            dataIn     <= (others => (others => '0'));
             devReady   <= '0';
             busy       <= '0';
             i2cEnClk   <= '0';
@@ -86,9 +87,18 @@ begin
         else
             case state is
                 when idle =>
+                    exec     <= '0';
+                    rw       <= devRw;
+                    rAddr    <= (others => (others => '0'));
+                    dataIn   <= (others => (others => '0'));
+                    devReady <= '0';
+                    busy     <= '0';
+                    i2cEnClk <= '0';
+
+                    state    <= idle;
+
                     if devExec = '1' and devId = radioroc and busyRad = '0' then
                         exec     <= '1';
-                        rw       <= devRw;
                         rAddr    <= devAddr;
                         dataIn   <= devDataIn;
                         devReady <= '0';
@@ -96,35 +106,19 @@ begin
                         i2cEnClk <= '1';
 
                         state    <= waitReady;
-                    else
-                        devReady <= '0';
-                        busy     <= '0';
-                        i2cEnClk <= '0';
-
-                        state    <= idle;
                     end if;
 
                 when waitReady =>
+                    exec     <= devExec and brstOn and not dataReady;
+                    devReady <= dataReady and brstOn;
+                    dataIn   <= devDataIn;
+
+                    state    <= waitReady;
+
                     if dataReady = '1' and brstOn = '0' then
                         exec  <= '0';
 
                         state <= store;
-                    elsif dataReady = '1' and brstOn = '1' then
-                        exec     <= '0';
-                        devReady <= '1';
-
-                        state    <= waitReady;
-                    elsif brstOn = '0' then
-                        exec     <= '0';
-                        devReady <= '0';
-
-                        state    <= waitReady;
-                    elsif brstOn = '1' then
-                        exec     <= devExec;
-                        devReady <= '0';
-                        dataIn   <= devDataIn;
-
-                        state    <= waitReady;
                     end if;
 
                 when store =>

@@ -234,9 +234,7 @@ signal rstI2CCnt : unsigned(bitsNum(rstRadI2CLen) downto 0);
 signal endAcq, rdValid : std_logic;
 
 attribute mark_debug : string;
-attribute mark_debug of sc_scl,
-                        sc_sda,
-                        i2cEnaRad,
+attribute mark_debug of i2cEnaRad,
                         i2cAddrRad,
                         i2cRwRad,
                         i2cDataWrRad,

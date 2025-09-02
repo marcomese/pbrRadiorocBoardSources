@@ -50,7 +50,6 @@ type state_t is (idle,
                  waitBusy,
                  burstRead,
                  burstWrite,
-                 lastBytesLoad,
                  transEnd);
 
 constant R0           : std_logic_vector(2 downto 0) := "000";
@@ -70,6 +69,7 @@ signal   rwSig,
          emptyBuff,
          lastBuff,
          lastLeft,
+         lastByte,
          brstOld,
          brstFall,
          readStarted  : std_logic;
@@ -115,6 +115,7 @@ begin
             shiftBuff     <= '0';
             leftBCnt      <= (others => '0');
             readStarted   <= '0';
+            lastByte      <= '0';
 
             state         <= idle;
         else
@@ -206,8 +207,12 @@ begin
 
                     state     <= burstWrite;
 
-                    if brstFall = '1' then
-                        state     <= lastBytesLoad;
+                    if brstFall = '1' and lastByte = '0' then
+                        lastByte  <= '1';
+                    elsif lastByte = '1' then
+                        lastByte  <= '0';
+                        loadBuff  <= '1';
+                        leftBCnt  <= unsigned(dataIn(0)(2 downto 0))-1;
                     elsif exec = '1' then
                         i2cEna    <= '1';
                         loadBuff  <= '1';
@@ -268,31 +273,21 @@ begin
                         end if;
                     end if;
 
-                when lastBytesLoad =>
-                    loadBuff  <= '1';
-                    leftBCnt  <= unsigned(dataIn(0)(2 downto 0))-1;
-
-                    state     <= burstWrite;
-
                 when transEnd =>
                     dataReady <= '0';
                     shiftBuff <= '0';
+                    dataOut   <= (others => (others => '0'));
 
                     state     <= transEnd;
 
-                    if i2cBusy = '0' and rwSig = devRead then
+                    if i2cBusy = '0' then
                         brstOnSig <= '0';
                         busy      <= '0';
                         dataReady <= '1';
-                        dataOut   <= (0      => i2cDataRd,
-                                      others => (others => '0'));
-
-                        state     <= idle;
-                    elsif i2cBusy = '0' and rwSig = devWrite then
-                        brstOnSig <= '0';
-                        busy      <= '0';
-                        dataReady <= '1';
-                        dataOut   <= (others => (others => '0'));
+    
+                        if rwSig = devRead then
+                            dataOut(0) <= i2cDataRd;
+                        end if;
 
                         state     <= idle;
                     end if;
