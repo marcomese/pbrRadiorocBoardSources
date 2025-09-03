@@ -127,7 +127,7 @@ begin
                 when idle =>
                     i2cEnaSig <= '0';
                     dataReady <= '0';
-                    rstBuff   <= '1';
+                    shiftBuff <= '0';
 
                     state     <= idle;
 
@@ -228,38 +228,33 @@ begin
                     dataOut   <= slvToDevData(dataOutBuff);
                     dataReady <= emptyBuff;
                     rstBuff   <= emptyBuff;
-                    shiftBuff <= i2cBusyFall and i2cEnaSig and not lastLeft;
+                    shiftBuff <= i2cBusyFall and i2cEnaSig;
                     brstOnSig <= brst or i2cEnaSig;
 
-                    state     <= burstRead;
+                    state <= burstRead;
 
-                    if exec = '1' then
+                    if brstOnSig = '0' then
+                        state <= transEnd;
+                    elsif exec = '1' then
                         i2cEnaSig <= '1';
-                    elsif i2cBusyFall = '1' and  brst = '0' then
-                        leftBCnt  <= leftBCnt - 1;
-                        i2cEnaSig <= not lastLeft;
-
-                        if lastLeft = '1' then
-                            state     <= transEnd;
-                        end if;
+                    elsif i2cBusyRise = '1' and  brst = '0' then
+                        i2cEnaSig <= '0';
                     end if;
 
                 when transEnd =>
                     dataReady <= '0';
                     shiftBuff <= '0';
+                    rstBuff   <= '0';
                     leftBCnt  <= (others => '0');
-                    dataOut   <= (others => (others => '0'));
+                    dataOut   <= slvToDevData(dataOutBuff);
 
                     state     <= transEnd;
 
                     if i2cBusy = '0' then
                         brstOnSig <= '0';
                         busy      <= '0';
+                        shiftBuff <= '1';
                         dataReady <= '1';
-    
-                        if rwSig = devRead then
-                            dataOut(0) <= i2cDataRd;
-                        end if;
 
                         state     <= idle;
                     end if;
