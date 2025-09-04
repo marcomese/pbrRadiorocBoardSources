@@ -39,15 +39,15 @@ architecture Behavioral of shiftReg is
 
 constant shiftNum : integer := integer(regLen/shiftLen);
 
-signal   shiftCnt : unsigned(bitsNum(shiftNum)-1 downto 0);
+signal   shiftCnt : unsigned(bitsNum(shiftNum) downto 0);
 
 signal   buffInt  : std_logic_vector(regLen-1 downto 0);
 
 begin
 
-empty <= '1' when shiftCnt = ones(shiftCnt'length) else '0';
+empty <= '1' when shiftCnt = shiftNum-1 else '0';
 
-last <= '1' when shiftCnt = zeroes(shiftCnt'length) else '0';
+last  <= '1' when shiftCnt = 0 else '0';
 
 leftShiftGen: if direction = "left" generate
 begin
@@ -90,7 +90,7 @@ end generate;
 shiftCntInst: process(clk, rst)
 begin
     if rising_edge(clk) then
-        if rst = '1' or load = '1' then
+        if rst = '1' or load = '1' or shiftCnt(shiftCnt'left) = '1' then
             shiftCnt <= to_unsigned(shiftNum-1, shiftCnt'length);
         elsif shift = '1' then
             shiftCnt <= shiftCnt - 1;

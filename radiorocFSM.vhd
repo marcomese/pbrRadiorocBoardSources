@@ -226,12 +226,12 @@ begin
                 when burstRead =>
                     i2cRw     <= devRead;
                     dataOut   <= slvToDevData(dataOutBuff);
-                    dataReady <= emptyBuff;
-                    rstBuff   <= emptyBuff;
+                    dataReady <= lastBuff and i2cBusyFall;
+                    rstBuff   <= '0';
                     shiftBuff <= i2cBusyFall and i2cEnaSig;
                     brstOnSig <= brst or i2cEnaSig;
 
-                    state <= burstRead;
+                    state     <= burstRead;
 
                     if brstOnSig = '0' then
                         state <= transEnd;

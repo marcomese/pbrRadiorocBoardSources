@@ -84,6 +84,10 @@ signal   tOutRst,
          devBrstSig,
          brstCollect,
          lastBrst,
+         rstBuff,
+         loadBuff,
+         emptyBuff,
+         lastBuff,
          endCnt        : std_logic;
 signal   devIdSig      : devices_t;
 signal   tOutCnt       : unsigned(bitsNum(tOut) downto 0);
@@ -91,10 +95,6 @@ signal   byteCnt       : unsigned(bitsNum(bytesNum) downto 0);
 signal   brstByteNum   : unsigned(bitsNum(bytesNum)-1 downto 0);
 signal   brstBuff      : byteArray_t(maxBrstLen-1 downto 0);
 signal   devDataOutSig : devData_t;
-signal   rstBuff       : std_logic;
-signal   loadBuff      : std_logic;
-signal   emptyBuff     : std_logic;
-signal   lastBuff      : std_logic;
 signal   parDataInBuff : std_logic_vector(devDataBytes*shiftLen-1 downto 0);
 signal   dataOutBuff   : std_logic_vector(devDataBytes*shiftLen-1 downto 0);
 
@@ -299,7 +299,7 @@ begin
                     if devRwSig = devWrite then
                         state <= getData;
                     else
-                        byteCnt <= resize(devDataToUnsigned(devDataOutSig)-devDataBytes-1, byteCnt'length);
+                        byteCnt <= resize(devDataToUnsigned(devDataOutSig)-1, byteCnt'length);
                         state   <= readDev;
                     end if;
 
@@ -312,11 +312,6 @@ begin
 
                 when sendBrst =>
                     i := to_integer(byteCnt);
-                    if lastBrst = '1' then
-                        n := 1;
-                    else
-                        n := devDataBytes;
-                    end if;
 
                     devExec <= '0';
 
@@ -324,7 +319,7 @@ begin
 
                     if devReady(devIdSig) = '1' and lastBrst = '0' then
                         devExec <= '1';
-                        byteCnt <= byteCnt - n;
+                        byteCnt <= byteCnt - devDataBytes;
 
                         byteArrCpy(devDataOutSig, brstBuff, i);
                     elsif devReady(devIdSig) = '1' and lastBrst = '1' and devBrstSig = '1' then
@@ -340,31 +335,30 @@ begin
                     end if;
 
                 when readDev =>
-                    tOutRst  <= '0';
-                    devExec  <= '0';
-                    loadBuff <= '1';
-                    rxEna    <= '0';
-                    txWrite  <= devReady(devIdSig);
+                    tOutRst    <= '0';
+                    devExec    <= '0';
+                    rxEna      <= '0';
+                    loadBuff   <= '0';
+                    devBrstSig <= not lastBrst;
+                    state      <= readDev;
 
-                    state    <= readDev;
-
-                    if devReady(devIdSig) = '1' and devBrstSig = '0' then
+                    if devReady(devIdSig) = '1' and endCnt = '1' then
                         tOutRst  <= '1';
-                        loadBuff <= '0';
 
-                        state <= done;
+                        state    <= done;
                     elsif devReady(devIdSig) = '1' and lastBrst = '0' then
                         tOutRst  <= '1';
-                        loadBuff <= '0';
+                        loadBuff <= '1';
                         byteCnt  <= byteCnt - devDataBytes;
 
                         state    <= sendDevData;
                     elsif devReady(devIdSig) = '1' and lastBrst = '1' then
-                        tOutRst    <= '1';
-                        loadBuff   <= '0';
-                        devBrstSig <= '0';
+                        tOutRst  <= '1';
+                        loadBuff <= '1';
+                        txWrite  <= '1';
+                        byteCnt  <= byteCnt - 1;
 
-                        state      <= sendDevData;
+                        state    <= sendDevData;
                     elsif tOutSig = '1' then
                         tOutRst <= '1';
                         rxEna   <= '1';
@@ -374,16 +368,15 @@ begin
 
                 when sendDevData =>
                     tOutRst   <= '0';
-                    txWrite   <= '0';
+                    txWrite   <= txWrAck or loadBuff;
+                    loadBuff <= '0';
 
                     state     <= sendDevData;
 
                     if lastBuff = '1' and devBrstSig = '0' then
-                        state      <= readDev;
+                        state <= done;
                     elsif  lastBuff = '1' and devBrstSig = '1' then
                         state <= readDev;
-                    elsif txWrAck = '1' then
-                        txWrite   <= '1';
                     end if;
 
                 when done =>
