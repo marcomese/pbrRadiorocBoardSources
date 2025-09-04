@@ -243,20 +243,19 @@ begin
 
                 when transEnd =>
                     dataReady <= '0';
-                    shiftBuff <= '0';
                     rstBuff   <= '0';
                     leftBCnt  <= (others => '0');
-                    dataOut   <= slvToDevData(dataOutBuff);
+                    dataOut   <= (others => (others => '0'));
 
                     state     <= transEnd;
 
                     if i2cBusy = '0' then
-                        brstOnSig <= '0';
-                        busy      <= '0';
-                        shiftBuff <= '1';
-                        dataReady <= '1';
+                        brstOnSig  <= '0';
+                        busy       <= '0';
+                        dataReady  <= '1';
+                        dataOut(dataOut'left) <= i2cDataRd;
 
-                        state     <= idle;
+                        state      <= idle;
                     end if;
 
                 when others =>

@@ -261,10 +261,10 @@ begin
 
                         state   <= done;
                     elsif endCnt = '1' and devBrstSig = '1' and brstCollect = '0' then
-                        tOutRst     <= '1';
-                        rxRdSig     <= '0';
+                        tOutRst <= '1';
+                        rxRdSig <= '0';
 
-                        state       <= checkBrstPar;
+                        state   <= checkBrstPar;
                     elsif endCnt = '1' and devBrstSig = '1' and brstCollect = '1' then
                         tOutRst     <= '1';
                         rxRdSig     <= '0';
@@ -299,7 +299,7 @@ begin
                     if devRwSig = devWrite then
                         state <= getData;
                     else
-                        byteCnt      <= resize(devDataToUnsigned(devDataOutSig)-devDataBytes-1, byteCnt'length);
+                        byteCnt <= resize(devDataToUnsigned(devDataOutSig)-devDataBytes-1, byteCnt'length);
                         state   <= readDev;
                     end if;
 
@@ -312,6 +312,11 @@ begin
 
                 when sendBrst =>
                     i := to_integer(byteCnt);
+                    if lastBrst = '1' then
+                        n := 1;
+                    else
+                        n := devDataBytes;
+                    end if;
 
                     devExec <= '0';
 
@@ -319,7 +324,7 @@ begin
 
                     if devReady(devIdSig) = '1' and lastBrst = '0' then
                         devExec <= '1';
-                        byteCnt <= byteCnt - devDataBytes;
+                        byteCnt <= byteCnt - n;
 
                         byteArrCpy(devDataOutSig, brstBuff, i);
                     elsif devReady(devIdSig) = '1' and lastBrst = '1' and devBrstSig = '1' then
@@ -338,14 +343,19 @@ begin
                     tOutRst  <= '0';
                     devExec  <= '0';
                     loadBuff <= '1';
+                    rxEna    <= '0';
+                    txWrite  <= devReady(devIdSig);
 
                     state    <= readDev;
 
-                    if devReady(devIdSig) = '1' and lastBrst = '0' then
+                    if devReady(devIdSig) = '1' and devBrstSig = '0' then
                         tOutRst  <= '1';
                         loadBuff <= '0';
-                        txWrite  <= '1';
-                        rxEna    <= '0';
+
+                        state <= done;
+                    elsif devReady(devIdSig) = '1' and lastBrst = '0' then
+                        tOutRst  <= '1';
+                        loadBuff <= '0';
                         byteCnt  <= byteCnt - devDataBytes;
 
                         state    <= sendDevData;
@@ -353,8 +363,6 @@ begin
                         tOutRst    <= '1';
                         loadBuff   <= '0';
                         devBrstSig <= '0';
-                        txWrite    <= '1';
-                        rxEna      <= '0';
 
                         state      <= sendDevData;
                     elsif tOutSig = '1' then
@@ -371,10 +379,7 @@ begin
                     state     <= sendDevData;
 
                     if lastBuff = '1' and devBrstSig = '0' then
-                        rxRdSig    <= '0';
-                        devBrstSig <= '0';
-
-                        state      <= done;
+                        state      <= readDev;
                     elsif  lastBuff = '1' and devBrstSig = '1' then
                         state <= readDev;
                     elsif txWrAck = '1' then
@@ -384,6 +389,7 @@ begin
                 when done =>
                     devExec <= '0';
                     byteCnt <= to_unsigned(devAddrBytes-1, byteCnt'length);
+                    txWrite <= '0';
                     error   <= (others => '0');
 
                     state   <= done;
