@@ -339,11 +339,13 @@ begin
                     devExec    <= '0';
                     rxEna      <= '0';
                     loadBuff   <= '0';
-                    devBrstSig <= not lastBrst;
+                    devBrstSig <= not lastBrst or endCnt;
+
                     state      <= readDev;
 
                     if devReady(devIdSig) = '1' and endCnt = '1' then
                         tOutRst  <= '1';
+                        devBrstSig <= '0';
 
                         state    <= done;
                     elsif devReady(devIdSig) = '1' and lastBrst = '0' then
@@ -355,7 +357,6 @@ begin
                     elsif devReady(devIdSig) = '1' and lastBrst = '1' then
                         tOutRst  <= '1';
                         loadBuff <= '1';
-                        txWrite  <= '1';
                         byteCnt  <= byteCnt - 1;
 
                         state    <= sendDevData;
@@ -373,9 +374,7 @@ begin
 
                     state     <= sendDevData;
 
-                    if lastBuff = '1' and devBrstSig = '0' then
-                        state <= done;
-                    elsif  lastBuff = '1' and devBrstSig = '1' then
+                    if lastBuff = '1' then
                         state <= readDev;
                     end if;
 

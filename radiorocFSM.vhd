@@ -72,6 +72,7 @@ signal   rwSig,
          lastLeft,
          lastByte,
          brstOld,
+         brstRise,
          brstFall     : std_logic;
 signal   dataInVec    : std_logic_vector(devDataBytes*8-1 downto 0);
 signal   dataOutBuff  : std_logic_vector(dataInVec'left downto 0);
@@ -96,6 +97,8 @@ dataInVec   <= devDataToSlv(dataIn);
 lastLeft    <= leftBCnt(leftBCnt'left);
 
 brstFall    <= brstOld and not brst;
+
+brstRise    <= brst and not brstOld;
 
 radioFSM: process(clk, rst, exec)
 begin
@@ -226,14 +229,14 @@ begin
                 when burstRead =>
                     i2cRw     <= devRead;
                     dataOut   <= slvToDevData(dataOutBuff);
-                    dataReady <= lastBuff and i2cBusyFall;
+                    dataReady <= i2cBusyFall and (lastBuff or not brst);
                     rstBuff   <= '0';
-                    shiftBuff <= i2cBusyFall and i2cEnaSig;
+                    shiftBuff <= i2cBusyFall and (i2cEnaSig or not brst);
                     brstOnSig <= brst or i2cEnaSig;
 
                     state     <= burstRead;
 
-                    if brstOnSig = '0' then
+                    if brstRise = '1' then
                         state <= transEnd;
                     elsif exec = '1' then
                         i2cEnaSig <= '1';

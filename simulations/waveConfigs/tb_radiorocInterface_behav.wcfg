@@ -13,15 +13,15 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="94.820000 us"></ZoomStartTime>
-      <ZoomEndTime time="410.420001 us"></ZoomEndTime>
-      <Cursor1Time time="224.720000 us"></Cursor1Time>
+      <ZoomStartTime time="0.000000 us"></ZoomStartTime>
+      <ZoomEndTime time="601.000001 us"></ZoomEndTime>
+      <Cursor1Time time="247.260000 us"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="182"></NameColumnWidth>
-      <ValueColumnWidth column_width="68"></ValueColumnWidth>
+      <ValueColumnWidth column_width="60"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="35" />
+   <WVObjectSize size="36" />
    <wvobject fp_name="/tb_radiorocInterface/clk" type="logic">
       <obj_property name="ElementShortName">clk</obj_property>
       <obj_property name="ObjectShortName">clk</obj_property>
@@ -48,6 +48,10 @@
       <obj_property name="ElementShortName">devBrstSig</obj_property>
       <obj_property name="ObjectShortName">devBrstSig</obj_property>
    </wvobject>
+   <wvobject fp_name="/tb_radiorocInterface/devInterfInst/endCnt" type="logic">
+      <obj_property name="ElementShortName">endCnt</obj_property>
+      <obj_property name="ObjectShortName">endCnt</obj_property>
+   </wvobject>
    <wvobject fp_name="/tb_radiorocInterface/i2cModule/sda" type="logic">
       <obj_property name="ElementShortName">sda</obj_property>
       <obj_property name="ObjectShortName">sda</obj_property>
@@ -73,10 +77,6 @@
    <wvobject fp_name="/tb_radiorocInterface/uut/devDataOut" type="array">
       <obj_property name="ElementShortName">devDataOut[3:0][7:0]</obj_property>
       <obj_property name="ObjectShortName">devDataOut[3:0][7:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_radiorocInterface/testData" type="array">
-      <obj_property name="ElementShortName">testData[7:0]</obj_property>
-      <obj_property name="ObjectShortName">testData[7:0]</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_radiorocInterface/devInterfInst/rstBuff" type="logic">
       <obj_property name="ElementShortName">rstBuff</obj_property>
@@ -165,5 +165,9 @@
    <wvobject fp_name="/tb_radiorocInterface/uut/radioFSMInst/dataOutBuff" type="array">
       <obj_property name="ElementShortName">dataOutBuff[31:0]</obj_property>
       <obj_property name="ObjectShortName">dataOutBuff[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_radiorocInterface/testData" type="array">
+      <obj_property name="ElementShortName">testData[7:0]</obj_property>
+      <obj_property name="ObjectShortName">testData[7:0]</obj_property>
    </wvobject>
 </wave_config>
