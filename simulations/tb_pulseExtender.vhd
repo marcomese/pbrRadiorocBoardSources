@@ -41,21 +41,45 @@ begin
     rstOrig <= '0';
     rstDest <= '0';
 
-    wait for clkPeriodOrig*10;
+--    wait for clkPeriodOrig*10;
+
+--    sigOrig <= "001";
+--    wait for clkPeriodOrig;
+--    sigOrig <= "000";
+
+--    wait for clkPeriodOrig*10;
+
+--    sigOrig <= "010";
+--    wait for clkPeriodOrig;
+--    sigOrig <= "000";
+
+--    wait for clkPeriodOrig*10;
+
+--    sigOrig <= "101";
+--    wait for clkPeriodOrig;
+--    sigOrig <= "000";
+
+    wait for clkPeriodOrig*10 - 15.0 ns;
 
     sigOrig <= "001";
     wait for clkPeriodOrig;
     sigOrig <= "000";
 
-    wait for clkPeriodOrig*10;
+    wait for clkPeriodOrig*10 + 15.0 ns;
 
-    sigOrig <= "010";
+    sigOrig <= "001";
     wait for clkPeriodOrig;
     sigOrig <= "000";
 
-    wait for clkPeriodOrig*10;
+    wait for clkPeriodOrig*10 + 15.0 ns;
 
-    sigOrig <= "101";
+    sigOrig <= "001";
+    wait for clkPeriodOrig;
+    sigOrig <= "000";
+
+    wait for clkPeriodOrig*10 + 15.0 ns;
+
+    sigOrig <= "001";
     wait for clkPeriodOrig;
     sigOrig <= "000";
 

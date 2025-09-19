@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="tb_pulseExtFSM_behav.wdb" id="1">
+         <top_modules>
+            <top_module name="glbl" />
+            <top_module name="tb_pulseExtFSM" />
+            <top_module name="utilspkg" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <zoom_setting>
+      <ZoomStartTime time="0.000 ns"></ZoomStartTime>
+      <ZoomEndTime time="584.246 ns"></ZoomEndTime>
+      <Cursor1Time time="210.000 ns"></Cursor1Time>
+   </zoom_setting>
+   <column_width_setting>
+      <NameColumnWidth column_width="172"></NameColumnWidth>
+      <ValueColumnWidth column_width="58"></ValueColumnWidth>
+   </column_width_setting>
+   <WVObjectSize size="13" />
+   <wvobject fp_name="/tb_pulseExtFSM/clkOrig" type="logic">
+      <obj_property name="ElementShortName">clkOrig</obj_property>
+      <obj_property name="ObjectShortName">clkOrig</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_pulseExtFSM/clkDest" type="logic">
+      <obj_property name="ElementShortName">clkDest</obj_property>
+      <obj_property name="ObjectShortName">clkDest</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_pulseExtFSM/uut/state" type="other">
+      <obj_property name="ElementShortName">state</obj_property>
+      <obj_property name="ObjectShortName">state</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_pulseExtFSM/uut/sigOrig" type="logic">
+      <obj_property name="ElementShortName">sigOrig</obj_property>
+      <obj_property name="ObjectShortName">sigOrig</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_pulseExtFSM/uut/sigDest" type="logic">
+      <obj_property name="ElementShortName">sigDest</obj_property>
+      <obj_property name="ObjectShortName">sigDest</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_pulseExtFSM/uut/pCnt" type="array">
+      <obj_property name="ElementShortName">pCnt[3:0]</obj_property>
+      <obj_property name="ObjectShortName">pCnt[3:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_pulseExtFSM/uut/endCnt" type="logic">
+      <obj_property name="ElementShortName">endCnt</obj_property>
+      <obj_property name="ObjectShortName">endCnt</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_pulseExtFSM/uut/pSig" type="logic">
+      <obj_property name="ElementShortName">pSig</obj_property>
+      <obj_property name="ObjectShortName">pSig</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_pulseExtFSM/uut/clkOrigFreq" type="other">
+      <obj_property name="ElementShortName">clkOrigFreq</obj_property>
+      <obj_property name="ObjectShortName">clkOrigFreq</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_pulseExtFSM/uut/clkDestFreq" type="other">
+      <obj_property name="ElementShortName">clkDestFreq</obj_property>
+      <obj_property name="ObjectShortName">clkDestFreq</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_pulseExtFSM/uut/cntVal" type="other">
+      <obj_property name="ElementShortName">cntVal</obj_property>
+      <obj_property name="ObjectShortName">cntVal</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_pulseExtFSM/uut/cntWidth" type="other">
+      <obj_property name="ElementShortName">cntWidth</obj_property>
+      <obj_property name="ObjectShortName">cntWidth</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_pulseExtFSM/uut/syncFF" type="array">
+      <obj_property name="ElementShortName">syncFF[0:0]</obj_property>
+      <obj_property name="ObjectShortName">syncFF[0:0]</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+   </wvobject>
+</wave_config>

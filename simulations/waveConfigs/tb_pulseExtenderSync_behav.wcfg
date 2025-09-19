@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="tb_pulseExtenderSync_behav.wdb" id="1">
+         <top_modules>
+            <top_module name="glbl" />
+            <top_module name="tb_pulseExtenderSync" />
+            <top_module name="utilspkg" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <zoom_setting>
+      <ZoomStartTime time="0.000 ns"></ZoomStartTime>
+      <ZoomEndTime time="1,400.001 ns"></ZoomEndTime>
+      <Cursor1Time time="1,400.000 ns"></Cursor1Time>
+   </zoom_setting>
+   <column_width_setting>
+      <NameColumnWidth column_width="168"></NameColumnWidth>
+      <ValueColumnWidth column_width="58"></ValueColumnWidth>
+   </column_width_setting>
+   <WVObjectSize size="6" />
+   <wvobject fp_name="/tb_pulseExtenderSync/clkOrig" type="logic">
+      <obj_property name="ElementShortName">clkOrig</obj_property>
+      <obj_property name="ObjectShortName">clkOrig</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_pulseExtenderSync/rstOrig" type="logic">
+      <obj_property name="ElementShortName">rstOrig</obj_property>
+      <obj_property name="ObjectShortName">rstOrig</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_pulseExtenderSync/clkDest" type="logic">
+      <obj_property name="ElementShortName">clkDest</obj_property>
+      <obj_property name="ObjectShortName">clkDest</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_pulseExtenderSync/rstDest" type="logic">
+      <obj_property name="ElementShortName">rstDest</obj_property>
+      <obj_property name="ObjectShortName">rstDest</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_pulseExtenderSync/sigOrig" type="array">
+      <obj_property name="ElementShortName">sigOrig[2:0]</obj_property>
+      <obj_property name="ObjectShortName">sigOrig[2:0]</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_pulseExtenderSync/sigDest" type="array">
+      <obj_property name="ElementShortName">sigDest[2:0]</obj_property>
+      <obj_property name="ObjectShortName">sigDest[2:0]</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+   </wvobject>
+</wave_config>
