@@ -52,7 +52,6 @@ architecture Behavioral of dataAcqCtrl is
 
 type state_t is (idle,
                  getNbAcq,
-                 sendRstAcq,
                  sendStartAcq,
                  sendSftTrg,
                  waitData,
@@ -175,9 +174,9 @@ begin
                 when getNbAcq =>
                     nbAcqSig <= devAddr(0);
 
-                    state    <= sendRstAcq;
+                    state    <= sendStartAcq;
 
-                when sendRstAcq =>
+                when sendStartAcq =>
                     rstAcqSig  <= '0';
                     strtAcqSig <= '1';
 
@@ -208,11 +207,6 @@ begin
 
                         state    <= idle;
                     end if;
-
-                when sendStartAcq =>
-                    strtAcqSig <= '0';
-
-                    state      <= waitData;
 
                 when waitData =>
                     swTrg <= '0';
