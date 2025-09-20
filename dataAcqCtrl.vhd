@@ -73,10 +73,12 @@ signal byteCnt        : unsigned(2 downto 0);
 
 signal swTrg,
        lastByte,
-       resetAcqSig,
-       startAcqSig,
+       rstAcqSig,
+       strtAcqSig,
        rdAcqSig,
-       readSent       : std_logic;
+       readSent,
+       trgSig,
+       contAcq        : std_logic;
 
 signal nbAcqSig       : std_logic_vector(7 downto 0);
 
@@ -98,16 +100,14 @@ selAdcSig     <= "00011001" &
                  swTrg &"0000000";
 -----------
 
+trgSig        <= extTrg or valTrg;
 nbAcq         <= nbAcqSig;
-
 lastByte      <= '1' when byteCnt = 0 else '0';
-
 selAdc        <= sync100to25Out(66 downto 3);
 resetAcq      <= sync100to25Out(2);
 startAcq      <= sync100to25Out(1);
 rdAcq         <= sync100to25Out(0);
-
-sync100to25In <= selAdcSig & resetAcqSig & startAcqSig & rdAcqSig;
+sync100to25In <= selAdcSig & rstAcqSig & strtAcqSig & rdAcqSig;
 
 clkSyncInst: entity work.pulseExtenderSync
 generic map(
@@ -142,165 +142,151 @@ dataAcqCtrlFSM: process(clk100M, rst, devExec)
 begin
     if rising_edge(clk100M) then
         if rst = '1' then
-            devReady    <= '0';
-            busy        <= '0';
-            resetAcqSig <= '1';
-            startAcqSig <= '0';
-            rdAcqSig    <= '0';
-            nbAcqSig    <= (others => '0');
-            devDataOut  <= (others => (others => '0'));
-            swTrg       <= '0';
-            byteCnt     <= to_unsigned(3, byteCnt'length);
-            state       <= idle;
+            devReady   <= '0';
+            busy       <= '0';
+            rstAcqSig  <= '1';
+            strtAcqSig <= '0';
+            rdAcqSig   <= '0';
+            nbAcqSig   <= (others => '0');
+            devDataOut <= (others => (others => '0'));
+            swTrg      <= '0';
+            contAcq    <= '0';
+            byteCnt    <= to_unsigned(3, byteCnt'length);
+
+            state      <= idle;
         else
             case state is
                 when idle =>
-                    if devExec = '1' and devId = acqSystem then
-                        dataIn   <= devDataIn;
-                        devReady <= '0';
-                        busy     <= '1';
-                        swTrg    <= '0';
-                        resetAcqSig <= '0';
+                    rstAcqSig <= '0';
 
-                        state    <= getNbAcq;
-                    else
-                        devReady <= '0';
-                        busy     <= '0';
-                        swTrg    <= '0';
-                        resetAcqSig <= '0';
+                    state     <= idle;
+
+                    if devExec = '1' and devId = acqSystem then
+                        dataIn <= devDataIn;
+                        busy   <= '1';
+
+                        state  <= getNbAcq;
+                    elsif contAcq = '1' and trgSig = '1' then
+                        rdAcqSig <= '1';
+
+                        state    <= readFifo;
+                    end if;
+
+                when getNbAcq =>
+                    nbAcqSig <= devAddr(0);
+
+                    state    <= sendRstAcq;
+
+                when sendRstAcq =>
+                    rstAcqSig  <= '0';
+                    strtAcqSig <= '1';
+
+                    state      <= sendStartAcq;
+
+                    if nbAcqSig = x"00" then
+                        rstAcqSig <= '1';
+
+                        state     <= sendSftTrg;
+                    elsif nbAcqSig = x"FF" then
+                        rdAcqSig <= '1';
+
+                        state    <= readFifo;
+                    elsif nbAcqSig = x"AA" then
+                        contAcq <= '1';
+
+                        state   <= idle;
+                    end if;
+
+                when sendSftTrg =>
+                    rstAcqSig <= '0';
+
+                    state     <= sendSftTrg;
+
+                    if sync100to25Out(2) = '1' then
+                        swTrg    <= '1';
+                        devReady <= '1';
 
                         state    <= idle;
                     end if;
 
-                when getNbAcq =>
-                    nbAcqSig    <= devAddr(0);
-
-                    state       <= sendRstAcq;
-
-                when sendRstAcq =>
-                    if nbAcqSig = x"00" then
-                        resetAcqSig <= '1';
-
-                        state       <= sendSftTrg;
-                    elsif nbAcqSig = x"FF" then
-                        resetAcqSig <= '0';
-                        rdAcqSig <= '1';
-                        --byteCnt    <= byteCnt - 1;
-
-                        state       <= readFifo;
-                    else
-                        resetAcqSig <= '0';
-                        startAcqSig <= '1';
-    
-                        state       <= sendStartAcq;
-                    end if;
-
-                when sendSftTrg =>
-                    if sync100to25Out(2) = '1' then
-                        resetAcqSig <= '0';
-                        swTrg    <= '1';
-                        devReady <= '1';
-
-                        state <= idle;
-                    else
-                        resetAcqSig <= '0';
-
-                        state <= sendSftTrg;
-                    end if;
-
                 when sendStartAcq =>
-                    startAcqSig <= '0';
+                    strtAcqSig <= '0';
 
-                    state       <= waitData;
+                    state      <= waitData;
 
                 when waitData =>
+                    swTrg <= '0';
+
+                    state <= waitData;
+
                     if endAcq = '1' then
-                        swTrg <= '0';
-
                         state <= collectData;
-                    else
-                        swTrg <= '0';
-
-                        state <= waitData;
                     end if;
 
                 when collectData =>
+                    rdAcqSig <= '0';
+                    devReady <= '0';
+
+                    state    <= acqEnd;
+
                     if emptyAcq = '0' then
                         rdAcqSig <= '1';
-                        devReady <= '0';
 
                         state    <= readFifo;
-                    else
-                        rdAcqSig <= '0';
-                        devReady <= '0';
-
-                        state    <= acqEnd; -- add error state
                     end if;
 
                 when readFifo =>
-                    i := to_integer(byteCnt);
+                    rdAcqSig <= '0';
+
+                    state    <= readFifo;
 
                     if (lastByte = '1' or emptyAcq = '1') and readSent = '1' then
                         state <= getLastByte;
                     elsif readSent = '1' then
-                        rdAcqSig   <= '1';
+                        rdAcqSig <= '1';
 
-                        state      <= waitRdValid;
-                    else
-                        rdAcqSig   <= '0';
-                        state <= readFifo;
+                        state    <= waitRdValid;
                     end if;
 
-                when getLastByte =>
---                    if rdValid = '1' then
-                        rdAcqSig   <= '0';
-                        dataOut(i) <= doutAcq;
-                        devDataOut <= dataOut;
-
-                        state      <= sendData;
---                    else
---                        dataOut(i) <= doutAcq;
---                        state <= getLastByte;
---                    end if;
-
                 when waitRdValid =>
+                    i := to_integer(byteCnt);
+
+                    rdAcqSig <= '0';
+
+                    state    <= waitRdValid;
+
                     if rdValid = '1' then
-                        rdAcqSig   <= '0';
                         dataOut(i) <= doutAcq;
                         byteCnt    <= byteCnt - 1;
 
                         state      <= readFifo;
-                    else
-                        rdAcqSig   <= '0';
-                        state      <= waitRdValid;
                     end if;
+
+                when getLastByte =>
+                    i := to_integer(byteCnt);
+
+                    rdAcqSig   <= '0';
+                    dataOut(i) <= doutAcq;
+                    devDataOut <= dataOut;
+
+                    state      <= sendData;
 
                 when sendData =>
-                    if emptyAcq = '1' then
-                        devReady   <= '1';
-                        devDataOut <= dataOut;
+                    devReady   <= '1';
+                    devDataOut <= dataOut;
+                    byteCnt    <= to_unsigned(3, byteCnt'length);
 
-                        byteCnt  <= to_unsigned(3, byteCnt'length);
-
-                        state    <= acqEnd;
-                    else
-                        devReady   <= '1';
-                        devDataOut <= dataOut;
-                        byteCnt    <= to_unsigned(3, byteCnt'length);
-
-                        state      <= acqEnd;--collectData;
-                    end if;
+                    state      <= acqEnd;
 
                 when acqEnd =>
-                    busy       <= '0';
-                    
-                    if emptyAcq = '1' then
-                        resetAcqSig <= '1';
-                    else
-                        resetAcqSig <= '0';
-                    end if;
+                    busy      <= '0';
+                    rstAcqSig <= '0';
 
-                    state      <= idle;
+                    state     <= idle;                    
+
+                    if emptyAcq = '1' then
+                        rstAcqSig <= '1';
+                    end if;
 
                 when others =>
                     devReady <= '0';
