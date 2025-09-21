@@ -25,8 +25,6 @@ port(
     clk100M    : in  std_logic;
     clk25M     : in  std_logic;
     rst        : in  std_logic;
-    extTrg     : in  std_logic;
-    valTrg     : in  std_logic;
     devExec    : in  std_logic;
     devId      : in  devices_t;
     devRw      : in  std_logic;
