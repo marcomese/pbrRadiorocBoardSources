@@ -68,7 +68,8 @@ ARCHITECTURE logic OF i2cMaster IS
   SIGNAL stretch       : STD_LOGIC := '0';               --identifies if slave is stretching scl
 
 attribute mark_debug : string;
-attribute mark_debug of sda_ena_n,
+attribute mark_debug of state,
+                        sda_ena_n,
                         scl_clk   : signal is "true";
 
 BEGIN

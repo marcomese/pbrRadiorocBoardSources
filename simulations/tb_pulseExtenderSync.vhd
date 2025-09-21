@@ -26,7 +26,7 @@ end component;
 
 constant clkPeriodOrig : time      := 10 ns;
 constant clkPeriodDest : time      := 40 ns;
-constant syncStages    : integer   := 1;
+constant syncStages    : integer   := 2;
 constant width         : integer   := 3;
 constant clkOrigFreq   : real      := 100.0e6;
 constant clkDestFreq   : real      := 25.0e6;
@@ -88,6 +88,12 @@ begin
 
     sigOrig <= "001";
     wait for clkPeriodOrig;
+    sigOrig <= "000";
+
+    wait for clkPeriodOrig*10 + 15.0 ns;
+
+    sigOrig <= "001";
+    wait for clkPeriodOrig*50;
     sigOrig <= "000";
 
     wait;

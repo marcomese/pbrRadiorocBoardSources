@@ -25,8 +25,6 @@ port(
     clk100M    : in  std_logic;
     clk25M     : in  std_logic;
     rst        : in  std_logic;
-    extTrg     : in  std_logic;
-    valTrg     : in  std_logic;
     devExec    : in  std_logic;
     devId      : in  devices_t;
     devRw      : in  std_logic;
@@ -39,6 +37,7 @@ port(
     resetAcq   : out std_logic;
     startAcq   : out std_logic;
     endAcq     : in  std_logic;
+    endMAcq    : out std_logic;
     rdValid    : in  std_logic;
     rdAcq      : out std_logic;
     emptyAcq   : in  std_logic;
@@ -54,8 +53,6 @@ type state_t is (idle,
                  getNbAcq,
                  sendStartAcq,
                  sendSftTrg,
-                 waitData,
-                 collectData,
                  readFifo,
                  waitRdValid,
                  getLastByte,
@@ -76,42 +73,38 @@ signal swTrg,
        strtAcqSig,
        rdAcqSig,
        readSent,
-       trgSig,
        contAcq        : std_logic;
 
 signal nbAcqSig       : std_logic_vector(7 downto 0);
 
-signal selAdcSig      : std_logic_vector(63 downto 0);
-
 signal sync100to25In,
-       sync100to25Out : std_logic_vector(66 downto 0);
+       sync100to25Out : std_logic_vector(3 downto 0);
 
 begin
 
 -- DEBUG --
-selAdcSig     <= "00011001" &
-                 "00000000" &
-                 "00000010" &
-                 "00000000" &
-                 "01110100" &
-                 "00000001" &
-                 "00000000" &
-                 swTrg &"0000000";
+selAdc <= "00011001"        & -- 63 downto 56
+          "00000000"        & -- 55 downto 48
+          "00000010"        & -- 47 downto 40
+          "00000000"        & -- 39 downto 32
+          "01110111"        & -- 31 downto 24 -- hit = 0
+          "00000001"        & -- 23 downto 16
+          "00000000"        & -- 15 downto 8
+          sync100to25Out(3) & -- 7
+          "0000000";          -- 6 downto 0
 -----------
 
-trgSig        <= extTrg or valTrg;
 nbAcq         <= nbAcqSig;
 lastByte      <= '1' when byteCnt = 0 else '0';
-selAdc        <= sync100to25Out(66 downto 3);
 resetAcq      <= sync100to25Out(2);
 startAcq      <= sync100to25Out(1);
 rdAcq         <= sync100to25Out(0);
-sync100to25In <= selAdcSig & rstAcqSig & strtAcqSig & rdAcqSig;
-
+sync100to25In <= swTrg & rstAcqSig & strtAcqSig & rdAcqSig;
+ 
 clkSyncInst: entity work.pulseExtenderSync
 generic map(
     width       => sync100to25Out'length,
-    syncStages  => 1,
+    syncStages  => 2,
     clkOrigFreq => 100.0e6,
     clkDestFreq => 25.0e6
 )
@@ -156,19 +149,21 @@ begin
         else
             case state is
                 when idle =>
-                    rstAcqSig <= '0';
+                    rstAcqSig  <= '0';
+                    strtAcqSig <= '0';
 
-                    state     <= idle;
+                    state      <= idle;
 
                     if devExec = '1' and devId = acqSystem then
                         dataIn <= devDataIn;
                         busy   <= '1';
 
                         state  <= getNbAcq;
-                    elsif contAcq = '1' and trgSig = '1' then
-                        rdAcqSig <= '1';
+                    elsif contAcq = '1' and endAcq = '1' then
+                        rdAcqSig   <= '1';
+                        strtAcqSig <= '1';
 
-                        state    <= readFifo;
+                        state      <= readFifo;
                     end if;
 
                 when getNbAcq =>
@@ -191,9 +186,16 @@ begin
 
                         state    <= readFifo;
                     elsif nbAcqSig = x"AA" then
-                        contAcq <= '1';
+                        contAcq    <= '1';
+                        strtAcqSig <= '1';
+                        nbAcqSig   <= x"FF";
 
-                        state   <= idle;
+                        state      <= idle;
+                    elsif nbAcqSig = x"EE" then
+                        contAcq   <= '0';
+                        rstAcqSig <= '1';
+
+                        state     <= idle;
                     end if;
 
                 when sendSftTrg =>
@@ -206,27 +208,6 @@ begin
                         devReady <= '1';
 
                         state    <= idle;
-                    end if;
-
-                when waitData =>
-                    swTrg <= '0';
-
-                    state <= waitData;
-
-                    if endAcq = '1' then
-                        state <= collectData;
-                    end if;
-
-                when collectData =>
-                    rdAcqSig <= '0';
-                    devReady <= '0';
-
-                    state    <= acqEnd;
-
-                    if emptyAcq = '0' then
-                        rdAcqSig <= '1';
-
-                        state    <= readFifo;
                     end if;
 
                 when readFifo =>

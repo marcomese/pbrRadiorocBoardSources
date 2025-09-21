@@ -110,7 +110,13 @@ endAcqSig(0) <= end_acq;
 endAcq       <= endAcqOut(0);
 rdValid      <= rdValidOut(0);
 
-clkSyncEndAcqInst: entity work.pulseExtender
+clkSyncEndAcqInst: entity work.pulseExtenderSync
+generic map(
+    width       => endAcqSig'length,
+    syncStages  => 2,
+    clkOrigFreq => 200.0e6,
+    clkDestFreq => 100.0e6
+)
 port map(
     clkOrig => clk_200M,
     rstOrig => rst,

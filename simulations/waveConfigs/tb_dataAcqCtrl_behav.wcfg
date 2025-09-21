@@ -15,15 +15,15 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="0.000000 us"></ZoomStartTime>
-      <ZoomEndTime time="50.000001 us"></ZoomEndTime>
-      <Cursor1Time time="50.000000 us"></Cursor1Time>
+      <ZoomStartTime time="38,792.850 ns"></ZoomStartTime>
+      <ZoomEndTime time="38,895.751 ns"></ZoomEndTime>
+      <Cursor1Time time="38,810.000 ns"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
-      <NameColumnWidth column_width="115"></NameColumnWidth>
-      <ValueColumnWidth column_width="58"></ValueColumnWidth>
+      <NameColumnWidth column_width="161"></NameColumnWidth>
+      <ValueColumnWidth column_width="68"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="33" />
+   <WVObjectSize size="57" />
    <wvobject fp_name="/tb_dataAcqCtrl/rst" type="logic">
       <obj_property name="ElementShortName">rst</obj_property>
       <obj_property name="ObjectShortName">rst</obj_property>
@@ -43,10 +43,6 @@
    <wvobject fp_name="/tb_dataAcqCtrl/start" type="logic">
       <obj_property name="ElementShortName">start</obj_property>
       <obj_property name="ObjectShortName">start</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl/dataAcqCtrlInst/resetAcqSig" type="logic">
-      <obj_property name="ElementShortName">resetAcqSig</obj_property>
-      <obj_property name="ObjectShortName">resetAcqSig</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_dataAcqCtrl/resetAcq" type="logic">
       <obj_property name="ElementShortName">resetAcq</obj_property>
@@ -97,6 +93,46 @@
       <obj_property name="ElementShortName">devExec</obj_property>
       <obj_property name="ObjectShortName">devExec</obj_property>
    </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl/dataAcqCtrlInst/strtAcqSig" type="logic">
+      <obj_property name="ElementShortName">strtAcqSig</obj_property>
+      <obj_property name="ObjectShortName">strtAcqSig</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl/adcInst/end_acq" type="logic">
+      <obj_property name="ElementShortName">end_acq</obj_property>
+      <obj_property name="ObjectShortName">end_acq</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl/adcInst/endAcqSig" type="array">
+      <obj_property name="ElementShortName">endAcqSig[0:0]</obj_property>
+      <obj_property name="ObjectShortName">endAcqSig[0:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl/adcInst/endAcqOut" type="array">
+      <obj_property name="ElementShortName">endAcqOut[0:0]</obj_property>
+      <obj_property name="ObjectShortName">endAcqOut[0:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl/adcInst/endAcq" type="logic">
+      <obj_property name="ElementShortName">endAcq</obj_property>
+      <obj_property name="ObjectShortName">endAcq</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl/dataAcqCtrlInst/endAcq" type="logic">
+      <obj_property name="ElementShortName">endAcq</obj_property>
+      <obj_property name="ObjectShortName">endAcq</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl/dataAcqCtrlInst/contAcq" type="logic">
+      <obj_property name="ElementShortName">contAcq</obj_property>
+      <obj_property name="ObjectShortName">contAcq</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl/dataAcqCtrlInst/rdAcqSig" type="logic">
+      <obj_property name="ElementShortName">rdAcqSig</obj_property>
+      <obj_property name="ObjectShortName">rdAcqSig</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl/dataAcqCtrlInst/rdAcq" type="logic">
+      <obj_property name="ElementShortName">rdAcq</obj_property>
+      <obj_property name="ObjectShortName">rdAcq</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl/dataAcqCtrlInst/readSent" type="logic">
+      <obj_property name="ElementShortName">readSent</obj_property>
+      <obj_property name="ObjectShortName">readSent</obj_property>
+   </wvobject>
    <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/state" type="other">
       <obj_property name="DisplayName">label</obj_property>
       <obj_property name="ElementShortName">state</obj_property>
@@ -114,6 +150,87 @@
       <obj_property name="ElementShortName">current_state</obj_property>
       <obj_property name="ObjectShortName">current_state</obj_property>
       <obj_property name="label">stateAdcInst</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl/adcInst/en_acq" type="logic">
+      <obj_property name="ElementShortName">en_acq</obj_property>
+      <obj_property name="ObjectShortName">en_acq</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl/t" type="array">
+      <obj_property name="ElementShortName">t[63:0]</obj_property>
+      <obj_property name="ObjectShortName">t[63:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="vbus398" type="vbus">
+      <obj_property name="label">selHit0</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="Radix">BINARYRADIX</obj_property>
+      <wvobject fp_name="/tb_dataAcqCtrl/sel_adc[31]" type="logic">
+         <obj_property name="ElementShortName">[31]</obj_property>
+         <obj_property name="ObjectShortName">[31]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_dataAcqCtrl/sel_adc[30]" type="logic">
+         <obj_property name="ElementShortName">[30]</obj_property>
+         <obj_property name="ObjectShortName">[30]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_dataAcqCtrl/sel_adc[29]" type="logic">
+         <obj_property name="ElementShortName">[29]</obj_property>
+         <obj_property name="ObjectShortName">[29]</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject fp_name="vbus401" type="vbus">
+      <obj_property name="label">selHit</obj_property>
+      <obj_property name="DisplayName">label</obj_property>
+      <wvobject fp_name="/tb_dataAcqCtrl/sel_adc[25]" type="logic">
+         <obj_property name="ElementShortName">[25]</obj_property>
+         <obj_property name="ObjectShortName">[25]</obj_property>
+      </wvobject>
+      <wvobject fp_name="/tb_dataAcqCtrl/sel_adc[24]" type="logic">
+         <obj_property name="ElementShortName">[24]</obj_property>
+         <obj_property name="ObjectShortName">[24]</obj_property>
+      </wvobject>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl/dataAcqCtrlInst/sync100to25Out" type="array">
+      <obj_property name="ElementShortName">sync100to25Out[3:0]</obj_property>
+      <obj_property name="ObjectShortName">sync100to25Out[3:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl/dataAcqCtrlInst/selAdc" type="array">
+      <obj_property name="ElementShortName">selAdc[63:0]</obj_property>
+      <obj_property name="ObjectShortName">selAdc[63:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl/sel_adc" type="array">
+      <obj_property name="ElementShortName">sel_adc[63:0]</obj_property>
+      <obj_property name="ObjectShortName">sel_adc[63:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl/adcInst/hit" type="logic">
+      <obj_property name="ElementShortName">hit</obj_property>
+      <obj_property name="ObjectShortName">hit</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl/adcInst/hit0" type="logic">
+      <obj_property name="ElementShortName">hit0</obj_property>
+      <obj_property name="ObjectShortName">hit0</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl/adcInst/trigger" type="logic">
+      <obj_property name="ElementShortName">trigger</obj_property>
+      <obj_property name="ObjectShortName">trigger</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl/adcInst/trigger_shrunk" type="logic">
+      <obj_property name="ElementShortName">trigger_shrunk</obj_property>
+      <obj_property name="ObjectShortName">trigger_shrunk</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl/adcInst/trigger_latched" type="logic">
+      <obj_property name="ElementShortName">trigger_latched</obj_property>
+      <obj_property name="ObjectShortName">trigger_latched</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl/adcInst/trigger_latched2" type="logic">
+      <obj_property name="ElementShortName">trigger_latched2</obj_property>
+      <obj_property name="ObjectShortName">trigger_latched2</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl/dataAcqCtrlInst/rstAcqSig" type="logic">
+      <obj_property name="ElementShortName">rstAcqSig</obj_property>
+      <obj_property name="ObjectShortName">rstAcqSig</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl/dataAcqCtrlInst/resetAcq" type="logic">
+      <obj_property name="ElementShortName">resetAcq</obj_property>
+      <obj_property name="ObjectShortName">resetAcq</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/validSig" type="logic">
       <obj_property name="ElementShortName">validSig</obj_property>

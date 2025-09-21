@@ -46,13 +46,17 @@ signal   state    : state_t;
 signal   pCnt     : unsigned(cntWidth downto 0);
 
 signal   endCnt,
-         pSig     : std_logic;
+         pSig,
+         sOrigO,
+         sOrigR   : std_logic;
 
 signal   syncFF   : std_logic_vector(syncStages-1 downto 0);
 
 begin
 
 endCnt <= pCnt(pCnt'left);
+
+sOrigR <= sigOrig and not sOrigO;
 
 noSyncStages: if syncStages = 0 generate
 begin
@@ -79,7 +83,7 @@ begin
     end process;
 end generate;
 
-pulseFSM: process(clkOrig, rstOrig, sigOrig)
+pulseFSM: process(clkOrig, rstOrig)
 begin
     if rising_edge(clkOrig) then
         if rstOrig = '1' then
@@ -88,11 +92,13 @@ begin
 
             state <= idle;
         else
+            sOrigO <= sigOrig;
+
             case state is
                 when idle =>
                     state <= idle;
 
-                    if sigOrig = '1' then
+                    if sOrigR = '1' then
                         pCnt  <= pCnt - 1;
                         pSig  <= '1';
 
