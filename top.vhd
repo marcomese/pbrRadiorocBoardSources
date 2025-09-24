@@ -163,7 +163,7 @@ constant readCmd    : std_logic_vector(3 downto 0) := x"A";
 constant writeCmd   : std_logic_vector(3 downto 0) := x"5";
 constant burstWrCmd : std_logic_vector(3 downto 0) := x"3";
 constant burstRdCmd : std_logic_vector(3 downto 0) := x"B";
-constant maxBrstLen : integer                      := 125;
+constant maxBrstLen : integer                      := 512;
 
 constant rstRadI2CLen : integer := 5;
 

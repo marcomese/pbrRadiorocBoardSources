@@ -187,7 +187,7 @@ constant readCmd       : std_logic_vector(3 downto 0) := x"A";
 constant writeCmd      : std_logic_vector(3 downto 0) := x"5";
 constant burstWrCmd    : std_logic_vector(3 downto 0) := x"3";
 constant burstRdCmd    : std_logic_vector(3 downto 0) := x"B";
-constant maxBrstLen    : natural                      := 40;
+constant maxBrstLen    : natural                      := 14000;
 constant delay         : natural                      := 1;--50000;
 
 signal rst               : std_logic := '0';
@@ -269,7 +269,7 @@ begin
 
     testRxRead <= '1';
 
-    testDataIn <= x"a6";
+    testDataIn <= x"b6";
     wait for clkPeriod100M*delay;
     testTxWrite <= '1';
     wait for clkPeriod100M;
@@ -281,6 +281,22 @@ begin
     testTxWrite <= '0';
     wait for clkPeriod100M*delay;
     testDataIn <= x"AA";
+    testTxWrite <= '1';
+    wait for clkPeriod100M;
+    testTxWrite <= '0';
+    testDataIn <= x"FF";
+    testTxWrite <= '1';
+    wait for clkPeriod100M;
+    testTxWrite <= '0';
+    testDataIn <= x"FF";
+    testTxWrite <= '1';
+    wait for clkPeriod100M;
+    testTxWrite <= '0';
+    testDataIn <= x"FF";
+    testTxWrite <= '1';
+    wait for clkPeriod100M;
+    testTxWrite <= '0';
+    testDataIn <= x"FF";
     testTxWrite <= '1';
     wait for clkPeriod100M;
     testTxWrite <= '0';

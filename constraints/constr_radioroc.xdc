@@ -163,6 +163,8 @@ set_property BITSTREAM.CONFIG.CONFIGRATE 50 [current_design]
 set_property BITSTREAM.GENERAL.COMPRESS TRUE [current_design]
 
 
+
+
 create_debug_core u_ila_0 ila
 set_property ALL_PROBE_SAME_MU true [get_debug_cores u_ila_0]
 set_property ALL_PROBE_SAME_MU_CNT 1 [get_debug_cores u_ila_0]
@@ -179,52 +181,52 @@ set_property port_width 4 [get_debug_ports u_ila_0/probe0]
 connect_debug_port u_ila_0/probe0 [get_nets [list {devInterfInst/state[0]} {devInterfInst/state[1]} {devInterfInst/state[2]} {devInterfInst/state[3]}]]
 create_debug_port u_ila_0 probe
 set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe1]
-set_property port_width 32 [get_debug_ports u_ila_0/probe1]
-connect_debug_port u_ila_0/probe1 [get_nets [list {radInterfInst/radioFSMInst/dataOutBuff[0]} {radInterfInst/radioFSMInst/dataOutBuff[1]} {radInterfInst/radioFSMInst/dataOutBuff[2]} {radInterfInst/radioFSMInst/dataOutBuff[3]} {radInterfInst/radioFSMInst/dataOutBuff[4]} {radInterfInst/radioFSMInst/dataOutBuff[5]} {radInterfInst/radioFSMInst/dataOutBuff[6]} {radInterfInst/radioFSMInst/dataOutBuff[7]} {radInterfInst/radioFSMInst/dataOutBuff[8]} {radInterfInst/radioFSMInst/dataOutBuff[9]} {radInterfInst/radioFSMInst/dataOutBuff[10]} {radInterfInst/radioFSMInst/dataOutBuff[11]} {radInterfInst/radioFSMInst/dataOutBuff[12]} {radInterfInst/radioFSMInst/dataOutBuff[13]} {radInterfInst/radioFSMInst/dataOutBuff[14]} {radInterfInst/radioFSMInst/dataOutBuff[15]} {radInterfInst/radioFSMInst/dataOutBuff[16]} {radInterfInst/radioFSMInst/dataOutBuff[17]} {radInterfInst/radioFSMInst/dataOutBuff[18]} {radInterfInst/radioFSMInst/dataOutBuff[19]} {radInterfInst/radioFSMInst/dataOutBuff[20]} {radInterfInst/radioFSMInst/dataOutBuff[21]} {radInterfInst/radioFSMInst/dataOutBuff[22]} {radInterfInst/radioFSMInst/dataOutBuff[23]} {radInterfInst/radioFSMInst/dataOutBuff[24]} {radInterfInst/radioFSMInst/dataOutBuff[25]} {radInterfInst/radioFSMInst/dataOutBuff[26]} {radInterfInst/radioFSMInst/dataOutBuff[27]} {radInterfInst/radioFSMInst/dataOutBuff[28]} {radInterfInst/radioFSMInst/dataOutBuff[29]} {radInterfInst/radioFSMInst/dataOutBuff[30]} {radInterfInst/radioFSMInst/dataOutBuff[31]}]]
+set_property port_width 4 [get_debug_ports u_ila_0/probe1]
+connect_debug_port u_ila_0/probe1 [get_nets [list {i2cRadModule/state[0]} {i2cRadModule/state[1]} {i2cRadModule/state[2]} {i2cRadModule/state[3]}]]
 create_debug_port u_ila_0 probe
 set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe2]
-set_property port_width 3 [get_debug_ports u_ila_0/probe2]
-connect_debug_port u_ila_0/probe2 [get_nets [list {radInterfInst/radioFSMInst/state[0]} {radInterfInst/radioFSMInst/state[1]} {radInterfInst/radioFSMInst/state[2]}]]
+set_property port_width 32 [get_debug_ports u_ila_0/probe2]
+connect_debug_port u_ila_0/probe2 [get_nets [list {radInterfInst/radioFSMInst/dataOutBuff[0]} {radInterfInst/radioFSMInst/dataOutBuff[1]} {radInterfInst/radioFSMInst/dataOutBuff[2]} {radInterfInst/radioFSMInst/dataOutBuff[3]} {radInterfInst/radioFSMInst/dataOutBuff[4]} {radInterfInst/radioFSMInst/dataOutBuff[5]} {radInterfInst/radioFSMInst/dataOutBuff[6]} {radInterfInst/radioFSMInst/dataOutBuff[7]} {radInterfInst/radioFSMInst/dataOutBuff[8]} {radInterfInst/radioFSMInst/dataOutBuff[9]} {radInterfInst/radioFSMInst/dataOutBuff[10]} {radInterfInst/radioFSMInst/dataOutBuff[11]} {radInterfInst/radioFSMInst/dataOutBuff[12]} {radInterfInst/radioFSMInst/dataOutBuff[13]} {radInterfInst/radioFSMInst/dataOutBuff[14]} {radInterfInst/radioFSMInst/dataOutBuff[15]} {radInterfInst/radioFSMInst/dataOutBuff[16]} {radInterfInst/radioFSMInst/dataOutBuff[17]} {radInterfInst/radioFSMInst/dataOutBuff[18]} {radInterfInst/radioFSMInst/dataOutBuff[19]} {radInterfInst/radioFSMInst/dataOutBuff[20]} {radInterfInst/radioFSMInst/dataOutBuff[21]} {radInterfInst/radioFSMInst/dataOutBuff[22]} {radInterfInst/radioFSMInst/dataOutBuff[23]} {radInterfInst/radioFSMInst/dataOutBuff[24]} {radInterfInst/radioFSMInst/dataOutBuff[25]} {radInterfInst/radioFSMInst/dataOutBuff[26]} {radInterfInst/radioFSMInst/dataOutBuff[27]} {radInterfInst/radioFSMInst/dataOutBuff[28]} {radInterfInst/radioFSMInst/dataOutBuff[29]} {radInterfInst/radioFSMInst/dataOutBuff[30]} {radInterfInst/radioFSMInst/dataOutBuff[31]}]]
 create_debug_port u_ila_0 probe
 set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe3]
 set_property port_width 2 [get_debug_ports u_ila_0/probe3]
 connect_debug_port u_ila_0/probe3 [get_nets [list {radInterfInst/state[0]} {radInterfInst/state[1]}]]
 create_debug_port u_ila_0 probe
 set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe4]
-set_property port_width 8 [get_debug_ports u_ila_0/probe4]
-connect_debug_port u_ila_0/probe4 [get_nets [list {i2cDataWrRad[0]} {i2cDataWrRad[1]} {i2cDataWrRad[2]} {i2cDataWrRad[3]} {i2cDataWrRad[4]} {i2cDataWrRad[5]} {i2cDataWrRad[6]} {i2cDataWrRad[7]}]]
+set_property port_width 3 [get_debug_ports u_ila_0/probe4]
+connect_debug_port u_ila_0/probe4 [get_nets [list {radInterfInst/radioFSMInst/state__0[0]} {radInterfInst/radioFSMInst/state__0[1]} {radInterfInst/radioFSMInst/state__0[2]}]]
 create_debug_port u_ila_0 probe
 set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe5]
-set_property port_width 8 [get_debug_ports u_ila_0/probe5]
-connect_debug_port u_ila_0/probe5 [get_nets [list {i2cDataRdRad[0]} {i2cDataRdRad[1]} {i2cDataRdRad[2]} {i2cDataRdRad[3]} {i2cDataRdRad[4]} {i2cDataRdRad[5]} {i2cDataRdRad[6]} {i2cDataRdRad[7]}]]
+set_property port_width 3 [get_debug_ports u_ila_0/probe5]
+connect_debug_port u_ila_0/probe5 [get_nets [list {radInterfInst/radioFSMInst/state[0]} {radInterfInst/radioFSMInst/state[1]} {radInterfInst/radioFSMInst/state[2]}]]
 create_debug_port u_ila_0 probe
 set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe6]
 set_property port_width 7 [get_debug_ports u_ila_0/probe6]
 connect_debug_port u_ila_0/probe6 [get_nets [list {i2cAddrRad[0]} {i2cAddrRad[1]} {i2cAddrRad[2]} {i2cAddrRad[3]} {i2cAddrRad[4]} {i2cAddrRad[5]} {i2cAddrRad[6]}]]
 create_debug_port u_ila_0 probe
 set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe7]
-set_property port_width 1 [get_debug_ports u_ila_0/probe7]
-connect_debug_port u_ila_0/probe7 [get_nets [list i2cBusyRad]]
+set_property port_width 8 [get_debug_ports u_ila_0/probe7]
+connect_debug_port u_ila_0/probe7 [get_nets [list {i2cDataRdRad[0]} {i2cDataRdRad[1]} {i2cDataRdRad[2]} {i2cDataRdRad[3]} {i2cDataRdRad[4]} {i2cDataRdRad[5]} {i2cDataRdRad[6]} {i2cDataRdRad[7]}]]
 create_debug_port u_ila_0 probe
 set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe8]
-set_property port_width 1 [get_debug_ports u_ila_0/probe8]
-connect_debug_port u_ila_0/probe8 [get_nets [list i2cEnaRad]]
+set_property port_width 8 [get_debug_ports u_ila_0/probe8]
+connect_debug_port u_ila_0/probe8 [get_nets [list {i2cDataWrRad[0]} {i2cDataWrRad[1]} {i2cDataWrRad[2]} {i2cDataWrRad[3]} {i2cDataWrRad[4]} {i2cDataWrRad[5]} {i2cDataWrRad[6]} {i2cDataWrRad[7]}]]
 create_debug_port u_ila_0 probe
 set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe9]
 set_property port_width 1 [get_debug_ports u_ila_0/probe9]
-connect_debug_port u_ila_0/probe9 [get_nets [list i2cRwRad]]
+connect_debug_port u_ila_0/probe9 [get_nets [list i2cBusyRad]]
 create_debug_port u_ila_0 probe
 set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe10]
 set_property port_width 1 [get_debug_ports u_ila_0/probe10]
-connect_debug_port u_ila_0/probe10 [get_nets [list i2cRadModule/scl_clk]]
+connect_debug_port u_ila_0/probe10 [get_nets [list i2cEnaRad]]
 create_debug_port u_ila_0 probe
 set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe11]
 set_property port_width 1 [get_debug_ports u_ila_0/probe11]
-connect_debug_port u_ila_0/probe11 [get_nets [list i2cModule/scl_clk]]
+connect_debug_port u_ila_0/probe11 [get_nets [list i2cRwRad]]
 create_debug_port u_ila_0 probe
 set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe12]
 set_property port_width 1 [get_debug_ports u_ila_0/probe12]
-connect_debug_port u_ila_0/probe12 [get_nets [list i2cModule/sda_ena_n]]
+connect_debug_port u_ila_0/probe12 [get_nets [list i2cRadModule/scl_clk]]
 create_debug_port u_ila_0 probe
 set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe13]
 set_property port_width 1 [get_debug_ports u_ila_0/probe13]
