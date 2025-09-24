@@ -549,7 +549,7 @@ begin
 
 --    wait until radBusy = '0';
 
---    wait for 150 us;
+    wait for 150 us;
 
     testRxRead <= '1';
 
@@ -571,7 +571,7 @@ begin
     wait for clkPeriod;
     testTxWrite <= '0';
 
-    wait until i2cBusy = '0';
+    --wait until i2cBusy = '0';
 
     wait until i2cBusy = '0';
 

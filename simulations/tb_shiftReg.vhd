@@ -20,7 +20,7 @@ port(
     shift     : in  std_logic;
     serDataIn : in  std_logic_vector(shiftLen-1 downto 0);
     parDataIn : in  std_logic_vector(regLen-1 downto 0);
-    empty     : out std_logic;
+    full      : out std_logic;
     last      : out std_logic;
     dataOut   : out std_logic_vector(regLen-1 downto 0)
 );
@@ -38,7 +38,7 @@ signal shift     : std_logic := '0';
 signal serDataIn : std_logic_vector(shiftLen-1 downto 0) := (others => '0');
 signal parDataIn : std_logic_vector(regLen-1 downto 0)   := (others => '0');
 signal dataOut   : std_logic_vector(regLen-1 downto 0);
-signal empty     : std_logic;
+signal full      : std_logic;
 signal last      : std_logic;
 
 begin
@@ -137,7 +137,7 @@ port map(
     shift      => shift,
     serDataIn  => serDataIn,
     parDataIn  => parDataIn,
-    empty      => empty,
+    full       => full,
     last       => last,
     dataOut    => dataOut
 );

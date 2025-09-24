@@ -67,7 +67,7 @@ signal   rwSig,
          rstBuff,
          loadBuff,
          shiftBuff,
-         emptyBuff,
+         fullBuff,
          lastBuff,
          lastLeft,
          lastByte,
@@ -229,14 +229,14 @@ begin
                 when burstRead =>
                     i2cRw     <= devRead;
                     dataOut   <= slvToDevData(dataOutBuff);
-                    dataReady <= i2cBusyFall and (lastBuff or not brst);
+                    dataReady <= i2cBusyFall;-- and (lastBuff or not brst);
                     rstBuff   <= '0';
                     shiftBuff <= i2cBusyFall and (i2cEnaSig or not brst);
                     brstOnSig <= brst or i2cEnaSig;
 
                     state     <= burstRead;
 
-                    if brstRise = '1' then
+                    if brst = '0' then
                         state <= transEnd;
                     elsif exec = '1' then
                         i2cEnaSig <= '1';
@@ -287,7 +287,7 @@ port map(
     rst        => rstBuff,
     load       => loadBuff,
     shift      => shiftBuff,
-    empty      => emptyBuff,
+    full       => fullBuff,
     last       => lastBuff,
     parDataIn  => dataInVec,
     serDataIn  => i2cDataRd,

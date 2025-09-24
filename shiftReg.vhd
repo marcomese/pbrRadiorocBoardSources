@@ -29,7 +29,7 @@ port(
     shift     : in  std_logic;
     serDataIn : in  std_logic_vector(shiftLen-1 downto 0);
     parDataIn : in  std_logic_vector(regLen-1 downto 0);
-    empty     : out std_logic;
+    full      : out std_logic;
     last      : out std_logic;
     dataOut   : out std_logic_vector(regLen-1 downto 0)
 );
@@ -44,8 +44,6 @@ signal   shiftCnt : unsigned(bitsNum(shiftNum) downto 0);
 signal   buffInt  : std_logic_vector(regLen-1 downto 0);
 
 begin
-
-empty <= '1' when shiftCnt = shiftNum-1 else '0';
 
 last  <= '1' when shiftCnt = 0 else '0';
 
@@ -90,9 +88,14 @@ end generate;
 shiftCntInst: process(clk, rst)
 begin
     if rising_edge(clk) then
-        if rst = '1' or load = '1' or shiftCnt(shiftCnt'left) = '1' then
+        if rst = '1' then
+            full     <= '0';
+            shiftCnt <= to_unsigned(shiftNum-1, shiftCnt'length);
+        elsif load = '1' or shiftCnt(shiftCnt'left) = '1' then
+            full     <= '1';
             shiftCnt <= to_unsigned(shiftNum-1, shiftCnt'length);
         elsif shift = '1' then
+            full     <= '0';
             shiftCnt <= shiftCnt - 1;
         end if;
     end if;

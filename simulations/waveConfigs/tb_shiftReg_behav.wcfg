@@ -12,12 +12,12 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="0.000 ns"></ZoomStartTime>
-      <ZoomEndTime time="2,802.001 ns"></ZoomEndTime>
-      <Cursor1Time time="290.000 ns"></Cursor1Time>
+      <ZoomStartTime time="9.000 ns"></ZoomStartTime>
+      <ZoomEndTime time="613.501 ns"></ZoomEndTime>
+      <Cursor1Time time="520.000 ns"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
-      <NameColumnWidth column_width="142"></NameColumnWidth>
+      <NameColumnWidth column_width="138"></NameColumnWidth>
       <ValueColumnWidth column_width="58"></ValueColumnWidth>
    </column_width_setting>
    <WVObjectSize size="12" />
@@ -45,6 +45,10 @@
       <obj_property name="ElementShortName">shiftCnt[3:0]</obj_property>
       <obj_property name="ObjectShortName">shiftCnt[3:0]</obj_property>
    </wvobject>
+   <wvobject fp_name="/tb_shiftReg/uut/full" type="logic">
+      <obj_property name="ElementShortName">full</obj_property>
+      <obj_property name="ObjectShortName">full</obj_property>
+   </wvobject>
    <wvobject fp_name="/tb_shiftReg/uut/empty" type="logic">
       <obj_property name="ElementShortName">empty</obj_property>
       <obj_property name="ObjectShortName">empty</obj_property>
@@ -53,17 +57,13 @@
       <obj_property name="ElementShortName">last</obj_property>
       <obj_property name="ObjectShortName">last</obj_property>
    </wvobject>
-   <wvobject fp_name="/tb_shiftReg/dataIn" type="array">
-      <obj_property name="ElementShortName">dataIn[31:0]</obj_property>
-      <obj_property name="ObjectShortName">dataIn[31:0]</obj_property>
-   </wvobject>
    <wvobject fp_name="/tb_shiftReg/uut/buffInt" type="array">
       <obj_property name="ElementShortName">buffInt[31:0]</obj_property>
       <obj_property name="ObjectShortName">buffInt[31:0]</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_shiftReg/dataOut" type="array">
-      <obj_property name="ElementShortName">dataOut[7:0]</obj_property>
-      <obj_property name="ObjectShortName">dataOut[7:0]</obj_property>
+      <obj_property name="ElementShortName">dataOut[31:0]</obj_property>
+      <obj_property name="ObjectShortName">dataOut[31:0]</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_shiftReg/clkPeriod" type="other">
       <obj_property name="ElementShortName">clkPeriod</obj_property>
