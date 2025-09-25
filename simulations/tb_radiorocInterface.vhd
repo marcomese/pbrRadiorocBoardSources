@@ -567,7 +567,7 @@ begin
     wait for clkPeriod;
     testDataIn <= x"00";
     wait for clkPeriod;
-    testDataIn <= x"06";
+    testDataIn <= x"02";
     wait for clkPeriod;
     testTxWrite <= '0';
 

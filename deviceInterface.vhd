@@ -18,6 +18,9 @@ use IEEE.NUMERIC_STD.ALL;
 use work.devicesPkg.all;
 use work.utilsPkg.all;
 
+library xpm;
+use xpm.vcomponents.all;
+
 entity deviceInterface is
 generic(
     clkFreq     : real;
@@ -70,7 +73,6 @@ type state_t is (idle,
                  errBrstPar);
 
 constant tOut          : integer := integer(clkFreq*timeout);
-constant shiftLen      : integer := 8;
 constant bytesNum      : integer := maxBrstLen;
 
 signal   state         : state_t;
@@ -84,11 +86,11 @@ signal   tOutRst,
          devBrstSig,
          brstCollect,
          lastBrst,
-         rstBuff,
-         loadBuff,
-         fullBuff,
-         lastBuff,
-         shiftBuff,
+         wEnFifo,
+         txWSig,
+         rstFifo,
+         wFullFifo,
+         emptyFifo,
          endCnt        : std_logic;
 signal   devIdSig      : devices_t;
 signal   tOutCnt       : unsigned(bitsNum(tOut) downto 0);
@@ -96,24 +98,23 @@ signal   byteCnt       : unsigned(bitsNum(bytesNum) downto 0);
 signal   brstByteNum   : unsigned(bitsNum(bytesNum)-1 downto 0);
 signal   brstBuff      : byteArray_t(maxBrstLen-1 downto 0);
 signal   devDataOutSig : devData_t;
-signal   parDataInBuff : std_logic_vector(devDataBytes*shiftLen-1 downto 0);
-signal   dataOutBuff   : std_logic_vector(devDataBytes*shiftLen-1 downto 0);
+signal   dataToFifo    : std_logic_vector(7 downto 0);
 
 attribute mark_debug : string;
 attribute mark_debug of state : signal is "true";
 
 begin
 
-rxRead        <= rxRdSig and not endCnt;
-devRw         <= devRwSig;
-devBurst      <= devBrstSig;
-devId         <= devIdSig;
-devDataOut    <= devDataOutSig;
-endCnt        <= byteCnt(byteCnt'left);
-tOutSig       <= tOutCnt(tOutCnt'left);
-lastBrst      <= not or_reduce(std_logic_vector(byteCnt(byteCnt'left downto 2)));
-parDataInBuff <= devDataToSlv(devDataIn(devIdSig));
-dataOut       <= dataOutBuff(dataOutBuff'left downto dataOutBuff'left-shiftLen+1);
+rxRead     <= rxRdSig and not endCnt;
+txWrite    <= txWSig;
+devRw      <= devRwSig;
+devBurst   <= devBrstSig;
+devId      <= devIdSig;
+devDataOut <= devDataOutSig;
+endCnt     <= byteCnt(byteCnt'left);
+tOutSig    <= tOutCnt(tOutCnt'left);
+lastBrst   <= not or_reduce(std_logic_vector(byteCnt(byteCnt'left downto 2)));
+dataToFifo <= devDataIn(devIdSig)(0);
 
 devRwDecProc: process(clk, rst, dataIn(7 downto 4))
 begin
@@ -149,7 +150,7 @@ begin
             tOutRst        <= '0';
             byteCnt        <= to_unsigned(devAddrBytes-1, byteCnt'length);
             rxRdSig        <= '0';
-            txWrite        <= '0';
+            txWSig         <= '0';
             rxEna          <= '1';
             flushRxFifo    <= '0';
             flushTxFifo    <= '0';
@@ -163,9 +164,9 @@ begin
             brstByteNum    <= (others => '0');
             brstBuff       <= (others => (others => '0'));
             brstCollect    <= '0';
-            rstBuff        <= '1';
-            loadBuff       <= '0';
-            shiftBuff      <= '0';
+            wEnFifo        <= '0';
+            txWSig         <= '0';
+            rstFifo        <= '1';
             error          <= (others => '0');
 
             state          <= idle;
@@ -175,7 +176,6 @@ begin
                     tOutRst <= '1';
                     busy    <= '0';
                     devExec <= '0';
-                    rstBuff <= '0';
                     rxRdSig <= rxPresent;
 
                     state   <= idle;
@@ -192,6 +192,7 @@ begin
 
                 when getDev =>
                     tOutRst <= '0';
+                    rstFifo <= '0';
 
                     state   <= getDev;
 
@@ -332,24 +333,22 @@ begin
                     end if;
 
                 when readDev =>
-                    tOutRst    <= '0';
-                    devExec    <= '0';
-                    rxEna      <= '0';
-                    loadBuff   <= '0';
-                    shiftBuff  <= '0';
+                    tOutRst  <= '0';
+                    devExec  <= '0';
+                    rxEna    <= '0';
+                    wEnFifo  <= '0';
 
-                    state      <= readDev;
+                    state    <= readDev;
 
-                    if endCnt = '1' then
-                        tOutRst  <= '1';
-
-                        state    <= sendDevData;
-                    elsif devReady(devIdSig) = '1' then
-                        tOutRst  <= '1';
-                        shiftBuff <= '1';
+                    if devReady(devIdSig) = '1' then
+                        tOutRst <= '1';
+                        wEnFifo <= '1';
                         byteCnt <= byteCnt - 1;
-                    elsif fullBuff = '1' then
-                        txWrite <= '1';
+                    elsif byteCnt = 1 and devBrstSig = '1' then
+                        devBrstSig <= '0';
+                    elsif wFullFifo = '1' or endCnt = '1' then
+                        tOutRst <= '1';
+                        txWSig  <= '1';
 
                         state   <= sendDevData;
                     elsif tOutSig = '1' then
@@ -360,25 +359,24 @@ begin
                     end if;
 
                 when sendDevData =>
-                    tOutRst  <= '0';
-                    txWrite  <= shiftBuff;
-                    shiftBuff <= txWrAck;
-                    loadBuff <= '0';
+                    tOutRst <= '0';
 
-                    state    <= sendDevData;
+                    state   <= sendDevData;
 
-                    if lastBuff = '1' then
-                        state <= readDev; 
+                    if emptyFifo = '1' and endCnt = '0' then
+                        txWSig <= '0';
+
+                        state  <= readDev;
                     elsif endCnt = '1' then
-                       devBrstSig <= '0';
-                        
-                       state <= done;
+                        devBrstSig <= '0';
+
+                        state <= done;
                     end if;
 
                 when done =>
                     devExec <= '0';
                     byteCnt <= to_unsigned(devAddrBytes-1, byteCnt'length);
-                    txWrite <= '0';
+                    txWSig  <= '0';
                     error   <= (others => '0');
 
                     state   <= done;
@@ -400,7 +398,7 @@ begin
                     tOutRst       <= '1';
                     byteCnt       <= to_unsigned(devAddrBytes-1, byteCnt'length);
                     rxRdSig       <= '0';
-                    txWrite       <= '0';
+                    txWSig        <= '0';
                     rxEna         <= '1';
                     flushRxFifo   <= '0';
                     flushTxFifo   <= '0';
@@ -417,7 +415,7 @@ begin
                     tOutRst       <= '1';
                     byteCnt       <= to_unsigned(devAddrBytes-1, byteCnt'length);
                     rxRdSig       <= '0';
-                    txWrite       <= '0';
+                    txWSig        <= '0';
                     rxEna         <= '1';
                     flushRxFifo   <= '0';
                     flushTxFifo   <= '0';
@@ -434,7 +432,7 @@ begin
                     tOutRst       <= '1';
                     byteCnt       <= to_unsigned(devAddrBytes-1, byteCnt'length);
                     rxRdSig       <= '0';
-                    txWrite       <= '0';
+                    txWSig        <= '0';
                     rxEna         <= '1';
                     flushRxFifo   <= '0';
                     flushTxFifo   <= '0';
@@ -451,7 +449,7 @@ begin
                     tOutRst       <= '1';
                     byteCnt       <= to_unsigned(devAddrBytes-1, byteCnt'length);
                     rxRdSig       <= '0';
-                    txWrite       <= '0';
+                    txWSig        <= '0';
                     rxEna         <= '1';
                     flushRxFifo   <= '0';
                     flushTxFifo   <= '0';
@@ -479,21 +477,45 @@ begin
     end if;
 end process;
 
-brstRdInst: entity work.shiftReg
+xpm_fifo_sync_inst : xpm_fifo_sync
 generic map(
-    direction  => "left",
-    regLen     => devDataBytes*shiftLen,
-    shiftLen   => shiftLen
+    FIFO_MEMORY_TYPE  => "block",
+    FIFO_READ_LATENCY => 0,
+    FIFO_WRITE_DEPTH  => maxBrstLen,
+    PROG_EMPTY_THRESH => 10,
+    PROG_FULL_THRESH  => 4,
+    READ_DATA_WIDTH   => 8,
+    READ_MODE         => "fwft",
+    USE_ADV_FEATURES  => "0707",
+    WRITE_DATA_WIDTH  => 8
 )
 port map(
-    clk        => clk,
-    rst        => rstBuff,
-    load       => loadBuff,
-    shift      => shiftBuff,
-    full       => fullBuff,
-    last       => lastBuff,
-    parDataIn  => parDataInBuff,
-    serDataIn  => parDataInBuff(7 downto 0),--(others => '0'),
-    dataOut    => dataOutBuff
+    dout          => dataOut,
+    empty         => emptyFifo,
+    full          => open,
+    din           => dataToFifo,
+    wr_en         => wEnFifo,
+    wr_clk        => clk,
+    rd_en         => txWSig,
+    rst           => rstFifo,
+    sleep         => '0',
+    almost_empty  => open,
+    almost_full   => open,
+    data_valid    => open,
+    dbiterr       => open,
+    overflow      => open,
+    prog_empty    => open,
+    prog_full     => wFullFifo,
+    rd_data_count => open,
+    rd_rst_busy   => open,
+    sbiterr       => open,
+    underflow     => open,
+    wr_ack        => open,
+    wr_data_count => open,
+    wr_rst_busy   => open,
+    injectdbiterr => '0',
+    injectsbiterr => '0'
+
 );
+
 end Behavioral;

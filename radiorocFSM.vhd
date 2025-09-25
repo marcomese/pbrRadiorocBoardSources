@@ -229,34 +229,37 @@ begin
                 when burstRead =>
                     i2cRw     <= devRead;
                     dataOut   <= slvToDevData(dataOutBuff);
-                    dataReady <= i2cBusyFall;-- and (lastBuff or not brst);
+                    dataReady <= i2cBusyFall;
                     rstBuff   <= '0';
                     shiftBuff <= i2cBusyFall and (i2cEnaSig or not brst);
                     brstOnSig <= brst or i2cEnaSig;
 
                     state     <= burstRead;
 
-                    if brst = '0' then
+                    if brst = '0' and i2cBusyFall = '1' then
+                        i2cEnaSig <= '0';
+
                         state <= transEnd;
                     elsif exec = '1' then
                         i2cEnaSig <= '1';
-                    elsif i2cBusyRise = '1' and  brst = '0' then
-                        i2cEnaSig <= '0';
                     end if;
 
                 when transEnd =>
                     dataReady <= '0';
                     rstBuff   <= '0';
+                    shiftBuff <= '0';
                     leftBCnt  <= (others => '0');
-                    dataOut   <= (others => (others => '0'));
+                    dataOut   <= (0      => i2cDataRd,
+                                  others => (others => '0'));
 
                     state     <= transEnd;
 
-                    if i2cBusy = '0' then
+                    if i2cBusyFall = '1' then
                         brstOnSig  <= '0';
                         busy       <= '0';
                         dataReady  <= '1';
-                        dataOut(dataOut'left) <= i2cDataRd;
+                        dataOut    <= (0      => i2cDataRd,
+                                       others => (others => '0'));
 
                         state      <= idle;
                     end if;
