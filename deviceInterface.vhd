@@ -344,7 +344,7 @@ begin
                         tOutRst <= '1';
                         wEnFifo <= '1';
                         byteCnt <= byteCnt - 1;
-                    elsif byteCnt = 1 and devBrstSig = '1' then
+                    elsif byteCnt = 0 and devBrstSig = '1' then
                         devBrstSig <= '0';
                     elsif wFullFifo = '1' or endCnt = '1' then
                         tOutRst <= '1';

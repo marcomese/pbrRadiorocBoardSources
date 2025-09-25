@@ -236,7 +236,7 @@ begin
 
                     state     <= burstRead;
 
-                    if brst = '0' and i2cBusyFall = '1' then
+                    if brst = '0' then
                         i2cEnaSig <= '0';
 
                         state <= transEnd;
