@@ -14,15 +14,15 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="328,550.500 ns"></ZoomStartTime>
-      <ZoomEndTime time="329,282.001 ns"></ZoomEndTime>
-      <Cursor1Time time="328,739.000 ns"></Cursor1Time>
+      <ZoomStartTime time="150,927.584 ns"></ZoomStartTime>
+      <ZoomEndTime time="151,422.085 ns"></ZoomEndTime>
+      <Cursor1Time time="151,010.000 ns"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="209"></NameColumnWidth>
-      <ValueColumnWidth column_width="76"></ValueColumnWidth>
+      <ValueColumnWidth column_width="60"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="37" />
+   <WVObjectSize size="41" />
    <wvobject fp_name="/tb_radiorocInterface/clk" type="logic">
       <obj_property name="ElementShortName">clk</obj_property>
       <obj_property name="ObjectShortName">clk</obj_property>
@@ -136,6 +136,10 @@
       <obj_property name="ElementShortName">dout[7:0]</obj_property>
       <obj_property name="ObjectShortName">dout[7:0]</obj_property>
    </wvobject>
+   <wvobject fp_name="/tb_radiorocInterface/devInterfInst/wAckFifo" type="logic">
+      <obj_property name="ElementShortName">wAckFifo</obj_property>
+      <obj_property name="ObjectShortName">wAckFifo</obj_property>
+   </wvobject>
    <wvobject fp_name="/tb_radiorocInterface/devInterfInst/txWrAck" type="logic">
       <obj_property name="ElementShortName">txWrAck</obj_property>
       <obj_property name="ObjectShortName">txWrAck</obj_property>
@@ -148,9 +152,21 @@
       <obj_property name="ElementShortName">rstFifo</obj_property>
       <obj_property name="ObjectShortName">rstFifo</obj_property>
    </wvobject>
-   <wvobject fp_name="/tb_radiorocInterface/devInterfInst/wFullFifo" type="logic">
-      <obj_property name="ElementShortName">wFullFifo</obj_property>
-      <obj_property name="ObjectShortName">wFullFifo</obj_property>
+   <wvobject fp_name="/tb_radiorocInterface/devInterfInst/wordWrt" type="logic">
+      <obj_property name="ElementShortName">wordWrt</obj_property>
+      <obj_property name="ObjectShortName">wordWrt</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_radiorocInterface/devInterfInst/wordWrtOld" type="logic">
+      <obj_property name="ElementShortName">wordWrtOld</obj_property>
+      <obj_property name="ObjectShortName">wordWrtOld</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_radiorocInterface/devInterfInst/wordWrtRise" type="logic">
+      <obj_property name="ElementShortName">wordWrtRise</obj_property>
+      <obj_property name="ObjectShortName">wordWrtRise</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_radiorocInterface/devInterfInst/wWrtR" type="logic">
+      <obj_property name="ElementShortName">wWrtR</obj_property>
+      <obj_property name="ObjectShortName">wWrtR</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_radiorocInterface/devInterfInst/emptyFifo" type="logic">
       <obj_property name="ElementShortName">emptyFifo</obj_property>

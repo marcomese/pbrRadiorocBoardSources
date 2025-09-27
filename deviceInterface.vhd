@@ -89,7 +89,10 @@ signal   tOutRst,
          wEnFifo,
          txWSig,
          rstFifo,
-         wFullFifo,
+         wordWrt,
+         wordWrtOld,
+         wordWrtRise,
+         wAckFifo,
          dValidFifo,
          emptyFifo,
          endCnt        : std_logic;
@@ -106,16 +109,18 @@ attribute mark_debug of state : signal is "true";
 
 begin
 
-rxRead     <= rxRdSig and not endCnt;
-txWrite    <= txWSig;
-devRw      <= devRwSig;
-devBurst   <= devBrstSig;
-devId      <= devIdSig;
-devDataOut <= devDataOutSig;
-endCnt     <= byteCnt(byteCnt'left);
-tOutSig    <= tOutCnt(tOutCnt'left);
-lastBrst   <= not or_reduce(std_logic_vector(byteCnt(byteCnt'left downto 2)));
-dataToFifo <= devDataIn(devIdSig)(0);
+rxRead      <= rxRdSig and not endCnt;
+txWrite     <= txWSig;
+devRw       <= devRwSig;
+devBurst    <= devBrstSig;
+devId       <= devIdSig;
+devDataOut  <= devDataOutSig;
+endCnt      <= byteCnt(byteCnt'left);
+tOutSig     <= tOutCnt(tOutCnt'left);
+wordWrt     <= not or_reduce(std_logic_vector(byteCnt(1 downto 0))); -- '1' when byteCnt is multiple of 4
+wordWrtRise <= wordWrt and not wordWrtOld;
+lastBrst    <= not or_reduce(std_logic_vector(byteCnt(byteCnt'left downto 2)));
+dataToFifo  <= devDataIn(devIdSig)(0);
 
 devRwDecProc: process(clk, rst, dataIn(7 downto 4))
 begin
@@ -168,10 +173,13 @@ begin
             wEnFifo        <= '0';
             txWSig         <= '0';
             rstFifo        <= '1';
+            wordWrtOld     <= '0';
             error          <= (others => '0');
 
             state          <= idle;
         else
+            wordWrtOld <= wordWrt;
+
             case state is
                 when idle =>
                     tOutRst <= '1';
@@ -235,7 +243,9 @@ begin
                         state <= getData;
 
                         if devBrstSig = '0' then
-                            state <= readDev;
+                            byteCnt <= (others => '0');
+
+                            state   <= readDev;
                         end if;
                     elsif rxPresent = '1' then
                         tOutRst    <= '1';
@@ -344,10 +354,11 @@ begin
                     if devReady(devIdSig) = '1' then
                         tOutRst <= '1';
                         wEnFifo <= '1';
+                    elsif wAckFifo = '1' then
                         byteCnt <= byteCnt - 1;
                     elsif byteCnt = 0 and devBrstSig = '1' then
                         devBrstSig <= '0';
-                    elsif wFullFifo = '1' or (endCnt = '1' and dValidFifo = '1') then
+                    elsif wordWrtRise = '1' or (endCnt = '1' and dValidFifo = '1') then
                         tOutRst <= '1';
                         txWSig  <= '1';
 
@@ -480,11 +491,9 @@ generic map(
     FIFO_MEMORY_TYPE  => "block",
     FIFO_READ_LATENCY => 0,
     FIFO_WRITE_DEPTH  => maxBrstLen,
-    PROG_EMPTY_THRESH => 10,
-    PROG_FULL_THRESH  => 4,
     READ_DATA_WIDTH   => 8,
     READ_MODE         => "fwft",
-    USE_ADV_FEATURES  => "1707",
+    USE_ADV_FEATURES  => "1010",
     WRITE_DATA_WIDTH  => 8
 )
 port map(
@@ -496,19 +505,19 @@ port map(
     wr_clk        => clk,
     rd_en         => txWSig,
     rst           => rstFifo,
+    data_valid    => dValidFifo,
+    wr_ack        => wAckFifo,
     sleep         => '0',
     almost_empty  => open,
     almost_full   => open,
-    data_valid    => dValidFifo,
     dbiterr       => open,
     overflow      => open,
     prog_empty    => open,
-    prog_full     => wFullFifo,
+    prog_full     => open,
     rd_data_count => open,
     rd_rst_busy   => open,
     sbiterr       => open,
     underflow     => open,
-    wr_ack        => open,
     wr_data_count => open,
     wr_rst_busy   => open,
     injectdbiterr => '0',
