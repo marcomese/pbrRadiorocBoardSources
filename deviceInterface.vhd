@@ -90,6 +90,7 @@ signal   tOutRst,
          txWSig,
          rstFifo,
          wFullFifo,
+         dValidFifo,
          emptyFifo,
          endCnt        : std_logic;
 signal   devIdSig      : devices_t;
@@ -346,7 +347,7 @@ begin
                         byteCnt <= byteCnt - 1;
                     elsif byteCnt = 0 and devBrstSig = '1' then
                         devBrstSig <= '0';
-                    elsif wFullFifo = '1' or endCnt = '1' then
+                    elsif wFullFifo = '1' or (endCnt = '1' and dValidFifo = '1') then
                         tOutRst <= '1';
                         txWSig  <= '1';
 
@@ -360,16 +361,13 @@ begin
 
                 when sendDevData =>
                     tOutRst <= '0';
+                    txWSig  <= txWrAck and not emptyFifo;
 
                     state   <= sendDevData;
 
                     if emptyFifo = '1' and endCnt = '0' then
-                        txWSig <= '0';
-
-                        state  <= readDev;
-                    elsif endCnt = '1' then
-                        devBrstSig <= '0';
-
+                        state <= readDev;
+                    elsif emptyFifo = '1' and endCnt = '1' then
                         state <= done;
                     end if;
 
@@ -486,7 +484,7 @@ generic map(
     PROG_FULL_THRESH  => 4,
     READ_DATA_WIDTH   => 8,
     READ_MODE         => "fwft",
-    USE_ADV_FEATURES  => "0707",
+    USE_ADV_FEATURES  => "1707",
     WRITE_DATA_WIDTH  => 8
 )
 port map(
@@ -501,7 +499,7 @@ port map(
     sleep         => '0',
     almost_empty  => open,
     almost_full   => open,
-    data_valid    => open,
+    data_valid    => dValidFifo,
     dbiterr       => open,
     overflow      => open,
     prog_empty    => open,
