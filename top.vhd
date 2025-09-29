@@ -239,7 +239,12 @@ attribute mark_debug of i2cEnaRad,
                         i2cRwRad,
                         i2cDataWrRad,
                         i2cBusyRad,
-                        i2cDataRdRad   : signal is "true";
+                        i2cDataRdRad,
+                        readRq,
+                        cs,
+                        sclk,
+                        mosi,
+                        miso      : signal is "true";
 
 
 begin

@@ -105,7 +105,18 @@ signal   devDataOutSig : devData_t;
 signal   dataToFifo    : std_logic_vector(7 downto 0);
 
 attribute mark_debug : string;
-attribute mark_debug of state : signal is "true";
+attribute mark_debug of state,
+                        dataOut,
+                        dataToFifo,
+                        wEnFifo,
+                        txWSig,
+                        rstFifo,
+                        wordWrt,
+                        wordWrtOld,
+                        wordWrtRise,
+                        wAckFifo,
+                        dValidFifo,
+                        emptyFifo   : signal is "true";
 
 begin
 
@@ -243,7 +254,7 @@ begin
                         state <= getData;
 
                         if devBrstSig = '0' then
-                            byteCnt <= (others => '0');
+                            --byteCnt <= (others => '0');
 
                             state   <= readDev;
                         end if;
@@ -344,12 +355,12 @@ begin
                     end if;
 
                 when readDev =>
-                    tOutRst  <= '0';
-                    devExec  <= '0';
-                    rxEna    <= '0';
-                    wEnFifo  <= '0';
+                    tOutRst <= '0';
+                    devExec <= '0';
+                    rxEna   <= '0';
+                    wEnFifo <= '0';
 
-                    state    <= readDev;
+                    state   <= readDev;
 
                     if devReady(devIdSig) = '1' then
                         tOutRst <= '1';
