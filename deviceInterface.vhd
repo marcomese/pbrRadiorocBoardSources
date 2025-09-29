@@ -65,6 +65,7 @@ type state_t is (idle,
                  getData,
                  checkBrstPar,
                  sendBrst,
+                 readBrst,
                  readDev,
                  sendDevData,
                  done,
@@ -131,9 +132,8 @@ tOutSig     <= tOutCnt(tOutCnt'left);
 wordWrt     <= not or_reduce(std_logic_vector(byteCnt(1 downto 0))); -- '1' when byteCnt is multiple of 4
 wordWrtRise <= wordWrt and not wordWrtOld;
 lastBrst    <= not or_reduce(std_logic_vector(byteCnt(byteCnt'left downto 2)));
-dataToFifo  <= devDataIn(devIdSig)(0);
 
-devRwDecProc: process(clk, rst, dataIn(7 downto 4))
+devRwDecProc: process(dataIn(7 downto 4))
 begin
     case dataIn(7 downto 4) is
         when readCmd =>
@@ -164,30 +164,31 @@ devFSM: process(clk, rst, rxPresent)
 begin
     if rising_edge(clk) then
         if rst = '1' then
-            tOutRst        <= '0';
-            byteCnt        <= to_unsigned(devAddrBytes-1, byteCnt'length);
-            rxRdSig        <= '0';
-            txWSig         <= '0';
-            rxEna          <= '1';
-            flushRxFifo    <= '0';
-            flushTxFifo    <= '0';
-            devIdSig       <= none;
-            devRwSig       <= '0';
-            devBrstSig     <= '0';
-            devAddr        <= (others => (others => '0'));
-            devDataOutSig  <= (others => (others => '0'));
-            devExec        <= '0';
-            busy           <= '0';
-            brstByteNum    <= (others => '0');
-            brstBuff       <= (others => (others => '0'));
-            brstCollect    <= '0';
-            wEnFifo        <= '0';
-            txWSig         <= '0';
-            rstFifo        <= '1';
-            wordWrtOld     <= '0';
-            error          <= (others => '0');
+            tOutRst       <= '0';
+            byteCnt       <= to_unsigned(devAddrBytes-1, byteCnt'length);
+            rxRdSig       <= '0';
+            txWSig        <= '0';
+            rxEna         <= '1';
+            flushRxFifo   <= '0';
+            flushTxFifo   <= '0';
+            devIdSig      <= none;
+            devRwSig      <= '0';
+            devBrstSig    <= '0';
+            devAddr       <= (others => (others => '0'));
+            devDataOutSig <= (others => (others => '0'));
+            devExec       <= '0';
+            busy          <= '0';
+            brstByteNum   <= (others => '0');
+            brstBuff      <= (others => (others => '0'));
+            brstCollect   <= '0';
+            wEnFifo       <= '0';
+            txWSig        <= '0';
+            rstFifo       <= '1';
+            wordWrtOld    <= '0';
+            dataToFifo    <= (others => '0');
+            error         <= (others => '0');
 
-            state          <= idle;
+            state         <= idle;
         else
             wordWrtOld <= wordWrt;
 
@@ -251,12 +252,10 @@ begin
                         byteCnt <= to_unsigned(devDataBytes-1, byteCnt'length);
                         devExec <= '1';
 
-                        state <= getData;
+                        state   <= getData;
 
                         if devBrstSig = '0' then
-                            --byteCnt <= (others => '0');
-
-                            state   <= readDev;
+                            state    <= readDev;
                         end if;
                     elsif rxPresent = '1' then
                         tOutRst    <= '1';
@@ -312,15 +311,15 @@ begin
                     end if;
 
                 when checkBrstPar =>
-                    rxRdSig      <= '1';
-                    brstByteNum  <= resize(devDataToUnsigned(devDataOutSig)-1, brstByteNum'length);
-                    byteCnt      <= resize(devDataToUnsigned(devDataOutSig)-1, byteCnt'length);
-                    brstCollect  <= '1';
+                    rxRdSig     <= '1';
+                    brstByteNum <= resize(devDataToUnsigned(devDataOutSig)-1, brstByteNum'length);
+                    byteCnt     <= resize(devDataToUnsigned(devDataOutSig)-1, byteCnt'length);
+                    brstCollect <= '1';
 
                     if devRwSig = devWrite then
                         state <= getData;
                     else
-                        state <= readDev;
+                        state <= readBrst;
                     end if;
 
                     if unsigned(devDataToSlv(devDataOutSig)) = 0 then
@@ -355,12 +354,32 @@ begin
                     end if;
 
                 when readDev =>
-                    tOutRst <= '0';
-                    devExec <= '0';
-                    rxEna   <= '0';
-                    wEnFifo <= '0';
+                    i := to_integer(byteCnt);
 
-                    state   <= readDev;
+                    tOutRst    <= '0';
+                    devExec    <= '0';
+                    rxEna      <= '0';
+                    wEnFifo    <= devReady(devIdSig) or wAckFifo;
+                    byteCnt    <= byteCnt - stdLogicToInt(wEnFifo);
+                    dataToFifo <= devDataIn(devIdSig)(i);
+
+                    state      <= readDev;
+
+                    if byteCnt = 0 then
+                        txWSig  <= '1';
+                        byteCnt <= byteCnt - 1;
+
+                        state   <= sendDevData;
+                    end if;
+
+                when readBrst =>
+                    tOutRst    <= '0';
+                    devExec    <= '0';
+                    rxEna      <= '0';
+                    wEnFifo    <= '0';
+                    dataToFifo <= devDataIn(devIdSig)(0);
+
+                    state      <= readBrst;
 
                     if devReady(devIdSig) = '1' then
                         tOutRst <= '1';
@@ -383,12 +402,13 @@ begin
 
                 when sendDevData =>
                     tOutRst <= '0';
+                    wEnFifo <= '0';
                     txWSig  <= txWrAck and not emptyFifo;
 
                     state   <= sendDevData;
 
                     if emptyFifo = '1' and endCnt = '0' then
-                        state <= readDev;
+                        state <= readBrst;
                     elsif emptyFifo = '1' and endCnt = '1' then
                         state <= done;
                     end if;
