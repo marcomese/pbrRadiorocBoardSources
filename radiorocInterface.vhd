@@ -64,9 +64,6 @@ signal   dataOut    : devData_t;
 
 signal   dataIn     : devData_t;
 
-attribute mark_debug : string;
-attribute mark_debug of state : signal is "true";
-
 begin
 
 devDataOut <= dataOut;

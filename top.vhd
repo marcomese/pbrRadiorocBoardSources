@@ -234,17 +234,7 @@ signal rstI2CCnt : unsigned(bitsNum(rstRadI2CLen) downto 0);
 signal endAcq, rdValid : std_logic;
 
 attribute mark_debug : string;
-attribute mark_debug of i2cEnaRad,
-                        i2cAddrRad,
-                        i2cRwRad,
-                        i2cDataWrRad,
-                        i2cBusyRad,
-                        i2cDataRdRad,
-                        readRq,
-                        cs,
-                        sclk,
-                        mosi,
-                        miso      : signal is "true";
+attribute mark_debug of extTrgSig : signal is "true";
 
 
 begin

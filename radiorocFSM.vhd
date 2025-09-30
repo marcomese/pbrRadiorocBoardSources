@@ -78,11 +78,6 @@ signal   dataInVec    : std_logic_vector(devDataBytes*8-1 downto 0);
 signal   dataOutBuff  : std_logic_vector(dataInVec'left downto 0);
 signal   leftBCnt     : unsigned(2 downto 0);
 
-attribute mark_debug : string;
-attribute mark_debug of state,
-                        dataOutBuff,
-                        brstOnSig   : signal is "true";
-
 begin
 
 brstOn      <= brstOnSig;
