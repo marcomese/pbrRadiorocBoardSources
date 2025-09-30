@@ -110,7 +110,7 @@ attribute mark_debug of current_state,
                         wr_en,
                         rd_en,
                         empty_acq,
-                        rdValidSig(0),
+                        rdValidSig,
 		                rd_data_count_acq,
                         dout : signal is "true";
 
