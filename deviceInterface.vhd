@@ -91,10 +91,7 @@ signal   tOutRst,
          txWSig,
          rstFifo,
          wordWrt,
-         wordWrtOld,
-         wordWrtRise,
          wAckFifo,
-         dValidFifo,
          emptyFifo,
          endCnt        : std_logic;
 signal   devIdSig      : devices_t;
@@ -103,6 +100,7 @@ signal   byteCnt       : unsigned(bitsNum(bytesNum) downto 0);
 signal   brstByteNum   : unsigned(bitsNum(bytesNum)-1 downto 0);
 signal   brstBuff      : byteArray_t(maxBrstLen-1 downto 0);
 signal   devDataOutSig : devData_t;
+signal   dataToFifoSel : std_logic_vector(1 downto 0);
 signal   dataToFifo    : std_logic_vector(7 downto 0);
 
 attribute mark_debug : string;
@@ -113,10 +111,7 @@ attribute mark_debug of state,
                         txWSig,
                         rstFifo,
                         wordWrt,
-                        wordWrtOld,
-                        wordWrtRise,
                         wAckFifo,
-                        dValidFifo,
                         emptyFifo,
                         devBrstSig   : signal is "true";
 
@@ -130,8 +125,6 @@ devId       <= devIdSig;
 devDataOut  <= devDataOutSig;
 endCnt      <= byteCnt(byteCnt'left);
 tOutSig     <= tOutCnt(tOutCnt'left);
-wordWrt     <= not or_reduce(std_logic_vector(byteCnt(1 downto 0))); -- '1' when byteCnt is multiple of 4
-wordWrtRise <= wordWrt and not wordWrtOld;
 lastBrst    <= not or_reduce(std_logic_vector(byteCnt(byteCnt'left downto 2)));
 
 devRwDecProc: process(dataIn(7 downto 4))
@@ -160,6 +153,22 @@ begin
     end case;
 end process;
 
+dataToFifoMux: process(dataToFifoSel, devDataIn, byteCnt)
+begin
+    case dataToFifoSel is
+        when "00" =>
+            dataToFifo <= (others => '0');
+        when "01" =>
+            dataToFifo <= (others => '0');
+        when "10" =>
+            dataToFifo <= devDataIn(devIdSig)(to_integer(byteCnt(1 downto 0)));
+        when "11" =>
+            dataToFifo <= devDataIn(devIdSig)(0);
+        when others =>
+            dataToFifo <= (others => '0');
+    end case;
+end process;
+
 devFSM: process(clk, rst, rxPresent)
     variable i : integer := 0;
 begin
@@ -185,14 +194,11 @@ begin
             wEnFifo       <= '0';
             txWSig        <= '0';
             rstFifo       <= '1';
-            wordWrtOld    <= '0';
-            dataToFifo    <= (others => '0');
+            dataToFifoSel <= "00";
             error         <= (others => '0');
 
             state         <= idle;
         else
-            wordWrtOld <= wordWrt;
-
             case state is
                 when idle =>
                     tOutRst <= '1';
@@ -203,13 +209,14 @@ begin
                     state   <= idle;
 
                     if rxPresent = '1' and validSig = '1' then
-                        devRwSig   <= rwSig;
-                        devBrstSig <= brstSig;
-                        devIdSig   <= slvToDev(dataIn(3 downto 0));
-                        busy       <= '1';
-                        error      <= (others => '0');
+                        devRwSig      <= rwSig;
+                        devBrstSig    <= brstSig;
+                        dataToFifoSel <= rwSig & brstSig;
+                        devIdSig      <= slvToDev(dataIn(3 downto 0));
+                        busy          <= '1';
+                        error         <= (others => '0');
 
-                        state      <= getDev;
+                        state         <= getDev;
                     end if;
 
                 when getDev =>
@@ -256,7 +263,7 @@ begin
                         state   <= getData;
 
                         if devBrstSig = '0' then
-                            state    <= readDev;
+                            state         <= readDev;
                         end if;
                     elsif rxPresent = '1' then
                         tOutRst    <= '1';
@@ -320,9 +327,9 @@ begin
                     if devRwSig = devWrite then
                         state <= getData;
                     else
-                        devExec <= '1';
+                        devExec       <= '1';
 
-                        state   <= readBrst;
+                        state         <= readBrst;
                     end if;
 
                     if unsigned(devDataToSlv(devDataOutSig)) = 0 then
@@ -363,8 +370,7 @@ begin
                     devExec    <= '0';
                     rxEna      <= '0';
                     wEnFifo    <= devReady(devIdSig) or wAckFifo;
-                    byteCnt    <= byteCnt - stdLogicToInt(wEnFifo);
-                    dataToFifo <= devDataIn(devIdSig)(i);
+                    byteCnt    <= byteCnt - stdLogicToInt(wAckFifo);
 
                     state      <= readDev;
 
@@ -380,7 +386,6 @@ begin
                     devExec    <= '0';
                     rxEna      <= '0';
                     wEnFifo    <= '0';
-                    dataToFifo <= devDataIn(devIdSig)(0);
 
                     state      <= readBrst;
 
@@ -391,7 +396,7 @@ begin
                         byteCnt <= byteCnt - 1;
                     elsif byteCnt = 0 and devBrstSig = '1' then
                         devBrstSig <= '0';
-                    elsif wordWrtRise = '1' or (endCnt = '1' and dValidFifo = '1') then
+                    elsif wordWrt = '1' or endCnt = '1' then
                         tOutRst <= '1';
                         txWSig  <= '1';
 
@@ -525,9 +530,10 @@ generic map(
     FIFO_MEMORY_TYPE  => "block",
     FIFO_READ_LATENCY => 0,
     FIFO_WRITE_DEPTH  => maxBrstLen,
+    PROG_FULL_THRESH  => 4,
     READ_DATA_WIDTH   => 8,
-    READ_MODE         => "fwft",
-    USE_ADV_FEATURES  => "1010",
+    READ_MODE         => "std",
+    USE_ADV_FEATURES  => "0012",
     WRITE_DATA_WIDTH  => 8
 )
 port map(
@@ -539,7 +545,7 @@ port map(
     wr_clk        => clk,
     rd_en         => txWSig,
     rst           => rstFifo,
-    data_valid    => dValidFifo,
+    data_valid    => open,
     wr_ack        => wAckFifo,
     sleep         => '0',
     almost_empty  => open,
@@ -547,7 +553,7 @@ port map(
     dbiterr       => open,
     overflow      => open,
     prog_empty    => open,
-    prog_full     => open,
+    prog_full     => wordWrt,
     rd_data_count => open,
     rd_rst_busy   => open,
     sbiterr       => open,

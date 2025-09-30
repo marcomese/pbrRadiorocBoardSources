@@ -14,13 +14,13 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="360,979.800 ns"></ZoomStartTime>
-      <ZoomEndTime time="361,246.601 ns"></ZoomEndTime>
-      <Cursor1Time time="361,140.000 ns"></Cursor1Time>
+      <ZoomStartTime time="364.270000 us"></ZoomStartTime>
+      <ZoomEndTime time="518.870001 us"></ZoomEndTime>
+      <Cursor1Time time="383.470000 us"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
-      <NameColumnWidth column_width="209"></NameColumnWidth>
-      <ValueColumnWidth column_width="58"></ValueColumnWidth>
+      <NameColumnWidth column_width="219"></NameColumnWidth>
+      <ValueColumnWidth column_width="63"></ValueColumnWidth>
    </column_width_setting>
    <WVObjectSize size="42" />
    <wvobject fp_name="/tb_radiorocInterface/clk" type="logic">
@@ -39,10 +39,6 @@
    <wvobject fp_name="/tb_radiorocInterface/i2cModule/scl" type="logic">
       <obj_property name="ElementShortName">scl</obj_property>
       <obj_property name="ObjectShortName">scl</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_radiorocInterface/devInterfInst/wordCnt" type="array">
-      <obj_property name="ElementShortName">wordCnt[1:0]</obj_property>
-      <obj_property name="ObjectShortName">wordCnt[1:0]</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_radiorocInterface/devInterfInst/byteCnt" type="array">
       <obj_property name="ElementShortName">byteCnt[6:0]</obj_property>
@@ -123,6 +119,11 @@
    <wvobject fp_name="/tb_radiorocInterface/devInterfInst/devDataIn" type="array">
       <obj_property name="ElementShortName">devDataIn[0:6][3:0][7:0]</obj_property>
       <obj_property name="ObjectShortName">devDataIn[0:6][3:0][7:0]</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_radiorocInterface/devInterfInst/dataToFifoSel" type="array">
+      <obj_property name="ElementShortName">dataToFifoSel[1:0]</obj_property>
+      <obj_property name="ObjectShortName">dataToFifoSel[1:0]</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_radiorocInterface/spiSlaveInst/data_in" type="array">
       <obj_property name="ElementShortName">data_in[7:0]</obj_property>
