@@ -100,6 +100,21 @@ architecture Behavioral of adc is
     attribute fsm_encoding of next_state : signal is "gray";
     attribute fsm_encoding of current_state : signal is "gray";
 
+attribute mark_debug : string;
+attribute mark_debug of current_state,
+                        start,
+                        en_acq,
+                        end_multi_acq,
+                        rst,
+                        din_l,
+                        wr_en,
+                        rd_en,
+                        empty_acq,
+                        rdValidSig(0),
+		                rd_data_count_acq,
+                        dout : signal is "true";
+
+
 begin
 
     clk_200M_n <= not clk_200M;

@@ -80,6 +80,11 @@ signal nbAcqSig       : std_logic_vector(7 downto 0);
 signal sync100to25In,
        sync100to25Out : std_logic_vector(3 downto 0);
 
+attribute mark_debug : string;
+attribute mark_debug of state,
+                        sync100to25Out : signal is "true";
+
+
 begin
 
 -- DEBUG --

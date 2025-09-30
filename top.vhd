@@ -234,8 +234,9 @@ signal rstI2CCnt : unsigned(bitsNum(rstRadI2CLen) downto 0);
 signal endAcq, rdValid : std_logic;
 
 attribute mark_debug : string;
-attribute mark_debug of extTrgSig : signal is "true";
-
+attribute mark_debug of extTrg,
+                        extTrgFF,
+                        extTrgSig : signal is "true";
 
 begin
 
