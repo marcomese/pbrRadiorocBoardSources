@@ -117,7 +117,8 @@ attribute mark_debug of state,
                         wordWrtRise,
                         wAckFifo,
                         dValidFifo,
-                        emptyFifo   : signal is "true";
+                        emptyFifo,
+                        devBrstSig   : signal is "true";
 
 begin
 
@@ -250,7 +251,7 @@ begin
                     elsif endCnt = '1' and devRwSig = devRead then
                         tOutRst <= '1';
                         byteCnt <= to_unsigned(devDataBytes-1, byteCnt'length);
-                        devExec <= '1';
+                        devExec <= not devBrstSig;
 
                         state   <= getData;
 
@@ -319,7 +320,9 @@ begin
                     if devRwSig = devWrite then
                         state <= getData;
                     else
-                        state <= readBrst;
+                        devExec <= '1';
+
+                        state   <= readBrst;
                     end if;
 
                     if unsigned(devDataToSlv(devDataOutSig)) = 0 then

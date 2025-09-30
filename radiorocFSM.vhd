@@ -80,7 +80,8 @@ signal   leftBCnt     : unsigned(2 downto 0);
 
 attribute mark_debug : string;
 attribute mark_debug of state,
-                        dataOutBuff : signal is "true";
+                        dataOutBuff,
+                        brstOnSig   : signal is "true";
 
 begin
 
