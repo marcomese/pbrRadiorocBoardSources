@@ -88,6 +88,7 @@ signal   tOutRst,
          brstCollect,
          lastBrst,
          wEnFifo,
+         rEnFifo,
          txWSig,
          rstFifo,
          wordWrt,
@@ -108,6 +109,7 @@ attribute mark_debug of state,
                         dataOut,
                         dataToFifo,
                         wEnFifo,
+                        rEnFifo,
                         txWSig,
                         rstFifo,
                         wordWrt,
@@ -192,6 +194,7 @@ begin
             brstBuff      <= (others => (others => '0'));
             brstCollect   <= '0';
             wEnFifo       <= '0';
+            rEnFifo       <= '0';
             txWSig        <= '0';
             rstFifo       <= '1';
             dataToFifoSel <= "00";
@@ -375,7 +378,7 @@ begin
                     state      <= readDev;
 
                     if byteCnt = 0 then
-                        txWSig  <= '1';
+                        rEnFifo <= '1';
                         byteCnt <= byteCnt - 1;
 
                         state   <= sendDevData;
@@ -398,7 +401,7 @@ begin
                         devBrstSig <= '0';
                     elsif wordWrt = '1' or endCnt = '1' then
                         tOutRst <= '1';
-                        txWSig  <= '1';
+                        rEnFifo <= '1';
 
                         state   <= sendDevData;
                     elsif tOutSig = '1' then
@@ -411,7 +414,8 @@ begin
                 when sendDevData =>
                     tOutRst <= '0';
                     wEnFifo <= '0';
-                    txWSig  <= txWrAck and not emptyFifo;
+                    rEnFifo <= txWrAck and not emptyFifo;
+                    txWSig  <= rEnFifo;
 
                     state   <= sendDevData;
 
@@ -528,7 +532,6 @@ end process;
 xpm_fifo_sync_inst : xpm_fifo_sync
 generic map(
     FIFO_MEMORY_TYPE  => "block",
-    FIFO_READ_LATENCY => 0,
     FIFO_WRITE_DEPTH  => maxBrstLen,
     PROG_FULL_THRESH  => 4,
     READ_DATA_WIDTH   => 8,
@@ -543,7 +546,7 @@ port map(
     din           => dataToFifo,
     wr_en         => wEnFifo,
     wr_clk        => clk,
-    rd_en         => txWSig,
+    rd_en         => rEnFifo,
     rst           => rstFifo,
     data_valid    => open,
     wr_ack        => wAckFifo,

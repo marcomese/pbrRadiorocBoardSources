@@ -549,7 +549,7 @@ begin
 
 --    wait until radBusy = '0';
 
-    wait for 150 us;
+    wait for 50 us;
 
     testRxRead <= '1';
 
