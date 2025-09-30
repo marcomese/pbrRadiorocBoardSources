@@ -331,6 +331,7 @@ begin
                         state <= getData;
                     else
                         devExec       <= '1';
+                        brstCollect   <= '0';
 
                         state         <= readBrst;
                     end if;
