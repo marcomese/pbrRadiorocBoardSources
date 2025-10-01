@@ -501,7 +501,7 @@ port map(
 	ADC_SCKHG <= adc_sck;
 	ADC_SCKLG <= adc_sck;
 
-i2cModule: entity work.i2cMaster
+i2cTmpModule: entity work.i2cMaster
 generic map(
     input_clk => 100000000,
     bus_clk   => 400000
