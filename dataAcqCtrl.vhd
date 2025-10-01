@@ -190,6 +190,7 @@ begin
                     writeReg(reg, rData, addr'pos(regStatus), idleStatus);
                     rstAcqSig  <= '0';
                     strtAcqSig <= '0';
+                    busy       <= '0';
 
                     state      <= idle;
 
@@ -207,18 +208,10 @@ begin
                         elsif devRw = devWrite and reg(dAddr).rMode = rw then
                             writeReg(reg, rData, addr'pos(regStatus), dAddr);
                             writeReg(reg, rData, dAddr, devDataIn);
-                            busy     <= '1';
+                            busy  <= '1';
 
-                            state    <= idle;
+                            state <= idle;
                         end if;
-
-
-
-
-                        dataIn <= devDataIn;
-                        busy   <= '1';
-
-                        state  <= getNbAcq;
                     elsif contAcq = '1' and endAcq = '1' then
                         rdAcqSig   <= '1';
                         strtAcqSig <= '1';
