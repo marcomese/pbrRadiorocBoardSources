@@ -187,7 +187,7 @@ begin
 
             case state is
                 when idle =>
-                    writeReg(reg, rData, addr'pos(regStatus), idleStatus);
+                    devReady   <= '0';
                     rstAcqSig  <= '0';
                     strtAcqSig <= '0';
                     busy       <= '0';
@@ -198,6 +198,7 @@ begin
                         if dAddr > addr'pos(addr'high) then
                             state    <= errAddr;
                         elsif devRw = devRead then
+                            writeReg(reg, rData, addr'pos(regStatus), idleStatus);
                             devReady   <= '1';
                             devDataOut <= readReg(reg, rData, dAddr);
                             busy       <= '1';
