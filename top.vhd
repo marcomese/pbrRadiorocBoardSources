@@ -145,7 +145,7 @@ architecture arch of radioroc_fw is
 	signal test_daq : std_logic;
 	signal on_edge : std_logic;
 
--- CONSTANTS for deviceInterface, sipmHvTmpCtrl and PulseGentCtrl
+-- CONSTANTS for deviceInterface, tmpCtrl and PulseGentCtrl
 
 constant clkFreq        : real      := 100.0e6;
 constant sclkFreq       : real      := 25.0e6;
@@ -169,7 +169,7 @@ constant rstRadI2CLen : integer := 5;
 
 signal   dataToDev,
          dataFromPGen,
-         dataFromHvTmp,
+         dataFromTmp,
          dataFromRadioroc,
          dataFromAcq       : devData_t;
 signal   devDataInVec      : devDataVec_t;
@@ -178,16 +178,16 @@ signal   devBusyVec        : devBusy_t;
 
 signal   devId          : devices_t;
 signal   devReadyPGen,
-         devReadyHvTmp,
+         devReadyTmp,
          devReadyRadioroc,
          devReadyAcq,
          devRw,
          devBurst,
          devExec,
          pgenBusy,
-         hvTmpBusy,
+         tmpBusy,
          devBusyPGen,
-         devBusyHvTmp,
+         devBusyTmp,
          devBusyRadioroc,
          devBusyAcq,
          devIntBusy     : std_logic;
@@ -472,6 +472,7 @@ port map(
     endAcq     => endAcq,
     rdValid    => rdValid,
     rdAcq      => rd_acq,
+    rdDataCnt  => rd_data_count_acq,
     emptyAcq   => empty_acq,
     nbAcq      => nb_acq,
     selAdc     => sel_adc,
@@ -594,12 +595,11 @@ port map(
     i2cDataRd  => i2cDataRdRad
 );
 
-hvTmpCtrlInst: entity work.sipmHvTmpCtrl
+tmpCtrlInst: entity work.tmpCtrl
 generic map(
     clkFreq    => clkFreq,
     readPeriod => readPeriod,
-    tmpAddr    => tmpAddr,
-    sipmHvAddr => sipmHvAddr
+    tmpAddr    => tmpAddr
 )
 port map(
     clk        => clk_100M,
@@ -609,9 +609,9 @@ port map(
     devRw      => devRw,
     devAddr    => devAddr,
     devDataIn  => dataToDev,
-    devDataOut => dataFromHvTmp,
-    devReady   => devReadyHvTmp,
-    busy       => devBusyHvTmp,
+    devDataOut => dataFromTmp,
+    devReady   => devReadyTmp,
+    busy       => devBusyTmp,
     i2cEna     => i2cEna,
     i2cAddr    => i2cAddr,
     i2cRw      => i2cRw,
@@ -621,20 +621,17 @@ port map(
 );
 
 devDataInVec(pulseGen)  <= dataFromPGen;
-devDataInVec(tmp275)    <= dataFromHvTmp;
-devDataInVec(a7585d)    <= dataFromHvTmp;
+devDataInVec(tmp275)    <= dataFromTmp;
 devDataInVec(radioroc)  <= dataFromRadioroc;
 devDataInVec(acqSystem) <= dataFromAcq;
 
 devReadyVec(pulseGen)   <= devReadyPGen;
-devReadyVec(tmp275)     <= devReadyHvTmp;
-devReadyVec(a7585d)     <= devReadyHvTmp;
+devReadyVec(tmp275)     <= devReadyTmp;
 devReadyVec(radioroc)   <= devReadyRadioroc;
 devReadyVec(acqSystem)  <= devReadyAcq;
 
 devBusyVec(pulseGen)    <= devBusyPGen;
-devBusyVec(tmp275)      <= devBusyHvTmp;
-devBusyVec(a7585d)      <= devBusyHvTmp;
+devBusyVec(tmp275)      <= devBusyTmp;
 devBusyVec(radioroc)    <= devBusyRadioroc;
 devBusyVec(acqSystem)   <= devBusyAcq;
 

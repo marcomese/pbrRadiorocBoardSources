@@ -16,6 +16,7 @@ use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.ALL;
 use work.utilsPkg.all;
 use work.devicesPkg.all;
+use work.registersPkg.all;
 
 library xpm;
 use xpm.vcomponents.all;
@@ -40,6 +41,7 @@ port(
     endMAcq    : out std_logic;
     rdValid    : in  std_logic;
     rdAcq      : out std_logic;
+    rdDataCnt  : in  std_logic_vector(15 downto 0);
     emptyAcq   : in  std_logic;
     nbAcq      : out std_logic_vector(7 downto 0);
     selAdc     : out std_logic_vector(63 downto 0);
@@ -49,6 +51,26 @@ end dataAcqCtrl;
 
 architecture Behavioral of dataAcqCtrl is
 
+--------------------- registers definitions ------------------------
+
+type addr is (regStatus,
+              regAcqEn,
+              regSwTrg,
+              regFifoCnt);
+
+constant reg : regsRec_t := (
+    addr'pos(regStatus)   => (rAddr => 0, rBegin => 31, rEnd => 2, rMode => ro),
+    addr'pos(regAcqEn)    => (rAddr => 0, rBegin => 1,  rEnd => 1, rMode => rw),
+    addr'pos(regSwTrg)    => (rAddr => 0, rBegin => 0,  rEnd => 0, rMode => rw),
+    addr'pos(regFifoCnt)  => (rAddr => 1, rBegin => 15, rEnd => 0, rMode => ro)
+);
+
+constant regsNum  : integer := reg(reg'high).rAddr+1;
+
+signal   rData    : regsData_t(regsNum-1 downto 0);
+
+--------------------------------------------------------------------
+
 type state_t is (idle,
                  getNbAcq,
                  sendStartAcq,
@@ -57,7 +79,13 @@ type state_t is (idle,
                  waitRdValid,
                  getLastByte,
                  sendData,
-                 acqEnd);
+                 acqEnd,
+                 errAddr,
+                 errReadOnly);
+
+constant idleStatus     : std_logic_vector(31 downto 0) := initSlv(32, 13, 0, "00" & x"001", '0');
+constant errAddrStatus  : std_logic_vector(31 downto 0) := initSlv(32, 13, 0, "11" & x"500", '0');
+constant errROnlyStatus : std_logic_vector(31 downto 0) := initSlv(32, 13, 0, "11" & x"A00", '0');
 
 signal state          : state_t;
 
@@ -66,6 +94,8 @@ signal dataOut        : devData_t;
 signal dataIn         : devData_t;
 
 signal byteCnt        : unsigned(2 downto 0);
+
+signal dAddr          : integer;
 
 signal swTrg,
        lastByte,
@@ -99,6 +129,7 @@ selAdc <= "00011001"        & -- 63 downto 56
           "0000000";          -- 6 downto 0
 -----------
 
+dAddr         <= devAddrToInt(devAddr);
 nbAcq         <= nbAcqSig;
 lastByte      <= '1' when byteCnt = 0 else '0';
 resetAcq      <= sync100to25Out(2);
@@ -152,14 +183,38 @@ begin
 
             state      <= idle;
         else
+            writeReg(reg, rData, addr'pos(regFifoCnt), resize(unsigned(rdDataCnt), regsLen));
+
             case state is
                 when idle =>
+                    writeReg(reg, rData, addr'pos(regStatus), idleStatus);
                     rstAcqSig  <= '0';
                     strtAcqSig <= '0';
 
                     state      <= idle;
 
                     if devExec = '1' and devId = acqSystem then
+                        if dAddr > addr'pos(addr'high) then
+                            state    <= errAddr;
+                        elsif devRw = devRead then
+                            devReady   <= '1';
+                            devDataOut <= readReg(reg, rData, dAddr);
+                            busy       <= '1';
+
+                            state      <= idle;
+                        elsif devRw = devWrite and reg(dAddr).rMode = ro then
+                            state    <= errReadOnly;
+                        elsif devRw = devWrite and reg(dAddr).rMode = rw then
+                            writeReg(reg, rData, addr'pos(regStatus), dAddr);
+                            writeReg(reg, rData, dAddr, devDataIn);
+                            busy     <= '1';
+
+                            state    <= idle;
+                        end if;
+
+
+
+
                         dataIn <= devDataIn;
                         busy   <= '1';
 
@@ -267,6 +322,18 @@ begin
                     if emptyAcq = '1' then
                         rstAcqSig <= '1';
                     end if;
+
+                when errAddr =>
+                    writeReg(reg, rData, addr'pos(regStatus), errAddrStatus);
+                    busy  <= '0';
+
+                    state <= idle;
+
+                when errReadOnly =>
+                    writeReg(reg, rData, addr'pos(regStatus), errROnlyStatus);
+                    busy  <= '0';
+
+                    state <= idle;
 
                 when others =>
                     devReady <= '0';

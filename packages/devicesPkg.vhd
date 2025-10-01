@@ -20,7 +20,6 @@ package devicesPkg is
 
     type devices_t is (none,
                        tmp275,
-                       a7585d,
                        radioroc,
                        pulseGen,
                        dataReg,
