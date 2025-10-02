@@ -56,25 +56,26 @@ architecture Behavioral of dataAcqCtrl is
 type addr is (regStatus,
               regAcqEn,
               regSwTrg,
-              regFifoCnt);
+              regFifoCnt,
+              regAcqNb);
 
 constant reg : regsRec_t := (
-    addr'pos(regStatus)   => (rAddr => 0, rBegin => 31, rEnd => 2, rMode => ro),
-    addr'pos(regAcqEn)    => (rAddr => 0, rBegin => 1,  rEnd => 1, rMode => rw),
-    addr'pos(regSwTrg)    => (rAddr => 0, rBegin => 0,  rEnd => 0, rMode => rw),
-    addr'pos(regFifoCnt)  => (rAddr => 1, rBegin => 15, rEnd => 0, rMode => ro)
+    addr'pos(regStatus)  => (rAddr => 0, rBegin => 31, rEnd => 2,  rMode => ro),
+    addr'pos(regAcqEn)   => (rAddr => 0, rBegin => 1,  rEnd => 1,  rMode => rw),
+    addr'pos(regSwTrg)   => (rAddr => 0, rBegin => 0,  rEnd => 0,  rMode => rw),
+    addr'pos(regFifoCnt) => (rAddr => 1, rBegin => 31, rEnd => 16, rMode => ro),
+    addr'pos(regAcqNb)   => (rAddr => 1, rBegin => 7,  rEnd => 0,  rMode => rw)
 );
 
-constant regsNum  : integer := reg(reg'high).rAddr+1;
+constant regsNum : integer := reg(reg'high).rAddr+1;
 
-signal   rData    : regsData_t(regsNum-1 downto 0);
+signal   rData   : regsData_t(regsNum-1 downto 0);
 
 --------------------------------------------------------------------
 
 type state_t is (idle,
-                 getNbAcq,
+                 execute,
                  sendStartAcq,
-                 sendSftTrg,
                  readFifo,
                  waitRdValid,
                  getLastByte,
@@ -89,21 +90,15 @@ constant errROnlyStatus : std_logic_vector(31 downto 0) := initSlv(32, 13, 0, "1
 
 signal state          : state_t;
 
-signal dataOut        : devData_t;
-
 signal dataIn         : devData_t;
-
-signal byteCnt        : unsigned(2 downto 0);
 
 signal dAddr          : integer;
 
 signal swTrg,
-       lastByte,
        rstAcqSig,
        strtAcqSig,
        rdAcqSig,
-       readSent,
-       contAcq        : std_logic;
+       readSent       : std_logic;
 
 signal nbAcqSig       : std_logic_vector(7 downto 0);
 
@@ -131,7 +126,6 @@ selAdc <= "00011001"        & -- 63 downto 56
 
 dAddr         <= devAddrToInt(devAddr);
 nbAcq         <= nbAcqSig;
-lastByte      <= '1' when byteCnt = 0 else '0';
 resetAcq      <= sync100to25Out(2);
 startAcq      <= sync100to25Out(1);
 rdAcq         <= sync100to25Out(0);
@@ -178,8 +172,6 @@ begin
             nbAcqSig   <= (others => '0');
             devDataOut <= (others => (others => '0'));
             swTrg      <= '0';
-            contAcq    <= '0';
-            byteCnt    <= to_unsigned(3, byteCnt'length);
 
             state      <= idle;
         else
@@ -190,6 +182,7 @@ begin
                     devReady   <= '0';
                     rstAcqSig  <= '0';
                     strtAcqSig <= '0';
+                    swTrg      <= '0';
                     busy       <= '0';
 
                     state      <= idle;
@@ -211,65 +204,46 @@ begin
                             writeReg(reg, rData, dAddr, devDataIn);
                             busy  <= '1';
 
-                            state <= idle;
+                            state <= execute;
                         end if;
-                    elsif contAcq = '1' and endAcq = '1' then
-                        rdAcqSig   <= '1';
-                        strtAcqSig <= '1';
-
-                        state      <= readFifo;
-                    end if;
-
-                when getNbAcq =>
-                    nbAcqSig <= devAddr(0);
-
-                    state    <= sendStartAcq;
-
-                when sendStartAcq =>
-                    rstAcqSig  <= '0';
-                    strtAcqSig <= '1';
-
-                    state      <= sendStartAcq;
-
-                    if nbAcqSig = x"00" then
-                        rstAcqSig <= '1';
-
-                        state     <= sendSftTrg;
-                    elsif nbAcqSig = x"FF" then
+                    elsif devRw = devRead and devBurst = '1' then
                         rdAcqSig <= '1';
 
                         state    <= readFifo;
-                    elsif nbAcqSig = x"AA" then
-                        contAcq    <= '1';
-                        strtAcqSig <= '1';
-                        nbAcqSig   <= x"FF";
-
-                        state      <= idle;
-                    elsif nbAcqSig = x"EE" then
-                        contAcq   <= '0';
-                        rstAcqSig <= '1';
-
-                        state     <= idle;
                     end if;
 
-                when sendSftTrg =>
-                    rstAcqSig <= '0';
+                when execute =>
+                    state <= idle;
 
-                    state     <= sendSftTrg;
+                    if isSet(reg, rData, addr'pos(regAcqEn)) then
+                        clearReg(reg, rData, addr'pos(regAcqEn));
+                        rstAcqSig <= '1';
 
-                    if sync100to25Out(2) = '1' then
-                        swTrg    <= '1';
-                        devReady <= '1';
+                        state     <= sendStartAcq;
+                    elsif isSet(reg, rData, addr'pos(regSwTrg)) then
+                        clearReg(reg, rData, addr'pos(regSwTrg));
+                        swTrg <= '1';
+                    elsif readReg(reg, rData, addr'pos(regStatus)) = addrToSlv(addr'pos(regAcqNb)) then
+                        nbAcqSig <= readReg(reg, rData, addr'pos(regAcqNb))(7 downto 0);
+                    end if;
 
-                        state    <= idle;
+                when sendStartAcq =>
+                    rstAcqSig  <= '0';
+                    strtAcqSig <= sync100to25Out(2); -- send startAcq after reset has been asserted at 25MHz
+
+                    state      <= sendStartAcq;
+
+                    if sync100to25Out(1) = '1' then -- go to idle when startAcq has been asserted at 25MHz
+                        state      <= idle;
                     end if;
 
                 when readFifo =>
                     rdAcqSig <= '0';
+                    devReady <= '0';
 
                     state    <= readFifo;
 
-                    if (lastByte = '1' or emptyAcq = '1') and readSent = '1' then
+                    if devBurst = '0' and readSent = '1' then
                         state <= getLastByte;
                     elsif readSent = '1' then
                         rdAcqSig <= '1';
@@ -278,38 +252,28 @@ begin
                     end if;
 
                 when waitRdValid =>
-                    i := to_integer(byteCnt);
-
                     rdAcqSig <= '0';
 
                     state    <= waitRdValid;
 
                     if rdValid = '1' then
-                        dataOut(i) <= doutAcq;
-                        byteCnt    <= byteCnt - 1;
+                        devDataOut(0) <= doutAcq;
+                        devReady      <= '1';
 
-                        state      <= readFifo;
+                        state         <= readFifo;
                     end if;
 
                 when getLastByte =>
-                    i := to_integer(byteCnt);
+                    rdAcqSig      <= '0';
+                    devReady      <= '1';
+                    devDataOut(0) <= doutAcq;
 
-                    rdAcqSig   <= '0';
-                    dataOut(i) <= doutAcq;
-                    devDataOut <= dataOut;
-
-                    state      <= sendData;
-
-                when sendData =>
-                    devReady   <= '1';
-                    devDataOut <= dataOut;
-                    byteCnt    <= to_unsigned(3, byteCnt'length);
-
-                    state      <= acqEnd;
+                    state         <= acqEnd;
 
                 when acqEnd =>
                     busy      <= '0';
                     rstAcqSig <= '0';
+                    devReady  <= '0';
 
                     state     <= idle;                    
 

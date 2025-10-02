@@ -99,8 +99,8 @@ package body registersPkg is
         
         procedure writeReg(constant reg : in regsRec_t;
                            signal   r   : out regsData_t;
-                           signal   a   : in integer;
-                           signal   val : in devData_t) is
+                           constant a   : in integer;
+                           constant val : in devData_t) is
             constant regVal : std_logic_vector(regsLen-1 downto 0) := devDataToSlv(val);
             constant regLen : integer                              := reg(a).rBegin - reg(a).rEnd + 1;
         begin
@@ -109,8 +109,8 @@ package body registersPkg is
 
         procedure writeReg(constant reg : in regsRec_t;
                            signal   r   : out regsData_t;
-                           signal   a   : in integer;
-                           signal   val : in std_logic_vector(regsLen-1 downto 0)) is
+                           constant a   : in integer;
+                           constant val : in std_logic_vector(regsLen-1 downto 0)) is
             variable regLen : integer := reg(a).rBegin - reg(a).rEnd + 1;
         begin
             r(reg(a).rAddr)(reg(a).rBegin downto reg(a).rEnd) <= val(regLen-1 downto 0);
@@ -118,8 +118,8 @@ package body registersPkg is
         
         procedure writeReg(constant reg : in regsRec_t;
                            signal   r   : out regsData_t;
-                           signal   a   : in integer;
-                           signal   val : in unsigned) is
+                           constant a   : in integer;
+                           constant val : in unsigned) is
             variable regVal : std_logic_vector(regsLen-1 downto 0) := std_logic_vector(resize(val,regsLen));
             variable regLen : integer := reg(a).rBegin - reg(a).rEnd + 1;
         begin
@@ -128,8 +128,8 @@ package body registersPkg is
         
         procedure writeReg(constant reg : in regsRec_t;
                            signal   r   : out regsData_t;
-                           signal   a   : in integer;
-                           signal   val : in integer) is
+                           constant a   : in integer;
+                           constant val : in integer) is
             variable regVal : std_logic_vector(regsLen-1 downto 0) := std_logic_vector(to_unsigned(val,regsLen));
             variable regLen : integer := reg(a).rBegin - reg(a).rEnd + 1;
         begin
@@ -138,7 +138,7 @@ package body registersPkg is
         
         procedure clearReg(constant reg : in regsRec_t;
                            signal   r   : out regsData_t;
-                           signal   a   : in  integer) is
+                           constant a   : in  integer) is
         begin
             for i in reg(a).rBegin to reg(a).rEnd loop
                 r(reg(a).rAddr)(i) <= '0';
