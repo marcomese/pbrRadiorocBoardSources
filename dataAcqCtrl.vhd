@@ -131,12 +131,9 @@ startAcq      <= sync100to25Out(1);
 rdAcq         <= sync100to25Out(0);
 sync100to25In <= swTrg & rstAcqSig & strtAcqSig & rdAcqSig;
  
-clkSyncInst: entity work.pulseExtenderSync
+clkSyncInst: entity work.pulseSync
 generic map(
-    width       => sync100to25Out'length,
-    syncStages  => 2,
-    clkOrigFreq => 100.0e6,
-    clkDestFreq => 25.0e6
+    width       => sync100to25Out'length
 )
 port map(
     clkOrig     => clk100M,
@@ -216,7 +213,6 @@ begin
                     state <= idle;
 
                     if isSet(reg, rData, addr'pos(regAcqEn)) then
-                        clearReg(reg, rData, addr'pos(regAcqEn));
                         rstAcqSig <= '1';
 
                         state     <= sendStartAcq;

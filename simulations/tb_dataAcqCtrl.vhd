@@ -269,7 +269,7 @@ begin
 
     testRxRead <= '1';
 
-    testDataIn <= x"b6";
+    testDataIn <= x"b5";
     wait for clkPeriod100M*delay;
     testTxWrite <= '1';
     wait for clkPeriod100M;
@@ -310,7 +310,7 @@ begin
 
     wait for 500 us;
 
-    testDataIn <= x"a6";
+    testDataIn <= x"a5";
     wait for clkPeriod100M*delay;
     testTxWrite <= '1';
     wait for clkPeriod100M;
