@@ -389,14 +389,11 @@ begin
                     tOutRst    <= '0';
                     devExec    <= '0';
                     rxEna      <= '0';
-                    wEnFifo    <= '0';
+                    wEnFifo    <= devReady(devIdSig);
 
                     state      <= readBrst;
 
-                    if devReady(devIdSig) = '1' then
-                        tOutRst <= '1';
-                        wEnFifo <= '1';
-                    elsif wAckFifo = '1' then
+                    if wAckFifo = '1' then
                         byteCnt <= byteCnt - 1;
                     elsif byteCnt = 0 and devBrstSig = '1' then
                         devBrstSig <= '0';

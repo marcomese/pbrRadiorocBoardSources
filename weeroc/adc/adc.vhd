@@ -93,10 +93,10 @@ architecture Behavioral of adc is
     
     signal trigger_shrunk, trigger_sft_shrunk, trigger_latched, trigger_sft_latched, trigger_latched2,  trigger_sft_latched2: std_logic;
 
-    signal endAcqSig, endAcqOut,
-           rdValidSig, rdValidOut, rdValidFF : std_logic_vector(0 downto 0);
+    signal endAcqSig, endAcqOut : std_logic_vector(0 downto 0);
+    signal rdValidSig : std_logic;
 
-	attribute fsm_encoding : string;
+ 	attribute fsm_encoding : string;
     attribute fsm_encoding of next_state : signal is "gray";
     attribute fsm_encoding of current_state : signal is "gray";
 
@@ -123,14 +123,11 @@ begin
 
 endAcqSig(0) <= end_acq;
 endAcq       <= endAcqOut(0);
-rdValid      <= rdValidOut(0);
+rdValid      <= rdValidSig;
 
-clkSyncEndAcqInst: entity work.pulseExtenderSync
+clkSyncEndAcqInst: entity work.pulseSync
 generic map(
-    width       => endAcqSig'length,
-    syncStages  => 2,
-    clkOrigFreq => 200.0e6,
-    clkDestFreq => 100.0e6
+    width       => endAcqSig'length
 )
 port map(
     clkOrig => clk_200M,
@@ -140,30 +137,6 @@ port map(
     sigOrig => endAcqSig,
     sigDest => endAcqOut
 );
-
-rdValidSyncProc: process(clk_100M, rst)
-begin
-    if rising_edge(clk_100M) then
-        if rst = '1' then
-            rdValidFF  <= (others => '0');
-            rdValidOut <= (others => '0');
-        else
-            rdValidFF  <= rdValidSig;
-            rdValidOut <= rdValidFF;
-        end if;
-    end if;
-end process;
-
---clkSyncRdValidInst: entity work.pulseExtender
---port map(
---    clkOrig => clk_200M,
---    rstOrig => rst,
---    clkDest => clk_100M,
---    rstDest => rst,
---    sigOrig => rdValidSig,
---    sigDest => rdValidOut
---);
-
 
     NORT_FPGA <= t(63) and t(62) and t(61) and t(60) and t(59) and t(58) and t(57) and t(56)
             and t(55) and t(54) and t(53) and t(52) and t(51) and t(50) and t(49) and t(48)
@@ -205,14 +178,14 @@ end process;
 	port map (
 		rst    => rst,
 		wr_clk => clk_200M_n,
-		rd_clk => clk_25M_n,
+		rd_clk => clk_100M,
 		din    => din_l,
 		wr_en  => wr_en,
 		rd_en  => rd_en,
 		dout   => dout,
 		full   => open,
 		empty  => empty_acq,
-		valid => rdValidSig(0),
+		valid => rdValidSig,
 		rd_data_count => rd_data_count_acq
 	);
 	

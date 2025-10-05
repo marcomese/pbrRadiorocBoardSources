@@ -78,7 +78,6 @@ type state_t is (idle,
                  sendStartAcq,
                  readFifo,
                  waitRdValid,
-                 getLastByte,
                  sendData,
                  acqEnd,
                  errAddr,
@@ -97,64 +96,32 @@ signal dAddr          : integer;
 signal swTrg,
        rstAcqSig,
        strtAcqSig,
-       rdAcqSig,
-       readSent       : std_logic;
+       rdAcqSig       : std_logic;
 
 signal nbAcqSig       : std_logic_vector(7 downto 0);
 
-signal sync100to25In,
-       sync100to25Out : std_logic_vector(3 downto 0);
-
 attribute mark_debug : string;
-attribute mark_debug of state,
-                        sync100to25Out : signal is "true";
-
+attribute mark_debug of state : signal is "true";
 
 begin
 
 -- DEBUG --
-selAdc <= "00011001"        & -- 63 downto 56
-          "00000000"        & -- 55 downto 48
-          "00000010"        & -- 47 downto 40
-          "00000000"        & -- 39 downto 32
-          "01110111"        & -- 31 downto 24 -- hit = 0
-          "00000001"        & -- 23 downto 16
-          "00000000"        & -- 15 downto 8
-          sync100to25Out(3) & -- 7
-          "0000000";          -- 6 downto 0
+selAdc <= "00011001" & -- 63 downto 56
+          "00000000" & -- 55 downto 48
+          "00000010" & -- 47 downto 40
+          "00000000" & -- 39 downto 32
+          "01110111" & -- 31 downto 24 -- hit = 0
+          "00000001" & -- 23 downto 16
+          "00000000" & -- 15 downto 8
+          swTrg      & -- 7
+          "0000000";   -- 6 downto 0
 -----------
 
-dAddr         <= devAddrToInt(devAddr);
-nbAcq         <= nbAcqSig;
-resetAcq      <= sync100to25Out(2);
-startAcq      <= sync100to25Out(1);
-rdAcq         <= sync100to25Out(0);
-sync100to25In <= swTrg & rstAcqSig & strtAcqSig & rdAcqSig;
- 
-clkSyncInst: entity work.pulseSync
-generic map(
-    width       => sync100to25Out'length
-)
-port map(
-    clkOrig     => clk100M,
-    rstOrig     => rst,
-    clkDest     => clk25M,
-    rstDest     => rst,
-    sigOrig     => sync100to25In,
-    sigDest     => sync100to25Out
-);
-
-sclkRiseInst: entity work.edgeDetector
-generic map(
-    clockEdge => "falling",
-    edge      => "rising"
-)
-port map(
-    clk       => clk100M,
-    rst       => rst,
-    signalIn  => sync100to25Out(0),
-    signalOut => readSent
-);
+dAddr    <= devAddrToInt(devAddr);
+nbAcq    <= nbAcqSig;
+resetAcq <= rstAcqSig;
+startAcq <= strtAcqSig;
+rdAcq    <= rdAcqSig;
 
 dataAcqCtrlFSM: process(clk100M, rst, devExec)
     variable i : integer := 0;
@@ -187,13 +154,15 @@ begin
                     if devExec = '1' and devId = acqSystem then
                         if dAddr > addr'pos(addr'high) then
                             state    <= errAddr;
-                        elsif devRw = devRead then
+                        elsif devRw = devRead and devBurst = '0' then
                             writeReg(reg, rData, addr'pos(regStatus), idleStatus);
                             devReady   <= '1';
                             devDataOut <= readReg(reg, rData, dAddr);
                             busy       <= '1';
 
                             state      <= idle;
+                        elsif devRw = devRead and devBurst = '1' then
+                            state    <= readFifo;
                         elsif devRw = devWrite and reg(dAddr).rMode = ro then
                             state    <= errReadOnly;
                         elsif devRw = devWrite and reg(dAddr).rMode = rw then
@@ -203,10 +172,6 @@ begin
 
                             state <= execute;
                         end if;
-                    elsif devRw = devRead and devBurst = '1' then
-                        rdAcqSig <= '1';
-
-                        state    <= readFifo;
                     end if;
 
                 when execute =>
@@ -225,46 +190,28 @@ begin
 
                 when sendStartAcq =>
                     rstAcqSig  <= '0';
-                    strtAcqSig <= sync100to25Out(2); -- send startAcq after reset has been asserted at 25MHz
+                    strtAcqSig <= '1';
 
-                    state      <= sendStartAcq;
-
-                    if sync100to25Out(1) = '1' then -- go to idle when startAcq has been asserted at 25MHz
-                        state      <= idle;
-                    end if;
+                    state      <= idle;
 
                 when readFifo =>
-                    rdAcqSig <= '0';
+                    rdAcqSig <= '1';
                     devReady <= '0';
-
-                    state    <= readFifo;
-
-                    if devBurst = '0' and readSent = '1' then
-                        state <= getLastByte;
-                    elsif readSent = '1' then
-                        rdAcqSig <= '1';
-
-                        state    <= waitRdValid;
-                    end if;
-
-                when waitRdValid =>
-                    rdAcqSig <= '0';
 
                     state    <= waitRdValid;
 
-                    if rdValid = '1' then
-                        devDataOut(0) <= doutAcq;
-                        devReady      <= '1';
-
-                        state         <= readFifo;
-                    end if;
-
-                when getLastByte =>
+                when waitRdValid =>
                     rdAcqSig      <= '0';
-                    devReady      <= '1';
+                    devReady      <= rdValid;
                     devDataOut(0) <= doutAcq;
 
-                    state         <= acqEnd;
+                    state         <= waitRdValid;
+
+                    if rdValid = '1' and devBurst = '1' then
+                        state <= readFifo;
+                    elsif rdValid = '1' and devBurst = '0' then
+                        state <= acqEnd;
+                    end if;
 
                 when acqEnd =>
                     busy      <= '0';

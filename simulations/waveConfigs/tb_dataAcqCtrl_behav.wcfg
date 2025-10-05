@@ -7,6 +7,7 @@
          <top_modules>
             <top_module name="devicespkg" />
             <top_module name="glbl" />
+            <top_module name="registerspkg" />
             <top_module name="tb_dataAcqCtrl" />
             <top_module name="types" />
             <top_module name="utilspkg" />
@@ -15,15 +16,15 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="38,792.850 ns"></ZoomStartTime>
-      <ZoomEndTime time="38,895.751 ns"></ZoomEndTime>
-      <Cursor1Time time="38,810.000 ns"></Cursor1Time>
+      <ZoomStartTime time="113,428.200 ns"></ZoomStartTime>
+      <ZoomEndTime time="113,754.401 ns"></ZoomEndTime>
+      <Cursor1Time time="113,510.000 ns"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
-      <NameColumnWidth column_width="161"></NameColumnWidth>
-      <ValueColumnWidth column_width="68"></ValueColumnWidth>
+      <NameColumnWidth column_width="139"></NameColumnWidth>
+      <ValueColumnWidth column_width="58"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="57" />
+   <WVObjectSize size="65" />
    <wvobject fp_name="/tb_dataAcqCtrl/rst" type="logic">
       <obj_property name="ElementShortName">rst</obj_property>
       <obj_property name="ObjectShortName">rst</obj_property>
@@ -52,10 +53,6 @@
       <obj_property name="ElementShortName">nb_acq[7:0]</obj_property>
       <obj_property name="ObjectShortName">nb_acq[7:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl/dataAcqCtrlInst/lastByte" type="logic">
-      <obj_property name="ElementShortName">lastByte</obj_property>
-      <obj_property name="ObjectShortName">lastByte</obj_property>
-   </wvobject>
    <wvobject fp_name="/tb_dataAcqCtrl/dataAcqCtrlInst/rdAcqSig" type="logic">
       <obj_property name="ElementShortName">rdAcqSig</obj_property>
       <obj_property name="ObjectShortName">rdAcqSig</obj_property>
@@ -64,6 +61,10 @@
       <obj_property name="ElementShortName">rd_en</obj_property>
       <obj_property name="ObjectShortName">rd_en</obj_property>
    </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl/dataAcqCtrlInst/devReady" type="logic">
+      <obj_property name="ElementShortName">devReady</obj_property>
+      <obj_property name="ObjectShortName">devReady</obj_property>
+   </wvobject>
    <wvobject fp_name="/tb_dataAcqCtrl/dataAcqCtrlInst/rdValid" type="logic">
       <obj_property name="ElementShortName">rdValid</obj_property>
       <obj_property name="ObjectShortName">rdValid</obj_property>
@@ -71,10 +72,6 @@
    <wvobject fp_name="/tb_dataAcqCtrl/adcInst/ff/valid" type="logic">
       <obj_property name="ElementShortName">valid</obj_property>
       <obj_property name="ObjectShortName">valid</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl/dataAcqCtrlInst/byteCnt" type="array">
-      <obj_property name="ElementShortName">byteCnt[2:0]</obj_property>
-      <obj_property name="ObjectShortName">byteCnt[2:0]</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_dataAcqCtrl/dout" type="array">
       <obj_property name="ElementShortName">dout[7:0]</obj_property>
@@ -88,10 +85,6 @@
    <wvobject fp_name="/tb_dataAcqCtrl/extTrg" type="logic">
       <obj_property name="ElementShortName">extTrg</obj_property>
       <obj_property name="ObjectShortName">extTrg</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/devExec" type="logic">
-      <obj_property name="ElementShortName">devExec</obj_property>
-      <obj_property name="ObjectShortName">devExec</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_dataAcqCtrl/dataAcqCtrlInst/strtAcqSig" type="logic">
       <obj_property name="ElementShortName">strtAcqSig</obj_property>
@@ -117,33 +110,81 @@
       <obj_property name="ElementShortName">endAcq</obj_property>
       <obj_property name="ObjectShortName">endAcq</obj_property>
    </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl/dataAcqCtrlInst/contAcq" type="logic">
-      <obj_property name="ElementShortName">contAcq</obj_property>
-      <obj_property name="ObjectShortName">contAcq</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl/dataAcqCtrlInst/rdAcqSig" type="logic">
-      <obj_property name="ElementShortName">rdAcqSig</obj_property>
-      <obj_property name="ObjectShortName">rdAcqSig</obj_property>
-   </wvobject>
    <wvobject fp_name="/tb_dataAcqCtrl/dataAcqCtrlInst/rdAcq" type="logic">
       <obj_property name="ElementShortName">rdAcq</obj_property>
       <obj_property name="ObjectShortName">rdAcq</obj_property>
    </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl/dataAcqCtrlInst/readSent" type="logic">
-      <obj_property name="ElementShortName">readSent</obj_property>
-      <obj_property name="ObjectShortName">readSent</obj_property>
+   <wvobject fp_name="/tb_dataAcqCtrl/adcInst/ff/rd_en" type="logic">
+      <obj_property name="ElementShortName">rd_en</obj_property>
+      <obj_property name="ObjectShortName">rd_en</obj_property>
    </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/state" type="other">
-      <obj_property name="DisplayName">label</obj_property>
-      <obj_property name="ElementShortName">state</obj_property>
-      <obj_property name="ObjectShortName">state</obj_property>
-      <obj_property name="label">stateDevInterf</obj_property>
+   <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/devBurst" type="logic">
+      <obj_property name="ElementShortName">devBurst</obj_property>
+      <obj_property name="ObjectShortName">devBurst</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl/adcInst/ff/valid" type="logic">
+      <obj_property name="ElementShortName">valid</obj_property>
+      <obj_property name="ObjectShortName">valid</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl/adcInst/rdValid" type="logic">
+      <obj_property name="ElementShortName">rdValid</obj_property>
+      <obj_property name="ObjectShortName">rdValid</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl/adcInst/rdValidSig" type="logic">
+      <obj_property name="ElementShortName">rdValidSig</obj_property>
+      <obj_property name="ObjectShortName">rdValidSig</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl/dataAcqCtrlInst/devRw" type="logic">
+      <obj_property name="ElementShortName">devRw</obj_property>
+      <obj_property name="ObjectShortName">devRw</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_dataAcqCtrl/dataAcqCtrlInst/state" type="other">
       <obj_property name="DisplayName">label</obj_property>
       <obj_property name="ElementShortName">state</obj_property>
       <obj_property name="ObjectShortName">state</obj_property>
       <obj_property name="label">stateDataAcqCtrl</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl/dataAcqCtrlInst/rdAcqSig" type="logic">
+      <obj_property name="ElementShortName">rdAcqSig</obj_property>
+      <obj_property name="ObjectShortName">rdAcqSig</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl/devReadyAcq" type="logic">
+      <obj_property name="ElementShortName">devReadyAcq</obj_property>
+      <obj_property name="ObjectShortName">devReadyAcq</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/devExec" type="logic">
+      <obj_property name="ElementShortName">devExec</obj_property>
+      <obj_property name="ObjectShortName">devExec</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/wEnFifo" type="logic">
+      <obj_property name="ElementShortName">wEnFifo</obj_property>
+      <obj_property name="ObjectShortName">wEnFifo</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/wAckFifo" type="logic">
+      <obj_property name="ElementShortName">wAckFifo</obj_property>
+      <obj_property name="ObjectShortName">wAckFifo</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/byteCnt" type="array">
+      <obj_property name="ElementShortName">byteCnt[14:0]</obj_property>
+      <obj_property name="ObjectShortName">byteCnt[14:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/rEnFifo" type="logic">
+      <obj_property name="ElementShortName">rEnFifo</obj_property>
+      <obj_property name="ObjectShortName">rEnFifo</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/txWSig" type="logic">
+      <obj_property name="ElementShortName">txWSig</obj_property>
+      <obj_property name="ObjectShortName">txWSig</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/emptyFifo" type="logic">
+      <obj_property name="ElementShortName">emptyFifo</obj_property>
+      <obj_property name="ObjectShortName">emptyFifo</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/state" type="other">
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="ElementShortName">state</obj_property>
+      <obj_property name="ObjectShortName">state</obj_property>
+      <obj_property name="label">stateDevInterf</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_dataAcqCtrl/adcInst/current_state" type="other">
       <obj_property name="DisplayName">label</obj_property>
@@ -187,10 +228,6 @@
          <obj_property name="ElementShortName">[24]</obj_property>
          <obj_property name="ObjectShortName">[24]</obj_property>
       </wvobject>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl/dataAcqCtrlInst/sync100to25Out" type="array">
-      <obj_property name="ElementShortName">sync100to25Out[3:0]</obj_property>
-      <obj_property name="ObjectShortName">sync100to25Out[3:0]</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_dataAcqCtrl/dataAcqCtrlInst/selAdc" type="array">
       <obj_property name="ElementShortName">selAdc[63:0]</obj_property>
@@ -239,10 +276,6 @@
    <wvobject fp_name="/tb_dataAcqCtrl/devId" type="other">
       <obj_property name="ElementShortName">devId</obj_property>
       <obj_property name="ObjectShortName">devId</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl/devReadyAcq" type="logic">
-      <obj_property name="ElementShortName">devReadyAcq</obj_property>
-      <obj_property name="ObjectShortName">devReadyAcq</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_dataAcqCtrl/devRw" type="logic">
       <obj_property name="ElementShortName">devRw</obj_property>

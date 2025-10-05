@@ -27,6 +27,7 @@ port(
     endAcq     : in  std_logic;
     rdValid    : in  std_logic;
     rdAcq      : out std_logic;
+    rdDataCnt  : in  std_logic_vector(15 downto 0);
     emptyAcq   : in  std_logic;
     nbAcq      : out std_logic_vector(7 downto 0);
     selAdc     : out std_logic_vector(63 downto 0);
@@ -249,12 +250,13 @@ signal readRq,
        testRxRead,
        testRxPresent,
        devIntBusy,
-       rdValid        : std_logic                    := '0';
+       rdValid        : std_logic                     := '0';
 signal dataToMaster,
        testDataIn,
        testDataOut,
        testData,
-       dataFromMaster : std_logic_vector(7 downto 0) := (others => '0');
+       dataFromMaster : std_logic_vector(7 downto 0)  := (others => '0');
+signal rdDataCnt      : std_logic_vector(15 downto 0) := (others => '0');
 
 begin
 
@@ -269,7 +271,7 @@ begin
 
     testRxRead <= '1';
 
-    testDataIn <= x"b5";
+    testDataIn <= x"55";
     wait for clkPeriod100M*delay;
     testTxWrite <= '1';
     wait for clkPeriod100M;
@@ -280,23 +282,23 @@ begin
     wait for clkPeriod100M;
     testTxWrite <= '0';
     wait for clkPeriod100M*delay;
-    testDataIn <= x"AA";
+    testDataIn <= x"01";
     testTxWrite <= '1';
     wait for clkPeriod100M;
     testTxWrite <= '0';
-    testDataIn <= x"FF";
+    testDataIn <= x"00";
     testTxWrite <= '1';
     wait for clkPeriod100M;
     testTxWrite <= '0';
-    testDataIn <= x"FF";
+    testDataIn <= x"00";
     testTxWrite <= '1';
     wait for clkPeriod100M;
     testTxWrite <= '0';
-    testDataIn <= x"FF";
+    testDataIn <= x"00";
     testTxWrite <= '1';
     wait for clkPeriod100M;
     testTxWrite <= '0';
-    testDataIn <= x"FF";
+    testDataIn <= x"01";
     testTxWrite <= '1';
     wait for clkPeriod100M;
     testTxWrite <= '0';
@@ -308,9 +310,9 @@ begin
     wait for clkPeriod100M;
     extTrg <= '0';
 
-    wait for 500 us;
+    wait for 100 us;
 
-    testDataIn <= x"a5";
+    testDataIn <= x"b5";
     wait for clkPeriod100M*delay;
     testTxWrite <= '1';
     wait for clkPeriod100M;
@@ -321,126 +323,27 @@ begin
     wait for clkPeriod100M;
     testTxWrite <= '0';
     wait for clkPeriod100M*delay;
-    testDataIn <= x"EE";
+    testDataIn <= x"00";
+    testTxWrite <= '1';
+    wait for clkPeriod100M;
+    testTxWrite <= '0';
+    testDataIn <= x"00";
+    testTxWrite <= '1';
+    wait for clkPeriod100M;
+    testTxWrite <= '0';
+    testDataIn <= x"00";
+    testTxWrite <= '1';
+    wait for clkPeriod100M;
+    testTxWrite <= '0';
+    testDataIn <= x"00";
+    testTxWrite <= '1';
+    wait for clkPeriod100M;
+    testTxWrite <= '0';
+    testDataIn <= x"02";
     testTxWrite <= '1';
     wait for clkPeriod100M;
     testTxWrite <= '0';
     wait for clkPeriod100M*delay;
-
-    wait for clkPeriod100M*10;
-
---    testDataIn <= x"a6";
---    wait for clkPeriod100M*delay;
---    testTxWrite <= '1';
---    wait for clkPeriod100M;
---    testTxWrite <= '0';
---    wait for clkPeriod100M*delay;
---    testDataIn <= x"00";
---    testTxWrite <= '1';
---    wait for clkPeriod100M;
---    testTxWrite <= '0';
---    wait for clkPeriod100M*delay;
---    testDataIn <= x"FF";
---    testTxWrite <= '1';
---    wait for clkPeriod100M;
---    testTxWrite <= '0';
---    wait for clkPeriod100M*delay;
-
---    wait for 40 us;
-
---    testDataIn <= x"a6";
---    wait for clkPeriod100M*delay;
---    testTxWrite <= '1';
---    wait for clkPeriod100M;
---    testTxWrite <= '0';
---    wait for clkPeriod100M*delay;
---    testDataIn <= x"00";
---    testTxWrite <= '1';
---    wait for clkPeriod100M;
---    testTxWrite <= '0';
---    wait for clkPeriod100M*delay;
---    testDataIn <= x"FF";
---    testTxWrite <= '1';
---    wait for clkPeriod100M;
---    testTxWrite <= '0';
---    wait for clkPeriod100M*delay;
-    
---    wait for 40 us;
-
---    testDataIn <= x"a6";
---    wait for clkPeriod100M*delay;
---    testTxWrite <= '1';
---    wait for clkPeriod100M;
---    testTxWrite <= '0';
---    wait for clkPeriod100M*delay;
---    testDataIn <= x"00";
---    testTxWrite <= '1';
---    wait for clkPeriod100M;
---    testTxWrite <= '0';
---    wait for clkPeriod100M*delay;
---    testDataIn <= x"FF";
---    testTxWrite <= '1';
---    wait for clkPeriod100M;
---    testTxWrite <= '0';
---    wait for clkPeriod100M*delay;
-
---    wait for 40 us;
-
---    testDataIn <= x"a6";
---    wait for clkPeriod100M*delay;
---    testTxWrite <= '1';
---    wait for clkPeriod100M;
---    testTxWrite <= '0';
---    wait for clkPeriod100M*delay;
---    testDataIn <= x"00";
---    testTxWrite <= '1';
---    wait for clkPeriod100M;
---    testTxWrite <= '0';
---    wait for clkPeriod100M*delay;
---    testDataIn <= x"00";
---    testTxWrite <= '1';
---    wait for clkPeriod100M;
---    testTxWrite <= '0';
---    wait for clkPeriod100M*delay;
-
---    wait for 40 us;
-
---    testDataIn <= x"a6";
---    wait for clkPeriod100M*delay;
---    testTxWrite <= '1';
---    wait for clkPeriod100M;
---    testTxWrite <= '0';
---    wait for clkPeriod100M*delay;
---    testDataIn <= x"00";
---    testTxWrite <= '1';
---    wait for clkPeriod100M;
---    testTxWrite <= '0';
---    wait for clkPeriod100M*delay;
---    testDataIn <= x"FF";
---    testTxWrite <= '1';
---    wait for clkPeriod100M;
---    testTxWrite <= '0';
---    wait for clkPeriod100M*delay;
-
---    wait for 40 us;
-
---    testDataIn <= x"a6";
---    wait for clkPeriod100M*delay;
---    testTxWrite <= '1';
---    wait for clkPeriod100M;
---    testTxWrite <= '0';
---    wait for clkPeriod100M*delay;
---    testDataIn <= x"00";
---    testTxWrite <= '1';
---    wait for clkPeriod100M;
---    testTxWrite <= '0';
---    wait for clkPeriod100M*delay;
---    testDataIn <= x"FF";
---    testTxWrite <= '1';
---    wait for clkPeriod100M;
---    testTxWrite <= '0';
---    wait for clkPeriod100M*delay;
-
 
     wait;
 end process;
@@ -464,6 +367,7 @@ port map(
     endAcq     => endAcq,
     rdValid    => rdValid,
     rdAcq      => rd_en,
+    rdDataCnt  => rdDataCnt,
     emptyAcq   => empty_acq,
     nbAcq      => nb_acq,
     selAdc     => sel_adc,

@@ -213,7 +213,7 @@ begin
 
     testRxRead <= '1';
 
-    testDataIn <= x"A3";
+    testDataIn <= x"A2";
     wait for clkPeriod;
     testTxWrite <= '1';
     wait for clkPeriod;
@@ -245,7 +245,7 @@ begin
 
 --    testRxRead <= '1';
 
---    testDataIn <= x"A3";
+--    testDataIn <= x"A2";
 --    wait for clkPeriod;
 --    testTxWrite <= '1';
 --    wait for clkPeriod;
@@ -273,7 +273,7 @@ begin
 
 --    wait for 10 us;
 
---    testDataIn <= x"A3";
+--    testDataIn <= x"A2";
 --    wait for clkPeriod;
 --    testTxWrite <= '1';
 --    wait for clkPeriod;
@@ -297,7 +297,7 @@ begin
 
 --    testRxRead <= '1';
 
---    testDataIn <= x"53";
+--    testDataIn <= x"52";
 --    wait for clkPeriod;
 --    testTxWrite <= '1';
 --    wait for clkPeriod;
@@ -319,7 +319,7 @@ begin
 
 --    testRxRead <= '1';
 
---    testDataIn <= x"33";
+--    testDataIn <= x"32";
 --    wait for clkPeriod*delay;
 --    testTxWrite <= '1';
 --    wait for clkPeriod;
@@ -553,7 +553,7 @@ begin
 
     testRxRead <= '1';
 
-    testDataIn <= x"B3";
+    testDataIn <= x"B2";
     wait for clkPeriod;
     testTxWrite <= '1';
     wait for clkPeriod;
