@@ -422,7 +422,9 @@ begin
                     state   <= sendDevData;
 
                     if emptyFifo = '1' and endCnt = '0' then
-                        state <= readBrst;
+                        devBrstSent <= '1';
+
+                        state       <= readBrst;
                     elsif emptyFifo = '1' and endCnt = '1' then
                         state <= done;
                     end if;
