@@ -23,29 +23,30 @@ use xpm.vcomponents.all;
 
 entity dataAcqCtrl is
 port(
-    clk100M    : in  std_logic;
-    clk25M     : in  std_logic;
-    rst        : in  std_logic;
-    devExec    : in  std_logic;
-    devId      : in  devices_t;
-    devRw      : in  std_logic;
-    devBurst   : in  std_logic;
-    devAddr    : in  devAddr_t;
-    devDataIn  : in  devData_t;
-    devDataOut : out devData_t;
-    devReady   : out std_logic;
-    busy       : out std_logic;
-    resetAcq   : out std_logic;
-    startAcq   : out std_logic;
-    endAcq     : in  std_logic;
-    endMAcq    : out std_logic;
-    rdValid    : in  std_logic;
-    rdAcq      : out std_logic;
-    rdDataCnt  : in  std_logic_vector(15 downto 0);
-    emptyAcq   : in  std_logic;
-    nbAcq      : out std_logic_vector(7 downto 0);
-    selAdc     : out std_logic_vector(63 downto 0);
-    doutAcq    : in  std_logic_vector(7 downto 0)
+    clk100M     : in  std_logic;
+    clk25M      : in  std_logic;
+    rst         : in  std_logic;
+    devExec     : in  std_logic;
+    devId       : in  devices_t;
+    devRw       : in  std_logic;
+    devBurst    : in  std_logic;
+    devBrstSent : in  std_logic;
+    devAddr     : in  devAddr_t;
+    devDataIn   : in  devData_t;
+    devDataOut  : out devData_t;
+    devReady    : out std_logic;
+    busy        : out std_logic;
+    resetAcq    : out std_logic;
+    startAcq    : out std_logic;
+    endAcq      : in  std_logic;
+    endMAcq     : out std_logic;
+    rdValid     : in  std_logic;
+    rdAcq       : out std_logic;
+    rdDataCnt   : in  std_logic_vector(15 downto 0);
+    emptyAcq    : in  std_logic;
+    nbAcq       : out std_logic_vector(7 downto 0);
+    selAdc      : out std_logic_vector(63 downto 0);
+    doutAcq     : in  std_logic_vector(7 downto 0)
 );
 end dataAcqCtrl;
 
@@ -77,7 +78,7 @@ type state_t is (idle,
                  execute,
                  sendStartAcq,
                  readFifo,
-                 waitRdValid,
+                 waitBrstSent,
                  sendData,
                  acqEnd,
                  errAddr,
@@ -195,21 +196,28 @@ begin
                     state      <= idle;
 
                 when readFifo =>
-                    rdAcqSig <= '1';
+                    rdAcqSig <= '0';
                     devReady <= '0';
 
-                    state    <= waitRdValid;
+                    state    <= readFifo;
 
-                when waitRdValid =>
-                    rdAcqSig      <= '0';
-                    devReady      <= rdValid;
-                    devDataOut(0) <= doutAcq;
+                    if emptyAcq = '0' and rdValid = '1' then
+                        devDataOut(0) <= doutAcq;
+                        devReady      <= '1';
 
-                    state         <= waitRdValid;
+                        state         <= waitBrstSent;
+                    else
+                        state <= acqEnd;
+                    end if;
 
-                    if rdValid = '1' and devBurst = '1' then
-                        state <= readFifo;
-                    elsif rdValid = '1' and devBurst = '0' then
+                when waitBrstSent =>
+                    devReady <= '0';
+
+                    if devBrstSent = '1' then
+                        rdAcqSig <= '1';
+
+                        state    <= readFifo;
+                    elsif devBurst = '0' then
                         state <= acqEnd;
                     end if;
 

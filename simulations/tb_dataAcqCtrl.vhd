@@ -10,28 +10,29 @@ architecture Behavioral of tb_dataAcqCtrl is
 
 component dataAcqCtrl is
 port(
-    clk100M    : in  std_logic;
-    clk25M     : in  std_logic;
-    rst        : in  std_logic;
-    devExec    : in  std_logic;
-    devId      : in  devices_t;
-    devRw      : in  std_logic;
-    devBurst   : in  std_logic;
-    devAddr    : in  devAddr_t;
-    devDataIn  : in  devData_t;
-    devDataOut : out devData_t;
-    devReady   : out std_logic;
-    busy       : out std_logic;
-    resetAcq   : out std_logic;
-    startAcq   : out std_logic;
-    endAcq     : in  std_logic;
-    rdValid    : in  std_logic;
-    rdAcq      : out std_logic;
-    rdDataCnt  : in  std_logic_vector(15 downto 0);
-    emptyAcq   : in  std_logic;
-    nbAcq      : out std_logic_vector(7 downto 0);
-    selAdc     : out std_logic_vector(63 downto 0);
-    doutAcq    : in  std_logic_vector(7 downto 0)
+    clk100M     : in  std_logic;
+    clk25M      : in  std_logic;
+    rst         : in  std_logic;
+    devExec     : in  std_logic;
+    devId       : in  devices_t;
+    devRw       : in  std_logic;
+    devBurst    : in  std_logic;
+    devBrstSent : in  std_logic;
+    devAddr     : in  devAddr_t;
+    devDataIn   : in  devData_t;
+    devDataOut  : out devData_t;
+    devReady    : out std_logic;
+    busy        : out std_logic;
+    resetAcq    : out std_logic;
+    startAcq    : out std_logic;
+    endAcq      : in  std_logic;
+    rdValid     : in  std_logic;
+    rdAcq       : out std_logic;
+    rdDataCnt   : in  std_logic_vector(15 downto 0);
+    emptyAcq    : in  std_logic;
+    nbAcq       : out std_logic_vector(7 downto 0);
+    selAdc      : out std_logic_vector(63 downto 0);
+    doutAcq     : in  std_logic_vector(7 downto 0)
 );
 end component;
 
@@ -98,6 +99,7 @@ port(
     devBusy     : in  devBusy_t;
     devRw       : out std_logic;
     devBurst    : out std_logic;
+    devBrstSent : out std_logic;
     devAddr     : out devAddr_t;
     devDataIn   : in  devDataVec_t;
     devDataOut  : out devData_t;
@@ -226,6 +228,7 @@ signal devId             : devices_t    := none;
 signal devReadyAcq       : std_logic    := '0';
 signal devRw             : std_logic    := '0';
 signal devBurst          : std_logic    := '0';
+signal devBrstSent       : std_logic    := '0';
 signal devAddr           : devAddr_t    := (others => (others => '0'));
 signal devExec           : std_logic    := '0';
 signal dataToDev,
@@ -350,28 +353,28 @@ end process;
 
 dataAcqCtrlInst : dataAcqCtrl
 port map(
-    clk25M     => clk_25M,
-    clk100M    => clk_100M,
-    rst        => rst,
-    devExec    => devExec,
-    devId      => devId,
-    devRw      => devRw,
-    devBurst   => devBurst,
-    devAddr    => devAddr,
-    devDataIn  => dataToDev,
-    devDataOut => dataFromAcq,
-    devReady   => devReadyAcq,
-    busy       => acqBusy,
-    resetAcq   => resetAcq,
-    startAcq   => start,
-    endAcq     => endAcq,
-    rdValid    => rdValid,
-    rdAcq      => rd_en,
-    rdDataCnt  => rdDataCnt,
-    emptyAcq   => empty_acq,
-    nbAcq      => nb_acq,
-    selAdc     => sel_adc,
-    doutAcq    => dout
+    clk100M     => clk_100M,
+    rst         => rst,
+    devExec     => devExec,
+    devId       => devId,
+    devRw       => devRw,
+    devBurst    => devBurst,
+    devBrstSent => devBrstSent,
+    devAddr     => devAddr,
+    devDataIn   => dataToDev,
+    devDataOut  => dataFromAcq,
+    devReady    => devReadyAcq,
+    busy        => acqBusy,
+    resetAcq    => resetAcq,
+    startAcq    => start,
+    endAcq      => endAcq,
+    rdValid     => rdValid,
+    rdAcq       => rd_en,
+    rdDataCnt   => rdDataCnt,
+    emptyAcq    => empty_acq,
+    nbAcq       => nb_acq,
+    selAdc      => sel_adc,
+    doutAcq     => dout
 );
 
 adcInst: adc
@@ -380,7 +383,6 @@ port map(
     clk_100M          => clk_100M,
     clk_200M          => clk_200M,
     clk_500M          => clk_500M,
-    clk_25M           => clk_25M,
     start             => start,
     sdo_hg            => sdo_hg,
     sdo_lg            => sdo_lg,
@@ -443,6 +445,7 @@ port map(
     devBusy      => devBusyVec,
     devRw        => devRw,
     devBurst     => devBurst,
+    devBrstSent  => devBrstSent,
     devAddr      => devAddr,
     devDataIn    => devDataInVec,
     devDataOut   => dataToDev,
