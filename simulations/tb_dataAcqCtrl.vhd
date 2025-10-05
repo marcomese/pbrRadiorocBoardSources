@@ -353,6 +353,7 @@ end process;
 
 dataAcqCtrlInst : dataAcqCtrl
 port map(
+    clk25M      => clk_25M,
     clk100M     => clk_100M,
     rst         => rst,
     devExec     => devExec,
@@ -383,6 +384,7 @@ port map(
     clk_100M          => clk_100M,
     clk_200M          => clk_200M,
     clk_500M          => clk_500M,
+    clk_25M           => clk_25M,
     start             => start,
     sdo_hg            => sdo_hg,
     sdo_lg            => sdo_lg,
