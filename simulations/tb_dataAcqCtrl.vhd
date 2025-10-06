@@ -18,7 +18,7 @@ port(
     devRw       : in  std_logic;
     devBrst     : in  std_logic;
     devBrstWrt  : in  std_logic;
-    devBrstSent : in  std_logic;
+    devBrstSnd  : in  std_logic;
     devAddr     : in  devAddr_t;
     devDataIn   : in  devData_t;
     devDataOut  : out devData_t;
@@ -101,7 +101,7 @@ port(
     devRw       : out std_logic;
     devBrst     : out std_logic;
     devBrstWrt  : out std_logic;
-    devBrstSent : out std_logic;
+    devBrstSnd  : out std_logic;
     devAddr     : out devAddr_t;
     devDataIn   : in  devDataVec_t;
     devDataOut  : out devData_t;
@@ -231,7 +231,7 @@ signal devReadyAcq       : std_logic    := '0';
 signal devRw             : std_logic    := '0';
 signal devBrst           : std_logic    := '0';
 signal devBrstWrt        : std_logic    := '0';
-signal devBrstSent       : std_logic    := '0';
+signal devBrstSnd        : std_logic    := '0';
 signal devAddr           : devAddr_t    := (others => (others => '0'));
 signal devExec           : std_logic    := '0';
 signal dataToDev,
@@ -274,6 +274,41 @@ begin
     wait for clkPeriod100M*5;
 
     wait for 350 ns;
+
+    testDataIn <= x"55";
+    wait for clkPeriod100M*delay;
+    testTxWrite <= '1';
+    wait for clkPeriod100M;
+    testTxWrite <= '0';
+    wait for clkPeriod100M*delay;
+    testDataIn <= x"00";
+    testTxWrite <= '1';
+    wait for clkPeriod100M;
+    testTxWrite <= '0';
+    wait for clkPeriod100M*delay;
+    testDataIn <= x"04";
+    testTxWrite <= '1';
+    wait for clkPeriod100M;
+    testTxWrite <= '0';
+    testDataIn <= x"00";
+    testTxWrite <= '1';
+    wait for clkPeriod100M;
+    testTxWrite <= '0';
+    testDataIn <= x"00";
+    testTxWrite <= '1';
+    wait for clkPeriod100M;
+    testTxWrite <= '0';
+    testDataIn <= x"00";
+    testTxWrite <= '1';
+    wait for clkPeriod100M;
+    testTxWrite <= '0';
+    testDataIn <= x"04";
+    testTxWrite <= '1';
+    wait for clkPeriod100M;
+    testTxWrite <= '0';
+    wait for clkPeriod100M*delay;
+
+    wait for 100 us;
 
     testRxRead <= '1';
 
@@ -341,11 +376,11 @@ begin
     testTxWrite <= '1';
     wait for clkPeriod100M;
     testTxWrite <= '0';
-    testDataIn <= x"00";
+    testDataIn <= x"02";
     testTxWrite <= '1';
     wait for clkPeriod100M;
     testTxWrite <= '0';
-    testDataIn <= x"0a";
+    testDataIn <= x"00";
     testTxWrite <= '1';
     wait for clkPeriod100M;
     testTxWrite <= '0';
@@ -364,7 +399,7 @@ port map(
     devRw       => devRw,
     devBrst     => devBrst,
     devBrstWrt  => devBrstWrt,
-    devBrstSent => devBrstSent,
+    devBrstSnd  => devBrstSnd,
     devAddr     => devAddr,
     devDataIn   => dataToDev,
     devDataOut  => dataFromAcq,
@@ -452,7 +487,7 @@ port map(
     devRw        => devRw,
     devBrst      => devBrst,
     devBrstWrt   => devBrstWrt,
-    devBrstSent  => devBrstSent,
+    devBrstSnd   => devBrstSnd,
     devAddr      => devAddr,
     devDataIn    => devDataInVec,
     devDataOut   => dataToDev,

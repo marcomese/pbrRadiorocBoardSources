@@ -31,7 +31,7 @@ port(
     devRw       : in  std_logic;
     devBrst     : in  std_logic;
     devBrstWrt  : in  std_logic;
-    devBrstSent : in  std_logic;
+    devBrstSnd  : in  std_logic;
     devAddr     : in  devAddr_t;
     devDataIn   : in  devData_t;
     devDataOut  : out devData_t;
@@ -79,7 +79,6 @@ type state_t is (idle,
                  execute,
                  sendStartAcq,
                  readFifo,
-                 waitBrstSent,
                  sendData,
                  acqEnd,
                  errAddr,
@@ -98,7 +97,8 @@ signal dAddr          : integer;
 signal swTrg,
        rstAcqSig,
        strtAcqSig,
-       rdAcqSig       : std_logic;
+       rdAcqSig,
+       devBrstSndOld  : std_logic;
 
 signal nbAcqSig       : std_logic_vector(7 downto 0);
 
@@ -124,7 +124,7 @@ dAddr    <= devAddrToInt(devAddr);
 nbAcq    <= nbAcqSig;
 resetAcq <= rstAcqSig;
 startAcq <= strtAcqSig;
-rdAcq    <= rdAcqSig;
+rdAcq    <= rdAcqSig;-- and not devBrstSnd;
 
 dataAcqCtrlFSM: process(clk100M, rst, devExec)
     variable i : integer := 0;
@@ -143,6 +143,8 @@ begin
             state      <= idle;
         else
             writeReg(reg, rData, addr'pos(regFifoCnt), resize(unsigned(rdDataCnt), regsLen));
+
+            devBrstSndOld <= devBrstSnd;
 
             case state is
                 when idle =>
@@ -165,6 +167,8 @@ begin
 
                             state      <= idle;
                         elsif devRw = devRead and devBrst = '1' then
+                            rdAcqSig <= '1';
+
                             state    <= readFifo;
                         elsif devRw = devWrite and reg(dAddr).rMode = ro then
                             state    <= errReadOnly;
@@ -198,29 +202,16 @@ begin
                     state      <= idle;
 
                 when readFifo =>
-                    rdAcqSig <= '0';
-                    devReady <= '0';
-
-                    state    <= readFifo;
-
-                    if emptyAcq = '0' and rdValid = '1' then
-                        devReady <= '1';
-
-                        state    <= waitBrstSent;
-                    else
-                        state <= acqEnd;
-                    end if;
-
-                when waitBrstSent =>
                     devDataOut(0) <= doutAcq;
-                    devReady      <= '0';
+                    devReady      <= rdValid;-- or (devBrstSndOld and not devBrstSnd);
+                    rdAcqSig      <= devBrstWrt;-- or (devBrstSndOld and not devBrstSnd);
 
-                    if devBrstSent = '1' then
-                        rdAcqSig <= '1';
+                    state         <= readFifo;
 
-                        state    <= readFifo;
-                    elsif devBrst = '0' then
-                        state <= acqEnd;
+                    if devBrst = '0' then-- and devBrstWrt = '1' then
+                        rdAcqSig <= '0';
+
+                        state    <= acqEnd;
                     end if;
 
                 when acqEnd =>

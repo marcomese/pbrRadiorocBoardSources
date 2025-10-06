@@ -49,7 +49,7 @@ port(
     devRw       : out std_logic;
     devBrst     : out std_logic;
     devBrstWrt  : out std_logic;
-    devBrstSent : out std_logic;
+    devBrstSnd  : out std_logic;
     devAddr     : out devAddr_t;
     devDataIn   : in  devDataVec_t;
     devDataOut  : out devData_t;
@@ -190,7 +190,7 @@ begin
             devRwSig      <= '0';
             devBrstSig    <= '0';
             devBrstWrt    <= '0';
-            devBrstSent   <= '0';
+            devBrstSnd    <= '0';
             devAddr       <= (others => (others => '0'));
             devDataOutSig <= (others => (others => '0'));
             devExec       <= '0';
@@ -395,7 +395,7 @@ begin
                     devExec     <= '0';
                     rxEna       <= '0';
                     devBrstWrt  <= '0';
-                    devBrstSent <= '0';
+                    devBrstSnd  <= '0';
                     wEnFifo     <= devReady(devIdSig);
 
                     state       <= readBrst;
@@ -406,10 +406,11 @@ begin
                     elsif byteCnt = 0 and devBrstSig = '1' then
                         devBrstSig <= '0';
                     elsif wordWrt = '1' or endCnt = '1' then
-                        tOutRst <= '1';
-                        rEnFifo <= '1';
+                        tOutRst    <= '1';
+                        rEnFifo    <= '1';
+                        devBrstSnd <= '1';
 
-                        state   <= sendDevData;
+                        state      <= sendDevData;
                     elsif tOutSig = '1' then
                         tOutRst <= '1';
                         rxEna   <= '1';
@@ -418,16 +419,15 @@ begin
                     end if;
 
                 when sendDevData =>
-                    tOutRst <= '0';
-                    wEnFifo <= '0';
-                    rEnFifo <= txWrAck and not emptyFifo;
-                    txWSig  <= rEnFifo;
+                    tOutRst     <= '0';
+                    wEnFifo     <= '0';
+                    rEnFifo     <= txWrAck and not emptyFifo;
+                    txWSig      <= rEnFifo;
+                    devBrstSnd  <= not emptyFifo;
 
                     state   <= sendDevData;
 
                     if emptyFifo = '1' and endCnt = '0' then
-                        devBrstSent <= '1';
-
                         state       <= readBrst;
                     elsif emptyFifo = '1' and endCnt = '1' then
                         state <= done;
