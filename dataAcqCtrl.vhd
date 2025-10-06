@@ -79,6 +79,7 @@ type state_t is (idle,
                  execute,
                  sendStartAcq,
                  readFifo,
+                 waitBrstSent,
                  sendData,
                  acqEnd,
                  errAddr,
@@ -97,8 +98,7 @@ signal dAddr          : integer;
 signal swTrg,
        rstAcqSig,
        strtAcqSig,
-       rdAcqSig,
-       devBrstSndOld  : std_logic;
+       rdAcqSig       : std_logic;
 
 signal nbAcqSig       : std_logic_vector(7 downto 0);
 
@@ -124,7 +124,7 @@ dAddr    <= devAddrToInt(devAddr);
 nbAcq    <= nbAcqSig;
 resetAcq <= rstAcqSig;
 startAcq <= strtAcqSig;
-rdAcq    <= rdAcqSig;-- and not devBrstSnd;
+rdAcq    <= rdAcqSig and not devBrstSnd;
 
 dataAcqCtrlFSM: process(clk100M, rst, devExec)
     variable i : integer := 0;
@@ -143,8 +143,6 @@ begin
             state      <= idle;
         else
             writeReg(reg, rData, addr'pos(regFifoCnt), resize(unsigned(rdDataCnt), regsLen));
-
-            devBrstSndOld <= devBrstSnd;
 
             case state is
                 when idle =>
@@ -203,15 +201,28 @@ begin
 
                 when readFifo =>
                     devDataOut(0) <= doutAcq;
-                    devReady      <= rdValid;-- or (devBrstSndOld and not devBrstSnd);
-                    rdAcqSig      <= devBrstWrt;-- or (devBrstSndOld and not devBrstSnd);
+                    devReady      <= rdValid;
+                    rdAcqSig      <= devBrstWrt;
 
                     state         <= readFifo;
 
-                    if devBrst = '0' then-- and devBrstWrt = '1' then
+                    if devBrstSnd = '1' then
+                        rdAcqSig <= '0';
+
+                        state    <= waitBrstSent; 
+                    elsif devBrst = '0' and devBrstWrt = '1' then
                         rdAcqSig <= '0';
 
                         state    <= acqEnd;
+                    end if;
+
+                when waitBrstSent =>
+                    state <= waitBrstSent;
+
+                    if devBrstSnd = '0' then
+                        rdAcqSig <= '1';
+
+                        state    <= readFifo;
                     end if;
 
                 when acqEnd =>

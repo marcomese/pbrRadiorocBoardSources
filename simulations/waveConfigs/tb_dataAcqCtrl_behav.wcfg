@@ -16,15 +16,15 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="213,438.500 ns"></ZoomStartTime>
-      <ZoomEndTime time="214,229.501 ns"></ZoomEndTime>
-      <Cursor1Time time="213,960.500 ns"></Cursor1Time>
+      <ZoomStartTime time="227,955.000 ns"></ZoomStartTime>
+      <ZoomEndTime time="228,971.001 ns"></ZoomEndTime>
+      <Cursor1Time time="228,680.000 ns"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
-      <NameColumnWidth column_width="188"></NameColumnWidth>
+      <NameColumnWidth column_width="184"></NameColumnWidth>
       <ValueColumnWidth column_width="58"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="74" />
+   <WVObjectSize size="75" />
    <wvobject fp_name="/tb_dataAcqCtrl/rst" type="logic">
       <obj_property name="ElementShortName">rst</obj_property>
       <obj_property name="ObjectShortName">rst</obj_property>
@@ -189,6 +189,7 @@
    <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/byteCnt" type="array">
       <obj_property name="ElementShortName">byteCnt[14:0]</obj_property>
       <obj_property name="ObjectShortName">byteCnt[14:0]</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/rEnFifo" type="logic">
       <obj_property name="ElementShortName">rEnFifo</obj_property>
@@ -197,6 +198,10 @@
    <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/txWSig" type="logic">
       <obj_property name="ElementShortName">txWSig</obj_property>
       <obj_property name="ObjectShortName">txWSig</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/xpm_fifo_sync_inst/FIFO_WRITE_DEPTH" type="array">
+      <obj_property name="ElementShortName">FIFO_WRITE_DEPTH[31:0]</obj_property>
+      <obj_property name="ObjectShortName">FIFO_WRITE_DEPTH[31:0]</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/emptyFifo" type="logic">
       <obj_property name="ElementShortName">emptyFifo</obj_property>

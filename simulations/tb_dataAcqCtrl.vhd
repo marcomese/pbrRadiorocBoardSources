@@ -376,7 +376,7 @@ begin
     testTxWrite <= '1';
     wait for clkPeriod100M;
     testTxWrite <= '0';
-    testDataIn <= x"02";
+    testDataIn <= x"01";
     testTxWrite <= '1';
     wait for clkPeriod100M;
     testTxWrite <= '0';
