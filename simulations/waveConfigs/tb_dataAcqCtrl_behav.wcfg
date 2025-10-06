@@ -16,15 +16,15 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="12,877.200 ns"></ZoomStartTime>
-      <ZoomEndTime time="13,207.401 ns"></ZoomEndTime>
-      <Cursor1Time time="13,077.400 ns"></Cursor1Time>
+      <ZoomStartTime time="113,165.000 ns"></ZoomStartTime>
+      <ZoomEndTime time="114,282.001 ns"></ZoomEndTime>
+      <Cursor1Time time="113,540.000 ns"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
-      <NameColumnWidth column_width="119"></NameColumnWidth>
+      <NameColumnWidth column_width="115"></NameColumnWidth>
       <ValueColumnWidth column_width="58"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="73" />
+   <WVObjectSize size="71" />
    <wvobject fp_name="/tb_dataAcqCtrl/rst" type="logic">
       <obj_property name="ElementShortName">rst</obj_property>
       <obj_property name="ObjectShortName">rst</obj_property>
@@ -101,10 +101,6 @@
       <obj_property name="ElementShortName">rdAcq</obj_property>
       <obj_property name="ObjectShortName">rdAcq</obj_property>
    </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/devBurst" type="logic">
-      <obj_property name="ElementShortName">devBurst</obj_property>
-      <obj_property name="ObjectShortName">devBurst</obj_property>
-   </wvobject>
    <wvobject fp_name="/tb_dataAcqCtrl/dataAcqCtrlInst/emptyAcq" type="logic">
       <obj_property name="ElementShortName">emptyAcq</obj_property>
       <obj_property name="ObjectShortName">emptyAcq</obj_property>
@@ -166,6 +162,14 @@
    <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/devBusy" type="array">
       <obj_property name="ElementShortName">devBusy[0:5]</obj_property>
       <obj_property name="ObjectShortName">devBusy[0:5]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/devBrstWrt" type="logic">
+      <obj_property name="ElementShortName">devBrstWrt</obj_property>
+      <obj_property name="ObjectShortName">devBrstWrt</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/devBrstSent" type="logic">
+      <obj_property name="ElementShortName">devBrstSent</obj_property>
+      <obj_property name="ObjectShortName">devBrstSent</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/byteCnt" type="array">
       <obj_property name="ElementShortName">byteCnt[14:0]</obj_property>
@@ -253,14 +257,6 @@
       <obj_property name="ElementShortName">clk_200M</obj_property>
       <obj_property name="ObjectShortName">clk_200M</obj_property>
    </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl/adcInst/clk_200M_n" type="logic">
-      <obj_property name="ElementShortName">clk_200M_n</obj_property>
-      <obj_property name="ObjectShortName">clk_200M_n</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl/adcInst/clk_100M_n" type="logic">
-      <obj_property name="ElementShortName">clk_100M_n</obj_property>
-      <obj_property name="ObjectShortName">clk_100M_n</obj_property>
-   </wvobject>
    <wvobject fp_name="/tb_dataAcqCtrl/adcInst/wr_en" type="logic">
       <obj_property name="ElementShortName">wr_en</obj_property>
       <obj_property name="ObjectShortName">wr_en</obj_property>
@@ -312,10 +308,6 @@
    <wvobject fp_name="/tb_dataAcqCtrl/devRw" type="logic">
       <obj_property name="ElementShortName">devRw</obj_property>
       <obj_property name="ObjectShortName">devRw</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl/devBurst" type="logic">
-      <obj_property name="ElementShortName">devBurst</obj_property>
-      <obj_property name="ObjectShortName">devBurst</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_dataAcqCtrl/devAddr" type="array">
       <obj_property name="ElementShortName">devAddr[1:0][7:0]</obj_property>

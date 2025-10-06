@@ -29,7 +29,8 @@ port(
     devExec     : in  std_logic;
     devId       : in  devices_t;
     devRw       : in  std_logic;
-    devBurst    : in  std_logic;
+    devBrst     : in  std_logic;
+    devBrstWrt  : in  std_logic;
     devBrstSent : in  std_logic;
     devAddr     : in  devAddr_t;
     devDataIn   : in  devData_t;
@@ -102,7 +103,8 @@ signal swTrg,
 signal nbAcqSig       : std_logic_vector(7 downto 0);
 
 attribute mark_debug : string;
-attribute mark_debug of state : signal is "true";
+attribute mark_debug of state,
+                        devDataOut : signal is "true";
 
 begin
 
@@ -155,14 +157,14 @@ begin
                     if devExec = '1' and devId = acqSystem then
                         if dAddr > addr'pos(addr'high) then
                             state    <= errAddr;
-                        elsif devRw = devRead and devBurst = '0' then
+                        elsif devRw = devRead and devBrst = '0' then
                             writeReg(reg, rData, addr'pos(regStatus), idleStatus);
                             devReady   <= '1';
                             devDataOut <= readReg(reg, rData, dAddr);
                             busy       <= '1';
 
                             state      <= idle;
-                        elsif devRw = devRead and devBurst = '1' then
+                        elsif devRw = devRead and devBrst = '1' then
                             state    <= readFifo;
                         elsif devRw = devWrite and reg(dAddr).rMode = ro then
                             state    <= errReadOnly;
@@ -202,22 +204,22 @@ begin
                     state    <= readFifo;
 
                     if emptyAcq = '0' and rdValid = '1' then
-                        devDataOut(0) <= doutAcq;
-                        devReady      <= '1';
+                        devReady <= '1';
 
-                        state         <= waitBrstSent;
+                        state    <= waitBrstSent;
                     else
                         state <= acqEnd;
                     end if;
 
                 when waitBrstSent =>
-                    devReady <= '0';
+                    devDataOut(0) <= doutAcq;
+                    devReady      <= '0';
 
                     if devBrstSent = '1' then
                         rdAcqSig <= '1';
 
                         state    <= readFifo;
-                    elsif devBurst = '0' then
+                    elsif devBrst = '0' then
                         state <= acqEnd;
                     end if;
 

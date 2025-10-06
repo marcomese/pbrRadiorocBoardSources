@@ -26,7 +26,7 @@ port(
     devExec    : in  std_logic;
     devId      : in  devices_t;
     devRw      : in  std_logic;
-    devBurst   : in  std_logic;
+    devBrst    : in  std_logic;
     devAddr    : in  devAddr_t;
     devDataIn  : in  devData_t;
     devDataOut : out devData_t;
@@ -149,7 +149,7 @@ port map(
     rst          => rst,      
     exec         => exec,
     rw           => rw,
-    brst         => devBurst,
+    brst         => devBrst,
     addr         => rAddr,
     dataIn       => dataIn,
     dataOut      => dataOut,

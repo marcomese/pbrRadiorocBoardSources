@@ -47,7 +47,8 @@ port(
     devReady    : in  devReady_t;
     devBusy     : in  devBusy_t;
     devRw       : out std_logic;
-    devBurst    : out std_logic;
+    devBrst     : out std_logic;
+    devBrstWrt  : out std_logic;
     devBrstSent : out std_logic;
     devAddr     : out devAddr_t;
     devDataIn   : in  devDataVec_t;
@@ -124,7 +125,7 @@ begin
 rxRead      <= rxRdSig and not endCnt;
 txWrite     <= txWSig;
 devRw       <= devRwSig;
-devBurst    <= devBrstSig;
+devBrst     <= devBrstSig;
 devId       <= devIdSig;
 devDataOut  <= devDataOutSig;
 endCnt      <= byteCnt(byteCnt'left);
@@ -188,6 +189,7 @@ begin
             devIdSig      <= none;
             devRwSig      <= '0';
             devBrstSig    <= '0';
+            devBrstWrt    <= '0';
             devBrstSent   <= '0';
             devAddr       <= (others => (others => '0'));
             devDataOutSig <= (others => (others => '0'));
@@ -392,13 +394,14 @@ begin
                     tOutRst     <= '0';
                     devExec     <= '0';
                     rxEna       <= '0';
+                    devBrstWrt  <= '0';
                     devBrstSent <= '0';
                     wEnFifo     <= devReady(devIdSig);
 
                     state       <= readBrst;
 
                     if wAckFifo = '1' then
-                        devBrstSent <= '1';
+                        devBrstWrt  <= '1';
                         byteCnt     <= byteCnt - 1;
                     elsif byteCnt = 0 and devBrstSig = '1' then
                         devBrstSig <= '0';

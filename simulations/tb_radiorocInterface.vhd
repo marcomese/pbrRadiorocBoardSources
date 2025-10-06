@@ -18,7 +18,7 @@ port(
     devExec    : in  std_logic;
     devId      : in  devices_t;
     devRw      : in  std_logic;
-    devBurst   : in  std_logic;
+    devBrst    : in  std_logic;
     devAddr    : in  devAddr_t;
     devDataIn  : in  devData_t;
     devDataOut : out devData_t;
@@ -60,7 +60,9 @@ port(
     devReady    : in  devReady_t;
     devBusy     : in  devBusy_t;
     devRw       : out std_logic;
-    devBurst    : out std_logic;
+    devBrst     : out std_logic;
+    devBrstWrt  : out std_logic;
+    devBrstSent : out std_logic;
     devAddr     : out devAddr_t;
     devDataIn   : in  devDataVec_t;
     devDataOut  : out devData_t;
@@ -158,7 +160,9 @@ signal   rst            : std_logic                    := '0';
 signal   devId          : devices_t                    := none;
 signal   devReadyRad    : std_logic                    := '0';
 signal   devRw          : std_logic                    := '0';
-signal   devBurst       : std_logic                    := '0';
+signal   devBrst        : std_logic                    := '0';
+signal   devBrstWrt     : std_logic                    := '0';
+signal   devBrstSent    : std_logic                    := '0';
 signal   devAddr        : devAddr_t                    := (others => (others => '0'));
 signal   devExec        : std_logic                    := '0';
 signal   radBusy,
@@ -642,7 +646,7 @@ port map(
     devExec    => devExec,
     devId      => devId,
     devRw      => devRw,
-    devBurst   => devBurst,
+    devBrst    => devBrst,
     devAddr    => devAddr,
     devDataIn  => dataToDev,
     devDataOut => dataFromRad,
@@ -686,7 +690,9 @@ port map(
     devReady     => devReadyVec,
     devBusy      => devBusyVec,
     devRw        => devRw,
-    devBurst     => devBurst,
+    devBrst      => devBrst,
+    devBrstWrt   => devBrstWrt,
+    devBrstSent  => devBrstSent,
     devAddr      => devAddr,
     devDataIn    => devDataInVec,
     devDataOut   => dataToDev,
