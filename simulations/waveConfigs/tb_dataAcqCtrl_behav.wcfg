@@ -16,26 +16,18 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="0.000000 us"></ZoomStartTime>
-      <ZoomEndTime time="500.000003 us"></ZoomEndTime>
-      <Cursor1Time time="113.510000 us"></Cursor1Time>
+      <ZoomStartTime time="12,877.200 ns"></ZoomStartTime>
+      <ZoomEndTime time="13,207.401 ns"></ZoomEndTime>
+      <Cursor1Time time="13,077.400 ns"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
-      <NameColumnWidth column_width="123"></NameColumnWidth>
+      <NameColumnWidth column_width="119"></NameColumnWidth>
       <ValueColumnWidth column_width="58"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="70" />
+   <WVObjectSize size="73" />
    <wvobject fp_name="/tb_dataAcqCtrl/rst" type="logic">
       <obj_property name="ElementShortName">rst</obj_property>
       <obj_property name="ObjectShortName">rst</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl/clk_100M" type="logic">
-      <obj_property name="ElementShortName">clk_100M</obj_property>
-      <obj_property name="ObjectShortName">clk_100M</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl/clk_200M" type="logic">
-      <obj_property name="ElementShortName">clk_200M</obj_property>
-      <obj_property name="ObjectShortName">clk_200M</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_dataAcqCtrl/clk_25M" type="logic">
       <obj_property name="ElementShortName">clk_25M</obj_property>
@@ -77,11 +69,6 @@
       <obj_property name="ElementShortName">dout[7:0]</obj_property>
       <obj_property name="ObjectShortName">dout[7:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl/rd_data_count_acq" type="array">
-      <obj_property name="ElementShortName">rd_data_count_acq[15:0]</obj_property>
-      <obj_property name="ObjectShortName">rd_data_count_acq[15:0]</obj_property>
-      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
-   </wvobject>
    <wvobject fp_name="/tb_dataAcqCtrl/extTrg" type="logic">
       <obj_property name="ElementShortName">extTrg</obj_property>
       <obj_property name="ObjectShortName">extTrg</obj_property>
@@ -113,10 +100,6 @@
    <wvobject fp_name="/tb_dataAcqCtrl/dataAcqCtrlInst/rdAcq" type="logic">
       <obj_property name="ElementShortName">rdAcq</obj_property>
       <obj_property name="ObjectShortName">rdAcq</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl/adcInst/ff/rd_en" type="logic">
-      <obj_property name="ElementShortName">rd_en</obj_property>
-      <obj_property name="ObjectShortName">rd_en</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/devBurst" type="logic">
       <obj_property name="ElementShortName">devBurst</obj_property>
@@ -256,6 +239,35 @@
    <wvobject fp_name="/tb_dataAcqCtrl/sel_adc" type="array">
       <obj_property name="ElementShortName">sel_adc[63:0]</obj_property>
       <obj_property name="ObjectShortName">sel_adc[63:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl/rd_data_count_acq" type="array">
+      <obj_property name="ElementShortName">rd_data_count_acq[15:0]</obj_property>
+      <obj_property name="ObjectShortName">rd_data_count_acq[15:0]</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl/clk_100M" type="logic">
+      <obj_property name="ElementShortName">clk_100M</obj_property>
+      <obj_property name="ObjectShortName">clk_100M</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl/clk_200M" type="logic">
+      <obj_property name="ElementShortName">clk_200M</obj_property>
+      <obj_property name="ObjectShortName">clk_200M</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl/adcInst/clk_200M_n" type="logic">
+      <obj_property name="ElementShortName">clk_200M_n</obj_property>
+      <obj_property name="ObjectShortName">clk_200M_n</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl/adcInst/clk_100M_n" type="logic">
+      <obj_property name="ElementShortName">clk_100M_n</obj_property>
+      <obj_property name="ObjectShortName">clk_100M_n</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl/adcInst/wr_en" type="logic">
+      <obj_property name="ElementShortName">wr_en</obj_property>
+      <obj_property name="ObjectShortName">wr_en</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl/adcInst/ff/rd_en" type="logic">
+      <obj_property name="ElementShortName">rd_en</obj_property>
+      <obj_property name="ObjectShortName">rd_en</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_dataAcqCtrl/adcInst/hit" type="logic">
       <obj_property name="ElementShortName">hit</obj_property>

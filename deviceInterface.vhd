@@ -109,6 +109,7 @@ attribute mark_debug : string;
 attribute mark_debug of state,
                         dataOut,
                         dataToFifo,
+                        dataToFifoSel,
                         wEnFifo,
                         rEnFifo,
                         txWSig,

@@ -84,7 +84,7 @@ architecture Behavioral of adc is
 	
 	signal NORT_FPGA : std_logic;
 	
-	signal clk_200M_n, clk_100M_n, en_trigext : std_logic;
+	signal  en_trigext : std_logic;
 	signal signal_in_pulse, signal_in_pulse2, latch, signal_in_delayed, reset_delay_cntr : std_logic;
 	constant delay_so : integer := 5;
 	signal delay_cntr : natural range 0 to 5;
@@ -117,8 +117,6 @@ attribute mark_debug of current_state,
 
 begin
 
-    clk_200M_n <= not clk_200M;
-    clk_100M_n <= not clk_100M;
     trig_out <= trigger_sft;
 
 endAcqSig(0) <= end_acq;
@@ -177,8 +175,8 @@ port map(
 	ff : fifo_acq
 	port map (
 		rst    => rst,
-		wr_clk => clk_200M_n,
-		rd_clk => clk_100M_n,
+		wr_clk => clk_200M,
+		rd_clk => clk_100M,
 		din    => din_l,
 		wr_en  => wr_en,
 		rd_en  => rd_en,
