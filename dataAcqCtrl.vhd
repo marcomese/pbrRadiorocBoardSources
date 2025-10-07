@@ -83,11 +83,13 @@ type state_t is (idle,
                  sendData,
                  acqEnd,
                  errAddr,
-                 errReadOnly);
+                 errReadOnly,
+                 errFifoEmpty);
 
-constant idleStatus     : std_logic_vector(31 downto 0) := initSlv(32, 13, 0, "00" & x"001", '0');
-constant errAddrStatus  : std_logic_vector(31 downto 0) := initSlv(32, 13, 0, "11" & x"500", '0');
-constant errROnlyStatus : std_logic_vector(31 downto 0) := initSlv(32, 13, 0, "11" & x"A00", '0');
+constant idleStatus         : std_logic_vector(31 downto 0) := initSlv(32, 13, 0, "00" & x"001", '0');
+constant errAddrStatus      : std_logic_vector(31 downto 0) := initSlv(32, 13, 0, "11" & x"500", '0');
+constant errROnlyStatus     : std_logic_vector(31 downto 0) := initSlv(32, 13, 0, "11" & x"A00", '0');
+constant errFifoEmptyStatus : std_logic_vector(31 downto 0) := initSlv(32, 13, 0, "11" & x"B00", '0');
 
 signal state          : state_t;
 
@@ -164,10 +166,12 @@ begin
                             busy       <= '1';
 
                             state      <= idle;
-                        elsif devRw = devRead and devBrst = '1' then
+                        elsif devRw = devRead and devBrst = '1' and emptyAcq = '0' then
                             rdAcqSig <= '1';
 
                             state    <= readFifo;
+                        elsif devRw = devRead and devBrst = '1' and emptyAcq = '1' then
+                            state <= errFifoEmpty;
                         elsif devRw = devWrite and reg(dAddr).rMode = ro then
                             state    <= errReadOnly;
                         elsif devRw = devWrite and reg(dAddr).rMode = rw then
@@ -247,6 +251,12 @@ begin
                     busy  <= '0';
 
                     state <= idle;
+
+                when errFifoEmpty =>
+                    writeReg(reg, rData, addr'pos(regStatus), errFifoEmptyStatus);
+                    busy  <= '0';
+
+                    state <= idle;                    
 
                 when others =>
                     devReady <= '0';

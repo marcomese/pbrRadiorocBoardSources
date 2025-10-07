@@ -386,6 +386,41 @@ begin
     testTxWrite <= '0';
     wait for clkPeriod100M*delay;
 
+    wait for 600 us;
+
+    testDataIn <= x"b5";
+    wait for clkPeriod100M*delay;
+    testTxWrite <= '1';
+    wait for clkPeriod100M;
+    testTxWrite <= '0';
+    wait for clkPeriod100M*delay;
+    testDataIn <= x"00";
+    testTxWrite <= '1';
+    wait for clkPeriod100M;
+    testTxWrite <= '0';
+    wait for clkPeriod100M*delay;
+    testDataIn <= x"00";
+    testTxWrite <= '1';
+    wait for clkPeriod100M;
+    testTxWrite <= '0';
+    testDataIn <= x"00";
+    testTxWrite <= '1';
+    wait for clkPeriod100M;
+    testTxWrite <= '0';
+    testDataIn <= x"00";
+    testTxWrite <= '1';
+    wait for clkPeriod100M;
+    testTxWrite <= '0';
+    testDataIn <= x"01";
+    testTxWrite <= '1';
+    wait for clkPeriod100M;
+    testTxWrite <= '0';
+    testDataIn <= x"00";
+    testTxWrite <= '1';
+    wait for clkPeriod100M;
+    testTxWrite <= '0';
+    wait for clkPeriod100M*delay;
+
     wait;
 end process;
 
