@@ -63,7 +63,7 @@ port(
     devBrst     : out std_logic;
     devBrstWrt  : out std_logic;
     devBrstSnd  : out std_logic;
-    devBrstRst  : out devStdLogic_t;
+    devBrstRst  : in  devStdLogic_t;
     devAddr     : out devAddr_t;
     devDataIn   : in  devDataVec_t;
     devDataOut  : out devData_t;

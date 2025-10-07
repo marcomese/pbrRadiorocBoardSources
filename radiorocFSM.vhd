@@ -223,14 +223,14 @@ begin
                     end if;
 
                 when burstRead =>
-                    i2cRw     <= devRead;
-                    dataOut   <= slvToDevData(dataOutBuff);
-                    dataReady <= i2cBusyFall;
-                    rstBuff   <= '0';
-                    shiftBuff <= i2cBusyFall and (i2cEnaSig or not brst);
-                    brstOnSig <= brst or i2cEnaSig;
+                    i2cRw      <= devRead;
+                    dataOut(0) <= i2cDataRd;
+                    dataReady  <= i2cBusyFall;
+                    rstBuff    <= '0';
+                    shiftBuff  <= i2cBusyFall and (i2cEnaSig or not brst);
+                    brstOnSig  <= brst or i2cEnaSig;
 
-                    state     <= burstRead;
+                    state      <= burstRead;
 
                     if brst = '0' then
                         i2cEnaSig <= '0';
@@ -241,21 +241,18 @@ begin
                     end if;
 
                 when transEnd =>
-                    dataReady <= '0';
-                    rstBuff   <= '0';
-                    shiftBuff <= '0';
-                    leftBCnt  <= (others => '0');
-                    dataOut   <= (0      => i2cDataRd,
-                                  others => (others => '0'));
+                    dataReady  <= '0';
+                    rstBuff    <= '0';
+                    shiftBuff  <= '0';
+                    leftBCnt   <= (others => '0');
+                    dataOut(0) <= i2cDataRd;
 
-                    state     <= transEnd;
+                    state      <= transEnd;
 
                     if i2cBusyFall = '1' then
                         brstOnSig  <= '0';
                         busy       <= '0';
                         dataReady  <= '1';
-                        dataOut    <= (0      => i2cDataRd,
-                                       others => (others => '0'));
 
                         state      <= idle;
                     end if;
