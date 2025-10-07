@@ -16,15 +16,15 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="227,955.000 ns"></ZoomStartTime>
-      <ZoomEndTime time="228,971.001 ns"></ZoomEndTime>
-      <Cursor1Time time="228,680.000 ns"></Cursor1Time>
+      <ZoomStartTime time="235,728.100 ns"></ZoomStartTime>
+      <ZoomEndTime time="237,318.101 ns"></ZoomEndTime>
+      <Cursor1Time time="236,480.100 ns"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
-      <NameColumnWidth column_width="184"></NameColumnWidth>
+      <NameColumnWidth column_width="180"></NameColumnWidth>
       <ValueColumnWidth column_width="58"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="75" />
+   <WVObjectSize size="76" />
    <wvobject fp_name="/tb_dataAcqCtrl/rst" type="logic">
       <obj_property name="ElementShortName">rst</obj_property>
       <obj_property name="ObjectShortName">rst</obj_property>
@@ -105,10 +105,6 @@
       <obj_property name="ElementShortName">dout[7:0]</obj_property>
       <obj_property name="ObjectShortName">dout[7:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/devBrst" type="logic">
-      <obj_property name="ElementShortName">devBrst</obj_property>
-      <obj_property name="ObjectShortName">devBrst</obj_property>
-   </wvobject>
    <wvobject fp_name="/tb_dataAcqCtrl/dataAcqCtrlInst/devBrstSnd" type="logic">
       <obj_property name="ElementShortName">devBrstSnd</obj_property>
       <obj_property name="ObjectShortName">devBrstSnd</obj_property>
@@ -139,6 +135,10 @@
       <obj_property name="ElementShortName">rd_data_count[15:0]</obj_property>
       <obj_property name="ObjectShortName">rd_data_count[15:0]</obj_property>
       <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/devBrst" type="logic">
+      <obj_property name="ElementShortName">devBrst</obj_property>
+      <obj_property name="ObjectShortName">devBrst</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_dataAcqCtrl/adcInst/ff/valid" type="logic">
       <obj_property name="ElementShortName">valid</obj_property>
@@ -178,6 +178,10 @@
       <obj_property name="ElementShortName">emptyAcq</obj_property>
       <obj_property name="ObjectShortName">emptyAcq</obj_property>
    </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl/dataAcqCtrlInst/devBrstRst" type="logic">
+      <obj_property name="ElementShortName">devBrstRst</obj_property>
+      <obj_property name="ObjectShortName">devBrstRst</obj_property>
+   </wvobject>
    <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/devExec" type="logic">
       <obj_property name="ElementShortName">devExec</obj_property>
       <obj_property name="ObjectShortName">devExec</obj_property>
@@ -189,7 +193,7 @@
    <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/byteCnt" type="array">
       <obj_property name="ElementShortName">byteCnt[14:0]</obj_property>
       <obj_property name="ObjectShortName">byteCnt[14:0]</obj_property>
-      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      <obj_property name="Radix">HEXRADIX</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/rEnFifo" type="logic">
       <obj_property name="ElementShortName">rEnFifo</obj_property>

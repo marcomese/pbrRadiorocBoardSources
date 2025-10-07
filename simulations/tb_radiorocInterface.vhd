@@ -57,12 +57,13 @@ port(
     flushRxFifo : out std_logic;
     flushTxFifo : out std_logic;
     devId       : out devices_t;
-    devReady    : in  devReady_t;
-    devBusy     : in  devBusy_t;
+    devReady    : in  devStdLogic_t;
+    devBusy     : in  devStdLogic_t;
     devRw       : out std_logic;
     devBrst     : out std_logic;
     devBrstWrt  : out std_logic;
     devBrstSnd  : out std_logic;
+    devBrstRst  : out devStdLogic_t;
     devAddr     : out devAddr_t;
     devDataIn   : in  devDataVec_t;
     devDataOut  : out devData_t;
@@ -163,6 +164,7 @@ signal   devRw          : std_logic                    := '0';
 signal   devBrst        : std_logic                    := '0';
 signal   devBrstWrt     : std_logic                    := '0';
 signal   devBrstSnd     : std_logic                    := '0';
+signal   devBrstRst     : devStdLogic_t                := (others => '0');
 signal   devAddr        : devAddr_t                    := (others => (others => '0'));
 signal   devExec        : std_logic                    := '0';
 signal   radBusy,
@@ -170,8 +172,8 @@ signal   radBusy,
 signal   dataToDev,
          dataFromRad    : devData_t                    := (others => (others => '0'));
 signal   devDataInVec   : devDataVec_t                 := (others => (others => (others => '0')));
-signal   devReadyVec    : devReady_t                   := (others => '0');
-signal   devBusyVec     : devBusy_t                    := (others => '0');
+signal   devReadyVec    : devStdLogic_t                := (others => '0');
+signal   devBusyVec     : devStdLogic_t                := (others => '0');
 signal   error          : std_logic_vector(2 downto 0) := "000";
 signal   rxRead         : std_logic                    := '0';
 signal   rxPresent      : std_logic                    := '0';
@@ -693,6 +695,7 @@ port map(
     devBrst      => devBrst,
     devBrstWrt   => devBrstWrt,
     devBrstSnd   => devBrstSnd,
+    devBrstRst   => devBrstRst,
     devAddr      => devAddr,
     devDataIn    => devDataInVec,
     devDataOut   => dataToDev,

@@ -30,11 +30,10 @@ package devicesPkg is
     constant  devWrite     : std_logic := '0';
     constant  devRead      : std_logic := '1';
 
-    type devAddr_t    is array(devAddrBytes-1 downto 0)         of std_logic_vector(7 downto 0);
-    type devData_t    is array(devDataBytes-1 downto 0)         of std_logic_vector(7 downto 0);
-    type devDataVec_t is array(devices_t'low to devices_t'high) of devData_t;
-    type devReady_t   is array(devices_t'low to devices_t'high) of std_logic;
-    type devBusy_t    is array(devices_t'low to devices_t'high) of std_logic;
+    type devAddr_t     is array(devAddrBytes-1 downto 0)         of std_logic_vector(7 downto 0);
+    type devData_t     is array(devDataBytes-1 downto 0)         of std_logic_vector(7 downto 0);
+    type devDataVec_t  is array(devices_t'low to devices_t'high) of devData_t;
+    type devStdLogic_t is array(devices_t'low to devices_t'high) of std_logic;
 
     function devToSlv(d: devices_t) return std_logic_vector;
 

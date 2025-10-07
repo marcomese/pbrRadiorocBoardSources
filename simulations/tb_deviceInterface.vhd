@@ -10,34 +10,40 @@ architecture Behavioral of tb_deviceInterface is
 
 component deviceInterface is
 generic(
-    clkFreq    : real;
-    timeout    : real;
-    readCmd    : std_logic_vector(3 downto 0);
-    writeCmd   : std_logic_vector(3 downto 0);
-    burstWrCmd : std_logic_vector(3 downto 0);
-    burstRdCmd : std_logic_vector(3 downto 0)
+    clkFreq     : real;
+    timeout     : real;
+    readCmd     : std_logic_vector(3 downto 0);
+    writeCmd    : std_logic_vector(3 downto 0);
+    burstWrCmd  : std_logic_vector(3 downto 0);
+    burstRdCmd  : std_logic_vector(3 downto 0);
+    maxBrstLen  : natural -- maximum number of bytes to read/write in burst mode
 );
 port(
-    clk        : in  std_logic;
-    rst        : in  std_logic;
-    dataIn     : in  std_logic_vector(7 downto 0);
-    dataOut    : out std_logic_vector(7 downto 0);
-    rxRead     : out std_logic;
-    rxPresent  : in  std_logic;
-    txWrite    : out std_logic;
-    txWrAck    : in  std_logic;
-    rxEna      : out std_logic;
-    devId      : out devices_t;
-    devReady   : in  devReady_t;
-    devBusy    : in  devBusy_t;
-    devRw      : out std_logic;
-    devBurst   : out std_logic;
-    devAddr    : out devAddr_t;
-    devDataIn  : in  devDataVec_t;
-    devDataOut : out devData_t;
-    devExec    : out std_logic;
-    busy       : out std_logic;
-    error      : out std_logic_vector(1 downto 0)
+    clk         : in  std_logic;
+    rst         : in  std_logic;
+    dataIn      : in  std_logic_vector(7 downto 0);
+    dataOut     : out std_logic_vector(7 downto 0);
+    rxRead      : out std_logic;
+    rxPresent   : in  std_logic;
+    txWrite     : out std_logic;
+    txWrAck     : in  std_logic;
+    rxEna       : out std_logic;
+    flushRxFifo : out std_logic;
+    flushTxFifo : out std_logic;
+    devId       : out devices_t;
+    devReady    : in  devStdLogic_t;
+    devBusy     : in  devStdLogic_t;
+    devRw       : out std_logic;
+    devBrst     : out std_logic;
+    devBrstWrt  : out std_logic;
+    devBrstSnd  : out std_logic;
+    devBrstRst  : out devStdLogic_t;
+    devAddr     : out devAddr_t;
+    devDataIn   : in  devDataVec_t;
+    devDataOut  : out devData_t;
+    devExec     : out std_logic;
+    busy        : out std_logic;
+    error       : out std_logic_vector(2 downto 0)
 );
 end component;
 

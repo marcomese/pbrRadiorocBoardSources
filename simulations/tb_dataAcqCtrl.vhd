@@ -19,6 +19,7 @@ port(
     devBrst     : in  std_logic;
     devBrstWrt  : in  std_logic;
     devBrstSnd  : in  std_logic;
+    devBrstRst  : out std_logic;
     devAddr     : in  devAddr_t;
     devDataIn   : in  devData_t;
     devDataOut  : out devData_t;
@@ -96,12 +97,13 @@ port(
     flushRxFifo : out std_logic;
     flushTxFifo : out std_logic;
     devId       : out devices_t;
-    devReady    : in  devReady_t;
-    devBusy     : in  devBusy_t;
+    devReady    : in  devStdLogic_t;
+    devBusy     : in  devStdLogic_t;
     devRw       : out std_logic;
     devBrst     : out std_logic;
     devBrstWrt  : out std_logic;
     devBrstSnd  : out std_logic;
+    devBrstRst  : in  devStdLogic_t;
     devAddr     : out devAddr_t;
     devDataIn   : in  devDataVec_t;
     devDataOut  : out devData_t;
@@ -232,14 +234,15 @@ signal devRw             : std_logic    := '0';
 signal devBrst           : std_logic    := '0';
 signal devBrstWrt        : std_logic    := '0';
 signal devBrstSnd        : std_logic    := '0';
+signal devBrstRst        : devStdLogic_t := (others => '0');
 signal devAddr           : devAddr_t    := (others => (others => '0'));
 signal devExec           : std_logic    := '0';
 signal dataToDev,
-       dataFromAcq       : devData_t    := (others => (others => '0'));
-signal devDataInVec      : devDataVec_t := (others => (others => (others => '0')));
-signal devReadyVec       : devReady_t   := (others => '0');
-signal devBusyVec        : devBusy_t    := (others => '0');
-signal acqBusy           : std_logic    := '0';
+       dataFromAcq       : devData_t     := (others => (others => '0'));
+signal devDataInVec      : devDataVec_t  := (others => (others => (others => '0')));
+signal devReadyVec       : devStdLogic_t := (others => '0');
+signal devBusyVec        : devStdLogic_t := (others => '0');
+signal acqBusy           : std_logic     := '0';
 signal error             : std_logic_vector(2 downto 0) := "000";
 signal rxRead            : std_logic                    := '0';
 signal rxPresent         : std_logic                    := '0';
@@ -256,6 +259,7 @@ signal readRq,
        testRxRead,
        testRxPresent,
        devIntBusy,
+       devBrstRstAcq,
        rdValid        : std_logic                     := '0';
 signal dataToMaster,
        testDataIn,
@@ -380,7 +384,7 @@ begin
     testTxWrite <= '1';
     wait for clkPeriod100M;
     testTxWrite <= '0';
-    testDataIn <= x"00";
+    testDataIn <= x"05";
     testTxWrite <= '1';
     wait for clkPeriod100M;
     testTxWrite <= '0';
@@ -435,6 +439,7 @@ port map(
     devBrst     => devBrst,
     devBrstWrt  => devBrstWrt,
     devBrstSnd  => devBrstSnd,
+    devBrstRst  => devBrstRstAcq,
     devAddr     => devAddr,
     devDataIn   => dataToDev,
     devDataOut  => dataFromAcq,
@@ -494,6 +499,7 @@ clk_200M <= not clk_200M after clkPeriod200M/2;
 devDataInVec(acqSystem) <= dataFromAcq;
 devReadyVec(acqSystem)  <= devReadyAcq;
 devBusyVec(acqSystem)   <= acqBusy;
+devBrstRst(acqSystem)   <= devBrstRstAcq;
 
 devInterfInst: deviceInterface
 generic map(
@@ -523,6 +529,7 @@ port map(
     devBrst      => devBrst,
     devBrstWrt   => devBrstWrt,
     devBrstSnd   => devBrstSnd,
+    devBrstRst   => devBrstRst,
     devAddr      => devAddr,
     devDataIn    => devDataInVec,
     devDataOut   => dataToDev,

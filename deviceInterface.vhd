@@ -44,12 +44,13 @@ port(
     flushRxFifo : out std_logic;
     flushTxFifo : out std_logic;
     devId       : out devices_t;
-    devReady    : in  devReady_t;
-    devBusy     : in  devBusy_t;
+    devReady    : in  devStdLogic_t;
+    devBusy     : in  devStdLogic_t;
     devRw       : out std_logic;
     devBrst     : out std_logic;
     devBrstWrt  : out std_logic;
     devBrstSnd  : out std_logic;
+    devBrstRst  : in  devStdLogic_t;
     devAddr     : out devAddr_t;
     devDataIn   : in  devDataVec_t;
     devDataOut  : out devData_t;
@@ -370,6 +371,11 @@ begin
                         byteArrCpy(devDataOutSig, brstBuff, i);
 
                         state <= done;
+                    elsif devBrstRst(devIdSig) = '1' then
+                        devBrstSig    <= '0';
+                        devDataOutSig <= (others => (others => '0'));
+
+                        state         <= done;
                     end if;
 
                 when readDev =>
@@ -411,6 +417,10 @@ begin
                         devBrstSnd <= '1';
 
                         state      <= sendDevData;
+                    elsif devBrstRst(devIdSig) = '1' then
+                        devBrstSig <= '0';
+
+                        state      <= done;
                     elsif tOutSig = '1' then
                         tOutRst <= '1';
                         rxEna   <= '1';
@@ -431,6 +441,10 @@ begin
                         state       <= readBrst;
                     elsif emptyFifo = '1' and endCnt = '1' then
                         state <= done;
+                    elsif devBrstRst(devIdSig) = '1' then
+                        devBrstSig <= '0';
+
+                        state      <= done;
                     end if;
 
                 when done =>

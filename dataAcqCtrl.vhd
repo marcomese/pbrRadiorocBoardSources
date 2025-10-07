@@ -23,31 +23,32 @@ use xpm.vcomponents.all;
 
 entity dataAcqCtrl is
 port(
-    clk100M     : in  std_logic;
-    clk25M      : in  std_logic;
-    rst         : in  std_logic;
-    devExec     : in  std_logic;
-    devId       : in  devices_t;
-    devRw       : in  std_logic;
-    devBrst     : in  std_logic;
-    devBrstWrt  : in  std_logic;
-    devBrstSnd  : in  std_logic;
-    devAddr     : in  devAddr_t;
-    devDataIn   : in  devData_t;
-    devDataOut  : out devData_t;
-    devReady    : out std_logic;
-    busy        : out std_logic;
-    resetAcq    : out std_logic;
-    startAcq    : out std_logic;
-    endAcq      : in  std_logic;
-    endMAcq     : out std_logic;
-    rdValid     : in  std_logic;
-    rdAcq       : out std_logic;
-    rdDataCnt   : in  std_logic_vector(15 downto 0);
-    emptyAcq    : in  std_logic;
-    nbAcq       : out std_logic_vector(7 downto 0);
-    selAdc      : out std_logic_vector(63 downto 0);
-    doutAcq     : in  std_logic_vector(7 downto 0)
+    clk100M    : in  std_logic;
+    clk25M     : in  std_logic;
+    rst        : in  std_logic;
+    devExec    : in  std_logic;
+    devId      : in  devices_t;
+    devRw      : in  std_logic;
+    devBrst    : in  std_logic;
+    devBrstWrt : in  std_logic;
+    devBrstSnd : in  std_logic;
+    devBrstRst : out std_logic;
+    devAddr    : in  devAddr_t;
+    devDataIn  : in  devData_t;
+    devDataOut : out devData_t;
+    devReady   : out std_logic;
+    busy       : out std_logic;
+    resetAcq   : out std_logic;
+    startAcq   : out std_logic;
+    endAcq     : in  std_logic;
+    endMAcq    : out std_logic;
+    rdValid    : in  std_logic;
+    rdAcq      : out std_logic;
+    rdDataCnt  : in  std_logic_vector(15 downto 0);
+    emptyAcq   : in  std_logic;
+    nbAcq      : out std_logic_vector(7 downto 0);
+    selAdc     : out std_logic_vector(63 downto 0);
+    doutAcq    : in  std_logic_vector(7 downto 0)
 );
 end dataAcqCtrl;
 
@@ -140,6 +141,7 @@ begin
             rdAcqSig   <= '0';
             nbAcqSig   <= (others => '0');
             devDataOut <= (others => (others => '0'));
+            devBrstRst <= '0';
             swTrg      <= '0';
 
             state      <= idle;
@@ -171,7 +173,9 @@ begin
 
                             state    <= readFifo;
                         elsif devRw = devRead and devBrst = '1' and emptyAcq = '1' then
-                            state <= errFifoEmpty;
+                            devBrstRst <= '1';
+
+                            state      <= errFifoEmpty;
                         elsif devRw = devWrite and reg(dAddr).rMode = ro then
                             state    <= errReadOnly;
                         elsif devRw = devWrite and reg(dAddr).rMode = rw then
@@ -227,6 +231,10 @@ begin
                         rdAcqSig <= '1';
 
                         state    <= readFifo;
+                    elsif emptyAcq = '1' then
+                        devBrstRst <= '1';
+
+                        state      <= errFifoEmpty;
                     end if;
 
                 when acqEnd =>
@@ -254,9 +262,10 @@ begin
 
                 when errFifoEmpty =>
                     writeReg(reg, rData, addr'pos(regStatus), errFifoEmptyStatus);
-                    busy  <= '0';
+                    devBrstRst <= '0';
+                    busy       <= '0';
 
-                    state <= idle;                    
+                    state      <= idle;                    
 
                 when others =>
                     devReady <= '0';

@@ -173,8 +173,9 @@ signal   dataToDev,
          dataFromRadioroc,
          dataFromAcq       : devData_t;
 signal   devDataInVec      : devDataVec_t;
-signal   devReadyVec       : devReady_t;
-signal   devBusyVec        : devBusy_t;
+signal   devReadyVec,
+         devBusyVec,
+         devBrstRst        : devStdLogic_t;
 
 signal   devId          : devices_t;
 signal   devReadyPGen,
@@ -192,6 +193,10 @@ signal   devReadyPGen,
          devBusyTmp,
          devBusyRadioroc,
          devBusyAcq,
+         devBrstRstPGen,
+         devBrstRstTmp,
+         devBrstRstRadioroc,
+         devBrstRstAcq,
          devIntBusy     : std_logic;
 signal   devAddr        : devAddr_t;
 
@@ -466,6 +471,7 @@ port map(
     devBrst     => devBrst,
     devBrstWrt  => devBrstWrt,
     devBrstSnd  => devBrstSnd,
+    devBrstRst  => devBrstRstAcq,
     devAddr     => devAddr,
     devDataIn   => dataToDev,
     devDataOut  => dataFromAcq,
@@ -639,6 +645,11 @@ devBusyVec(tmp275)      <= devBusyTmp;
 devBusyVec(radioroc)    <= devBusyRadioroc;
 devBusyVec(acqSystem)   <= devBusyAcq;
 
+devBrstRst(pulseGen)    <= devBrstRstPGen;
+devBrstRst(tmp275)      <= devBrstRstTmp;
+devBrstRst(radioroc)    <= devBrstRstRadioroc;
+devBrstRst(acqSystem)   <= devBrstRstAcq;
+
 devInterfInst: entity work.deviceInterface
 generic map(
     clkFreq      => clkFreq,
@@ -666,6 +677,7 @@ port map(
     devBrst     => devBrst,
     devBrstWrt  => devBrstWrt,
     devBrstSnd  => devBrstSnd,
+    devBrstRst  => devBrstRst,
     devAddr     => devAddr,
     devDataIn   => devDataInVec,
     devDataOut  => dataToDev,
