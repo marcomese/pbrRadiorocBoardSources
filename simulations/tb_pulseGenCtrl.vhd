@@ -35,33 +35,40 @@ end component;
 
 component deviceInterface is
 generic(
-    clkFreq    : real;
-    timeout    : real;
-    readCmd    : std_logic_vector(3 downto 0);
-    writeCmd   : std_logic_vector(3 downto 0);
-    burstWrCmd : std_logic_vector(3 downto 0);
-    burstRdCmd : std_logic_vector(3 downto 0)
+    clkFreq     : real;
+    timeout     : real;
+    readCmd     : std_logic_vector(3 downto 0);
+    writeCmd    : std_logic_vector(3 downto 0);
+    burstWrCmd  : std_logic_vector(3 downto 0);
+    burstRdCmd  : std_logic_vector(3 downto 0);
+    maxBrstLen  : natural -- maximum number of bytes to read/write in burst mode
 );
 port(
-    clk        : in  std_logic;
-    rst        : in  std_logic;
-    dataIn     : in  std_logic_vector(7 downto 0);
-    dataOut    : out std_logic_vector(7 downto 0);
-    rxRead     : out std_logic;
-    rxPresent  : in  std_logic;
-    txWrite    : out std_logic;
-    rxEna      : out std_logic;
-    txWrAck    : in  std_logic;
-    devId      : out devices_t;
-    devReady   : in  devReady_t;
-    devRw      : out std_logic;
-    devBurst   : out std_logic;
-    devAddr    : out devAddr_t;
-    devDataOut : out devData_t;
-    devDataIn  : in  devDataVec_t;
-    devExec    : out std_logic;
-    busy       : out std_logic;
-    error      : out std_logic_vector(1 downto 0)
+    clk         : in  std_logic;
+    rst         : in  std_logic;
+    dataIn      : in  std_logic_vector(7 downto 0);
+    dataOut     : out std_logic_vector(7 downto 0);
+    rxRead      : out std_logic;
+    rxPresent   : in  std_logic;
+    txWrite     : out std_logic;
+    txWrAck     : in  std_logic;
+    rxEna       : out std_logic;
+    flushRxFifo : out std_logic;
+    flushTxFifo : out std_logic;
+    devId       : out devices_t;
+    devReady    : in  devStdLogic_t;
+    devBusy     : in  devStdLogic_t;
+    devRw       : out std_logic;
+    devBrst     : out std_logic;
+    devBrstWrt  : out std_logic;
+    devBrstSnd  : out std_logic;
+    devBrstRst  : in  devStdLogic_t;
+    devAddr     : out devAddr_t;
+    devDataIn   : in  devDataVec_t;
+    devDataOut  : out devData_t;
+    devExec     : out std_logic;
+    busy        : out std_logic;
+    error       : out std_logic_vector(2 downto 0)
 );
 end component;
 
@@ -85,6 +92,7 @@ port(
     tx_full      : out std_logic;
     rx_reset     : in  std_logic;
     tx_reset     : in  std_logic;
+    read_rq      : in  std_logic;
     cs           : out std_logic;
     sclk         : out std_logic;
     miso         : in  std_logic;
@@ -120,23 +128,27 @@ end component;
 constant clkPeriod    : time      := 10 ns;
 constant dacClkPeriod : time      := 100 ns;
 constant clkFreq      : real      := 100.0e6;
-constant sclkFreq     : real      := 25.0e6;
+constant sclkFreq     : real      := 20.0e6;
 constant timeout      : real      := 1.0e-6;
 constant sleepOnPwrOn : boolean   := True;
 constant pwrOnTime    : real      := 20.0e-6;
 constant settlingTime : real      := 5.0e-6;
 
-constant readCmd    : std_logic_vector(3 downto 0) := x"A";
-constant writeCmd   : std_logic_vector(3 downto 0) := x"5";
-constant burstWrCmd : std_logic_vector(3 downto 0) := x"3";
-constant burstRdCmd : std_logic_vector(3 downto 0) := x"B";
+constant chipID         : std_logic_vector(3 downto 0) := "0000";
+constant readCmd        : std_logic_vector(3 downto 0) := x"A";
+constant writeCmd       : std_logic_vector(3 downto 0) := x"5";
+constant burstWrCmd     : std_logic_vector(3 downto 0) := x"3";
+constant burstRdCmd     : std_logic_vector(3 downto 0) := x"B";
 
 signal   clk          : std_logic := '1';
 signal   rst          : std_logic := '0';
 signal   devId        : devices_t := none;
 signal   devReady     : std_logic := '0';
 signal   devRw        : std_logic := '0';
-signal   devburst     : std_logic := '0';
+signal   devBrst      : std_logic := '0';
+signal   devBrstWrt   : std_logic := '0';
+signal   devBrstSnd   : std_logic := '0';
+signal   devBrstRst   : devStdLogic_t := (others => '0');
 signal   devAddr      : devAddr_t := (others => (others => '0'));
 signal   devExec      : std_logic := '0';
 signal   txWrAck      : std_logic := '0';
@@ -150,15 +162,17 @@ signal   dacCS        : std_logic := '0';
 signal   dataToDev,
          dataFromDev  : devData_t := (others => (others => '0'));
 signal   devDataInVec : devDataVec_t                 := (others => (others => (others => '0')));
-signal   devReadyVec  : devReady_t                   := (others => '0');
-signal   error        : std_logic_vector(1 downto 0) := "00";
+signal   devReadyVec  : devStdLogic_t                := (others => '0');
+signal   devBusyVec   : devStdLogic_t                := (others => '0');
+signal   error        : std_logic_vector(2 downto 0) := "000";
 signal   dataIn       : std_logic_vector(7 downto 0) := (others => '0');
 signal   dataOut      : std_logic_vector(7 downto 0) := (others => '0');
 signal   rxRead       : std_logic                    := '0';
 signal   rxPresent    : std_logic                    := '0';
 signal   txWrite      : std_logic                    := '0';
 signal   rxEna        : std_logic                    := '1';
-signal   cs,
+signal   readRq,
+         cs,
          sclk,
          miso,
          mosi,
@@ -181,7 +195,7 @@ begin
 
     testRxRead <= '1';
 
-    testDataIn <= x"04";
+    testDataIn <= x"53";
     wait for clkPeriod;
     testTxWrite <= '1';
     wait for clkPeriod;
@@ -198,7 +212,7 @@ begin
     testDataIn <= x"64";
     wait for clkPeriod;
 
-    testDataIn <= x"04";
+    testDataIn <= x"53";
     wait for clkPeriod;
     testDataIn <= x"00";
     wait for clkPeriod;
@@ -213,7 +227,7 @@ begin
     testDataIn <= x"14";
     wait for clkPeriod;
 
-    testDataIn <= x"04";
+    testDataIn <= x"53";
     wait for clkPeriod;
     testDataIn <= x"00";
     wait for clkPeriod;
@@ -228,7 +242,7 @@ begin
     testDataIn <= x"AA";
     wait for clkPeriod;
 
-    testDataIn <= x"04";
+    testDataIn <= x"53";
     wait for clkPeriod;
     testDataIn <= x"00";
     wait for clkPeriod;
@@ -246,7 +260,7 @@ begin
 
     wait for 24 us;
 
-    testDataIn <= x"84";
+    testDataIn <= x"a3";
     wait for clkPeriod;
     testTxWrite <= '1';
     wait for clkPeriod;
@@ -254,19 +268,11 @@ begin
     wait for clkPeriod;
     testDataIn <= x"05";
     wait for clkPeriod;
-    testDataIn <= x"00";
-    wait for clkPeriod;
-    testDataIn <= x"00";
-    wait for clkPeriod;
-    testDataIn <= x"00";
-    wait for clkPeriod;
-    testDataIn <= x"00";
-    wait for clkPeriod;
     testTxWrite <= '0';
 
     wait for 5 us;
 
-    testDataIn <= x"04";
+    testDataIn <= x"53";
     wait for clkPeriod;
     testTxWrite <= '1';
     wait for clkPeriod;
@@ -286,7 +292,7 @@ begin
     
     wait for 30 us;
 
-    testDataIn <= x"04";
+    testDataIn <= x"53";
     wait for clkPeriod;
     testTxWrite <= '1';
     wait for clkPeriod;
@@ -306,7 +312,7 @@ begin
 
     wait for 50 us;
 
-    testDataIn <= x"04";
+    testDataIn <= x"53";
     wait for clkPeriod;
     testTxWrite <= '1';
     wait for clkPeriod;
@@ -326,7 +332,7 @@ begin
 
     wait for 30 us;
 
-    testDataIn <= x"04";
+    testDataIn <= x"53";
     wait for clkPeriod;
     testTxWrite <= '1';
     wait for clkPeriod;
@@ -346,7 +352,7 @@ begin
 
     wait for 40 us;
 
-    testDataIn <= x"04";
+    testDataIn <= x"53";
     wait for clkPeriod;
     testTxWrite <= '1';
     wait for clkPeriod;
@@ -363,7 +369,7 @@ begin
     testDataIn <= x"00";
     wait for clkPeriod;
 
-    testDataIn <= x"04";
+    testDataIn <= x"53";
     wait for clkPeriod;
     testDataIn <= x"00";
     wait for clkPeriod;
@@ -412,6 +418,7 @@ port map(
 
 devDataInVec(pulseGen) <= dataFromDev;
 devReadyVec(pulseGen)  <= devReady;
+devBusyVec(pulseGen)   <= pgenBusy;
 
 devInterfInst: deviceInterface
 generic map(
@@ -420,7 +427,8 @@ generic map(
     readCmd    => readCmd,
     writeCmd   => writeCmd,
     burstWrCmd => burstWrCmd,
-    burstRdCmd => burstRdCmd
+    burstRdCmd => burstRdCmd,
+    maxBrstLen => 100
 )
 port map(
     clk        => clk,
@@ -434,8 +442,12 @@ port map(
     rxEna      => rxEna,
     devId      => devId,
     devReady   => devReadyVec,
+    devBusy    => devBusyVec,
     devRw      => devRw,
-    devBurst   => devBurst,
+    devBrst    => devBrst,
+    devBrstWrt => devBrstWrt,
+    devBrstSnd => devBrstSnd,
+    devBrstRst => devBrstRst,
     devAddr    => devAddr,
     devDataIn  => devDataInVec,
     devDataOut => dataToDev,
@@ -488,6 +500,7 @@ port map(
     tx_full      => open,
     rx_reset     => rst,
     tx_reset     => rst,
+    read_rq      => readRq,
     cs           => cs,
     sclk         => sclk,
     miso         => miso,

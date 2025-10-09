@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="tb_pulseGenCtrl_behav.wdb" id="1">
+         <top_modules>
+            <top_module name="devicespkg" />
+            <top_module name="glbl" />
+            <top_module name="registerspkg" />
+            <top_module name="tb_pulseGenCtrl" />
+            <top_module name="utilspkg" />
+            <top_module name="vcomponents" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <zoom_setting>
+      <ZoomStartTime time="0.000000 us"></ZoomStartTime>
+      <ZoomEndTime time="80.000003 us"></ZoomEndTime>
+      <Cursor1Time time="14.710000 us"></Cursor1Time>
+   </zoom_setting>
+   <column_width_setting>
+      <NameColumnWidth column_width="276"></NameColumnWidth>
+      <ValueColumnWidth column_width="120"></ValueColumnWidth>
+   </column_width_setting>
+   <WVObjectSize size="56" />
+   <wave_markers>
+      <marker time="13710000" label="" />
+   </wave_markers>
+   <wvobject fp_name="/tb_pulseGenCtrl/clk" type="logic">
+      <obj_property name="ElementShortName">clk</obj_property>
+      <obj_property name="ObjectShortName">clk</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_pulseGenCtrl/rst" type="logic">
+      <obj_property name="ElementShortName">rst</obj_property>
+      <obj_property name="ObjectShortName">rst</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_pulseGenCtrl/devId" type="other">
+      <obj_property name="ElementShortName">devId</obj_property>
+      <obj_property name="ObjectShortName">devId</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_pulseGenCtrl/devReady" type="logic">
+      <obj_property name="ElementShortName">devReady</obj_property>
+      <obj_property name="ObjectShortName">devReady</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_pulseGenCtrl/devRw" type="logic">
+      <obj_property name="ElementShortName">devRw</obj_property>
+      <obj_property name="ObjectShortName">devRw</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_pulseGenCtrl/devBrst" type="logic">
+      <obj_property name="ElementShortName">devBrst</obj_property>
+      <obj_property name="ObjectShortName">devBrst</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_pulseGenCtrl/devBrstWrt" type="logic">
+      <obj_property name="ElementShortName">devBrstWrt</obj_property>
+      <obj_property name="ObjectShortName">devBrstWrt</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_pulseGenCtrl/devBrstSnd" type="logic">
+      <obj_property name="ElementShortName">devBrstSnd</obj_property>
+      <obj_property name="ObjectShortName">devBrstSnd</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_pulseGenCtrl/devBrstRst" type="array">
+      <obj_property name="ElementShortName">devBrstRst[0:5]</obj_property>
+      <obj_property name="ObjectShortName">devBrstRst[0:5]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_pulseGenCtrl/devAddr" type="array">
+      <obj_property name="ElementShortName">devAddr[1:0][7:0]</obj_property>
+      <obj_property name="ObjectShortName">devAddr[1:0][7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_pulseGenCtrl/devExec" type="logic">
+      <obj_property name="ElementShortName">devExec</obj_property>
+      <obj_property name="ObjectShortName">devExec</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_pulseGenCtrl/txWrAck" type="logic">
+      <obj_property name="ElementShortName">txWrAck</obj_property>
+      <obj_property name="ObjectShortName">txWrAck</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_pulseGenCtrl/pgenBusy" type="logic">
+      <obj_property name="ElementShortName">pgenBusy</obj_property>
+      <obj_property name="ObjectShortName">pgenBusy</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_pulseGenCtrl/devIntBusy" type="logic">
+      <obj_property name="ElementShortName">devIntBusy</obj_property>
+      <obj_property name="ObjectShortName">devIntBusy</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_pulseGenCtrl/pulse" type="logic">
+      <obj_property name="ElementShortName">pulse</obj_property>
+      <obj_property name="ObjectShortName">pulse</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_pulseGenCtrl/dacClk" type="logic">
+      <obj_property name="ElementShortName">dacClk</obj_property>
+      <obj_property name="ObjectShortName">dacClk</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_pulseGenCtrl/dacSDI" type="logic">
+      <obj_property name="ElementShortName">dacSDI</obj_property>
+      <obj_property name="ObjectShortName">dacSDI</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_pulseGenCtrl/dacSCLK" type="logic">
+      <obj_property name="ElementShortName">dacSCLK</obj_property>
+      <obj_property name="ObjectShortName">dacSCLK</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_pulseGenCtrl/dacCS" type="logic">
+      <obj_property name="ElementShortName">dacCS</obj_property>
+      <obj_property name="ObjectShortName">dacCS</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_pulseGenCtrl/dataToDev" type="array">
+      <obj_property name="ElementShortName">dataToDev[3:0][7:0]</obj_property>
+      <obj_property name="ObjectShortName">dataToDev[3:0][7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_pulseGenCtrl/dataFromDev" type="array">
+      <obj_property name="ElementShortName">dataFromDev[3:0][7:0]</obj_property>
+      <obj_property name="ObjectShortName">dataFromDev[3:0][7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_pulseGenCtrl/devDataInVec" type="array">
+      <obj_property name="ElementShortName">devDataInVec[0:5][3:0][7:0]</obj_property>
+      <obj_property name="ObjectShortName">devDataInVec[0:5][3:0][7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_pulseGenCtrl/devReadyVec" type="array">
+      <obj_property name="ElementShortName">devReadyVec[0:5]</obj_property>
+      <obj_property name="ObjectShortName">devReadyVec[0:5]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_pulseGenCtrl/devBusyVec" type="array">
+      <obj_property name="ElementShortName">devBusyVec[0:5]</obj_property>
+      <obj_property name="ObjectShortName">devBusyVec[0:5]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_pulseGenCtrl/error" type="array">
+      <obj_property name="ElementShortName">error[2:0]</obj_property>
+      <obj_property name="ObjectShortName">error[2:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_pulseGenCtrl/dataIn" type="array">
+      <obj_property name="ElementShortName">dataIn[7:0]</obj_property>
+      <obj_property name="ObjectShortName">dataIn[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_pulseGenCtrl/dataOut" type="array">
+      <obj_property name="ElementShortName">dataOut[7:0]</obj_property>
+      <obj_property name="ObjectShortName">dataOut[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_pulseGenCtrl/rxRead" type="logic">
+      <obj_property name="ElementShortName">rxRead</obj_property>
+      <obj_property name="ObjectShortName">rxRead</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_pulseGenCtrl/rxPresent" type="logic">
+      <obj_property name="ElementShortName">rxPresent</obj_property>
+      <obj_property name="ObjectShortName">rxPresent</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_pulseGenCtrl/txWrite" type="logic">
+      <obj_property name="ElementShortName">txWrite</obj_property>
+      <obj_property name="ObjectShortName">txWrite</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_pulseGenCtrl/rxEna" type="logic">
+      <obj_property name="ElementShortName">rxEna</obj_property>
+      <obj_property name="ObjectShortName">rxEna</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_pulseGenCtrl/readRq" type="logic">
+      <obj_property name="ElementShortName">readRq</obj_property>
+      <obj_property name="ObjectShortName">readRq</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_pulseGenCtrl/cs" type="logic">
+      <obj_property name="ElementShortName">cs</obj_property>
+      <obj_property name="ObjectShortName">cs</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_pulseGenCtrl/sclk" type="logic">
+      <obj_property name="ElementShortName">sclk</obj_property>
+      <obj_property name="ObjectShortName">sclk</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_pulseGenCtrl/miso" type="logic">
+      <obj_property name="ElementShortName">miso</obj_property>
+      <obj_property name="ObjectShortName">miso</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_pulseGenCtrl/mosi" type="logic">
+      <obj_property name="ElementShortName">mosi</obj_property>
+      <obj_property name="ObjectShortName">mosi</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_pulseGenCtrl/testTxWrite" type="logic">
+      <obj_property name="ElementShortName">testTxWrite</obj_property>
+      <obj_property name="ObjectShortName">testTxWrite</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_pulseGenCtrl/testRxRead" type="logic">
+      <obj_property name="ElementShortName">testRxRead</obj_property>
+      <obj_property name="ObjectShortName">testRxRead</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_pulseGenCtrl/testRxPresent" type="logic">
+      <obj_property name="ElementShortName">testRxPresent</obj_property>
+      <obj_property name="ObjectShortName">testRxPresent</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_pulseGenCtrl/dataToMaster" type="array">
+      <obj_property name="ElementShortName">dataToMaster[7:0]</obj_property>
+      <obj_property name="ObjectShortName">dataToMaster[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_pulseGenCtrl/testDataIn" type="array">
+      <obj_property name="ElementShortName">testDataIn[7:0]</obj_property>
+      <obj_property name="ObjectShortName">testDataIn[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_pulseGenCtrl/testDataOut" type="array">
+      <obj_property name="ElementShortName">testDataOut[7:0]</obj_property>
+      <obj_property name="ObjectShortName">testDataOut[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_pulseGenCtrl/dataFromMaster" type="array">
+      <obj_property name="ElementShortName">dataFromMaster[7:0]</obj_property>
+      <obj_property name="ObjectShortName">dataFromMaster[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_pulseGenCtrl/clkPeriod" type="other">
+      <obj_property name="ElementShortName">clkPeriod</obj_property>
+      <obj_property name="ObjectShortName">clkPeriod</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_pulseGenCtrl/dacClkPeriod" type="other">
+      <obj_property name="ElementShortName">dacClkPeriod</obj_property>
+      <obj_property name="ObjectShortName">dacClkPeriod</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_pulseGenCtrl/clkFreq" type="other">
+      <obj_property name="ElementShortName">clkFreq</obj_property>
+      <obj_property name="ObjectShortName">clkFreq</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_pulseGenCtrl/sclkFreq" type="other">
+      <obj_property name="ElementShortName">sclkFreq</obj_property>
+      <obj_property name="ObjectShortName">sclkFreq</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_pulseGenCtrl/timeout" type="other">
+      <obj_property name="ElementShortName">timeout</obj_property>
+      <obj_property name="ObjectShortName">timeout</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_pulseGenCtrl/sleepOnPwrOn" type="other">
+      <obj_property name="ElementShortName">sleepOnPwrOn</obj_property>
+      <obj_property name="ObjectShortName">sleepOnPwrOn</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_pulseGenCtrl/pwrOnTime" type="other">
+      <obj_property name="ElementShortName">pwrOnTime</obj_property>
+      <obj_property name="ObjectShortName">pwrOnTime</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_pulseGenCtrl/settlingTime" type="other">
+      <obj_property name="ElementShortName">settlingTime</obj_property>
+      <obj_property name="ObjectShortName">settlingTime</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_pulseGenCtrl/chipID" type="array">
+      <obj_property name="ElementShortName">chipID[3:0]</obj_property>
+      <obj_property name="ObjectShortName">chipID[3:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_pulseGenCtrl/readCmd" type="array">
+      <obj_property name="ElementShortName">readCmd[3:0]</obj_property>
+      <obj_property name="ObjectShortName">readCmd[3:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_pulseGenCtrl/writeCmd" type="array">
+      <obj_property name="ElementShortName">writeCmd[3:0]</obj_property>
+      <obj_property name="ObjectShortName">writeCmd[3:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_pulseGenCtrl/burstWrCmd" type="array">
+      <obj_property name="ElementShortName">burstWrCmd[3:0]</obj_property>
+      <obj_property name="ObjectShortName">burstWrCmd[3:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_pulseGenCtrl/burstRdCmd" type="array">
+      <obj_property name="ElementShortName">burstRdCmd[3:0]</obj_property>
+      <obj_property name="ObjectShortName">burstRdCmd[3:0]</obj_property>
+   </wvobject>
+</wave_config>
