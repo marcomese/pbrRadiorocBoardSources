@@ -133,6 +133,10 @@ signal   dacCmd         : std_logic_vector(3 downto 0);
 signal   dacValue       : std_logic_vector(11 downto 0);
 signal   settled        : std_logic_vector(1 downto 0);
 
+attribute mark_debug : string;
+attribute mark_debug of state,
+                        pulse : signal is "true";
+
 begin
 
 dAddr     <= devAddrToInt(devAddr);
@@ -250,7 +254,7 @@ begin
                         settled  <= "01";
 
                         state    <= waitSettlingTime;
-                    elsif devExec = '1' then
+                    elsif devExec = '1' and devID = pulseGen then
                         busy     <= '0';
                         execSig  <= '1';
 
@@ -268,7 +272,7 @@ begin
                         dacSend <= '0';
 
                         state   <= idle;
-                    elsif devExec = '1' then
+                    elsif devExec = '1' and devID = pulseGen then
                         busy     <= '0';
                         execSig  <= '1';
 
@@ -287,7 +291,7 @@ begin
                         dacSend <= '0';
 
                         state   <= idle;
-                    elsif devExec = '1' then
+                    elsif devExec = '1' and devID = pulseGen then
                         busy     <= '0';
                         execSig  <= '1';
 
@@ -320,7 +324,7 @@ begin
                         settled  <= "00";
 
                         state    <= idle;
-                    elsif devExec = '1' then
+                    elsif devExec = '1' and devID = pulseGen then
                         busy     <= '0';
                         execSig  <= '1';
 
@@ -352,7 +356,7 @@ begin
                         settled  <= "00";
 
                         state    <= idle;
-                    elsif devExec = '1' then
+                    elsif devExec = '1' and devID = pulseGen then
                         busy     <= '0';
                         execSig  <= '1';
 
@@ -388,7 +392,7 @@ begin
                     period := readReg(reg, rData, addr'pos(regTSet));
                     width  := readReg(reg, rData, addr'pos(regWSet));
 
-                    if devExec = '1' then
+                    if devExec = '1' and devID = pulseGen then
                         writeReg(reg, rData, addr'pos(regStatus), idleStatus);
                         busy    <= '0';
                         pulse   <= '0';
@@ -416,7 +420,7 @@ begin
                     period := readReg(reg, rData, addr'pos(regTSet));
                     width  := readReg(reg, rData, addr'pos(regWSet));
 
-                    if devExec = '1' then
+                    if devExec = '1' and devID = pulseGen then
                         writeReg(reg, rData, addr'pos(regStatus), idleStatus);
                         busy    <= '0';
                         pulse   <= '0';
