@@ -197,7 +197,9 @@ signal   devReadyPGen,
          devBrstRstTmp,
          devBrstRstRadioroc,
          devBrstRstAcq,
-         devIntBusy     : std_logic;
+         devIntBusy,
+         pulseSig,
+         pulsingSig     : std_logic;
 signal   devAddr        : devAddr_t;
 
 -- SIGNALS FOR spiSlave --
@@ -246,6 +248,8 @@ attribute mark_debug of extTrg,
                         extTrgSig : signal is "true";
 
 begin
+
+    pulse <= pulseSig;
 
 	reset <= not(npwr_reset);
 
@@ -454,6 +458,8 @@ port map(
 		hold_ext => sc_holdext,
 		trig_ext => sc_trigext,
 		trig_out => trig_out,
+		pulsing => pulsingSig,
+		pulse => pulseSig,
 		extTrg => extTrgSig,
 		endAcq => endAcq,
 		rdValid => rdValid,
@@ -574,7 +580,8 @@ port map(
     devDataOut   => dataFromPGen,
     devExec      => devExec,
     busy         => devBusyPGen,
-    pulse        => pulse,
+    pulsing      => pulsingSig,
+    pulse        => pulseSig,
     dacSDI       => dacSDI,
     dacSCLK      => dacSCLK,
     dacCS        => dacCS
@@ -652,38 +659,38 @@ devBrstRst(acqSystem)   <= devBrstRstAcq;
 
 devInterfInst: entity work.deviceInterface
 generic map(
-    clkFreq      => clkFreq,
-    timeout      => timeout,
-    readCmd      => readCmd,
-    writeCmd     => writeCmd,
-    burstWrCmd   => burstWrCmd,
-    burstRdCmd   => burstRdCmd,
-    maxBrstLen   => maxBrstLen
+    clkFreq    => clkFreq,
+    timeout    => timeout,
+    readCmd    => readCmd,
+    writeCmd   => writeCmd,
+    burstWrCmd => burstWrCmd,
+    burstRdCmd => burstRdCmd,
+    maxBrstLen => maxBrstLen
 )
 port map(
-    clk         => clk_100M,
-    rst         => reset,
-    dataIn      => dataFromMaster,
-    dataOut     => dataToMaster,
-    rxRead      => rxRead,
-    rxEna       => rxEna,
-    rxPresent   => rxPresent,
-    txWrite     => txWrite,
-    txWrAck     => txWrAck,
-    devId       => devId,
-    devReady    => devReadyVec,
-    devBusy     => devBusyVec,
-    devRw       => devRw,
-    devBrst     => devBrst,
-    devBrstWrt  => devBrstWrt,
-    devBrstSnd  => devBrstSnd,
-    devBrstRst  => devBrstRst,
-    devAddr     => devAddr,
-    devDataIn   => devDataInVec,
-    devDataOut  => dataToDev,
-    devExec     => devExec,
-    busy        => devIntBusy,
-    error       => error
+    clk        => clk_100M,
+    rst        => reset,
+    dataIn     => dataFromMaster,
+    dataOut    => dataToMaster,
+    rxRead     => rxRead,
+    rxEna      => rxEna,
+    rxPresent  => rxPresent,
+    txWrite    => txWrite,
+    txWrAck    => txWrAck,
+    devId      => devId,
+    devReady   => devReadyVec,
+    devBusy    => devBusyVec,
+    devRw      => devRw,
+    devBrst    => devBrst,
+    devBrstWrt => devBrstWrt,
+    devBrstSnd => devBrstSnd,
+    devBrstRst => devBrstRst,
+    devAddr    => devAddr,
+    devDataIn  => devDataInVec,
+    devDataOut => dataToDev,
+    devExec    => devExec,
+    busy       => devIntBusy,
+    error      => error
 );
 
 end arch;

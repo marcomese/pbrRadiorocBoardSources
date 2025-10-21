@@ -36,6 +36,8 @@ entity adc is
 		hold_ext : out std_logic;
 		trig_ext : out std_logic;
 		trig_out : out std_logic;
+		pulsing : in std_logic;
+		pulse : in std_logic;
 		extTrg : in std_logic;
 		endAcq : out std_logic;
 		rdValid : out std_logic;
@@ -250,7 +252,7 @@ port map(
     cd <=   sel_adc(63 downto 56) & "000";  
     conv_delay <= to_integer(unsigned(cd));
     
-    trigger <= (en_acq and (hit or extTrg));
+    trigger <= en_acq and ((not pulsing and (hit or extTrg)) or (pulsing and pulse));
     trigger_sft <= sel_adc(7);--signal_in_pulse or signal_in_pulse2 or latch;
     
     process(trigger_shrunk, trigger)

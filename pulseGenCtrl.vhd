@@ -49,6 +49,7 @@ port(
     devDataOut   : out devData_t;
     devReady     : out std_logic;
     busy         : out std_logic;
+    pulsing      : out std_logic;
     pulse        : out std_logic;
     dacSDI       : out std_logic;
     dacSCLK      : out std_logic;
@@ -144,6 +145,7 @@ endSettl  <= settlCnt(settlCnt'left);
 endOnCnt  <= onCnt(32);
 endOffCnt <= offCnt(32);
 start     <= devExec or execSig;
+pulsing   <= '1' when isSet(reg, rData, addr'pos(regOutEn)) else '0';
 
 pGenFSM: process(clk, rst, devExec, start)
     variable period : unsigned(31 downto 0) := (others => '0');
