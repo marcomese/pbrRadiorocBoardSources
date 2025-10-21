@@ -16,22 +16,34 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="235,728.100 ns"></ZoomStartTime>
-      <ZoomEndTime time="237,318.101 ns"></ZoomEndTime>
-      <Cursor1Time time="236,480.100 ns"></Cursor1Time>
+      <ZoomStartTime time="9,937.250 ns"></ZoomStartTime>
+      <ZoomEndTime time="10,256.051 ns"></ZoomEndTime>
+      <Cursor1Time time="10,004.650 ns"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
-      <NameColumnWidth column_width="180"></NameColumnWidth>
+      <NameColumnWidth column_width="176"></NameColumnWidth>
       <ValueColumnWidth column_width="58"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="76" />
+   <WVObjectSize size="80" />
+   <wvobject fp_name="/tb_dataAcqCtrl/clk_100M" type="logic">
+      <obj_property name="ElementShortName">clk_100M</obj_property>
+      <obj_property name="ObjectShortName">clk_100M</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl/clkN_100M" type="logic">
+      <obj_property name="ElementShortName">clkN_100M</obj_property>
+      <obj_property name="ObjectShortName">clkN_100M</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl/clk_200M" type="logic">
+      <obj_property name="ElementShortName">clk_200M</obj_property>
+      <obj_property name="ObjectShortName">clk_200M</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl/clkN_200M" type="logic">
+      <obj_property name="ElementShortName">clkN_200M</obj_property>
+      <obj_property name="ObjectShortName">clkN_200M</obj_property>
+   </wvobject>
    <wvobject fp_name="/tb_dataAcqCtrl/rst" type="logic">
       <obj_property name="ElementShortName">rst</obj_property>
       <obj_property name="ObjectShortName">rst</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl/clk_25M" type="logic">
-      <obj_property name="ElementShortName">clk_25M</obj_property>
-      <obj_property name="ObjectShortName">clk_25M</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_dataAcqCtrl/start" type="logic">
       <obj_property name="ElementShortName">start</obj_property>
@@ -168,15 +180,31 @@
       <obj_property name="ElementShortName">devRw</obj_property>
       <obj_property name="ObjectShortName">devRw</obj_property>
    </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/state" type="other">
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="ElementShortName">state</obj_property>
+      <obj_property name="ObjectShortName">state</obj_property>
+      <obj_property name="label">stateDevInterf</obj_property>
+   </wvobject>
    <wvobject fp_name="/tb_dataAcqCtrl/dataAcqCtrlInst/state" type="other">
       <obj_property name="DisplayName">label</obj_property>
       <obj_property name="ElementShortName">state</obj_property>
       <obj_property name="ObjectShortName">state</obj_property>
       <obj_property name="label">stateDataAcqCtrl</obj_property>
    </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl/adcInst/current_state" type="other">
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="ElementShortName">current_state</obj_property>
+      <obj_property name="ObjectShortName">current_state</obj_property>
+      <obj_property name="label">stateAdcInst</obj_property>
+   </wvobject>
    <wvobject fp_name="/tb_dataAcqCtrl/dataAcqCtrlInst/emptyAcq" type="logic">
       <obj_property name="ElementShortName">emptyAcq</obj_property>
       <obj_property name="ObjectShortName">emptyAcq</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl/extTrg" type="logic">
+      <obj_property name="ElementShortName">extTrg</obj_property>
+      <obj_property name="ObjectShortName">extTrg</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_dataAcqCtrl/dataAcqCtrlInst/devBrstRst" type="logic">
       <obj_property name="ElementShortName">devBrstRst</obj_property>
@@ -210,18 +238,6 @@
    <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/emptyFifo" type="logic">
       <obj_property name="ElementShortName">emptyFifo</obj_property>
       <obj_property name="ObjectShortName">emptyFifo</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/state" type="other">
-      <obj_property name="DisplayName">label</obj_property>
-      <obj_property name="ElementShortName">state</obj_property>
-      <obj_property name="ObjectShortName">state</obj_property>
-      <obj_property name="label">stateDevInterf</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl/adcInst/current_state" type="other">
-      <obj_property name="DisplayName">label</obj_property>
-      <obj_property name="ElementShortName">current_state</obj_property>
-      <obj_property name="ObjectShortName">current_state</obj_property>
-      <obj_property name="label">stateAdcInst</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_dataAcqCtrl/adcInst/en_acq" type="logic">
       <obj_property name="ElementShortName">en_acq</obj_property>

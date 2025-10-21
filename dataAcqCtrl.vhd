@@ -24,7 +24,6 @@ use xpm.vcomponents.all;
 entity dataAcqCtrl is
 port(
     clk100M    : in  std_logic;
-    clk25M     : in  std_logic;
     rst        : in  std_logic;
     devExec    : in  std_logic;
     devId      : in  devices_t;

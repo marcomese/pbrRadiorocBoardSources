@@ -10,31 +10,30 @@ architecture Behavioral of tb_dataAcqCtrl is
 
 component dataAcqCtrl is
 port(
-    clk100M     : in  std_logic;
-    clk25M      : in  std_logic;
-    rst         : in  std_logic;
-    devExec     : in  std_logic;
-    devId       : in  devices_t;
-    devRw       : in  std_logic;
-    devBrst     : in  std_logic;
-    devBrstWrt  : in  std_logic;
-    devBrstSnd  : in  std_logic;
-    devBrstRst  : out std_logic;
-    devAddr     : in  devAddr_t;
-    devDataIn   : in  devData_t;
-    devDataOut  : out devData_t;
-    devReady    : out std_logic;
-    busy        : out std_logic;
-    resetAcq    : out std_logic;
-    startAcq    : out std_logic;
-    endAcq      : in  std_logic;
-    rdValid     : in  std_logic;
-    rdAcq       : out std_logic;
-    rdDataCnt   : in  std_logic_vector(15 downto 0);
-    emptyAcq    : in  std_logic;
-    nbAcq       : out std_logic_vector(7 downto 0);
-    selAdc      : out std_logic_vector(63 downto 0);
-    doutAcq     : in  std_logic_vector(7 downto 0)
+    clk100M    : in  std_logic;
+    rst        : in  std_logic;
+    devExec    : in  std_logic;
+    devId      : in  devices_t;
+    devRw      : in  std_logic;
+    devBrst    : in  std_logic;
+    devBrstWrt : in  std_logic;
+    devBrstSnd : in  std_logic;
+    devBrstRst : out std_logic;
+    devAddr    : in  devAddr_t;
+    devDataIn  : in  devData_t;
+    devDataOut : out devData_t;
+    devReady   : out std_logic;
+    busy       : out std_logic;
+    resetAcq   : out std_logic;
+    startAcq   : out std_logic;
+    endAcq     : in  std_logic;
+    rdValid    : in  std_logic;
+    rdAcq      : out std_logic;
+    rdDataCnt  : in  std_logic_vector(15 downto 0);
+    emptyAcq   : in  std_logic;
+    nbAcq      : out std_logic_vector(7 downto 0);
+    selAdc     : out std_logic_vector(63 downto 0);
+    doutAcq    : in  std_logic_vector(7 downto 0)
 );
 end component;
 
@@ -42,9 +41,10 @@ component adc is
  Port (
   rst   : in std_logic;
   clk_100M : in std_logic;
+  clkN_100M : in std_logic;
   clk_200M : in std_logic;
+  clkN_200M : in std_logic;
   clk_500M : in std_logic;
-  clk_25M  : in std_logic;
   start    : in std_logic;
   sdo_hg  : IN STD_LOGIC;
   sdo_lg  : IN STD_LOGIC;
@@ -67,6 +67,8 @@ component adc is
   hold_ext : out std_logic;
   trig_ext : out std_logic;
   trig_out : out std_logic;
+  pulse : in std_logic;
+  pulsing : in std_logic;
   extTrg : in std_logic;
   endAcq : out std_logic;
   rdValid : out std_logic;
@@ -199,7 +201,9 @@ constant delay         : natural                      := 1;--50000;
 
 signal rst               : std_logic := '0';
 signal clk_100M          : std_logic := '1';
+signal clkN_100M          : std_logic := '0';
 signal clk_200M          : std_logic := '1';
+signal clkN_200M          : std_logic := '0';
 signal clk_500M          : std_logic := '0';
 signal clk_25M           : std_logic := '1';
 signal start             : std_logic := '0';
@@ -249,6 +253,8 @@ signal rxPresent         : std_logic                    := '0';
 signal txWrite           : std_logic                    := '0';
 signal txWrAck           : std_logic                    := '0';
 signal flushRxFifo       : std_logic                    := '0';
+signal pulsing       : std_logic                    := '0';
+signal pulse       : std_logic                    := '0';
 signal rxEna             : std_logic                    := '1';
 signal readRq,
        cs,
@@ -430,7 +436,6 @@ end process;
 
 dataAcqCtrlInst : dataAcqCtrl
 port map(
-    clk25M      => clk_25M,
     clk100M     => clk_100M,
     rst         => rst,
     devExec     => devExec,
@@ -461,9 +466,10 @@ adcInst: adc
 port map(
     rst               => resetAcq,
     clk_100M          => clk_100M,
+    clkN_100M          => clkN_100M,
     clk_200M          => clk_200M,
+    clkN_200M          => clkN_200M,
     clk_500M          => clk_500M,
-    clk_25M           => clk_25M,
     start             => start,
     sdo_hg            => sdo_hg,
     sdo_lg            => sdo_lg,
@@ -487,14 +493,17 @@ port map(
     trig_ext          => trig_ext,
     trig_out          => trig_out,
     extTrg            => extTrg,
+    pulsing           => pulsing,
+    pulse             => pulse,
     endAcq            => endAcq,
     rdValid           => rdValid,
     test              => test
 );
 
-clk_25M  <= not clk_25M  after clkPeriod25M/2;
 clk_100M <= not clk_100M after clkPeriod100M/2;
+clkN_100M <= not clkN_100M after clkPeriod100M/2;
 clk_200M <= not clk_200M after clkPeriod200M/2;
+clkN_200M <= not clkN_200M after clkPeriod200M/2;
 
 devDataInVec(acqSystem) <= dataFromAcq;
 devReadyVec(acqSystem)  <= devReadyAcq;

@@ -101,7 +101,7 @@ architecture arch of radioroc_fw is
 	signal T                                              : std_logic_vector(63 downto 0);
 	-- Clock and reset
 	signal reset, locked_1, locked_2, locked_3                               : std_logic;
-	signal clk_2M, clk_10M, clk_20M, clk_25M, clk_50M, clk_100M, clk_200M, clk_250M : std_logic;
+	signal clk_2M, clk_10M, clk_50M, clk_100M, clk_200M, clkN_100M, clkN_200M, clk_250M : std_logic;
 	signal clk_500M : std_logic;
 	signal clk_100k                                                          : std_logic;
 	signal cpt_clk                                                           : natural range 0 to 4;
@@ -309,29 +309,14 @@ end process;
 		clk_in1_n  => CLK_100M_N,
 		reset    => reset,
 		clk_out1 => clk_10M,
-		clk_out2 => clk_20M,
-		clk_out3 => clk_25M,
+		clk_out2 => clkN_100M,
+		clk_out3 => clkN_200M,
 		clk_out4 => clk_100M,
 		clk_out5 => clk_200M,
 		clk_out6 => clk_250M,
 		clk_out7 => clk_500M,
 		locked   => locked_1
 	);
- 
-	process (reset, clk_20M)
-	begin
-		if reset = '1' then
-			cpt_clk <= 0;
-			clk_2M  <= '0';
-		elsif rising_edge(clk_20M) then
-			if cpt_clk = 4 then
-				clk_2M  <= not clk_2M;
-				cpt_clk <= 0;
-			else
-				cpt_clk <= cpt_clk + 1;
-			end if;
-		end if;
-	end process;
 
 	Div : entity xil_defaultlib.Diviseur
 	port map(
@@ -433,9 +418,10 @@ port map(
 	Port map (
 		rst 	 => reset_acq,
 		clk_100M => clk_100M,
+		clkN_100M => clkN_100M,
 		clk_200M => clk_200M,
+		clkN_200M => clkN_200M,
 		clk_500M => clk_500M,
-		clk_25M  => clk_25M,
 		start    => start_acq,
 		sdo_hg	 => ADC_HG,
 		sdo_lg	 => ADC_LG,
@@ -468,7 +454,6 @@ port map(
 
 dataAcqCtrlInst : entity work.dataAcqCtrl
 port map(
-    clk25M      => clk_25M,
     clk100M     => clk_100M,
     rst         => reset,
     devExec     => devExec,
