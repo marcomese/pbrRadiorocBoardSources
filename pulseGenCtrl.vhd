@@ -79,19 +79,19 @@ constant reg : regsRec_t := (
     addr'pos(regTSet)    => (rAddr => 2, rBegin => 31, rEnd => 0,  rMode => rw)
 );
 
-constant regsNum  : integer := reg(reg'high).rAddr+1;
+constant regsNum : integer := reg(reg'high).rAddr+1;
 
-signal   rData    : regsData_t(regsNum-1 downto 0);
+signal   rData   : regsData_t(regsNum-1 downto 0);
 
 --------------------------------------------------------------------
 
-constant settlingCount  : integer   := integer(settlingTime*clkFreq);
-constant pwrOnCount     : integer   := integer(pwrOnTime*clkFreq);
-constant sleepPwrOn     : std_logic := boolToStdLogic(sleepOnPwrOn);
+constant settlingCount  : integer                       := integer(settlingTime*clkFreq);
+constant pwrOnCount     : integer                       := integer(pwrOnTime*clkFreq);
+constant sleepPwrOn     : std_logic                     := boolToStdLogic(sleepOnPwrOn);
 
-constant dacSetVUpdtCMD : std_logic_vector(3 downto 0) := "0011";
-constant dacOffCMD      : std_logic_vector(3 downto 0) := "0100";
-constant dacRefCMD      : std_logic_vector(2 downto 0) := "011";
+constant dacSetVUpdtCMD : std_logic_vector(3 downto 0)  := "0011";
+constant dacOffCMD      : std_logic_vector(3 downto 0)  := "0100";
+constant dacRefCMD      : std_logic_vector(2 downto 0)  := "011";
 
 constant idleStatus     : std_logic_vector(31 downto 0) := initSlv(32, 13, 0, "00" & x"001", '0');
 constant settlStatus    : std_logic_vector(31 downto 0) := initSlv(32, 13, 0, "00" & x"002", '0');
@@ -111,28 +111,25 @@ type state_t is (idle,
                  setRef,
                  pwrSave,
                  checkVWT,
-                 pulseOff,
-                 pulseOn,
                  errAddr,
                  errReadOnly,
                  errVWT);
 
-signal   state          : state_t;
-signal   dAddr          : integer;
-signal   settlCnt       : unsigned(bitsNum(max(settlingCount, pwrOnCount)) downto 0);
-signal   onCnt,
-         offCnt         : unsigned(32 downto 0);
+signal   state      : state_t;
+signal   dAddr      : integer;
+signal   settlCnt   : unsigned(bitsNum(max(settlingCount, pwrOnCount)) downto 0);
 signal   dacSend,
          dacBusySig,
          endPwrOn,
          endSettl,
-         endOnCnt,
-         endOffCnt,
          execSig,
-         start          : std_logic;
-signal   dacCmd         : std_logic_vector(3 downto 0);
-signal   dacValue       : std_logic_vector(11 downto 0);
-signal   settled        : std_logic_vector(1 downto 0);
+         pGenEn,
+         start      : std_logic;
+signal   dacCmd     : std_logic_vector(3 downto 0);
+signal   dacValue   : std_logic_vector(11 downto 0);
+signal   periodSig,
+         widthSig   : std_logic_vector(31 downto 0);
+signal   settled    : std_logic_vector(1 downto 0);
 
 attribute mark_debug : string;
 attribute mark_debug of state,
@@ -140,17 +137,14 @@ attribute mark_debug of state,
 
 begin
 
-dAddr     <= devAddrToInt(devAddr);
-endSettl  <= settlCnt(settlCnt'left);
-endOnCnt  <= onCnt(32);
-endOffCnt <= offCnt(32);
-start     <= devExec or execSig;
-pulsing   <= '1' when isSet(reg, rData, addr'pos(regOutEn)) else '0';
+dAddr    <= devAddrToInt(devAddr);
+endSettl <= settlCnt(settlCnt'left);
+start    <= devExec or execSig;
 
 pGenFSM: process(clk, rst, devExec, start)
-    variable period : unsigned(31 downto 0) := (others => '0');
-    variable width  : unsigned(31 downto 0) := (others => '0');
-    variable ampl   : unsigned(31 downto 0) := (others => '0');
+    variable ampl   : unsigned(31 downto 0)         := (others => '0');
+    variable period : std_logic_vector(31 downto 0) := (others => '0');
+    variable width  : std_logic_vector(31 downto 0) := (others => '0');
 begin
     if rising_edge(clk) then
         if rst = '1' then
@@ -158,11 +152,9 @@ begin
             devDataOut <= (others => (others => '0'));
             rData      <= (others => (others => '0'));
             settlCnt   <= to_unsigned(settlingCount-2, settlCnt'length);
-            onCnt      <= (others => '0');
-            offCnt     <= (others => '0');
             execSig    <= '0';
             busy       <= '0';
-            pulse      <= '0';
+            pGenEn     <= '0';
             dacSend    <= '0';
             dacCmd     <= (others => '0');
             dacValue   <= (others => '0');
@@ -172,6 +164,11 @@ begin
         else
             case state is
                 when idle =>
+                    writeReg(reg, rData, addr'pos(regStatus), idleStatus);
+                    execSig <= '0';
+
+                    state   <= idle;
+
                     if start = '1' and devID = pulseGen then
                         if dAddr > addr'pos(addr'high) then
                             execSig  <= '0';
@@ -185,30 +182,27 @@ begin
 
                             state      <= execute;
                         elsif devRw = devWrite and reg(dAddr).rMode = ro then
-                            execSig  <= '0';
+                            execSig <= '0';
 
-                            state    <= errReadOnly;
+                            state   <= errReadOnly;
                         elsif devRw = devWrite and reg(dAddr).rMode = rw then
                             writeReg(reg, rData, addr'pos(regStatus), dAddr);
                             writeReg(reg, rData, dAddr, devDataIn);
-                            execSig  <= '0';
-                            busy     <= '1';
+                            execSig <= '0';
+                            busy    <= '1';
 
-                            state    <= execute;
+                            state   <= execute;
                         else
                             writeReg(reg, rData, addr'pos(regStatus), idleStatus);
-                            execSig  <= '0';
+                            execSig <= '0';
     
-                            state    <= idle;
+                            state   <= idle;
                         end if;
-                    else
-                        writeReg(reg, rData, addr'pos(regStatus), idleStatus);
-                        execSig  <= '0';
-
-                        state    <= idle;
                     end if;
 
                 when execute =>
+                    state <= execute;
+
                     if dacBusySig = '0' then
                         if readReg(reg, rData, addr'pos(regStatus)) = addrToSlv(addr'pos(regVSet)) then
                             devReady <= '0';
@@ -231,25 +225,32 @@ begin
                             dacValue <= (others => '0');
     
                             state    <= pwrSave;
+                        elsif not isSet(reg, rData, addr'pos(regOutEn)) then
+                            pGenEn <= '0';
+                            busy   <= '0';
+
+                            state  <= idle;
                         elsif isSet(reg, rData, addr'pos(regOutEn)) and not isSet(reg, rData, addr'pos(regPwrSave)) then
                             devReady <= '0';
     
                             state    <= checkVWT;
                         elsif isSet(reg, rData, addr'pos(regOutEn)) and isSet(reg, rData, addr'pos(regPwrSave)) then
                             devReady <= '0';
-    
+
                             state    <= waitSettlingTime;
                         else
                             devReady <= '0';
                             busy     <= '0';
-    
+
                             state    <= idle;
                         end if;
-                    else
-                        state <= execute;
                     end if;
 
                 when setVDac =>
+                    dacSend <= '0';
+
+                    state   <= setVDac;
+
                     if dacBusySig = '1' then
                         settlCnt <= to_unsigned(settlingCount-2, settlCnt'length);
                         dacSend  <= '0';
@@ -257,17 +258,17 @@ begin
 
                         state    <= waitSettlingTime;
                     elsif devExec = '1' and devID = pulseGen then
-                        busy     <= '0';
-                        execSig  <= '1';
+                        busy    <= '0';
+                        execSig <= '1';
 
-                        state    <= idle;
-                    else
-                        dacSend <= '0';
-
-                        state   <= setVDac;
+                        state   <= idle;
                     end if;
 
                 when setRef =>
+                    dacSend <= '0';
+
+                    state   <= setRef;
+
                     if dacBusySig = '1' then
                         clearReg(reg, rData, addr'pos(regOutEn));
                         busy    <= '0';
@@ -275,17 +276,17 @@ begin
 
                         state   <= idle;
                     elsif devExec = '1' and devID = pulseGen then
-                        busy     <= '0';
-                        execSig  <= '1';
+                        busy    <= '0';
+                        execSig <= '1';
 
-                        state    <= idle;
-                    else
-                        dacSend <= '0';
-
-                        state   <= setRef;
+                        state   <= idle;
                     end if;
 
                 when pwrSave =>
+                    dacSend <= '0';
+
+                    state   <= pwrSave;
+
                     if dacBusySig = '1' then
                         writeReg(reg, rData, addr'pos(regStatus), idleStatus);
                         clearReg(reg, rData, addr'pos(regOutEn));
@@ -294,19 +295,18 @@ begin
 
                         state   <= idle;
                     elsif devExec = '1' and devID = pulseGen then
-                        busy     <= '0';
-                        execSig  <= '1';
+                        busy    <= '0';
+                        execSig <= '1';
 
-                        state    <= idle;
-                    else
-                        dacSend <= '0';
-
-                        state   <= pwrSave;
+                        state   <= idle;
                     end if;
 
                 when waitSettlingTime =>
-                    period := readReg(reg, rData, addr'pos(regTSet));
-                    width  := readReg(reg, rData, addr'pos(regWSet));
+                    writeReg(reg, rData, addr'pos(regStatus), settlStatus);
+                    settlCnt <= settlCnt - 1;
+                    settled  <= "01";
+
+                    state    <= waitSettlingTime;
 
                     if endSettl = '1' and isSet(reg, rData, addr'pos(regPwrSave)) then
                         settlCnt <= to_unsigned(pwrOnCount-2, settlCnt'length);
@@ -331,17 +331,14 @@ begin
                         execSig  <= '1';
 
                         state    <= idle;
-                    else
-                        writeReg(reg, rData, addr'pos(regStatus), settlStatus);
-                        settlCnt <= settlCnt - 1;
-                        settled  <= "01";
-
-                        state    <= waitSettlingTime;
                     end if;
 
                 when waitPwrOnTime =>
-                    period := readReg(reg, rData, addr'pos(regTSet));
-                    width  := readReg(reg, rData, addr'pos(regWSet));
+                    writeReg(reg, rData, addr'pos(regStatus), settlPwrStatus);
+                    settlCnt <= settlCnt - 1;
+                    settled  <= "10";
+
+                    state    <= waitPwrOnTime;
 
                     if endSettl = '1' and isSet(reg, rData, addr'pos(regOutEn)) then
                         writeReg(reg, rData, addr'pos(regStatus), pOnStatus);
@@ -363,12 +360,6 @@ begin
                         execSig  <= '1';
 
                         state    <= idle;
-                    else
-                        writeReg(reg, rData, addr'pos(regStatus), settlPwrStatus);
-                        settlCnt <= settlCnt - 1;
-                        settled  <= "10";
-
-                        state    <= waitPwrOnTime;
                     end if;
 
                 when checkVWT =>
@@ -376,74 +367,18 @@ begin
                     period := readReg(reg, rData, addr'pos(regTSet));
                     width  := readReg(reg, rData, addr'pos(regWSet));
 
+                    state  <= errVWT;
+
                     if settled = "01" then
                         state <= waitSettlingTime;
                     elsif settled = "10" then
                         state <= waitPwrOnTime;
-                    elsif period > width and width > 0 and ampl > 0 then
-                        onCnt  <= '0' & width-2;
-                        offCnt <= '0' & period-width-2;
-                        pulse  <= '1';
+                    elsif unsigned(period) > unsigned(width) and unsigned(width) > 0 and unsigned(ampl) > 0 then
+                        periodSig <= period;
+                        widthSig  <= width;
+                        pGenEn    <= '1';
 
-                        state  <= pulseOn;
-                    else
-                        state  <= errVWT;
-                    end if;
-
-                when pulseOn =>
-                    period := readReg(reg, rData, addr'pos(regTSet));
-                    width  := readReg(reg, rData, addr'pos(regWSet));
-
-                    if devExec = '1' and devID = pulseGen then
-                        writeReg(reg, rData, addr'pos(regStatus), idleStatus);
-                        busy    <= '0';
-                        pulse   <= '0';
-                        onCnt   <= (others => '0');
-                        offCnt  <= (others => '0');
-                        execSig <= '1';
-
-                        state   <= idle;
-                    elsif endOnCnt = '1' then
-                        writeReg(reg, rData, addr'pos(regStatus), pOffStatus);
-                        pulse  <= '0';
-                        onCnt  <= '0' & width-2;
-                        offCnt <= '0' & period-width-2;
-
-                        state  <= pulseOff;
-                    else
-                        writeReg(reg, rData, addr'pos(regStatus), pOnStatus);
-                        pulse <= '1';
-                        onCnt <= onCnt - 1;
-
-                        state <= pulseOn;
-                    end if;
-
-                when pulseOff =>
-                    period := readReg(reg, rData, addr'pos(regTSet));
-                    width  := readReg(reg, rData, addr'pos(regWSet));
-
-                    if devExec = '1' and devID = pulseGen then
-                        writeReg(reg, rData, addr'pos(regStatus), idleStatus);
-                        busy    <= '0';
-                        pulse   <= '0';
-                        onCnt   <= (others => '0');
-                        offCnt  <= (others => '0');
-                        execSig <= '1';
-
-                        state   <= idle;
-                    elsif endOffCnt = '1' then
-                        writeReg(reg, rData, addr'pos(regStatus), pOnStatus);
-                        pulse  <= '1';
-                        onCnt  <= '0' & width-2;
-                        offCnt <= '0' & period-width-2;
-
-                        state  <= pulseOn;
-                    else
-                        writeReg(reg, rData, addr'pos(regStatus), pOffStatus);
-                        pulse  <= '0';
-                        offCnt <= offCnt - 1;
-
-                        state  <= pulseOff;
+                        state     <= idle;
                     end if;
 
                 when errAddr =>
@@ -476,6 +411,17 @@ begin
         end if;
     end if;
 end process;
+
+pGenFSMInst: entity work.pulseGenFSM
+port map(
+    clk     => clk,
+    rst     => rst,
+    en      => pGenEn,
+    period  => periodSig,
+    width   => widthSig,
+    pulsing => pulsing,
+    pulse   => pulse
+);
 
 dacSerInst: entity work.dacSerialInterface
 port map(

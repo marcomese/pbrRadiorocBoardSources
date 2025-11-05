@@ -27,6 +27,7 @@ port(
     devExec      : in  std_logic;
     busy         : out std_logic;
     pulse        : out std_logic;
+    pulsing      : out std_logic;
     dacSDI       : out std_logic;
     dacSCLK      : out std_logic;
     dacCS        : out std_logic
@@ -139,6 +140,8 @@ constant readCmd        : std_logic_vector(3 downto 0) := x"A";
 constant writeCmd       : std_logic_vector(3 downto 0) := x"5";
 constant burstWrCmd     : std_logic_vector(3 downto 0) := x"3";
 constant burstRdCmd     : std_logic_vector(3 downto 0) := x"B";
+constant tmpAddr        : std_logic_vector(6 downto 0) := "1001000";
+constant readPeriod     : real      := 1.0;
 
 signal   clk          : std_logic := '1';
 signal   rst          : std_logic := '0';
@@ -160,6 +163,8 @@ signal   dacSDI       : std_logic := '0';
 signal   dacSCLK      : std_logic := '0';
 signal   dacCS        : std_logic := '0';
 signal   dataToDev,
+         dataFromRadioroc,
+         dataFromTmp,
          dataFromDev  : devData_t := (others => (others => '0'));
 signal   devDataInVec : devDataVec_t                 := (others => (others => (others => '0')));
 signal   devReadyVec  : devStdLogic_t                := (others => '0');
@@ -170,21 +175,37 @@ signal   dataOut      : std_logic_vector(7 downto 0) := (others => '0');
 signal   rxRead       : std_logic                    := '0';
 signal   rxPresent    : std_logic                    := '0';
 signal   txWrite      : std_logic                    := '0';
-signal   rxEna        : std_logic                    := '1';
+signal   rxEna,en_clki2c        : std_logic                    := '1';
+signal   i2cAddrRad     : std_logic_vector(6 downto 0) := (others => '0');
 signal   readRq,
          cs,
          sclk,
          miso,
          mosi,
+         i2cEnaRad,       
+         i2cRwRad,
+         i2cBusyRad,
+         devReadyRadioroc,
+         devBusyRadioroc,
          testTxWrite,
          testRxRead,
+         sc_sda,
+         sc_scl, 
+         rst_n,
+         devReadyTmp,
+         devBusyTmp, 
+         pulsing,
          testRxPresent  : std_logic := '0';
 signal   dataToMaster,
          testDataIn,
          testDataOut,
-         dataFromMaster : std_logic_vector(7 downto 0) := (others => '0');
+         dataFromMaster,
+         i2cDataWrRad,    
+         i2cDataRdRad       : std_logic_vector(7 downto 0) := (others => '0');
 
 begin
+
+rst_n <= not rst;
 
 stimProc: process
 begin
@@ -310,6 +331,26 @@ begin
     wait for clkPeriod;
     testTxWrite <= '0';
 
+--    wait for 20 us;
+
+--    testDataIn <= x"a1";
+--    wait for clkPeriod;
+--    testTxWrite <= '1';
+--    wait for clkPeriod;
+--    testDataIn <= x"00";
+--    wait for clkPeriod;
+--    testDataIn <= x"01";
+--    wait for clkPeriod;
+--    testDataIn <= x"0A";
+--    wait for clkPeriod;
+--    testDataIn <= x"0B";
+--    wait for clkPeriod;
+--    testDataIn <= x"0C";
+--    wait for clkPeriod;
+--    testDataIn <= x"0D";
+--    wait for clkPeriod;
+--    testTxWrite <= '0';
+
     wait for 50 us;
 
     testDataIn <= x"53";
@@ -411,14 +452,92 @@ port map(
     devExec      => devExec,
     busy         => pgenBusy,
     pulse        => pulse,
+    pulsing      => pulsing,
     dacSDI       => dacSDI,
     dacSCLK      => dacSCLK,
     dacCS        => dacCS
 );
 
+radInterfInst: entity work.radiorocInterface
+generic map(
+    chipID     => chipID
+)
+port map(
+    clk        => clk,
+    rst        => rst,
+    devExec    => devExec,
+    devId      => devId,
+    devRw      => devRw,
+    devBrst    => devBrst,
+    devAddr    => devAddr,
+    devDataIn  => dataToDev,
+    devDataOut => dataFromRadioroc,
+    devReady   => devReadyRadioroc,
+    busy       => devBusyRadioroc,
+    i2cEnClk   => en_clki2c,
+    i2cEna     => i2cEnaRad,
+    i2cAddr    => i2cAddrRad,
+    i2cRw      => i2cRwRad,
+    i2cDataWr  => i2cDataWrRad,
+    i2cBusy    => i2cBusyRad,
+    i2cDataRd  => i2cDataRdRad
+);
+
+tmpCtrlInst: entity work.tmpCtrl
+generic map(
+    clkFreq    => clkFreq,
+    readPeriod => readPeriod,
+    tmpAddr    => tmpAddr
+)
+port map(
+    clk        => clk,
+    rst        => rst,
+    devExec    => devExec,
+    devId      => devId,
+    devRw      => devRw,
+    devAddr    => devAddr,
+    devDataIn  => dataToDev,
+    devDataOut => dataFromTmp,
+    devReady   => devReadyTmp,
+    busy       => devBusyTmp,
+    i2cEna     => i2cEnaRad,
+    i2cAddr    => i2cAddrRad,
+    i2cRw      => i2cRwRad,
+    i2cDataWr  => i2cDataWrRad,
+    i2cBusy    => i2cBusyRad,
+    i2cDataRd  => i2cDataRdRad
+);
+
+i2cRadModule: entity work.i2cMaster
+generic map(
+    input_clk => 100000000,
+    bus_clk   => 500000
+)
+port map(
+    clk       => clk,
+    reset_n   => rst_n,
+    ena       => i2cEnaRad,
+    addr      => i2cAddrRad,
+    rw        => i2cRwRad,
+    data_wr   => i2cDataWrRad,
+    busy      => i2cBusyRad,
+    data_rd   => i2cDataRdRad,
+    ack_error => open,
+    sda       => sc_sda,
+    scl       => sc_scl
+);
+
 devDataInVec(pulseGen) <= dataFromDev;
 devReadyVec(pulseGen)  <= devReady;
 devBusyVec(pulseGen)   <= pgenBusy;
+
+devDataInVec(tmp275) <= dataFromTmp;
+devReadyVec(tmp275)  <= devReadyTmp;
+devBusyVec(tmp275)   <= devBusyTmp;
+
+devDataInVec(radioroc) <= dataFromRadioroc;
+devReadyVec(radioroc)  <= devReadyRadioroc;
+devBusyVec(radioroc)   <= devBusyRadioroc;
 
 devInterfInst: deviceInterface
 generic map(
@@ -506,6 +625,5 @@ port map(
     miso         => miso,
     mosi         => mosi
 );
-
 
 end Behavioral;
