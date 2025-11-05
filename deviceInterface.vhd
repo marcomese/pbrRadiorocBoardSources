@@ -102,6 +102,7 @@ signal   devIdSig      : devices_t;
 signal   tOutCnt       : unsigned(bitsNum(tOut) downto 0);
 signal   byteCnt       : unsigned(bitsNum(bytesNum) downto 0);
 signal   brstByteNum   : unsigned(bitsNum(bytesNum)-1 downto 0);
+signal   brstBuff      : byteArray_t(maxBrstLen-1 downto 0);
 signal   devDataOutSig : devData_t;
 signal   dataToFifoSel : std_logic_vector(1 downto 0);
 signal   dataToFifo    : std_logic_vector(7 downto 0);
@@ -164,7 +165,7 @@ begin
         when "00" =>
             dataToFifo <= (others => '0');
         when "01" =>
-            dataToFifo <= dataIn;
+            dataToFifo <= (others => '0');
         when "10" =>
             dataToFifo <= devDataIn(devIdSig)(to_integer(byteCnt(1 downto 0)));
         when "11" =>
@@ -196,6 +197,7 @@ begin
             devExec       <= '0';
             busy          <= '0';
             brstByteNum   <= (others => '0');
+            brstBuff      <= (others => (others => '0'));
             brstCollect   <= '0';
             wEnFifo       <= '0';
             rEnFifo       <= '0';
@@ -287,7 +289,6 @@ begin
                     i := to_integer(byteCnt);
 
                     tOutRst <= '0';
-                    wEnFifo <= '0';
 
                     state   <= getData;
 
@@ -315,10 +316,10 @@ begin
                         byteCnt          <= byteCnt - 1;
                         devDataOutSig(i) <= dataIn;
                     elsif rxPresent = '1' and brstCollect = '1' then
-                        tOutRst <= '1';
-                        rxRdSig <= '1';
-                        byteCnt <= byteCnt - 1;
-                        wEnFifo <= '1';
+                        tOutRst     <= '1';
+                        rxRdSig     <= '1';
+                        byteCnt     <= byteCnt - 1;
+                        brstBuff(i) <= dataIn;
                     elsif tOutSig = '1' then
                         tOutRst <= '1';
                         rxRdSig <= '0';
