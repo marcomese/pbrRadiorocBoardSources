@@ -59,14 +59,18 @@ type addr is (regStatus,
               regAcqEn,
               regSwTrg,
               regFifoCnt,
-              regAcqNb);
+              regAcqNb,
+              regSelAdcMSB,
+              regSelAdcLSB);
 
 constant reg : regsRec_t := (
-    addr'pos(regStatus)  => (rAddr => 0, rBegin => 31, rEnd => 2,  rMode => ro),
-    addr'pos(regAcqEn)   => (rAddr => 0, rBegin => 1,  rEnd => 1,  rMode => rw),
-    addr'pos(regSwTrg)   => (rAddr => 0, rBegin => 0,  rEnd => 0,  rMode => rw),
-    addr'pos(regFifoCnt) => (rAddr => 1, rBegin => 31, rEnd => 16, rMode => ro),
-    addr'pos(regAcqNb)   => (rAddr => 1, rBegin => 7,  rEnd => 0,  rMode => rw)
+    addr'pos(regStatus)    => (rAddr => 0, rBegin => 31,  rEnd => 2,  rMode => ro),
+    addr'pos(regAcqEn)     => (rAddr => 0, rBegin => 1,   rEnd => 1,  rMode => rw),
+    addr'pos(regSwTrg)     => (rAddr => 0, rBegin => 0,   rEnd => 0,  rMode => rw),
+    addr'pos(regFifoCnt)   => (rAddr => 1, rBegin => 31,  rEnd => 16, rMode => ro),
+    addr'pos(regAcqNb)     => (rAddr => 1, rBegin => 7,   rEnd => 0,  rMode => rw),
+    addr'pos(regSelAdcMSB) => (rAddr => 2, rBegin => 31,  rEnd => 0,  rMode => rw),
+    addr'pos(regSelAdcLSB) => (rAddr => 3, rBegin => 31,  rEnd => 0,  rMode => rw)
 );
 
 constant regsNum : integer := reg(reg'high).rAddr+1;
@@ -110,16 +114,19 @@ attribute mark_debug of state,
 
 begin
 
+selAdc <= readReg(reg, rData, addr'pos(regSelAdcMSB)) &
+          readReg(reg, rData, addr'pos(regSelAdcLSB)); 
+
 -- DEBUG --
-selAdc <= "00011001" & -- 63 downto 56
-          "00000000" & -- 55 downto 48
-          "00000010" & -- 47 downto 40
-          "00000000" & -- 39 downto 32
-          "01110111" & -- 31 downto 24 -- hit = 0
-          "00000001" & -- 23 downto 16
-          "00000000" & -- 15 downto 8
-          swTrg      & -- 7
-          "0000000";   -- 6 downto 0
+--selAdc <= "00011001" & -- 63 downto 56
+--          "00000000" & -- 55 downto 48
+--          "00000010" & -- 47 downto 40
+--          "00000000" & -- 39 downto 32
+--          "01110100" & -- 31 downto 24 -- hit = not t0
+--          "00000001" & -- 23 downto 16
+--          "00000000" & -- 15 downto 8
+--          swTrg      & -- 7
+--          "0000000";   -- 6 downto 0
 -----------
 
 dAddr    <= devAddrToInt(devAddr);
