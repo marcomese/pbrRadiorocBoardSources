@@ -242,10 +242,15 @@ signal rstI2CCnt : unsigned(bitsNum(rstRadI2CLen) downto 0);
 
 signal endAcq, rdValid : std_logic;
 
+signal dbgOr : std_logic;
+
+signal dbgFF : std_logic_vector(3 downto 0);
+
 attribute mark_debug : string;
 attribute mark_debug of extTrg,
                         extTrgFF,
-                        extTrgSig : signal is "true";
+                        extTrgSig,
+                        dbgFF     : signal is "true";
 
 begin
 
@@ -254,6 +259,19 @@ begin
 	reset <= not(npwr_reset);
 
 	nCMOS <= '1';
+
+    dbgOR <= dbgFF(3) or dbgFF(2) or dbgFF(1) or dbgFF(0);
+    
+    dbgFFInst: process(reset, clk_200M)
+    begin
+        if rising_edge(clk_200M) then
+            if reset = '1' then
+                dbgFF <= (others => '0');
+            else
+                dbgFF <= sc_outd_probe & sc_NORT2 & sc_NORT1 & sc_NORTQ;
+            end if;
+        end if;
+    end process;
 
 extTrgSync: process(reset, clk_200M)
 begin
@@ -412,7 +430,7 @@ port map(
 
 	sc_clk_sm <= clk_10M when (en_clki2c = '1') else '0';
 
-    dbgOut <= dout_acq;
+    dbgOut <= dout_acq(dout_acq'left downto 1) & dbgOR;
 
 	adc : entity xil_defaultlib.adc
 	Port map (
@@ -480,6 +498,8 @@ port map(
     doutAcq     => dout_acq
 );
 
+    sc_val_evt <= '1';
+
 	sc_reset_n   <= reset_n_sft and reset_n_acq;
 
 	sc_rstn_read <= rstb_read_sft and rstn_read_acq;
@@ -487,6 +507,8 @@ port map(
     sc_rstb_i2c  <= rstI2CCnt(rstI2CCnt'left);
 
     sc_rstb_sc  <= rstI2CCnt(rstI2CCnt'left);
+
+    sc_rstb_probe <= rstI2CCnt(rstI2CCnt'left);
 
     radiorocI2CRst: process(clk_100M, reset, rstI2CCnt)
     begin

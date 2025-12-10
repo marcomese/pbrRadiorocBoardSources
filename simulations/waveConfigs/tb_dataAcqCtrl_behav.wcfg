@@ -16,15 +16,15 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="210,167.006 ns"></ZoomStartTime>
-      <ZoomEndTime time="218,157.007 ns"></ZoomEndTime>
-      <Cursor1Time time="212,937.006 ns"></Cursor1Time>
+      <ZoomStartTime time="210,285.000 ns"></ZoomStartTime>
+      <ZoomEndTime time="218,295.001 ns"></ZoomEndTime>
+      <Cursor1Time time="214,135.000 ns"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
-      <NameColumnWidth column_width="172"></NameColumnWidth>
+      <NameColumnWidth column_width="168"></NameColumnWidth>
       <ValueColumnWidth column_width="58"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="80" />
+   <WVObjectSize size="78" />
    <wvobject fp_name="/tb_dataAcqCtrl/clk_100M" type="logic">
       <obj_property name="ElementShortName">clk_100M</obj_property>
       <obj_property name="ObjectShortName">clk_100M</obj_property>
@@ -40,6 +40,10 @@
    <wvobject fp_name="/tb_dataAcqCtrl/clkN_200M" type="logic">
       <obj_property name="ElementShortName">clkN_200M</obj_property>
       <obj_property name="ObjectShortName">clkN_200M</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl/adcInst/wr_en" type="logic">
+      <obj_property name="ElementShortName">wr_en</obj_property>
+      <obj_property name="ObjectShortName">wr_en</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_dataAcqCtrl/rst" type="logic">
       <obj_property name="ElementShortName">rst</obj_property>
@@ -283,18 +287,6 @@
    <wvobject fp_name="/tb_dataAcqCtrl/sel_adc" type="array">
       <obj_property name="ElementShortName">sel_adc[63:0]</obj_property>
       <obj_property name="ObjectShortName">sel_adc[63:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl/clk_100M" type="logic">
-      <obj_property name="ElementShortName">clk_100M</obj_property>
-      <obj_property name="ObjectShortName">clk_100M</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl/clk_200M" type="logic">
-      <obj_property name="ElementShortName">clk_200M</obj_property>
-      <obj_property name="ObjectShortName">clk_200M</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl/adcInst/wr_en" type="logic">
-      <obj_property name="ElementShortName">wr_en</obj_property>
-      <obj_property name="ObjectShortName">wr_en</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_dataAcqCtrl/adcInst/rdValid" type="logic">
       <obj_property name="ElementShortName">rdValid</obj_property>

@@ -8,6 +8,25 @@ end tb_pulseGenCtrl;
 
 architecture Behavioral of tb_pulseGenCtrl is
 
+component PLL_Radioroc_1
+port
+ (-- Clock in ports
+  -- Clock out ports
+  clk_out1          : out    std_logic;
+  clk_out2          : out    std_logic;
+  clk_out3          : out    std_logic;
+  clk_out4          : out    std_logic;
+  clk_out5          : out    std_logic;
+  clk_out6          : out    std_logic;
+  clk_out7          : out    std_logic;
+  -- Status and control signals
+  reset             : in     std_logic;
+  locked            : out    std_logic;
+  clk_in1_p         : in     std_logic;
+  clk_in1_n         : in     std_logic
+ );
+end component;
+
 component pulseGenCtrl
 generic(
     clkFreq      : real;
@@ -143,7 +162,8 @@ constant burstRdCmd     : std_logic_vector(3 downto 0) := x"B";
 constant tmpAddr        : std_logic_vector(6 downto 0) := "1001000";
 constant readPeriod     : real      := 1.0;
 
-signal   clk          : std_logic := '1';
+signal   clkIn_p      : std_logic := '1';
+signal   clkIn_n      : std_logic := '0';
 signal   rst          : std_logic := '0';
 signal   devId        : devices_t := none;
 signal   devReady     : std_logic := '0';
@@ -195,6 +215,14 @@ signal   readRq,
          devReadyTmp,
          devBusyTmp, 
          pulsing,
+         clk10,
+         clk,
+         clkN100, 
+         clkN200, 
+         clk200,  
+         clk50,   
+         clk500,  
+         locked,   
          testRxPresent  : std_logic := '0';
 signal   dataToMaster,
          testDataIn,
@@ -429,9 +457,26 @@ begin
     wait;
 end process;
 
-clk <= not clk after clkPeriod/2;
+clkIn_p <= not clkIn_p after clkPeriod/2;
+clkIn_n <= not clkIn_n after clkPeriod/2;
 
 dacClk <= not dacClk after dacClkPeriod/2;
+
+pll1 : PLL_RADIOROC_1
+port map
+(
+    clk_in1_p  => clkIn_p,
+    clk_in1_n  => clkIn_n,
+    reset    => rst,
+    clk_out1 => clk10,
+    clk_out2 => clkN100,
+    clk_out3 => clkN200,
+    clk_out4 => clk,
+    clk_out5 => clk200,
+    clk_out6 => clk50,
+    clk_out7 => clk500,
+    locked   => locked
+);
 
 uut: pulseGenCtrl
 generic map(

@@ -115,6 +115,14 @@ attribute mark_debug of current_state,
                         empty_acq,
                         rdValidSig,
 		                rd_data_count_acq,
+		                ck_read,
+		                ch,
+		                n_cnv,
+		                cpt_adc_sck,
+		                adc_sck_s,
+		                trig_ext,
+		                hold_ext,
+		                trigger,
                         dout : signal is "true";
 
 
@@ -178,8 +186,8 @@ port map(
 	ff : fifo_acq
 	port map (
 		rst    => rst,
-		wr_clk => clk_200M,
-		rd_clk => clk_100M,
+		wr_clk => clkN_200M,
+		rd_clk => clkN_100M,
 		din    => din_l,
 		wr_en  => wr_en,
 		rd_en  => rd_en,
