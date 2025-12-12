@@ -131,10 +131,6 @@ signal   periodSig,
          widthSig   : std_logic_vector(31 downto 0);
 signal   settled    : std_logic_vector(1 downto 0);
 
-attribute mark_debug : string;
-attribute mark_debug of state,
-                        pulse : signal is "true";
-
 begin
 
 dAddr    <= devAddrToInt(devAddr);

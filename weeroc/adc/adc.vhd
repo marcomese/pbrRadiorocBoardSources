@@ -104,26 +104,10 @@ architecture Behavioral of adc is
     attribute fsm_encoding of current_state : signal is "gray";
 
 attribute mark_debug : string;
-attribute mark_debug of current_state,
-                        start,
-                        en_acq,
-                        end_multi_acq,
-                        rst,
-                        din_l,
-                        wr_en,
-                        rd_en,
-                        empty_acq,
-                        rdValidSig,
-		                rd_data_count_acq,
-		                ck_read,
-		                ch,
-		                n_cnv,
-		                cpt_adc_sck,
-		                adc_sck_s,
-		                trig_ext,
-		                hold_ext,
-		                trigger,
-                        dout : signal is "true";
+attribute mark_debug of trigger,
+		                t,
+		                hit,
+		                sel_adc : signal is "true";
 
 
 begin

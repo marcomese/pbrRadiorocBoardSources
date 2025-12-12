@@ -108,10 +108,6 @@ signal swTrg,
 
 signal nbAcqSig       : std_logic_vector(7 downto 0);
 
-attribute mark_debug : string;
-attribute mark_debug of state,
-                        devDataOut : signal is "true";
-
 begin
 
 selAdc <= readReg(reg, rData, addr'pos(regSelAdcMSB)) &
