@@ -109,9 +109,6 @@ signal   dataToFifo    : std_logic_vector(7 downto 0);
 
 attribute mark_debug : string;
 attribute mark_debug of state,
-                        dataOut,
-                        dataToFifo,
-                        dataToFifoSel,
                         wEnFifo,
                         rEnFifo,
                         txWSig,

@@ -497,9 +497,9 @@ port map(
 
     sc_val_evt <= '1';
 
-	sc_reset_n   <= reset_n_sft and reset_n_acq;
+	sc_reset_n   <= reset_n_acq;
 
-	sc_rstn_read <= rstb_read_sft and rstn_read_acq;
+	sc_rstn_read <= rstn_read_acq;
 
     sc_rstb_i2c  <= rstI2CCnt(rstI2CCnt'left);
 

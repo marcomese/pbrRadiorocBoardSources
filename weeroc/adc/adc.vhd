@@ -104,9 +104,23 @@ architecture Behavioral of adc is
     attribute fsm_encoding of current_state : signal is "gray";
 
 attribute mark_debug : string;
-attribute mark_debug of trigger,
+attribute mark_debug of current_state,
+                        extTrg,
+                        wr_en,
+                        ck_read,
+                        en_adc_sck,
+                        pulse,
+                        trigger,
 		                t,
+		                hit0,
+		                hit1,
 		                hit,
+		                trig_ext,
+		                hold_ext,
+		                rstb_rd_s,
+		                rst_n,
+		                din_l,
+		                dout,
 		                sel_adc : signal is "true";
 
 
@@ -245,7 +259,7 @@ port map(
     cd <=   sel_adc(63 downto 56) & "000";  
     conv_delay <= to_integer(unsigned(cd));
     
-    trigger <= en_acq and hit;--en_acq and ((not pulsing and (hit or extTrg)) or (pulsing and pulse));
+    trigger <= en_acq and (hit or extTrg or pulse);
     trigger_sft <= sel_adc(7);--signal_in_pulse or signal_in_pulse2 or latch;
     
     process(trigger_shrunk, trigger)
