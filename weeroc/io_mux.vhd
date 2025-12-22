@@ -7,15 +7,11 @@ entity io_mux is
 	port
 	(
 		t             : in  std_logic_vector (63 downto 0);
-		clk_scurves   : in  std_logic;
 		NORT1         : in  std_logic;
 		NORT2         : in  std_logic;
 		NORTQ         : in  std_logic;
-		trig_out      : in  std_logic;
 		sc_outd_probe : in  std_logic;
-		sel_trigger   : in  std_logic_vector(5 downto 0);
-		sel           : in  std_logic_vector(17 downto 0);
-		test_daq       : in std_logic
+		sel_trigger   : in  std_logic_vector(5 downto 0)
 	);
 end entity io_mux;
 

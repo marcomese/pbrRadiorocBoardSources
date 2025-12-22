@@ -15,7 +15,6 @@ entity adc is
 		clkN_100M : in std_logic;
 		clk_200M : in std_logic;
 		clkN_200M : in std_logic;
-		clk_500M : in std_logic;
 		start    : in std_logic;
 		sdo_hg	 : IN STD_LOGIC;
 		sdo_lg	 : IN STD_LOGIC;
@@ -81,7 +80,7 @@ architecture Behavioral of adc is
 	signal sdo_hg_des, sdo_lg_des : std_logic_vector(15 downto 0);
 	signal din, din_l : std_logic_vector(31 downto 0);
 	
-	signal en_adc_sck, adc_sck_s, rstb_rd_s, t_window, rst_n, t_topo : std_logic;
+	signal en_adc_sck, adc_sck_s, rstb_rd_s, rst_n : std_logic;
 	signal t0, t1, trigger, trigger_sft,  holdext, trgEdge, trgSftEdge : std_logic;
 	
 	signal adc_sck_vector :  std_logic_vector(1 downto 0);
@@ -89,9 +88,6 @@ architecture Behavioral of adc is
 	signal NORT_FPGA : std_logic;
 	
 	signal  en_trigext : std_logic;
-	signal signal_in_pulse, signal_in_pulse2, latch, signal_in_delayed, reset_delay_cntr : std_logic;
-	constant delay_so : integer := 5;
-	signal delay_cntr : natural range 0 to 5;
 	signal hd : std_logic_vector(11 downto 0);
     signal cd : std_logic_vector(10 downto 0);
     
@@ -213,32 +209,10 @@ Port map (
 			 hit1    when "011",
 			 NORT_FPGA when "100",
 			 '0'  when others;		 
-			 
-    tw  : entity xil_defaultlib.trigger_window 
-    Port map ( 
-        clk => clk_100M,
-        t0  => t0,
-        t1  => t1,
-        window_size => sel_adc(23 downto 16),
-        tout   => t_window
-    );
-    
-    tt : entity xil_defaultlib.trigger_topo
-    Port map ( 
-        clk => clk_100M,
-        NORT_FPGA => NORT_FPGA,
-        fast_clk => clk_500M,
-        t   => t,
-        window_size => sel_adc(23 downto 16),
-        nb_trig     => sel_adc(45 downto 40),
-        tout        => t_topo
-    );
     
     with sel_adc(25 downto 24) select
         hit <= not t0 when "00",
-               t_window when "01",
-               t_topo when "10",
-               '0'        when others;
+               '0'    when others;
                
     trig_ext <=      '0' when sel_adc(26) = '0' else (trigger or en_trigext);
     hold_ext <=      sel_adc(27) and holdext; 

@@ -2,6 +2,7 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use IEEE.numeric_std.all;
+use IEEE.STD_LOGIC_MISC.ALL;
 
 library UNISIM;
 use UNISIM.VComponents.all;
@@ -86,8 +87,6 @@ architecture arch of radioroc_fw is
       clk_out3          : out    std_logic;
       clk_out4          : out    std_logic;
       clk_out5          : out    std_logic;
-      clk_out6          : out    std_logic;
-      clk_out7          : out    std_logic;
       -- Status and control signals
       reset             : in     std_logic;
       locked            : out    std_logic;
@@ -101,7 +100,7 @@ architecture arch of radioroc_fw is
 	signal T                                              : std_logic_vector(63 downto 0);
 	-- Clock and reset
 	signal reset, locked_1, locked_2, locked_3                               : std_logic;
-	signal clk_2M, clk_10M, clk_50M, clk_100M, clk_200M, clkN_100M, clkN_200M, clk_250M : std_logic;
+	signal clk_2M, clk_10M, clk_50M, clk_100M, clk_200M, clkN_100M, clkN_200M : std_logic;
 	signal clk_500M : std_logic;
 	signal clk_100k                                                          : std_logic;
 	signal cpt_clk                                                           : natural range 0 to 4;
@@ -110,24 +109,8 @@ architecture arch of radioroc_fw is
     signal end_i2c, n_reset_i2c, rd55, wr_i2c, en_clki2c : std_logic;
 	signal rstb_read_sft, reset_n_sft : std_logic;
 	signal i2c_in, i2c_set, q, start, end_rd, spy_i2c     : std_logic_vector(7 downto 0);
-	-- Scurves
-	signal en_test_Scurve, rstb_Scurve, clk_Scurve, reset_scurve, raz_chn_scurve, clk_scurves: std_logic;
-	signal clk_S, nb_scurve                       : std_logic_vector(1 downto 0);
-	signal sel_chn_scurve              : std_logic_vector(7 downto 0);
-	signal P_cnt, T_cnt                : std_logic_vector(15 downto 0);
-	-- Staircases
-	signal rst_staircase, enable_stair : std_logic;
-	signal cpt_testair                 : integer range 0 to 268435455;
-	-- TDC
-	signal en_tdc, coincidence_on, rst_tdc, rst_tdc_sft, fifo_wr, master, overrun : std_logic;
-	signal coincidence_delay, coincidence_width : std_logic_vector(7 downto 0);
-	signal fifo_in : std_logic_vector(31 downto 0);
-	signal en_l_tdc : std_logic_vector(63 downto 0);
 	-- Others
 	signal OR64_s           : std_logic := '0';
-	signal Scurve_trigger   : std_logic;
-	signal testair          : std_logic_vector(31 downto 0);
-	signal spy_hi  : std_logic_vector(7 downto 0);
 	signal sel_trigger : std_logic_vector(7 downto 0);
 	signal sel_io : std_logic_vector(23 downto 0);
 	--ADC Acquisition
@@ -257,8 +240,11 @@ begin
 
 	nCMOS <= '1';
 
+    OR64_s <= or_reduce(T);
+	n_reset_i2c <= en_clki2c and npwr_reset;
+
     dbgOR <= dbgFF(3) or dbgFF(2) or dbgFF(1) or dbgFF(0);
-    
+
     dbgFFInst: process(reset, clk_200M)
     begin
         if rising_edge(clk_200M) then
@@ -328,83 +314,8 @@ end process;
 		clk_out3 => clkN_200M,
 		clk_out4 => clk_100M,
 		clk_out5 => clk_200M,
-		clk_out6 => clk_250M,
-		clk_out7 => clk_500M,
 		locked   => locked_1
 	);
-
-	Div : entity xil_defaultlib.Diviseur
-	port map(
-	clock_in   => clk_10M,
-	clk_Scurve => clk_S,
-	clk_100k   => clk_100k,
-	clock_out  => clk_Scurve
-	);
-
-	OR64_inst : entity xil_defaultlib.OR64
-	port map (
-	data   => T,
-	result => OR64_s
-	);
-
-    iom : entity xil_defaultlib.io_mux
-	port map
-	(
-		t             => t,
-		clk_scurves   => clk_scurves,
-		NORT1         => sc_NORT1,
-		NORT2         => sc_NORT2,
-		NORTQ         => sc_NORTQ,
-		trig_out      => trig_out,
-		sc_outd_probe => sc_outd_probe,
-		sel_trigger   => sel_trigger(5 downto 0),
-		sel           => sel_io(17 downto 0),
-		test_daq      => test_daq
-    );
-
-	process (rst_staircase, Scurve_trigger)
-	begin
-		if rst_staircase = '1' then
-			cpt_testair <= 0;
-		elsif rising_edge(Scurve_trigger) then
-			if enable_stair = '1' then
-				if cpt_testair = 268435455 then
-					cpt_testair <= 0;
-				else
-					cpt_testair <= cpt_testair + 1;
-				end if;
-			end if;
-		end if;
-	end process;
-
-	testair <= std_logic_vector(to_unsigned(cpt_testair, 32));
-
-	chn_mx : entity xil_defaultlib.Scurve_chn_mux
-	port map(
-	T           => T,
-	OR64        => OR64_s,
-	sel         => sel_chn_Scurve,
-	CH_Scurve_o => Scurve_trigger
-	);
-
-	Scurve_inst : entity xil_defaultlib.scurves
-	port map(
-	rst       => reset_scurve,
-	clk       => clk_10M,
-	fq_clk    => clk_S,
-	nb        => nb_scurve,
-	enable    => en_test_scurve,
-	trigger   => Scurve_trigger,
-	on_edge   => on_edge,
-	cpt_pulse => P_cnt,
-	cpt_trig  => T_cnt,
-	ready     => open,
-	raz_chn   => raz_chn_scurve,
-	clk_scurves => clk_scurves
-	);
-
-	reset_scurve <= not(rstb_Scurve and npwr_reset);
-	n_reset_i2c <= en_clki2c and npwr_reset;
 
 i2cRadModule: entity work.i2cMaster
 generic map(
@@ -436,7 +347,6 @@ port map(
 		clkN_100M => clkN_100M,
 		clk_200M => clk_200M,
 		clkN_200M => clkN_200M,
-		clk_500M => clk_500M,
 		start    => start_acq,
 		sdo_hg	 => ADC_HG,
 		sdo_lg	 => ADC_LG,
@@ -495,31 +405,31 @@ port map(
     doutAcq     => dout_acq
 );
 
-    sc_val_evt <= '1';
+sc_val_evt <= '1';
 
-	sc_reset_n   <= reset_n_acq;
+sc_reset_n   <= reset_n_acq;
 
-	sc_rstn_read <= rstn_read_acq;
+sc_rstn_read <= rstn_read_acq;
 
-    sc_rstb_i2c  <= rstI2CCnt(rstI2CCnt'left);
+sc_rstb_i2c  <= rstI2CCnt(rstI2CCnt'left);
 
-    sc_rstb_sc  <= rstI2CCnt(rstI2CCnt'left);
+sc_rstb_sc  <= rstI2CCnt(rstI2CCnt'left);
 
-    sc_rstb_probe <= rstI2CCnt(rstI2CCnt'left);
+sc_rstb_probe <= rstI2CCnt(rstI2CCnt'left);
 
-    radiorocI2CRst: process(clk_100M, reset, rstI2CCnt)
-    begin
-        if rising_edge(clk_100M) then
-            if reset = '1' then
-                rstI2CCnt <= to_unsigned(rstRadI2CLen-1, rstI2CCnt'length);
-            elsif rstI2CCnt(rstI2CCnt'left) = '0' then
-                rstI2CCnt <= rstI2CCnt - 1;
-            end if;
+radiorocI2CRst: process(clk_100M, reset, rstI2CCnt)
+begin
+    if rising_edge(clk_100M) then
+        if reset = '1' then
+            rstI2CCnt <= to_unsigned(rstRadI2CLen-1, rstI2CCnt'length);
+        elsif rstI2CCnt(rstI2CCnt'left) = '0' then
+            rstI2CCnt <= rstI2CCnt - 1;
         end if;
-    end process;
+    end if;
+end process;
 
-	ADC_SCKHG <= adc_sck;
-	ADC_SCKLG <= adc_sck;
+ADC_SCKHG <= adc_sck;
+ADC_SCKLG <= adc_sck;
 
 i2cTmpModule: entity work.i2cMaster
 generic map(
@@ -539,8 +449,6 @@ port map(
     sda       => SDA_275,
     scl       => SCL_275
 );
-
-   rst_tdc <= reset or rst_tdc_sft;
 
 spiSlaveInst: entity work.SPISlave
 port map(
