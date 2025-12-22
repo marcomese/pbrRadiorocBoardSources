@@ -1,6 +1,7 @@
 library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
+use IEEE.STD_LOGIC_MISC.ALL;
 
 library work;
 use work.types.all;
@@ -81,7 +82,7 @@ architecture Behavioral of adc is
 	signal din, din_l : std_logic_vector(31 downto 0);
 	
 	signal en_adc_sck, adc_sck_s, rstb_rd_s, t_window, rst_n, t_topo : std_logic;
-	signal t0, t1, trigger, trigger_sft,  holdext : std_logic;
+	signal t0, t1, trigger, trigger_sft,  holdext, trgEdge, trgSftEdge : std_logic;
 	
 	signal adc_sck_vector :  std_logic_vector(1 downto 0);
 	
@@ -94,8 +95,6 @@ architecture Behavioral of adc is
 	signal hd : std_logic_vector(11 downto 0);
     signal cd : std_logic_vector(10 downto 0);
     
-    signal trigger_shrunk, trigger_sft_shrunk, trigger_latched, trigger_sft_latched, trigger_latched2,  trigger_sft_latched2: std_logic;
-
     signal endAcqSig, endAcqOut : std_logic_vector(0 downto 0);
     signal rdValidSig : std_logic;
 
@@ -126,11 +125,11 @@ attribute mark_debug of current_state,
 
 begin
 
-    trig_out <= trigger_sft;
-
+trig_out     <= trigger_sft;
 endAcqSig(0) <= end_acq;
 endAcq       <= endAcqOut(0);
 rdValid      <= rdValidSig;
+NORT_FPGA    <= and_reduce(t);
 
 clkSyncEndAcqInst: entity work.pulseSync
 generic map(
@@ -145,25 +144,16 @@ port map(
     sigDest => endAcqOut
 );
 
-    NORT_FPGA <= t(63) and t(62) and t(61) and t(60) and t(59) and t(58) and t(57) and t(56)
-            and t(55) and t(54) and t(53) and t(52) and t(51) and t(50) and t(49) and t(48)
-            and t(47) and t(46) and t(45) and t(44) and t(43) and t(42) and t(41) and t(40)
-            and t(39) and t(38) and t(37) and t(36) and t(35) and t(34) and t(33) and t(32)
-            and t(31) and t(30) and t(29) and t(28) and t(27) and t(26) and t(25) and t(24)
-            and t(23) and t(22) and t(21) and t(20) and t(19) and t(18) and t(17) and t(16)
-            and t(15) and t(14) and t(13) and t(12) and t(11) and t(10) and t(9) and t(8)
-            and t(7) and t(6) and t(5) and t(4) and t(3) and t(2) and t(1) and t(0);
-
-	ma : entity xil_defaultlib.multi_acq
-	Port map (
-		rst 	 => rst,
-		clk_200M => clk_200M,
-		start	 => start,
-		end_acq  => end_acq,
-		nb_acq 	 => nb_acq,
-		en_acq => en_acq,
-		end_multi_acq => end_multi_acq,
-		rst_n => rst_n
+ma : entity xil_defaultlib.multi_acq
+Port map (
+    rst 	 => rst,
+    clk_200M => clk_200M,
+    start	 => start,
+    end_acq  => end_acq,
+    nb_acq 	 => nb_acq,
+    en_acq => en_acq,
+    end_multi_acq => end_multi_acq,
+    rst_n => rst_n
 );
 	
 	adc_sck_s <= clk_100M and en_adc_sck;
@@ -260,75 +250,32 @@ port map(
     conv_delay <= to_integer(unsigned(cd));
     
     trigger <= en_acq and (hit or extTrg or pulse);
-    trigger_sft <= sel_adc(7);--signal_in_pulse or signal_in_pulse2 or latch;
-    
-    process(trigger_shrunk, trigger)
-    begin
-    if trigger_shrunk = '1' then
-        trigger_shrunk <= '0';
-    elsif rising_edge(trigger) then
-        trigger_shrunk <= '1';
-    end if; 
-    end process;
-    
-    process(trigger_sft_shrunk, trigger_sft)
-    begin
-    if trigger_sft_shrunk = '1' then
-        trigger_sft_shrunk <= '0';
-    elsif rising_edge(trigger_sft) then
-        trigger_sft_shrunk <= '1';
-    end if;
-    end process;
-    
-    process(trigger_shrunk, clk_200M)
-    begin
-    if trigger_shrunk = '1' then
-        trigger_latched <= '1';
-    elsif rising_edge(clk_200M) then
-        trigger_latched <= '0';
-    end if;
-    end process;
-    
-    process(trigger_sft_shrunk, clk_200M)
-    begin
-    if trigger_sft_shrunk = '1' then
-        trigger_sft_latched <= '1';
-    elsif rising_edge(clk_200M) then
-        trigger_sft_latched <= '0';
-    end if;
-   end process;
-    
---    signal_in_pulse <= sel_adc(7) and not(signal_in_delayed);
+    trigger_sft <= sel_adc(7);
 
---    process(rst, clk_200M)
---    begin
---      if (rst = '1') then
---        delay_cntr <= 0;
---        latch <= '0';
---        reset_delay_cntr <= '0';
---        signal_in_pulse2 <= '0';
---        signal_in_delayed <= '0';
---      elsif rising_edge(clk_200M) then
---        if sel_adc(7) = '1' then 
---          latch <= '1';
---        end if;  
---        if reset_delay_cntr = '1' then
---          delay_cntr <= 0;
---          latch <= '0'; 
---        elsif latch = '1' then
---          delay_cntr <= delay_cntr + 1;
---        end if;
---        signal_in_delayed <= sel_adc(7);
---        signal_in_pulse2 <= signal_in_pulse; 
-        
---    if (delay_cntr = delay_so) then
---        reset_delay_cntr  <= '1';
---      elsif signal_in_pulse = '1' then
---        reset_delay_cntr  <= '0';     
---      end if;
---     end if;
---    end process;
-    
+trgEdgeInst: entity work.edgeDetector
+generic map(
+    clockEdge => "falling",
+    edge      => "rising"
+)
+port map(
+    clk       => clk_200M,
+    rst       => rst,
+    signalIn  => trigger,
+    signalOut => trgEdge
+);
+
+trgSftEdgeInst: entity work.edgeDetector
+generic map(
+    clockEdge => "falling",
+    edge      => "rising"
+)
+port map(
+    clk       => clk_200M,
+    rst       => rst,
+    signalIn  => trigger_sft,
+    signalOut => trgSftEdge
+);
+
 	process(rst, clk_200M)
 	begin
 	if rst = '1' then
@@ -337,11 +284,7 @@ port map(
 		ch <= 0;
 		cpt_adc_sck <= 0;
 		adc_sck_vector <= "11";
-		trigger_latched2 <= '0';
-		trigger_sft_latched2 <= '0';
 	elsif rising_edge(clk_200M) then
-	    trigger_latched2 <= trigger_latched;
-	    trigger_sft_latched2 <= trigger_sft_latched;
 		current_state <= next_state;
 		adc_sck_vector <= adc_sck_vector(0) & adc_sck_s;
 		if current_state = idle then
@@ -366,11 +309,11 @@ port map(
 	end if;
 	end process;
 	
-	process(current_state, trigger_latched2, trigger_sft_latched2, cpt, ch, cpt_adc_sck)
+	process(current_state, trgEdge, trgSftEdge, cpt, ch, cpt_adc_sck)
 	begin
 		case current_state is 
 			when idle => 
-				if trigger_latched2 = '1' or trigger_sft_latched2 = '1' then
+				if trgEdge = '1' or trgSftEdge = '1' then
 					next_state <= wait_hold;
 				else 
 					next_state <= idle;
