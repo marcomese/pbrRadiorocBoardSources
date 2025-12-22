@@ -3,9 +3,6 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 use IEEE.STD_LOGIC_MISC.ALL;
 
-library work;
-use work.types.all;
-
 library xil_defaultlib;
 
 entity adc is
