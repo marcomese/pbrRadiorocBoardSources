@@ -103,7 +103,6 @@ architecture arch of radioroc_fw is
 	signal clk_2M, clk_10M, clk_50M, clk_100M, clk_200M, clkN_100M, clkN_200M : std_logic;
 	signal clk_500M : std_logic;
 	signal clk_100k                                                          : std_logic;
-	signal cpt_clk                                                           : natural range 0 to 4;
 	-- I2C
 --	signal end_i2c, n_reset_i2c, rd55, wr_i2c, en_clki2c, sda_i, sda_o, sda_oen : std_logic;
     signal end_i2c, n_reset_i2c, rd55, wr_i2c, en_clki2c : std_logic;
@@ -234,27 +233,27 @@ attribute mark_debug of dbgFF     : signal is "true";
 
 begin
 
-    pulse <= pulseSig;
+pulse <= pulseSig;
 
-	reset <= not(npwr_reset);
+reset <= not(npwr_reset);
 
-	nCMOS <= '1';
+nCMOS <= '1';
 
-    OR64_s <= or_reduce(T);
-	n_reset_i2c <= en_clki2c and npwr_reset;
+OR64_s <= or_reduce(T);
+n_reset_i2c <= en_clki2c and npwr_reset;
 
-    dbgOR <= dbgFF(3) or dbgFF(2) or dbgFF(1) or dbgFF(0);
+dbgOR <= dbgFF(3) or dbgFF(2) or dbgFF(1) or dbgFF(0);
 
-    dbgFFInst: process(reset, clk_200M)
-    begin
-        if rising_edge(clk_200M) then
-            if reset = '1' then
-                dbgFF <= (others => '0');
-            else
-                dbgFF <= sc_outd_probe & sc_NORT2 & sc_NORT1 & sc_NORTQ;
-            end if;
+dbgFFInst: process(reset, clk_200M)
+begin
+    if rising_edge(clk_200M) then
+        if reset = '1' then
+            dbgFF <= (others => '0');
+        else
+            dbgFF <= sc_outd_probe & sc_NORT2 & sc_NORT1 & sc_NORTQ;
         end if;
-    end process;
+    end if;
+end process;
 
 extTrgSync: process(reset, clk_200M)
 begin
@@ -269,53 +268,52 @@ begin
     end if;
 end process;
 
-	IOs : entity xil_defaultlib.IO
-    Port map(
-        ADC_SCKHG => ADC_SCKHG,
-        ADC_SCKLG => ADC_SCKLG,
-        ADC_HG    => ADC_HG,
-        ADC_LG    => ADC_LG,
-        T_p       => T_p,
-        T_n       => T_n,
-        ADC_SCKHG_p => ADC_SCKHG_p,
-        ADC_SCKHG_n => ADC_SCKHG_n,
-        ADC_SCKLG_p => ADC_SCKLG_p,
-        ADC_SCKLG_n => ADC_SCKLG_n,
-        ADC_HG_p    => ADC_HG_p,
-        ADC_HG_n    => ADC_HG_n,
-        ADC_LG_p => ADC_LG_p,
-        ADC_LG_n => ADC_LG_n,
-        T       => T,
-        readRq   => readRq,
-        readRq_p => readRq_p,
-        readRq_n => readRq_n,
-        cs       => cs,
-        cs_p     => cs_p,
-        cs_n     => cs_n,
-        sclk     => sclk,
-        sclk_p   => sclk_p,
-        sclk_n   => sclk_n,
-        mosi     => mosi,
-        mosi_p   => mosi_p,
-        mosi_n   => mosi_n,
-        miso     => miso,
-        miso_p   => miso_p,
-        miso_n   => miso_n
-    );
+IOs : entity xil_defaultlib.IO
+port map(
+    ADC_SCKHG => ADC_SCKHG,
+    ADC_SCKLG => ADC_SCKLG,
+    ADC_HG    => ADC_HG,
+    ADC_LG    => ADC_LG,
+    T_p       => T_p,
+    T_n       => T_n,
+    ADC_SCKHG_p => ADC_SCKHG_p,
+    ADC_SCKHG_n => ADC_SCKHG_n,
+    ADC_SCKLG_p => ADC_SCKLG_p,
+    ADC_SCKLG_n => ADC_SCKLG_n,
+    ADC_HG_p    => ADC_HG_p,
+    ADC_HG_n    => ADC_HG_n,
+    ADC_LG_p => ADC_LG_p,
+    ADC_LG_n => ADC_LG_n,
+    T       => T,
+    readRq   => readRq,
+    readRq_p => readRq_p,
+    readRq_n => readRq_n,
+    cs       => cs,
+    cs_p     => cs_p,
+    cs_n     => cs_n,
+    sclk     => sclk,
+    sclk_p   => sclk_p,
+    sclk_n   => sclk_n,
+    mosi     => mosi,
+    mosi_p   => mosi_p,
+    mosi_n   => mosi_n,
+    miso     => miso,
+    miso_p   => miso_p,
+    miso_n   => miso_n
+);
 
-	pll1 : PLL_RADIOROC_1
-	port map
-	(
-		clk_in1_p  => CLK_100M_P,
-		clk_in1_n  => CLK_100M_N,
-		reset    => reset,
-		clk_out1 => clk_10M,
-		clk_out2 => clkN_100M,
-		clk_out3 => clkN_200M,
-		clk_out4 => clk_100M,
-		clk_out5 => clk_200M,
-		locked   => locked_1
-	);
+pll1 : PLL_RADIOROC_1
+port map(
+    clk_in1_p  => CLK_100M_P,
+    clk_in1_n  => CLK_100M_N,
+    reset    => reset,
+    clk_out1 => clk_10M,
+    clk_out2 => clkN_100M,
+    clk_out3 => clkN_200M,
+    clk_out4 => clk_100M,
+    clk_out5 => clk_200M,
+    locked   => locked_1
+);
 
 i2cRadModule: entity work.i2cMaster
 generic map(
@@ -336,46 +334,51 @@ port map(
     scl       => sc_scl
 );
 
-	sc_clk_sm <= clk_10M when (en_clki2c = '1') else '0';
+scClkSmBufInst: BUFGCE
+port map(
+    O => sc_clk_sm,
+    CE => en_clki2c,
+    I => clk_10M
+);
 
-    dbgOut <= dout_acq(dout_acq'left downto 1) & dbgOR;
+dbgOut <= dout_acq(dout_acq'left downto 1) & dbgOR;
 
-	adc : entity xil_defaultlib.adc
-	Port map (
-		rst 	 => reset_acq,
-		clk_100M => clk_100M,
-		clkN_100M => clkN_100M,
-		clk_200M => clk_200M,
-		clkN_200M => clkN_200M,
-		start    => start_acq,
-		sdo_hg	 => ADC_HG,
-		sdo_lg	 => ADC_LG,
-		NORT1	 => sc_NORT1,
-		NORT2 	 => sc_NORT2,
-		NORTQ    => sc_NORTQ,
-		nb_acq   => nb_acq,
-		t		 => t,
-		sel_adc => sel_adc,
-		rd_en 	 => rd_acq,
-		dout 	 => dout_acq,
-		reset_n    => reset_n_acq,
-		rstb_rd  => rstn_read_acq,
-		ck_read  => sc_ck_read,
-		n_cnv 	 => nCNV,
-		adc_sck  => adc_sck,
-		empty_acq => empty_acq,
-		end_multi_acq => end_acq,
-		rd_data_count_acq => rd_data_count_acq,
-		hold_ext => sc_holdext,
-		trig_ext => sc_trigext,
-		trig_out => trig_out,
-		pulsing => pulsingSig,
-		pulse => pulseSig,
-		extTrg => extTrgSig,
-		endAcq => endAcq,
-		rdValid => rdValid,
-		test => test_daq
-	);
+adc: entity xil_defaultlib.adc
+port map(
+    rst 	 => reset_acq,
+    clk_100M => clk_100M,
+    clkN_100M => clkN_100M,
+    clk_200M => clk_200M,
+    clkN_200M => clkN_200M,
+    start    => start_acq,
+    sdo_hg	 => ADC_HG,
+    sdo_lg	 => ADC_LG,
+    NORT1	 => sc_NORT1,
+    NORT2 	 => sc_NORT2,
+    NORTQ    => sc_NORTQ,
+    nb_acq   => nb_acq,
+    t		 => t,
+    sel_adc => sel_adc,
+    rd_en 	 => rd_acq,
+    dout 	 => dout_acq,
+    reset_n    => reset_n_acq,
+    rstb_rd  => rstn_read_acq,
+    ck_read  => sc_ck_read,
+    n_cnv 	 => nCNV,
+    adc_sck  => adc_sck,
+    empty_acq => empty_acq,
+    end_multi_acq => end_acq,
+    rd_data_count_acq => rd_data_count_acq,
+    hold_ext => sc_holdext,
+    trig_ext => sc_trigext,
+    trig_out => trig_out,
+    pulsing => pulsingSig,
+    pulse => pulseSig,
+    extTrg => extTrgSig,
+    endAcq => endAcq,
+    rdValid => rdValid,
+    test => test_daq
+);
 
 dataAcqCtrlInst : entity work.dataAcqCtrl
 port map(
