@@ -23,7 +23,8 @@ package devicesPkg is
                        radioroc,
                        pulseGen,
                        dataReg,
-                       acqSystem);
+                       acqSystem,
+                       rateMeters);
 
     constant  devDataBytes : integer   := 4;
     constant  devAddrBytes : integer   := 2;

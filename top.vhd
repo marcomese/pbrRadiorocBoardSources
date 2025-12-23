@@ -153,32 +153,35 @@ signal   dataToDev,
          dataFromPGen,
          dataFromTmp,
          dataFromRadioroc,
-         dataFromAcq       : devData_t;
+         dataFromAcq,
+         dataFromRM        : devData_t;
 signal   devDataInVec      : devDataVec_t;
 signal   devReadyVec,
          devBusyVec,
          devBrstRst        : devStdLogic_t;
 
 signal   devId          : devices_t;
+
 signal   devReadyPGen,
          devReadyTmp,
          devReadyRadioroc,
          devReadyAcq,
+         devReadyRM,  
          devRw,
          devBrst,
          devBrstWrt,
          devBrstSnd,
          devExec,
-         pgenBusy,
-         tmpBusy,
          devBusyPGen,
          devBusyTmp,
          devBusyRadioroc,
          devBusyAcq,
+         devBusyRM,
          devBrstRstPGen,
          devBrstRstTmp,
          devBrstRstRadioroc,
          devBrstRstAcq,
+         devBrstRstRM,
          devIntBusy,
          pulseSig,
          pulsingSig     : std_logic;
@@ -380,6 +383,29 @@ port map(
     test => test_daq
 );
 
+rateMetersInst: entity work.rateMetersCtrl
+generic map(
+    trgNum     => t'length
+)
+port map(
+    clk        => clk_100M,
+    clkTmr     => clk_100M,
+    rst        => reset,
+    trgIn      => t,
+    devExec    => devExec,
+    devId      => devId,
+    devRw      => devRw,
+    devBrst    => devBrst,
+    devBrstWrt => devBrstWrt,
+    devBrstSnd => devBrstSnd,
+    devBrstRst => devBrstRstRM,
+    devAddr    => devAddr,
+    devDataIn  => dataToDev,
+    devDataOut => dataFromRM,
+    devReady   => devReadyRM,
+    busy       => devBusyRM
+);
+
 dataAcqCtrlInst : entity work.dataAcqCtrl
 port map(
     clk100M     => clk_100M,
@@ -556,21 +582,25 @@ devDataInVec(pulseGen)  <= dataFromPGen;
 devDataInVec(tmp275)    <= dataFromTmp;
 devDataInVec(radioroc)  <= dataFromRadioroc;
 devDataInVec(acqSystem) <= dataFromAcq;
+devDataInVec(rateMeters)<= dataFromRM;
 
 devReadyVec(pulseGen)   <= devReadyPGen;
 devReadyVec(tmp275)     <= devReadyTmp;
 devReadyVec(radioroc)   <= devReadyRadioroc;
 devReadyVec(acqSystem)  <= devReadyAcq;
+devReadyVec(rateMeters) <= devReadyRM;
 
 devBusyVec(pulseGen)    <= devBusyPGen;
 devBusyVec(tmp275)      <= devBusyTmp;
 devBusyVec(radioroc)    <= devBusyRadioroc;
 devBusyVec(acqSystem)   <= devBusyAcq;
+devBusyVec(rateMeters)  <= devBusyRM;
 
 devBrstRst(pulseGen)    <= devBrstRstPGen;
 devBrstRst(tmp275)      <= devBrstRstTmp;
 devBrstRst(radioroc)    <= devBrstRstRadioroc;
 devBrstRst(acqSystem)   <= devBrstRstAcq;
+devBrstRst(rateMeters)  <= devBrstRstRM;
 
 devInterfInst: entity work.deviceInterface
 generic map(

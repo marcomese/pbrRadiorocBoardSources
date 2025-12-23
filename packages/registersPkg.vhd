@@ -18,6 +18,8 @@ package registersPkg is
 
     type regsRec_t is array(integer range <>) of regSub_t;
 
+    type regModeRec_t is array(integer range <>) of regMode_t;
+
     type regsData_t is array(integer range <>) of std_logic_vector(regsLen-1 downto 0);
 
     function slvToAddr(sAddr: std_logic_vector) return integer;
@@ -59,6 +61,8 @@ package registersPkg is
     function isSet(reg: regsRec_t; r: regsData_t; a: integer) return std_logic;
     
     function isSet(reg: regsRec_t; r: regsData_t; a: integer; bitPos: integer) return boolean;
+
+    function initRegs(rModes: regModeRec_t) return regsRec_t;
 
 end package registersPkg;
 
@@ -161,5 +165,15 @@ package body registersPkg is
         begin
             return regVal(bitPos) = '1';
         end function isSet;
+
+        function initRegs(rModes: regModeRec_t) return regsRec_t is
+            variable tmp      : regsRec_t(0 to rModes'length-1);
+        begin
+            for i in 0 to rModes'length-1 loop
+                tmp(i) := (rAddr  => i, rBegin => 31, rEnd   => 0, rMode  => rModes(i));
+            end loop;
+
+            return tmp;
+        end function;
 
 end package body;

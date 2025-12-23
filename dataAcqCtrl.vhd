@@ -113,18 +113,6 @@ begin
 selAdc <= readReg(reg, rData, addr'pos(regSelAdcMSB)) &
           readReg(reg, rData, addr'pos(regSelAdcLSB)); 
 
--- DEBUG --
---selAdc <= "00011001" & -- 63 downto 56
---          "00000000" & -- 55 downto 48
---          "00000010" & -- 47 downto 40
---          "00000000" & -- 39 downto 32
---          "01110100" & -- 31 downto 24 -- hit = not t0
---          "00000001" & -- 23 downto 16
---          "00000000" & -- 15 downto 8
---          swTrg      & -- 7
---          "0000000";   -- 6 downto 0
------------
-
 dAddr    <= devAddrToInt(devAddr);
 nbAcq    <= nbAcqSig;
 resetAcq <= rstAcqSig;
@@ -145,6 +133,7 @@ begin
             devDataOut <= (others => (others => '0'));
             devBrstRst <= '0';
             swTrg      <= '0';
+            rData      <= (others => (others => '0'));
 
             state      <= idle;
         else
