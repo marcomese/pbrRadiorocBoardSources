@@ -107,17 +107,6 @@ signal   devDataOutSig : devData_t;
 signal   dataToFifoSel : std_logic_vector(1 downto 0);
 signal   dataToFifo    : std_logic_vector(7 downto 0);
 
-attribute mark_debug : string;
-attribute mark_debug of state,
-                        wEnFifo,
-                        rEnFifo,
-                        txWSig,
-                        rstFifo,
-                        wordWrt,
-                        wAckFifo,
-                        emptyFifo,
-                        devBrstSig   : signal is "true";
-
 begin
 
 rxRead      <= rxRdSig and not endCnt;

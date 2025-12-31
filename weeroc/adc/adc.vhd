@@ -92,31 +92,6 @@ architecture Behavioral of adc is
     signal endAcqSig, endAcqOut : std_logic_vector(0 downto 0);
     signal rdValidSig : std_logic;
 
- 	attribute fsm_encoding : string;
-    attribute fsm_encoding of next_state : signal is "gray";
-    attribute fsm_encoding of current_state : signal is "gray";
-
-attribute mark_debug : string;
-attribute mark_debug of current_state,
-                        extTrg,
-                        wr_en,
-                        ck_read,
-                        en_adc_sck,
-                        pulse,
-                        trigger,
-		                t,
-		                hit0,
-		                hit1,
-		                hit,
-		                trig_ext,
-		                hold_ext,
-		                rstb_rd_s,
-		                rst_n,
-		                din_l,
-		                dout,
-		                sel_adc : signal is "true";
-
-
 begin
 
 trig_out     <= trigger_sft;
