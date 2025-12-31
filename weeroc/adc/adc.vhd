@@ -2,7 +2,8 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 use IEEE.STD_LOGIC_MISC.ALL;
-
+library UNISIM;
+use UNISIM.vcomponents.all;
 library xil_defaultlib;
 
 entity adc is
@@ -149,7 +150,13 @@ Port map (
     rst_n => rst_n
 );
 	
-	adc_sck_s <= clk_100M and en_adc_sck;
+adcSckBufInst: BUFGCE
+port map(
+    O => adc_sck_s,
+    CE => en_adc_sck,
+    I => clk_100M
+);
+
 	adc_sck <= adc_sck_s;
 	rstb_rd <= rstb_rd_s;
 	
