@@ -250,6 +250,17 @@ begin
     end if;
 end process;
 
+inTrgSync: entity work.trgSync
+generic map(
+    trgNum => t'length
+)
+port map(
+    clk  => clk_100M,
+    rst  => reset,
+    tIn  => T,
+    tOut => tEdge
+);
+
 extTrgSync: process(reset, clk_200M)
 begin
     if rising_edge(clk_200M) then
@@ -262,21 +273,6 @@ begin
         end if;
     end if;
 end process;
-
-trgEdgeGen: for i in 0 to T'length-1 generate
-begin
-    trgEdgeInst: entity work.edgeDetector
-    generic map(
-        clockEdge => "rising",
-        edge      => "falling"
-    )
-    port map(
-        clk       => clk_100M,
-        rst       => reset,
-        signalIn  => T(i),
-        signalOut => tEdge(i)
-    );
-end generate;
 
 IOs : entity xil_defaultlib.IO
 port map(
