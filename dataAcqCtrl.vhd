@@ -110,9 +110,6 @@ signal nbAcqSig       : std_logic_vector(7 downto 0);
 
 begin
 
-selAdc <= readReg(reg, rData, addr'pos(regSelAdcMSB)) &
-          readReg(reg, rData, addr'pos(regSelAdcLSB)); 
-
 dAddr    <= devAddrToInt(devAddr);
 nbAcq    <= nbAcqSig;
 resetAcq <= rstAcqSig;
@@ -138,6 +135,9 @@ begin
             state      <= idle;
         else
             writeReg(reg, rData, addr'pos(regFifoCnt), resize(unsigned(rdDataCnt), regsLen));
+
+            selAdc <= readReg(reg, rData, addr'pos(regSelAdcMSB)) &
+                      readReg(reg, rData, addr'pos(regSelAdcLSB)); 
 
             case state is
                 when idle =>
