@@ -71,7 +71,7 @@ architecture Behavioral of adc is
 	signal hold_delay : natural range 0 to 4095;
 	signal conv_delay : natural range 0 to 2047;
 	
-	signal hit0, hit1, hit, en_acq : std_logic;
+	signal hit0, hit, en_acq : std_logic;
 	signal end_acq : std_logic;
 	signal wr_en : std_logic;
 	
@@ -79,7 +79,7 @@ architecture Behavioral of adc is
 	signal din, din_l : std_logic_vector(31 downto 0);
 	
 	signal en_adc_sck, adc_sck_s, rstb_rd_s, rst_n : std_logic;
-	signal t0, t1, trigger, trigger_sft,  holdext, trgEdge, trgSftEdge : std_logic;
+	signal t0, trigger, trigger_sft,  holdext, trgEdge, trgSftEdge : std_logic;
 	
 	signal adc_sck_vector :  std_logic_vector(1 downto 0);
 	
@@ -178,20 +178,8 @@ port map(
 			 hit0    when "011",
 			 NORT_FPGA when "100",
 			 '0'  when others;		
-			 
-	hit1 <= t(to_integer(unsigned(sel_adc(13 downto 8))));
-	
-	with sel_adc(50 downto 48) select 
-		t1 <=  NORT1 when "000",
-			  NORT2 when "001",
-			  NORTQ when "010",
-			 hit1    when "011",
-			 NORT_FPGA when "100",
-			 '0'  when others;		 
-    
-    with sel_adc(25 downto 24) select
-        hit <= not t0 when "00",
-               '0'    when others;
+
+    hit <= not t0;
                
     trig_ext <=      '0' when sel_adc(26) = '0' else (trigger or en_trigext);
     hold_ext <=      sel_adc(27) and holdext; 
