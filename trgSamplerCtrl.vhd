@@ -17,7 +17,7 @@ use work.utilsPkg.all;
 use work.devicesPkg.all;
 use work.registersPkg.all;
 
-entity trgSampler is
+entity trgSamplerCtrl is
 generic(
     trgNum     : natural
 );
@@ -40,9 +40,9 @@ port(
     devReady   : out std_logic;
     busy       : out std_logic
 );
-end trgSampler;
+end trgSamplerCtrl;
 
-architecture Behavioral of trgSampler is
+architecture Behavioral of trgSamplerCtrl is
 
 --------------------- registers definitions ------------------------
 

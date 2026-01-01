@@ -392,7 +392,7 @@ port map(
     test => test_daq
 );
 
-trgSamplerInst: entity work.trgSampler
+trgSamplerInst: entity work.trgSamplerCtrl
 generic map(
     trgNum     => T'length
 )
