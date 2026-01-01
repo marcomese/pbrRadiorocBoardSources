@@ -139,7 +139,7 @@ constant trgNum        : natural                      := 64;
 
 signal rst               : std_logic := '0';
 signal clk_100M          : std_logic := '1';
-signal t           : std_logic_vector(63 downto 0) := (others => '1');
+signal t                 : std_logic_vector(63 downto 0) := (others => '1');
 signal devId             : devices_t    := none;
 signal devReadyTSmpl     : std_logic    := '0';
 signal devRw             : std_logic    := '0';
@@ -173,13 +173,13 @@ signal readRq,
        devIntBusy,
        devBrstRstTSmpl,
        rdValid,
-       evtTrigger        : std_logic                     := '0';
+       evtTrigger       : std_logic                    := '0';
 signal dataToMaster,
        testDataIn,
        testDataOut,
        testData,
-       dataFromMaster : std_logic_vector(7 downto 0)  := (others => '0');
-signal rdDataCnt      : std_logic_vector(15 downto 0) := (others => '0');
+       dataFromMaster   : std_logic_vector(7 downto 0)  := (others => '0');
+signal rdDataCnt        : std_logic_vector(15 downto 0) := (others => '0');
 
 begin
 
@@ -227,7 +227,7 @@ begin
 
     wait for 50 us;
 
-    testDataIn <= x"a7";
+    testDataIn <= x"57";
     wait for clkPeriod100M*delay;
     testTxWrite <= '1';
     wait for clkPeriod100M;
@@ -242,42 +242,35 @@ begin
     testTxWrite <= '1';
     wait for clkPeriod100M;
     testTxWrite <= '0';
-
-    wait for 500 ns;
-    
-    t(0) <= '0';
-    wait for clkPeriod100M;
-    t(0) <= '1';
-
-    wait for clkPeriod100M;
-
-    t(0) <= '0';
-    wait for clkPeriod100M;
-    t(0) <= '1';
-
-    wait for clkPeriod100M;
-
-    t(0) <= '0';
-    wait for clkPeriod100M;
-    t(0) <= '1';
-
-    wait for clkPeriod100M;
-
-    testDataIn <= x"a6";
-    wait for clkPeriod100M*delay;
-    testTxWrite <= '1';
-    wait for clkPeriod100M;
-    testTxWrite <= '0';
-    wait for clkPeriod100M*delay;
     testDataIn <= x"00";
     testTxWrite <= '1';
     wait for clkPeriod100M;
     testTxWrite <= '0';
-    wait for clkPeriod100M*delay;
-    testDataIn <= x"02";
+    testDataIn <= x"00";
     testTxWrite <= '1';
     wait for clkPeriod100M;
     testTxWrite <= '0';
+    testDataIn <= x"00";
+    testTxWrite <= '1';
+    wait for clkPeriod100M;
+    testTxWrite <= '0';
+    testDataIn <= x"0f"; -- reset every 1e8*10ns = 1s
+    testTxWrite <= '1';
+    wait for clkPeriod100M;
+    testTxWrite <= '0';
+    wait for clkPeriod100M*delay;
+
+    wait for 50 us;
+
+    t(0) <= '0';
+    wait for clkPeriod100M*5;
+
+    evtTrigger <= '1';
+    wait for clkPeriod100M;
+    evtTrigger <= '0';
+
+    wait for clkPeriod100M*3;
+    t(0) <= '1';
 
     wait;
 end process;

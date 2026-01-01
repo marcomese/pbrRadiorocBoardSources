@@ -129,7 +129,7 @@ begin
 
                     state      <= idle;
 
-                    if devExec = '1' and devId = rateMeters then
+                    if devExec = '1' and devId = trgSampler then
                         if dAddr > trgNum+addrNum-1 then
                             state    <= errAddr;
                         elsif devRw = devRead and devBrst = '0' then
