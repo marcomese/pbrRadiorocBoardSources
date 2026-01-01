@@ -35,6 +35,7 @@ entity adc is
 		hold_ext : out std_logic;
 		trig_ext : out std_logic;
 		trig_out : out std_logic;
+		evtTrigger : out std_logic;
 		pulsing : in std_logic;
 		pulse : in std_logic;
 		extTrg : in std_logic;
@@ -94,6 +95,7 @@ architecture Behavioral of adc is
 
 begin
 
+evtTrigger   <= trigger;
 trig_out     <= trigger_sft;
 endAcqSig(0) <= end_acq;
 endAcq       <= endAcqOut(0);

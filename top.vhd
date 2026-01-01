@@ -150,7 +150,8 @@ signal   dataToDev,
          dataFromTmp,
          dataFromRadioroc,
          dataFromAcq,
-         dataFromRM        : devData_t;
+         dataFromRM,
+         dataFromTSmpl     : devData_t;
 signal   devDataInVec      : devDataVec_t;
 signal   devReadyVec,
          devBusyVec,
@@ -162,7 +163,8 @@ signal   devReadyPGen,
          devReadyTmp,
          devReadyRadioroc,
          devReadyAcq,
-         devReadyRM,  
+         devReadyRM,
+         devReadyTSmpl, 
          devRw,
          devBrst,
          devBrstWrt,
@@ -173,14 +175,17 @@ signal   devReadyPGen,
          devBusyRadioroc,
          devBusyAcq,
          devBusyRM,
+         devBusyTSmpl,
          devBrstRstPGen,
          devBrstRstTmp,
          devBrstRstRadioroc,
          devBrstRstAcq,
          devBrstRstRM,
+         devBrstRstTSmpl,
          devIntBusy,
          pulseSig,
-         pulsingSig     : std_logic;
+         pulsingSig,
+         evtTrigger     : std_logic;
 signal   devAddr        : devAddr_t;
 
 -- SIGNALS FOR spiSlave --
@@ -378,6 +383,7 @@ port map(
     hold_ext => sc_holdext,
     trig_ext => sc_trigext,
     trig_out => trig_out,
+    evtTrigger => evtTrigger,
     pulsing => pulsingSig,
     pulse => pulseSig,
     extTrg => extTrgSig,
@@ -386,9 +392,33 @@ port map(
     test => test_daq
 );
 
+trgSamplerInst: entity work.trgSampler
+generic map(
+    trgNum     => T'length
+)
+port map(
+    clk        => clk_100M,
+    clkTmr     => clk_100M,
+    rst        => reset,
+    evtTrigger => evtTrigger,
+    trgIn      => tEdge,
+    devExec    => devExec,
+    devId      => devId,
+    devRw      => devRw,
+    devBrst    => devBrst,
+    devBrstWrt => devBrstWrt,
+    devBrstSnd => devBrstSnd,
+    devBrstRst => devBrstRstTSmpl,
+    devAddr    => devAddr,
+    devDataIn  => dataToDev,
+    devDataOut => dataFromTSmpl,
+    devReady   => devReadyTSmpl,
+    busy       => devBusyTSmpl
+);
+
 rateMetersInst: entity work.rateMetersCtrl
 generic map(
-    trgNum     => t'length
+    trgNum     => T'length
 )
 port map(
     clk        => clk_100M,
@@ -586,24 +616,28 @@ devDataInVec(tmp275)    <= dataFromTmp;
 devDataInVec(radioroc)  <= dataFromRadioroc;
 devDataInVec(acqSystem) <= dataFromAcq;
 devDataInVec(rateMeters)<= dataFromRM;
+devDataInVec(trgSampler)<= dataFromTSmpl;
 
 devReadyVec(pulseGen)   <= devReadyPGen;
 devReadyVec(tmp275)     <= devReadyTmp;
 devReadyVec(radioroc)   <= devReadyRadioroc;
 devReadyVec(acqSystem)  <= devReadyAcq;
 devReadyVec(rateMeters) <= devReadyRM;
+devReadyVec(trgSampler) <= devReadyTSmpl;
 
 devBusyVec(pulseGen)    <= devBusyPGen;
 devBusyVec(tmp275)      <= devBusyTmp;
 devBusyVec(radioroc)    <= devBusyRadioroc;
 devBusyVec(acqSystem)   <= devBusyAcq;
 devBusyVec(rateMeters)  <= devBusyRM;
+devBusyVec(trgSampler)  <= devBusyTSmpl;
 
 devBrstRst(pulseGen)    <= devBrstRstPGen;
 devBrstRst(tmp275)      <= devBrstRstTmp;
 devBrstRst(radioroc)    <= devBrstRstRadioroc;
 devBrstRst(acqSystem)   <= devBrstRstAcq;
 devBrstRst(rateMeters)  <= devBrstRstRM;
+devBrstRst(trgSampler)  <= devBrstRstTSmpl;
 
 devInterfInst: entity work.deviceInterface
 generic map(

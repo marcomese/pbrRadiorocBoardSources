@@ -24,7 +24,8 @@ package devicesPkg is
                        pulseGen,
                        dataReg,
                        acqSystem,
-                       rateMeters);
+                       rateMeters,
+                       trgSampler);
 
     constant  devDataBytes : integer   := 4;
     constant  devAddrBytes : integer   := 2;

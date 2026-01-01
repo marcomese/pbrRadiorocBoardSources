@@ -202,7 +202,7 @@ end generate;
 nSAfterTrgENProc: process(clk, rst)
 begin
     if rising_edge(clk) then
-        if rst = '1' or cntNSAftTrgSig then
+        if rst = '1' or cntNSAftTrgSig = '1' then
             cntNSAftTrgEn <= '0';
         elsif evtTrigger = '1' then
             cntNSAftTrgEn <= '1';

@@ -67,6 +67,7 @@ component adc is
   hold_ext : out std_logic;
   trig_ext : out std_logic;
   trig_out : out std_logic;
+  evtTrigger : out std_logic;
   pulse : in std_logic;
   pulsing : in std_logic;
   extTrg : in std_logic;
@@ -266,7 +267,8 @@ signal readRq,
        testRxPresent,
        devIntBusy,
        devBrstRstAcq,
-       rdValid        : std_logic                     := '0';
+       rdValid,
+       evtTrigger        : std_logic                     := '0';
 signal dataToMaster,
        testDataIn,
        testDataOut,
@@ -492,6 +494,7 @@ port map(
     hold_ext          => hold_ext,
     trig_ext          => trig_ext,
     trig_out          => trig_out,
+    evtTrigger        => evtTrigger,
     extTrg            => extTrg,
     pulsing           => pulsing,
     pulse             => pulse,
