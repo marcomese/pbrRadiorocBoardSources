@@ -97,7 +97,7 @@ architecture arch of radioroc_fw is
 
     -- LVDS
 	signal ADC_SCKHG, ADC_SCKLG, ADC_HG, ADC_LG : std_logic;
-	signal T                                              : std_logic_vector(63 downto 0);
+	signal T, tEdge                                       : std_logic_vector(63 downto 0);
 	-- Clock and reset
 	signal reset, locked_1, locked_2, locked_3                               : std_logic;
 	signal clk_2M, clk_10M, clk_50M, clk_100M, clk_200M, clkN_100M, clkN_200M : std_logic;
@@ -108,10 +108,6 @@ architecture arch of radioroc_fw is
     signal end_i2c, n_reset_i2c, rd55, wr_i2c, en_clki2c : std_logic;
 	signal rstb_read_sft, reset_n_sft : std_logic;
 	signal i2c_in, i2c_set, q, start, end_rd, spy_i2c     : std_logic_vector(7 downto 0);
-	-- Others
-	signal OR64_s           : std_logic := '0';
-	signal sel_trigger : std_logic_vector(7 downto 0);
-	signal sel_io : std_logic_vector(23 downto 0);
 	--ADC Acquisition
 	signal reset_acq, start_acq, rd_acq, adc_sck, end_acq, empty_acq, rstn_read_acq, reset_n_acq, trig_out : std_logic;
 	signal nb_acq, dout_acq : std_logic_vector(7 downto 0);
@@ -239,7 +235,6 @@ reset <= not(npwr_reset);
 
 nCMOS <= '1';
 
-OR64_s <= or_reduce(T);
 n_reset_i2c <= en_clki2c and npwr_reset;
 
 dbgOR <= dbgFF(3) or dbgFF(2) or dbgFF(1) or dbgFF(0);
@@ -267,6 +262,21 @@ begin
         end if;
     end if;
 end process;
+
+trgEdgeGen: for i in 0 to T'length-1 generate
+begin
+    trgEdgeInst: entity work.edgeDetector
+    generic map(
+        clockEdge => "rising",
+        edge      => "falling"
+    )
+    port map(
+        clk       => clk_100M,
+        rst       => reset,
+        signalIn  => T(i),
+        signalOut => tEdge(i)
+    );
+end generate;
 
 IOs : entity xil_defaultlib.IO
 port map(
@@ -388,7 +398,7 @@ port map(
     clk        => clk_100M,
     clkTmr     => clk_100M,
     rst        => reset,
-    trgIn      => t,
+    trgIn      => tEdge,
     devExec    => devExec,
     devId      => devId,
     devRw      => devRw,
