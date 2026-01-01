@@ -8,7 +8,7 @@ end tb_trgSampler;
 
 architecture Behavioral of tb_trgSampler is
 
-component trgSampler is
+component trgSamplerCtrl is
 generic(
     trgNum     : natural
 );
@@ -141,7 +141,7 @@ signal rst               : std_logic := '0';
 signal clk_100M          : std_logic := '1';
 signal t           : std_logic_vector(63 downto 0) := (others => '1');
 signal devId             : devices_t    := none;
-signal devReadyRm        : std_logic    := '0';
+signal devReadyTSmpl     : std_logic    := '0';
 signal devRw             : std_logic    := '0';
 signal devBrst           : std_logic    := '0';
 signal devBrstWrt        : std_logic    := '0';
@@ -150,11 +150,11 @@ signal devBrstRst        : devStdLogic_t := (others => '0');
 signal devAddr           : devAddr_t    := (others => (others => '0'));
 signal devExec           : std_logic    := '0';
 signal dataToDev,
-       dataFromRM        : devData_t     := (others => (others => '0'));
+       dataFromTSmpl     : devData_t     := (others => (others => '0'));
 signal devDataInVec      : devDataVec_t  := (others => (others => (others => '0')));
 signal devReadyVec       : devStdLogic_t := (others => '0');
 signal devBusyVec        : devStdLogic_t := (others => '0');
-signal rmBusy            : std_logic     := '0';
+signal devBusyTSmpl      : std_logic     := '0';
 signal error             : std_logic_vector(2 downto 0) := "000";
 signal rxRead            : std_logic                    := '0';
 signal rxPresent         : std_logic                    := '0';
@@ -171,8 +171,9 @@ signal readRq,
        testRxRead,
        testRxPresent,
        devIntBusy,
-       devBrstRstRM,
-       rdValid        : std_logic                     := '0';
+       devBrstRstTSmpl,
+       rdValid,
+       evtTrigger        : std_logic                     := '0';
 signal dataToMaster,
        testDataIn,
        testDataOut,
@@ -191,7 +192,7 @@ begin
 
     wait for 350 ns;
 
-    testDataIn <= x"56";
+    testDataIn <= x"57";
     wait for clkPeriod100M*delay;
     testTxWrite <= '1';
     wait for clkPeriod100M;
@@ -226,7 +227,7 @@ begin
 
     wait for 50 us;
 
-    testDataIn <= x"a6";
+    testDataIn <= x"a7";
     wait for clkPeriod100M*delay;
     testTxWrite <= '1';
     wait for clkPeriod100M;
@@ -289,6 +290,7 @@ port map(
     clk        => clk_100M,
     clkTmr     => clk_100M,
     rst        => rst,
+    evtTrigger => evtTrigger,
     trgIn      => t,
     devExec    => devExec,
     devId      => devId,
@@ -296,20 +298,20 @@ port map(
     devBrst    => devBrst,
     devBrstWrt => devBrstWrt,
     devBrstSnd => devBrstSnd,
-    devBrstRst => devBrstRstRM,
+    devBrstRst => devBrstRstTSmpl,
     devAddr    => devAddr,
     devDataIn  => dataToDev,
-    devDataOut => dataFromRM,
-    devReady   => devReadyRM,
-    busy       => rmBusy
+    devDataOut => dataFromTSmpl,
+    devReady   => devReadyTSmpl,
+    busy       => devBusyTSmpl
 );
 
 clk_100M <= not clk_100M after clkPeriod100M/2;
 
-devDataInVec(acqSystem) <= dataFromRM;
-devReadyVec(acqSystem)  <= devReadyRM;
-devBusyVec(acqSystem)   <= rmBusy;
-devBrstRst(acqSystem)   <= devBrstRstRM;
+devDataInVec(trgSampler) <= dataFromTSmpl;
+devReadyVec(trgSampler)  <= devReadyTSmpl;
+devBusyVec(trgSampler)   <= devBusyTSmpl;
+devBrstRst(trgSampler)   <= devBrstRstTSmpl;
 
 devInterfInst: deviceInterface
 generic map(
