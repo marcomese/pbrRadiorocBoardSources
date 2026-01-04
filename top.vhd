@@ -394,7 +394,8 @@ port map(
 
 trgSamplerInst: entity work.trgSamplerCtrl
 generic map(
-    trgNum     => T'length
+    trgNum        => T'length,
+    nSAfterTrgDef => 16
 )
 port map(
     clk        => clk_100M,

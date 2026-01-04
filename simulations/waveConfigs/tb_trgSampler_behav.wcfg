@@ -16,21 +16,22 @@
    </db_ref_list>
    <zoom_setting>
       <ZoomStartTime time="0.000 ns"></ZoomStartTime>
-      <ZoomEndTime time="102.501 ns"></ZoomEndTime>
-      <Cursor1Time time="50.000 ns"></Cursor1Time>
+      <ZoomEndTime time="3,390.001 ns"></ZoomEndTime>
+      <Cursor1Time time="0.002 ns"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
-      <NameColumnWidth column_width="160"></NameColumnWidth>
-      <ValueColumnWidth column_width="73"></ValueColumnWidth>
+      <NameColumnWidth column_width="201"></NameColumnWidth>
+      <ValueColumnWidth column_width="99"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="55" />
+   <WVObjectSize size="27" />
+   <wave_markers>
+      <marker time="100870000" label="" />
+      <marker time="100550000" label="" />
+      <marker time="100710000" label="" />
+   </wave_markers>
    <wvobject fp_name="/tb_trgSampler/rst" type="logic">
       <obj_property name="ElementShortName">rst</obj_property>
       <obj_property name="ObjectShortName">rst</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_trgSampler/clk_100M" type="logic">
-      <obj_property name="ElementShortName">clk_100M</obj_property>
-      <obj_property name="ObjectShortName">clk_100M</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_trgSampler/t" type="array">
       <obj_property name="ElementShortName">t[63:0]</obj_property>
@@ -52,9 +53,75 @@
       <obj_property name="ElementShortName">devBrst</obj_property>
       <obj_property name="ObjectShortName">devBrst</obj_property>
    </wvobject>
+   <wvobject fp_name="/tb_trgSampler/evtTrigger" type="logic">
+      <obj_property name="ElementShortName">evtTrigger</obj_property>
+      <obj_property name="ObjectShortName">evtTrigger</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_trgSampler/uut/cntTmrSig" type="logic">
+      <obj_property name="ElementShortName">cntTmrSig</obj_property>
+      <obj_property name="ObjectShortName">cntTmrSig</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_trgSampler/clk_100M" type="logic">
+      <obj_property name="ElementShortName">clk_100M</obj_property>
+      <obj_property name="ObjectShortName">clk_100M</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_trgSampler/t[0]" type="logic">
+      <obj_property name="ElementShortName">[0]</obj_property>
+      <obj_property name="ObjectShortName">[0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_trgSampler/uut/rData[2]" type="array">
+      <obj_property name="ElementShortName">[2][31:0]</obj_property>
+      <obj_property name="ObjectShortName">[2][31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_trgSampler/uut/sampledTrg[0]" type="array">
+      <obj_property name="ElementShortName">[0][31:0]</obj_property>
+      <obj_property name="ObjectShortName">[0][31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_trgSampler/uut/cntTmr" type="array">
+      <obj_property name="ElementShortName">cntTmr[16:0]</obj_property>
+      <obj_property name="ObjectShortName">cntTmr[16:0]</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_trgSampler/uut/cntNSAfterTrg" type="array">
+      <obj_property name="ElementShortName">cntNSAfterTrg[16:0]</obj_property>
+      <obj_property name="ObjectShortName">cntNSAfterTrg[16:0]</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_trgSampler/uut/sampledTrg" type="array">
+      <obj_property name="ElementShortName">sampledTrg[0:63][31:0]</obj_property>
+      <obj_property name="ObjectShortName">sampledTrg[0:63][31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_trgSampler/uut/cntTmrSet" type="logic">
+      <obj_property name="ElementShortName">cntTmrSet</obj_property>
+      <obj_property name="ObjectShortName">cntTmrSet</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_trgSampler/uut/cntNSAftTrgSig" type="logic">
+      <obj_property name="ElementShortName">cntNSAftTrgSig</obj_property>
+      <obj_property name="ObjectShortName">cntNSAftTrgSig</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_trgSampler/uut/cntNSAftTrgSet" type="logic">
+      <obj_property name="ElementShortName">cntNSAftTrgSet</obj_property>
+      <obj_property name="ObjectShortName">cntNSAftTrgSet</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_trgSampler/uut/cntNSAftTrgEn" type="logic">
+      <obj_property name="ElementShortName">cntNSAftTrgEn</obj_property>
+      <obj_property name="ObjectShortName">cntNSAftTrgEn</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_trgSampler/uut/state" type="other">
+      <obj_property name="ElementShortName">state</obj_property>
+      <obj_property name="ObjectShortName">state</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_trgSampler/uut/rData[1]" type="array">
+      <obj_property name="ElementShortName">[1][31:0]</obj_property>
+      <obj_property name="ObjectShortName">[1][31:0]</obj_property>
+   </wvobject>
    <wvobject fp_name="/tb_trgSampler/uut/rData" type="array">
-      <obj_property name="ElementShortName">rData[66:0][31:0]</obj_property>
-      <obj_property name="ObjectShortName">rData[66:0][31:0]</obj_property>
+      <obj_property name="ElementShortName">rData[65:0][31:0]</obj_property>
+      <obj_property name="ObjectShortName">rData[65:0][31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_trgSampler/uut/trgIn" type="array">
+      <obj_property name="ElementShortName">trgIn[63:0]</obj_property>
+      <obj_property name="ObjectShortName">trgIn[63:0]</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_trgSampler/devBrstWrt" type="logic">
       <obj_property name="ElementShortName">devBrstWrt</obj_property>
@@ -71,177 +138,5 @@
    <wvobject fp_name="/tb_trgSampler/devAddr" type="array">
       <obj_property name="ElementShortName">devAddr[1:0][7:0]</obj_property>
       <obj_property name="ObjectShortName">devAddr[1:0][7:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_trgSampler/devExec" type="logic">
-      <obj_property name="ElementShortName">devExec</obj_property>
-      <obj_property name="ObjectShortName">devExec</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_trgSampler/dataToDev" type="array">
-      <obj_property name="ElementShortName">dataToDev[3:0][7:0]</obj_property>
-      <obj_property name="ObjectShortName">dataToDev[3:0][7:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_trgSampler/dataFromTSmpl" type="array">
-      <obj_property name="ElementShortName">dataFromTSmpl[3:0][7:0]</obj_property>
-      <obj_property name="ObjectShortName">dataFromTSmpl[3:0][7:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_trgSampler/devDataInVec" type="array">
-      <obj_property name="ElementShortName">devDataInVec[0:7][3:0][7:0]</obj_property>
-      <obj_property name="ObjectShortName">devDataInVec[0:7][3:0][7:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_trgSampler/devReadyVec" type="array">
-      <obj_property name="ElementShortName">devReadyVec[0:7]</obj_property>
-      <obj_property name="ObjectShortName">devReadyVec[0:7]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_trgSampler/devBusyVec" type="array">
-      <obj_property name="ElementShortName">devBusyVec[0:7]</obj_property>
-      <obj_property name="ObjectShortName">devBusyVec[0:7]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_trgSampler/devBusyTSmpl" type="logic">
-      <obj_property name="ElementShortName">devBusyTSmpl</obj_property>
-      <obj_property name="ObjectShortName">devBusyTSmpl</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_trgSampler/error" type="array">
-      <obj_property name="ElementShortName">error[2:0]</obj_property>
-      <obj_property name="ObjectShortName">error[2:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_trgSampler/rxRead" type="logic">
-      <obj_property name="ElementShortName">rxRead</obj_property>
-      <obj_property name="ObjectShortName">rxRead</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_trgSampler/rxPresent" type="logic">
-      <obj_property name="ElementShortName">rxPresent</obj_property>
-      <obj_property name="ObjectShortName">rxPresent</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_trgSampler/txWrite" type="logic">
-      <obj_property name="ElementShortName">txWrite</obj_property>
-      <obj_property name="ObjectShortName">txWrite</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_trgSampler/txWrAck" type="logic">
-      <obj_property name="ElementShortName">txWrAck</obj_property>
-      <obj_property name="ObjectShortName">txWrAck</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_trgSampler/flushRxFifo" type="logic">
-      <obj_property name="ElementShortName">flushRxFifo</obj_property>
-      <obj_property name="ObjectShortName">flushRxFifo</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_trgSampler/rxEna" type="logic">
-      <obj_property name="ElementShortName">rxEna</obj_property>
-      <obj_property name="ObjectShortName">rxEna</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_trgSampler/readRq" type="logic">
-      <obj_property name="ElementShortName">readRq</obj_property>
-      <obj_property name="ObjectShortName">readRq</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_trgSampler/cs" type="logic">
-      <obj_property name="ElementShortName">cs</obj_property>
-      <obj_property name="ObjectShortName">cs</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_trgSampler/sclk" type="logic">
-      <obj_property name="ElementShortName">sclk</obj_property>
-      <obj_property name="ObjectShortName">sclk</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_trgSampler/miso" type="logic">
-      <obj_property name="ElementShortName">miso</obj_property>
-      <obj_property name="ObjectShortName">miso</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_trgSampler/mosi" type="logic">
-      <obj_property name="ElementShortName">mosi</obj_property>
-      <obj_property name="ObjectShortName">mosi</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_trgSampler/testTxWrite" type="logic">
-      <obj_property name="ElementShortName">testTxWrite</obj_property>
-      <obj_property name="ObjectShortName">testTxWrite</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_trgSampler/testRxRead" type="logic">
-      <obj_property name="ElementShortName">testRxRead</obj_property>
-      <obj_property name="ObjectShortName">testRxRead</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_trgSampler/testRxPresent" type="logic">
-      <obj_property name="ElementShortName">testRxPresent</obj_property>
-      <obj_property name="ObjectShortName">testRxPresent</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_trgSampler/devIntBusy" type="logic">
-      <obj_property name="ElementShortName">devIntBusy</obj_property>
-      <obj_property name="ObjectShortName">devIntBusy</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_trgSampler/devBrstRstTSmpl" type="logic">
-      <obj_property name="ElementShortName">devBrstRstTSmpl</obj_property>
-      <obj_property name="ObjectShortName">devBrstRstTSmpl</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_trgSampler/rdValid" type="logic">
-      <obj_property name="ElementShortName">rdValid</obj_property>
-      <obj_property name="ObjectShortName">rdValid</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_trgSampler/evtTrigger" type="logic">
-      <obj_property name="ElementShortName">evtTrigger</obj_property>
-      <obj_property name="ObjectShortName">evtTrigger</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_trgSampler/dataToMaster" type="array">
-      <obj_property name="ElementShortName">dataToMaster[7:0]</obj_property>
-      <obj_property name="ObjectShortName">dataToMaster[7:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_trgSampler/testDataIn" type="array">
-      <obj_property name="ElementShortName">testDataIn[7:0]</obj_property>
-      <obj_property name="ObjectShortName">testDataIn[7:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_trgSampler/testDataOut" type="array">
-      <obj_property name="ElementShortName">testDataOut[7:0]</obj_property>
-      <obj_property name="ObjectShortName">testDataOut[7:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_trgSampler/testData" type="array">
-      <obj_property name="ElementShortName">testData[7:0]</obj_property>
-      <obj_property name="ObjectShortName">testData[7:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_trgSampler/dataFromMaster" type="array">
-      <obj_property name="ElementShortName">dataFromMaster[7:0]</obj_property>
-      <obj_property name="ObjectShortName">dataFromMaster[7:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_trgSampler/rdDataCnt" type="array">
-      <obj_property name="ElementShortName">rdDataCnt[15:0]</obj_property>
-      <obj_property name="ObjectShortName">rdDataCnt[15:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_trgSampler/clkPeriod100M" type="other">
-      <obj_property name="ElementShortName">clkPeriod100M</obj_property>
-      <obj_property name="ObjectShortName">clkPeriod100M</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_trgSampler/clkFreq" type="other">
-      <obj_property name="ElementShortName">clkFreq</obj_property>
-      <obj_property name="ObjectShortName">clkFreq</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_trgSampler/sclkFreq" type="other">
-      <obj_property name="ElementShortName">sclkFreq</obj_property>
-      <obj_property name="ObjectShortName">sclkFreq</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_trgSampler/timeout" type="other">
-      <obj_property name="ElementShortName">timeout</obj_property>
-      <obj_property name="ObjectShortName">timeout</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_trgSampler/readCmd" type="array">
-      <obj_property name="ElementShortName">readCmd[3:0]</obj_property>
-      <obj_property name="ObjectShortName">readCmd[3:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_trgSampler/writeCmd" type="array">
-      <obj_property name="ElementShortName">writeCmd[3:0]</obj_property>
-      <obj_property name="ObjectShortName">writeCmd[3:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_trgSampler/burstWrCmd" type="array">
-      <obj_property name="ElementShortName">burstWrCmd[3:0]</obj_property>
-      <obj_property name="ObjectShortName">burstWrCmd[3:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_trgSampler/burstRdCmd" type="array">
-      <obj_property name="ElementShortName">burstRdCmd[3:0]</obj_property>
-      <obj_property name="ObjectShortName">burstRdCmd[3:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_trgSampler/maxBrstLen" type="other">
-      <obj_property name="ElementShortName">maxBrstLen</obj_property>
-      <obj_property name="ObjectShortName">maxBrstLen</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_trgSampler/delay" type="other">
-      <obj_property name="ElementShortName">delay</obj_property>
-      <obj_property name="ObjectShortName">delay</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_trgSampler/trgNum" type="other">
-      <obj_property name="ElementShortName">trgNum</obj_property>
-      <obj_property name="ObjectShortName">trgNum</obj_property>
    </wvobject>
 </wave_config>

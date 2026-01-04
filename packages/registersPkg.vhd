@@ -7,6 +7,8 @@ package registersPkg is
 
     constant regsLen : natural := 32;
 
+    constant AUTO_ADDR : integer := -1;
+
     type regMode_t is (ro, rw);
     
     type regSub_t is record
@@ -16,7 +18,15 @@ package registersPkg is
         rMode  : regMode_t;
     end record regSub_t;
 
+    type rBordersSub_t is record
+        rAddr  : integer;
+        rBegin : integer;
+        rEnd   : integer;
+    end record rBordersSub_t;
+
     type regsRec_t is array(integer range <>) of regSub_t;
+
+    type rBorders_t is array(integer range <>) of rBordersSub_t;
 
     type regModeRec_t is array(integer range <>) of regMode_t;
 
@@ -63,6 +73,8 @@ package registersPkg is
     function isSet(reg: regsRec_t; r: regsData_t; a: integer; bitPos: integer) return boolean;
 
     function initRegs(rModes: regModeRec_t) return regsRec_t;
+
+    function initRegs(rModes: regModeRec_t; rBorders: rBorders_t) return regsRec_t;
 
 end package registersPkg;
 
@@ -167,10 +179,36 @@ package body registersPkg is
         end function isSet;
 
         function initRegs(rModes: regModeRec_t) return regsRec_t is
-            variable tmp      : regsRec_t(0 to rModes'length-1);
+            variable tmp : regsRec_t(0 to rModes'length-1);
         begin
             for i in 0 to rModes'length-1 loop
                 tmp(i) := (rAddr  => i, rBegin => 31, rEnd   => 0, rMode  => rModes(i));
+            end loop;
+
+            return tmp;
+        end function;
+
+        function initRegs(rModes: regModeRec_t; rBorders: rBorders_t) return regsRec_t is
+            variable tmp      : regsRec_t(0 to rModes'length-1);
+            variable lastAddr : integer := -1;
+        begin
+
+            assert rModes'length = rBorders'length
+                report "rModes and rBorders must have the same length"
+                severity failure;
+
+            for i in 0 to rModes'length-1 loop
+                if rBorders(i).rAddr = AUTO_ADDR then
+                    tmp(i).rAddr := lastAddr + 1;
+                else
+                    tmp(i).rAddr := rBorders(i).rAddr;
+                end if;
+        
+                lastAddr := tmp(i).rAddr;
+        
+                tmp(i).rBegin := rBorders(i).rBegin;
+                tmp(i).rEnd   := rBorders(i).rEnd;
+                tmp(i).rMode  := rModes(i);
             end loop;
 
             return tmp;

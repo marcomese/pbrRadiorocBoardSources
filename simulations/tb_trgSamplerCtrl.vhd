@@ -10,7 +10,8 @@ architecture Behavioral of tb_trgSampler is
 
 component trgSamplerCtrl is
 generic(
-    trgNum     : natural
+    trgNum        : natural;
+    nSAfterTrgDef : integer
 );
 port(
     clk        : in  std_logic;
@@ -211,15 +212,15 @@ begin
     testTxWrite <= '1';
     wait for clkPeriod100M;
     testTxWrite <= '0';
-    testDataIn <= x"01";
+    testDataIn <= x"00";
     testTxWrite <= '1';
     wait for clkPeriod100M;
     testTxWrite <= '0';
-    testDataIn <= x"86";
+    testDataIn <= x"00";
     testTxWrite <= '1';
     wait for clkPeriod100M;
     testTxWrite <= '0';
-    testDataIn <= x"a0"; -- reset every 1e8*10ns = 1s
+    testDataIn <= x"00"; -- reset every 1e8*10ns = 1s
     testTxWrite <= '1';
     wait for clkPeriod100M;
     testTxWrite <= '0';
@@ -254,7 +255,7 @@ begin
     testTxWrite <= '1';
     wait for clkPeriod100M;
     testTxWrite <= '0';
-    testDataIn <= x"0f"; -- reset every 1e8*10ns = 1s
+    testDataIn <= x"10"; -- reset every 1e8*10ns = 1s
     testTxWrite <= '1';
     wait for clkPeriod100M;
     testTxWrite <= '0';
@@ -263,7 +264,7 @@ begin
     wait for 50 us;
 
     t(0) <= '0';
-    wait for clkPeriod100M*5;
+    wait for clkPeriod100M*4;
 
     evtTrigger <= '1';
     wait for clkPeriod100M;
@@ -271,13 +272,23 @@ begin
 
     wait for clkPeriod100M*3;
     t(0) <= '1';
+    wait for clkPeriod100M;
+    t(0) <= '0';
+    wait for clkPeriod100M;
+    t(0) <= '1';
+    wait for clkPeriod100M;
+    t(0) <= '0';
+
+    wait for clkPeriod100M*5;
+    t(0) <= '1';
 
     wait;
 end process;
 
 uut: trgSamplerCtrl
 generic map(
-    trgNum     => trgNum
+    trgNum        => trgNum,
+    nSAfterTrgDef => 16
 )
 port map(
     clk        => clk_100M,
