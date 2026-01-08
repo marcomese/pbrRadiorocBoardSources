@@ -20,7 +20,7 @@ entity adc is
 		NORT2 	 : in std_logic;
 		NORTQ    : in std_logic;
 		nb_acq   : in std_logic_vector(7 downto 0);
-		t		 : in std_logic_vector(63 downto 0);
+		t		 : in std_logic_vector(127 downto 0);
         sel_adc : in std_logic_vector(63 downto 0);
 		rd_en 	 : in std_logic;
 		dout 	 : out std_logic_vector(7 downto 0);

@@ -37,8 +37,8 @@ entity radioroc_fw is
 		sc_NORT1      : in    std_logic;
 		sc_NORTQ      : in    std_logic;
 
-		T_p           : in std_logic_vector(63 downto 0);
-		T_n           : in std_logic_vector(63 downto 0);
+		T_1           : in std_logic_vector(63 downto 0);
+		T_2           : in std_logic_vector(63 downto 0);
 
 		ADC_SCKHG_p   : out std_logic;
 		ADC_SCKHG_n   : out std_logic;
@@ -97,7 +97,8 @@ architecture arch of radioroc_fw is
 
     -- LVDS
 	signal ADC_SCKHG, ADC_SCKLG, ADC_HG, ADC_LG : std_logic;
-	signal T, tEdge                                       : std_logic_vector(63 downto 0);
+	signal tEdge1, tEdge2 : std_logic_vector(63 downto 0);
+	signal tEdge12 : std_logic_vector(127 downto 0);
 	-- Clock and reset
 	signal reset, locked_1, locked_2, locked_3                               : std_logic;
 	signal clk_2M, clk_10M, clk_50M, clk_100M, clk_200M, clkN_100M, clkN_200M : std_logic;
@@ -244,6 +245,8 @@ n_reset_i2c <= en_clki2c and npwr_reset;
 
 dbgOR <= dbgFF(3) or dbgFF(2) or dbgFF(1) or dbgFF(0);
 
+tEdge12 <= tEdge1 & tEdge2;
+
 dbgFFInst: process(reset, clk_200M)
 begin
     if rising_edge(clk_200M) then
@@ -255,15 +258,26 @@ begin
     end if;
 end process;
 
-inTrgSync: entity work.trgSync
+inTrg1Sync: entity work.trgSync
 generic map(
-    trgNum => t'length
+    trgNum => T_1'length
 )
 port map(
     clk  => clk_100M,
     rst  => reset,
-    tIn  => T,
-    tOut => tEdge
+    tIn  => T_1,
+    tOut => tEdge1
+);
+
+inTrg2Sync: entity work.trgSync
+generic map(
+    trgNum => T_2'length
+)
+port map(
+    clk  => clk_100M,
+    rst  => reset,
+    tIn  => T_2,
+    tOut => tEdge2
 );
 
 extTrgSync: process(reset, clk_200M)
@@ -285,8 +299,6 @@ port map(
     ADC_SCKLG => ADC_SCKLG,
     ADC_HG    => ADC_HG,
     ADC_LG    => ADC_LG,
-    T_p       => T_p,
-    T_n       => T_n,
     ADC_SCKHG_p => ADC_SCKHG_p,
     ADC_SCKHG_n => ADC_SCKHG_n,
     ADC_SCKLG_p => ADC_SCKLG_p,
@@ -295,7 +307,6 @@ port map(
     ADC_HG_n    => ADC_HG_n,
     ADC_LG_p => ADC_LG_p,
     ADC_LG_n => ADC_LG_n,
-    T       => T,
     readRq   => readRq,
     readRq_p => readRq_p,
     readRq_n => readRq_n,
@@ -368,7 +379,7 @@ port map(
     NORT2 	 => sc_NORT2,
     NORTQ    => sc_NORTQ,
     nb_acq   => nb_acq,
-    t		 => t,
+    t		 => tEdge12,
     sel_adc => sel_adc,
     rd_en 	 => rd_acq,
     dout 	 => dout_acq,
@@ -394,7 +405,7 @@ port map(
 
 trgSamplerInst: entity work.trgSamplerCtrl
 generic map(
-    trgNum        => T'length,
+    trgNum        => tEdge12'length,
     nSAfterTrgDef => 16
 )
 port map(
@@ -402,7 +413,7 @@ port map(
     clkTmr     => clk_100M,
     rst        => reset,
     evtTrigger => evtTrigger,
-    trgIn      => tEdge,
+    trgIn      => tEdge12,
     devExec    => devExec,
     devId      => devId,
     devRw      => devRw,
@@ -419,13 +430,13 @@ port map(
 
 rateMetersInst: entity work.rateMetersCtrl
 generic map(
-    trgNum     => T'length
+    trgNum     => tEdge12'length
 )
 port map(
     clk        => clk_100M,
     clkTmr     => clk_100M,
     rst        => reset,
-    trgIn      => tEdge,
+    trgIn      => tEdge12,
     devExec    => devExec,
     devId      => devId,
     devRw      => devRw,

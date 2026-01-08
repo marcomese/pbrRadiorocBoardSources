@@ -11,8 +11,6 @@ entity IO is
     ADC_SCKLG : in std_logic;
     ADC_HG    : out std_logic;
     ADC_LG    : out std_logic;
-    T_p     : in std_logic_vector(63 downto 0);
-    T_n : in std_logic_vector(63 downto 0);
     ADC_SCKHG_p : out std_logic;
     ADC_SCKHG_n : out std_logic;
     ADC_SCKLG_p : out std_logic;
@@ -21,7 +19,6 @@ entity IO is
     ADC_HG_n    : in std_logic;
     ADC_LG_p : in std_logic;
     ADC_LG_n : in std_logic;
-    T : out std_logic_vector(63 downto 0);
     readRq   : in std_logic;
     readRq_p : out std_logic;
     readRq_n : out std_logic;
@@ -43,18 +40,6 @@ end IO;
 architecture Behavioral of IO is
 
 begin
-
-TRIG : for I in 0 to 63 generate
-   IBUF : IBUFDS_DIFF_OUT
-   Generic map (
-   DIFF_TERM => TRUE
-   )
-   Port map (
-   OB => T(I),--O => T(I) pour radio OB => T(I) pour psiroc
-   I => T_p(I),
-   IB => T_n(I)
-   );
-end generate;
 
 OBUF2 : OBUFDS
 Port map (
