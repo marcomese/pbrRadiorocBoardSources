@@ -263,7 +263,7 @@ generic map(
     trgNum => T_1'length
 )
 port map(
-    clk  => clk_100M,
+    clk  => clk_200M,
     rst  => reset,
     tIn  => T_1,
     tOut => tEdge1
@@ -274,7 +274,7 @@ generic map(
     trgNum => T_2'length
 )
 port map(
-    clk  => clk_100M,
+    clk  => clk_200M,
     rst  => reset,
     tIn  => T_2,
     tOut => tEdge2
