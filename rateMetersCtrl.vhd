@@ -16,6 +16,8 @@ use IEEE.NUMERIC_STD.ALL;
 use work.utilsPkg.all;
 use work.devicesPkg.all;
 use work.registersPkg.all;
+library xpm;
+use xpm.vcomponents.all;
 
 entity rateMetersCtrl is
 generic(
@@ -200,5 +202,30 @@ begin
         end if;
     end if;
 end process;
+
+   xpm_memory_spram_inst : xpm_memory_spram
+   generic map (
+      ADDR_WIDTH_A       => bitsNum(trgNum+addrNum),
+      BYTE_WRITE_WIDTH_A => 32,
+      MEMORY_SIZE        => 2112,
+      READ_DATA_WIDTH_A  => 32,
+      WRITE_DATA_WIDTH_A => 32,
+      READ_LATENCY_A     => 1,
+      MEMORY_PRIMITIVE   => "block",
+      WRITE_MODE_A       => "write_first"
+   )
+port map (
+      douta          => douta,
+      addra          => addra,
+      clka           => clka,
+      dina           => dina,
+      ena            => ena,
+      regcea         => regcea,
+      rsta           => rsta,
+      sleep          => '0',
+      wea            => wea,
+      injectdbiterra => '0',
+      injectsbiterra => '0'
+);
 
 end Behavioral;
