@@ -50,18 +50,20 @@ architecture Behavioral of rateMetersCtrl is
 type addr is (regStatus,
               regTmrBase);
 
-constant addrNum  : natural := addr'pos(addr'right)+1;
+constant addrNum        : natural := addr'pos(addr'right)+1;
 
-constant regModes : regModeRec_t(0 to trgNum+addrNum-1) := (0      => ro,  -- regStatus
+constant regModes       : regModeRec_t(0 to trgNum+addrNum-1) := (0      => ro,  -- regStatus
                                                             1      => rw,  -- regTmrBase
                                                             others => ro); -- counters
 
-constant reg      : regsRec_t := initRegs(regModes);
+constant reg            : regsRec_t := initRegs(regModes);
 
-constant regsNum  : integer := reg(reg'high).rAddr+1;
+constant regsNum        : integer := reg(reg'high).rAddr+1;
 
-signal   rData    : regsData_t(regsNum-1 downto 0);
-
+constant byteWriteWidth : integer := 32;
+constant writeDataWidth : integer := 32;
+constant readDataWidth  : integer := 32;
+constant regSize        : integer := (trgNum+addrNum)*writeDataWidth;
 --------------------------------------------------------------------
 
 type state_t is (idle,
@@ -69,32 +71,40 @@ type state_t is (idle,
                  errAddr,
                  errReadOnly);
 
-type rateMeters_t is array(0 to trgNum-1) of unsigned(31 downto 0);
+type rateMeters_t is array(0 to trgNum-1) of unsigned(regsLen-1 downto 0);
 
-constant idleStatus     : std_logic_vector(31 downto 0) := initSlv(32, 13, 0, "00" & x"001", '0');
-constant errAddrStatus  : std_logic_vector(31 downto 0) := initSlv(32, 13, 0, "11" & x"500", '0');
-constant errROnlyStatus : std_logic_vector(31 downto 0) := initSlv(32, 13, 0, "11" & x"A00", '0');
+constant idleStatus     : std_logic_vector(regsLen-1 downto 0) := initSlv(regsLen, 13, 0, "00" & x"001", '0');
+constant errAddrStatus  : std_logic_vector(regsLen-1 downto 0) := initSlv(regsLen, 13, 0, "11" & x"500", '0');
+constant errROnlyStatus : std_logic_vector(regsLen-1 downto 0) := initSlv(regsLen, 13, 0, "11" & x"A00", '0');
 
-signal state     : state_t;
+signal state       : state_t;
 
-signal dataIn    : devData_t;
+signal addrToReg,
+       lastAddr    : std_logic_vector(bitsNum(trgNum+addrNum)-1 downto 0);
 
-signal dAddr     : integer;
+signal dataFromReg,
+       dataToReg   : std_logic_vector(devDataBytes*8-1 downto 0);
 
-signal trgMeters : rateMeters_t;
+signal dAddr       : integer;
 
-signal cntTmrMax : unsigned(31 downto 0);
+signal trgMeters   : rateMeters_t;
 
-signal cntTmr    : unsigned(cntTmrMax'length downto 0); -- MSB = overflow
+signal cntTmrMax   : unsigned(devDataBytes*8-1 downto 0);
 
-signal cntTmrSig,
-       cntTmrSet : std_logic;
+signal cntTmr      : unsigned(cntTmrMax'length downto 0); -- MSB = overflow
+
+signal readReg,
+       writeReg,
+       cntTmrSig,
+       cntTmrSet   : std_logic;
 
 begin
 
-dAddr     <= devAddrToInt(devAddr);
+dAddr      <= devAddrToInt(devAddr);
 
-cntTmrSig <= cntTmr(cntTmr'left);
+cntTmrSig  <= cntTmr(cntTmr'left);
+
+devDataOut <= slvToDevData(dataFromReg);
 
 rateMetersCtrlFSM: process(clk, rst, devExec)
 begin
@@ -102,11 +112,12 @@ begin
         if rst = '1' then
             devReady   <= '0';
             busy       <= '0';
-            devDataOut <= (others => (others => '0'));
             devBrstRst <= '0';
             cntTmrMax  <= (others => '0');
             cntTmrSet  <= '0';
-            rData      <= (others => (others => '0'));
+            readReg    <= '0';
+            writeReg   <= '0';
+            dataToReg  <= (others => '0');
 
             state      <= idle;
         else
@@ -119,27 +130,29 @@ begin
 
             case state is
                 when idle =>
-                    devReady   <= '0';
-                    busy       <= '0';
-                    cntTmrSet  <= '0';
-
-                    state      <= idle;
+                    devReady  <= '0';
+                    busy      <= '0';
+                    cntTmrSet <= '0';
+                    readReg   <= '0';
+                    writeReg  <= '0';
+                    addrToReg <= devAddrToSlice(devAddr, bitsNum(trgNum+addrNum)-1, 0);
+                    dataToReg <= devDataToSlv(devDataIn);
+                    state     <= idle;
 
                     if devExec = '1' and devId = rateMeters then
                         if dAddr > trgNum+addrNum-1 then
                             state    <= errAddr;
                         elsif devRw = devRead and devBrst = '0' then
-                            writeReg(reg, rData, addr'pos(regStatus), idleStatus);
+                            readReg    <= '1';
                             devReady   <= '1';
-                            devDataOut <= readReg(reg, rData, dAddr);
                             busy       <= '1';
 
                             state      <= idle;
                         elsif devRw = devWrite and reg(dAddr).rMode = ro then
                             state    <= errReadOnly;
                         elsif devRw = devWrite and reg(dAddr).rMode = rw then
-                            writeReg(reg, rData, addr'pos(regStatus), dAddr);
-                            writeReg(reg, rData, dAddr, devDataIn);
+                            lastAddr <= devAddrToSlice(devAddr, bitsNum(trgNum+addrNum)-1, 0);
+                            writeReg(reg, rData, dAddr, devDataIn);<
                             busy  <= '1';
 
                             state <= execute;
@@ -203,27 +216,27 @@ begin
     end if;
 end process;
 
-   xpm_memory_spram_inst : xpm_memory_spram
-   generic map (
-      ADDR_WIDTH_A       => bitsNum(trgNum+addrNum),
-      BYTE_WRITE_WIDTH_A => 32,
-      MEMORY_SIZE        => 2112,
-      READ_DATA_WIDTH_A  => 32,
-      WRITE_DATA_WIDTH_A => 32,
-      READ_LATENCY_A     => 1,
-      MEMORY_PRIMITIVE   => "block",
-      WRITE_MODE_A       => "write_first"
-   )
-port map (
-      douta          => douta,
-      addra          => addra,
-      clka           => clka,
-      dina           => dina,
-      ena            => ena,
-      regcea         => regcea,
-      rsta           => rsta,
+regsRMInst: xpm_memory_spram
+generic map(
+  ADDR_WIDTH_A       => bitsNum(trgNum+addrNum),
+  BYTE_WRITE_WIDTH_A => byteWriteWidth,
+  MEMORY_SIZE        => regSize,
+  READ_DATA_WIDTH_A  => readDataWdith,
+  WRITE_DATA_WIDTH_A => writeDataWdith,
+  READ_LATENCY_A     => 1,
+  MEMORY_PRIMITIVE   => "block",
+  WRITE_MODE_A       => "write_first"
+)
+port map(
+      clka           => clk,
+      rsta           => rst,
+      addra          => addrToReg,
+      douta          => dataFromReg,
+      dina           => dataToReg,
+      ena            => enReg,
+      wea            => writeReg,
+      regcea         => '1',
       sleep          => '0',
-      wea            => wea,
       injectdbiterra => '0',
       injectsbiterra => '0'
 );
