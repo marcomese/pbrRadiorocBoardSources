@@ -35,6 +35,8 @@ package registersPkg is
     function slvToAddr(sAddr: std_logic_vector) return integer;
 
     function addrToSlv(a: integer) return std_logic_vector;
+
+    function addrToSlice(a: integer; left: integer; right: integer) return std_logic_vector;
     
     function readReg(reg: regsRec_t; r: regsData_t; a: integer) return std_logic_vector;
     
@@ -89,7 +91,15 @@ package body registersPkg is
         begin
             return std_logic_vector(to_unsigned(a, regsLen));
         end function addrToSlv;
-        
+
+        function addrToSlice(a: integer; left: integer; right: integer) return std_logic_vector is
+            variable sAddr : std_logic_vector(regsLen-1 downto 0); 
+        begin
+            sAddr := std_logic_vector(to_unsigned(a, regsLen));
+
+            return sAddr(left downto right);
+        end function addrToSlice;
+
         function readReg(reg: regsRec_t; r: regsData_t; a: integer) return std_logic_vector is
         begin
             return std_logic_vector(resize(unsigned(r(reg(a).rAddr)(reg(a).rBegin downto reg(a).rEnd)), regsLen));

@@ -16,14 +16,14 @@
    </db_ref_list>
    <zoom_setting>
       <ZoomStartTime time="0.000000 us"></ZoomStartTime>
-      <ZoomEndTime time="4,797.090000 us"></ZoomEndTime>
-      <Cursor1Time time="51.130000 us"></Cursor1Time>
+      <ZoomEndTime time="2,036.986635 us"></ZoomEndTime>
+      <Cursor1Time time="1,031.264393 us"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
-      <NameColumnWidth column_width="128"></NameColumnWidth>
-      <ValueColumnWidth column_width="58"></ValueColumnWidth>
+      <NameColumnWidth column_width="226"></NameColumnWidth>
+      <ValueColumnWidth column_width="99"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="54" />
+   <WVObjectSize size="69" />
    <wave_markers>
       <marker time="1003390000" label="" />
    </wave_markers>
@@ -39,29 +39,13 @@
       <obj_property name="ElementShortName">t[63:0]</obj_property>
       <obj_property name="ObjectShortName">t[63:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/tb_rateMetersCtrl/uut/t" type="array">
-      <obj_property name="ElementShortName">t[63:0]</obj_property>
-      <obj_property name="ObjectShortName">t[63:0]</obj_property>
-   </wvobject>
    <wvobject fp_name="/tb_rateMetersCtrl/t[0]" type="logic">
-      <obj_property name="ElementShortName">[0]</obj_property>
-      <obj_property name="ObjectShortName">[0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_rateMetersCtrl/uut/t[0]" type="logic">
       <obj_property name="ElementShortName">[0]</obj_property>
       <obj_property name="ObjectShortName">[0]</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_rateMetersCtrl/devId" type="other">
       <obj_property name="ElementShortName">devId</obj_property>
       <obj_property name="ObjectShortName">devId</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_rateMetersCtrl/uut/rData" type="array">
-      <obj_property name="ElementShortName">rData[65:0][31:0]</obj_property>
-      <obj_property name="ObjectShortName">rData[65:0][31:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_rateMetersCtrl/uut/rData[2]" type="array">
-      <obj_property name="ElementShortName">[2][31:0]</obj_property>
-      <obj_property name="ObjectShortName">[2][31:0]</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_rateMetersCtrl/uut/trgMeters" type="array">
       <obj_property name="ElementShortName">trgMeters[0:63][31:0]</obj_property>
@@ -72,6 +56,10 @@
       <obj_property name="ElementShortName">[0][31:0]</obj_property>
       <obj_property name="ObjectShortName">[0][31:0]</obj_property>
       <obj_property name="label">trgMeters[0][31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_rateMetersCtrl/uut/dataToReg" type="array">
+      <obj_property name="ElementShortName">dataToReg[31:0]</obj_property>
+      <obj_property name="ObjectShortName">dataToReg[31:0]</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_rateMetersCtrl/uut/cntTmrMax" type="array">
       <obj_property name="ElementShortName">cntTmrMax[31:0]</obj_property>
@@ -93,6 +81,66 @@
       <obj_property name="ElementShortName">devReadyRm</obj_property>
       <obj_property name="ObjectShortName">devReadyRm</obj_property>
    </wvobject>
+   <wvobject fp_name="/tb_rateMetersCtrl/uut/lastAddr" type="array">
+      <obj_property name="ElementShortName">lastAddr[6:0]</obj_property>
+      <obj_property name="ObjectShortName">lastAddr[6:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_rateMetersCtrl/uut/enReg" type="logic">
+      <obj_property name="ElementShortName">enReg</obj_property>
+      <obj_property name="ObjectShortName">enReg</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_rateMetersCtrl/uut/dataToReg" type="array">
+      <obj_property name="ElementShortName">dataToReg[31:0]</obj_property>
+      <obj_property name="ObjectShortName">dataToReg[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_rateMetersCtrl/uut/cntTmrSet" type="logic">
+      <obj_property name="ElementShortName">cntTmrSet</obj_property>
+      <obj_property name="ObjectShortName">cntTmrSet</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_rateMetersCtrl/uut/cntTmrMax" type="array">
+      <obj_property name="ElementShortName">cntTmrMax[31:0]</obj_property>
+      <obj_property name="ObjectShortName">cntTmrMax[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_rateMetersCtrl/uut/regsRMInst/addra" type="array">
+      <obj_property name="ElementShortName">addra[6:0]</obj_property>
+      <obj_property name="ObjectShortName">addra[6:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_rateMetersCtrl/uut/regsRMInst/dina" type="array">
+      <obj_property name="ElementShortName">dina[31:0]</obj_property>
+      <obj_property name="ObjectShortName">dina[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_rateMetersCtrl/uut/regsRMInst/douta" type="array">
+      <obj_property name="ElementShortName">douta[31:0]</obj_property>
+      <obj_property name="ObjectShortName">douta[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_rateMetersCtrl/uut/cntTmrSig" type="logic">
+      <obj_property name="ElementShortName">cntTmrSig</obj_property>
+      <obj_property name="ObjectShortName">cntTmrSig</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_rateMetersCtrl/uut/regsRMInst/web" type="array">
+      <obj_property name="ElementShortName">web[65:0]</obj_property>
+      <obj_property name="ObjectShortName">web[65:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_rateMetersCtrl/uut/regsRMInst/addrb" type="array">
+      <obj_property name="ElementShortName">addrb[1:0]</obj_property>
+      <obj_property name="ObjectShortName">addrb[1:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_rateMetersCtrl/uut/regsRMInst/dinb" type="array">
+      <obj_property name="ElementShortName">dinb[2111:0]</obj_property>
+      <obj_property name="ObjectShortName">dinb[2111:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_rateMetersCtrl/uut/regsRMInst/doutb" type="array">
+      <obj_property name="ElementShortName">doutb[2111:0]</obj_property>
+      <obj_property name="ObjectShortName">doutb[2111:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_rateMetersCtrl/uut/state" type="other">
+      <obj_property name="ElementShortName">state</obj_property>
+      <obj_property name="ObjectShortName">state</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_rateMetersCtrl/uut/devDataOut" type="array">
+      <obj_property name="ElementShortName">devDataOut[3:0][7:0]</obj_property>
+      <obj_property name="ObjectShortName">devDataOut[3:0][7:0]</obj_property>
+   </wvobject>
    <wvobject fp_name="/tb_rateMetersCtrl/devRw" type="logic">
       <obj_property name="ElementShortName">devRw</obj_property>
       <obj_property name="ObjectShortName">devRw</obj_property>
@@ -110,8 +158,8 @@
       <obj_property name="ObjectShortName">devBrstSnd</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_rateMetersCtrl/devBrstRst" type="array">
-      <obj_property name="ElementShortName">devBrstRst[0:6]</obj_property>
-      <obj_property name="ObjectShortName">devBrstRst[0:6]</obj_property>
+      <obj_property name="ElementShortName">devBrstRst[0:7]</obj_property>
+      <obj_property name="ObjectShortName">devBrstRst[0:7]</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_rateMetersCtrl/devAddr" type="array">
       <obj_property name="ElementShortName">devAddr[1:0][7:0]</obj_property>
@@ -134,16 +182,16 @@
       <obj_property name="ObjectShortName">dataFromRM[3:0][7:0]</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_rateMetersCtrl/devDataInVec" type="array">
-      <obj_property name="ElementShortName">devDataInVec[0:6][3:0][7:0]</obj_property>
-      <obj_property name="ObjectShortName">devDataInVec[0:6][3:0][7:0]</obj_property>
+      <obj_property name="ElementShortName">devDataInVec[0:7][3:0][7:0]</obj_property>
+      <obj_property name="ObjectShortName">devDataInVec[0:7][3:0][7:0]</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_rateMetersCtrl/devReadyVec" type="array">
-      <obj_property name="ElementShortName">devReadyVec[0:6]</obj_property>
-      <obj_property name="ObjectShortName">devReadyVec[0:6]</obj_property>
+      <obj_property name="ElementShortName">devReadyVec[0:7]</obj_property>
+      <obj_property name="ObjectShortName">devReadyVec[0:7]</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_rateMetersCtrl/devBusyVec" type="array">
-      <obj_property name="ElementShortName">devBusyVec[0:6]</obj_property>
-      <obj_property name="ObjectShortName">devBusyVec[0:6]</obj_property>
+      <obj_property name="ElementShortName">devBusyVec[0:7]</obj_property>
+      <obj_property name="ObjectShortName">devBusyVec[0:7]</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_rateMetersCtrl/rmBusy" type="logic">
       <obj_property name="ElementShortName">rmBusy</obj_property>
@@ -244,5 +292,17 @@
    <wvobject fp_name="/tb_rateMetersCtrl/rdDataCnt" type="array">
       <obj_property name="ElementShortName">rdDataCnt[15:0]</obj_property>
       <obj_property name="ObjectShortName">rdDataCnt[15:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_rateMetersCtrl/uut/writeRegB" type="array">
+      <obj_property name="ElementShortName">writeRegB[65:0]</obj_property>
+      <obj_property name="ObjectShortName">writeRegB[65:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_rateMetersCtrl/uut/rmToBuf" type="array">
+      <obj_property name="ElementShortName">rmToBuf[2111:0]</obj_property>
+      <obj_property name="ObjectShortName">rmToBuf[2111:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_rateMetersCtrl/uut/regsRMInst/xpm_memory_base_inst/mem" type="array">
+      <obj_property name="ElementShortName">mem[0:65][31:0]</obj_property>
+      <obj_property name="ObjectShortName">mem[0:65][31:0]</obj_property>
    </wvobject>
 </wave_config>

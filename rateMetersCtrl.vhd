@@ -50,26 +50,37 @@ architecture Behavioral of rateMetersCtrl is
 type addr is (regStatus,
               regTmrBase);
 
-constant addrNum        : natural := addr'pos(addr'right)+1;
+constant addrNum         : natural := addr'pos(addr'right)+1;
 
-constant regModes       : regModeRec_t(0 to trgNum+addrNum-1) := (0      => ro,  -- regStatus
-                                                            1      => rw,  -- regTmrBase
-                                                            others => ro); -- counters
+constant regModes        : regModeRec_t(0 to trgNum+addrNum-1) := (0      => ro,  -- regStatus
+                                                                   1      => rw,  -- regTmrBase
+                                                                   others => ro); -- counters
 
-constant reg            : regsRec_t := initRegs(regModes);
+constant reg             : regsRec_t := initRegs(regModes);
 
-constant regsNum        : integer := reg(reg'high).rAddr+1;
+constant regsNum         : integer := reg(reg'high).rAddr+1;
 
-constant byteWriteWidth : integer := 32;
-constant writeDataWidth : integer := 32;
-constant readDataWidth  : integer := 32;
-constant regSize        : integer := (trgNum+addrNum)*writeDataWidth;
+constant regSize         : integer := (trgNum+addrNum)*regsLen;
+
+constant fifoDepth       : integer := 2;
+constant fifoWDWidth     : integer := regSize;
+constant fifoRDWidth     : integer := integer(fifoWDWidth/fifoDepth);
+
+constant byteWriteWidthA : integer := regsLen;
+constant writeDataWidthA : integer := regsLen;
+constant readDataWidthA  : integer := regsLen;
+constant byteWriteWidthB : integer := 8;
+constant wenALen         : integer := integer(writeDataWidthA/byteWriteWidthA);
+constant wenBLen         : integer := integer(fifoRDWidth/byteWriteWidthB);
 --------------------------------------------------------------------
 
-type state_t is (idle,
-                 execute,
-                 errAddr,
-                 errReadOnly);
+type stateRMCtrl_t is (idle,
+                       execute,
+                       errAddr,
+                       errReadOnly);
+
+type stateFifoCtrl_t is (idle,
+                         writeBport);
 
 type rateMeters_t is array(0 to trgNum-1) of unsigned(regsLen-1 downto 0);
 
@@ -77,26 +88,38 @@ constant idleStatus     : std_logic_vector(regsLen-1 downto 0) := initSlv(regsLe
 constant errAddrStatus  : std_logic_vector(regsLen-1 downto 0) := initSlv(regsLen, 13, 0, "11" & x"500", '0');
 constant errROnlyStatus : std_logic_vector(regsLen-1 downto 0) := initSlv(regsLen, 13, 0, "11" & x"A00", '0');
 
-signal state       : state_t;
+signal state        : stateRMCtrl_t;
 
-signal addrToReg,
-       lastAddr    : std_logic_vector(bitsNum(trgNum+addrNum)-1 downto 0);
+signal fcState      : stateFifoCtrl_t;
 
-signal dataFromReg,
-       dataToReg   : std_logic_vector(devDataBytes*8-1 downto 0);
+signal addrToRegA,
+       lastAddr     : std_logic_vector(bitsNum(trgNum+addrNum)-1 downto 0);
 
-signal dAddr       : integer;
+signal dataFromRegA,
+       dataToRegA   : std_logic_vector(devDataBytes*8-1 downto 0);
 
-signal trgMeters   : rateMeters_t;
+signal addrToRegB   : std_logic_vector(bitsNum(fifoDepth)-1 downto 0);
 
-signal cntTmrMax   : unsigned(devDataBytes*8-1 downto 0);
+signal rmToBuf      : std_logic_vector(regSize-1 downto 0);
 
-signal cntTmr      : unsigned(cntTmrMax'length downto 0); -- MSB = overflow
+signal dAddr        : integer;
 
-signal readReg,
-       writeReg,
+signal trgMeters    : rateMeters_t;
+
+signal cntTmrMax    : unsigned(devDataBytes*8-1 downto 0);
+
+signal cntTmr       : unsigned(cntTmrMax'length downto 0); -- MSB = overflow
+
+signal enRegA,
+       enRegB,
+       fifoDValid,
+       fifoWAck,
+       fifoRdEn,
        cntTmrSig,
-       cntTmrSet   : std_logic;
+       cntTmrSet    : std_logic;
+signal fifoDOut     : std_logic_vector(fifoRDWidth-1 downto 0);
+signal writeRegA    : std_logic_vector(wenALen-1 downto 0);
+signal writeRegB    : std_logic_vector(wenBLen-1 downto 0);
 
 begin
 
@@ -104,46 +127,48 @@ dAddr      <= devAddrToInt(devAddr);
 
 cntTmrSig  <= cntTmr(cntTmr'left);
 
-devDataOut <= slvToDevData(dataFromReg);
+devDataOut <= slvToDevData(dataFromRegA);
+
+rmToBuf(addrNum*regsLen-1 downto 0) <= (others => '0');
+rmToBufGen: for i in 0 to trgNum-1 generate
+begin
+    rmToBuf((i+addrNum+1)*regsLen-1 downto (i+addrNum)*regsLen) <= std_logic_vector(trgMeters(i));
+end generate;
 
 rateMetersCtrlFSM: process(clk, rst, devExec)
 begin
     if rising_edge(clk) then
         if rst = '1' then
-            devReady   <= '0';
-            busy       <= '0';
-            devBrstRst <= '0';
-            cntTmrMax  <= (others => '0');
-            cntTmrSet  <= '0';
-            readReg    <= '0';
-            writeReg   <= '0';
-            dataToReg  <= (others => '0');
+            devReady    <= '0';
+            busy        <= '0';
+            devBrstRst  <= '0';
+            lastAddr    <= (others => '0');
+            cntTmrMax   <= (others => '0');
+            cntTmrSet   <= '0';
+            enRegA      <= '0';
+            writeRegA   <= (others => '0');
+            dataToRegA  <= (others => '0');
 
-            state      <= idle;
+            state       <= idle;
         else
-
-            trgMtrsToRDataLoop: for i in 0 to trgNum-1 loop
-                if cntTmrSig = '1' then
-                    rData(i+addrNum) <= std_logic_vector(trgMeters(i));
-                end if;
-            end loop;
-
             case state is
                 when idle =>
-                    devReady  <= '0';
-                    busy      <= '0';
-                    cntTmrSet <= '0';
-                    readReg   <= '0';
-                    writeReg  <= '0';
-                    addrToReg <= devAddrToSlice(devAddr, bitsNum(trgNum+addrNum)-1, 0);
-                    dataToReg <= devDataToSlv(devDataIn);
+                    devReady   <= '0';
+                    busy       <= '0';
+                    cntTmrSet  <= '0';
+                    enRegA     <= '0';
+                    writeRegA  <= (others => '0');
+                    addrToRegA <= devAddrToSlice(devAddr, bitsNum(trgNum+addrNum)-1, 0);
+                    dataToRegA <= devDataToSlv(devDataIn);
+
                     state     <= idle;
 
                     if devExec = '1' and devId = rateMeters then
                         if dAddr > trgNum+addrNum-1 then
                             state    <= errAddr;
                         elsif devRw = devRead and devBrst = '0' then
-                            readReg    <= '1';
+                            enRegA     <= '1';
+                            writeRegA  <= (others => '0');
                             devReady   <= '1';
                             busy       <= '1';
 
@@ -151,39 +176,51 @@ begin
                         elsif devRw = devWrite and reg(dAddr).rMode = ro then
                             state    <= errReadOnly;
                         elsif devRw = devWrite and reg(dAddr).rMode = rw then
-                            lastAddr <= devAddrToSlice(devAddr, bitsNum(trgNum+addrNum)-1, 0);
-                            writeReg(reg, rData, dAddr, devDataIn);<
-                            busy  <= '1';
+                            lastAddr  <= devAddrToSlice(devAddr, bitsNum(trgNum+addrNum)-1, 0);
+                            enRegA    <= '1';
+                            writeRegA <= (others => '1');
+                            busy      <= '1';
 
-                            state <= execute;
+                            state     <= execute;
                         end if;
                     end if;
 
                 when execute =>
-                    state <= idle;
+                    enRegA    <= '0';
+                    writeRegA <= (others => '0');
 
-                    if readReg(reg, rData, addr'pos(regStatus)) = addrToSlv(addr'pos(regTmrBase)) then
-                        cntTmrMax <= readReg(reg, rData, addr'pos(regTmrBase));
+                    state     <= idle;
+
+                    if lastAddr = addrToSlice(addr'pos(regTmrBase), bitsNum(trgNum+addrNum)-1, 0) then
+                        cntTmrMax <= unsigned(dataToRegA);
                         cntTmrSet <= '1';
                     end if;
 
                 when errAddr =>
-                    writeReg(reg, rData, addr'pos(regStatus), errAddrStatus);
-                    busy  <= '0';
+                    enRegA     <= '1';
+                    writeRegA  <= (others => '1');
+                    addrToRegA <= (others => '0');
+                    dataToRegA <= errAddrStatus;
+                    busy       <= '0';
 
-                    state <= idle;
+                    state      <= idle;
 
                 when errReadOnly =>
-                    writeReg(reg, rData, addr'pos(regStatus), errROnlyStatus);
-                    busy  <= '0';
+                    enRegA     <= '1';
+                    writeRegA  <= (others => '1');
+                    addrToRegA <= (others => '0');
+                    dataToRegA <= errROnlyStatus;
+                    busy       <= '0';
 
-                    state <= idle;
+                    state      <= idle;
 
                 when others =>
-                    devReady <= '0';
-                    busy     <= '0';
+                    enRegA    <= '0';
+                    writeRegA <= (others => '0');
+                    devReady  <= '0';
+                    busy      <= '0';
 
-                    state    <= idle;
+                    state     <= idle;
             end case;
         end if;
     end if;
@@ -215,30 +252,101 @@ begin
         end if;
     end if;
 end process;
+            fifoDValid
+            fifoWAck
+fifoBufCtrl: process(clk, rst)
+begin
+    if rising_edge(clk) then
+        if rst = '1' then
+            fifoRdEn   <= '0';
+            enRegB     <= '0';
+            writeRegB  <= (others => '0');
 
-regsRMInst: xpm_memory_spram
+            fcState    <= idle;
+        else
+            case state is
+                when idle =>
+                    fifoRdEn   <= '0';
+                    enRegB     <= '0';
+                    writeRegB  <= (others => '0');
+        
+                    fcState    <= idle;
+                when writeBport =>
+                when others =>
+                    fifoRdEn   <= '0';
+                    enRegB     <= '0';
+                    writeRegB  <= (others => '0');
+        
+                    fcState    <= idle;
+            end case;
+        end if;
+    end if;
+end process;
+
+buffRMInst: xpm_fifo_sync
 generic map(
-  ADDR_WIDTH_A       => bitsNum(trgNum+addrNum),
-  BYTE_WRITE_WIDTH_A => byteWriteWidth,
-  MEMORY_SIZE        => regSize,
-  READ_DATA_WIDTH_A  => readDataWdith,
-  WRITE_DATA_WIDTH_A => writeDataWdith,
-  READ_LATENCY_A     => 1,
-  MEMORY_PRIMITIVE   => "block",
-  WRITE_MODE_A       => "write_first"
+    FIFO_MEMORY_TYPE  => "block",
+    FIFO_WRITE_DEPTH  => fifoDepth,
+    READ_DATA_WIDTH   => fifoRDWidth,
+    WRITE_DATA_WIDTH  => fifoWDWidth,
+    FIFO_READ_LATENCY => 0,
+    READ_MODE         => "fwft",
+    USE_ADV_FEATURES  => "1010"
 )
 port map(
-      clka           => clk,
-      rsta           => rst,
-      addra          => addrToReg,
-      douta          => dataFromReg,
-      dina           => dataToReg,
-      ena            => enReg,
-      wea            => writeReg,
-      regcea         => '1',
-      sleep          => '0',
-      injectdbiterra => '0',
-      injectsbiterra => '0'
+    rst           => rst,
+    wr_clk        => clk,
+    din           => rmToBuf,
+    dout          => fifoDOut,
+    data_valid    => fifoDValid,
+    wr_ack        => fifoWAck,
+    rd_en         => fifoRdEn,
+    wr_en         => cntTmrSig,
+    sleep         => '0',
+    injectdbiterr => '0',
+    injectsbiterr => '0'
+);
+
+
+regsRMInst: xpm_memory_tdpram
+generic map(
+    ADDR_WIDTH_A       => bitsNum(trgNum+addrNum),
+    BYTE_WRITE_WIDTH_A => byteWriteWidthA,
+    READ_DATA_WIDTH_A  => readDataWidthA,
+    WRITE_DATA_WIDTH_A => writeDataWidthA,
+    READ_LATENCY_A     => 1,
+    WRITE_MODE_A       => "write_first",
+    ADDR_WIDTH_B       => fifoDepth,
+    BYTE_WRITE_WIDTH_B => byteWriteWidthB,
+    READ_DATA_WIDTH_B  => fifoRDWidth,
+    WRITE_DATA_WIDTH_B => fifoRDWidth,
+    READ_LATENCY_B     => 1,
+    WRITE_MODE_B       => "write_first",
+    MEMORY_SIZE        => regSize,
+    MEMORY_PRIMITIVE   => "block"
+)
+port map(
+    clka               => clk,
+    clkb               => clk,
+    rsta               => rst,
+    rstb               => rst,
+    addra              => addrToRegA,
+    dina               => dataToRegA,
+    douta              => dataFromRegA,
+    ena                => enRegA,
+    wea                => writeRegA,
+    addrb              => addrToRegB,
+    dinb               => fifoDOut,
+    doutb              => open,
+    enb                => enRegB,
+    web                => writeRegB,
+    sleep              => '0',
+    regcea             => '1',
+    injectdbiterra     => '0',
+    injectsbiterra     => '0',
+    regceb             => '1',
+    injectdbiterrb     => '0',
+    injectsbiterrb     => '0'
 );
 
 end Behavioral;
