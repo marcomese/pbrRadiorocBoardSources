@@ -62,14 +62,16 @@ constant regsNum         : integer := reg(reg'high).rAddr+1;
 
 constant regSize         : integer := (trgNum+addrNum)*regsLen;
 
-constant fifoDepth       : integer := 2;
-constant fifoWDWidth     : integer := regSize;
-constant fifoRDWidth     : integer := integer(fifoWDWidth/fifoDepth);
+constant fifoWDWidth     : integer := trgNum*regsLen;
+constant fifoRDWidth     : integer := addrNum*regsLen;
+constant fifoDepth       : integer := fifoWDWidth/fifoRDWidth;
 
 constant byteWriteWidthA : integer := regsLen;
 constant writeDataWidthA : integer := regsLen;
 constant readDataWidthA  : integer := regsLen;
-constant byteWriteWidthB : integer := 8;
+constant byteWriteWidthB : integer := fifoRDWidth;
+constant writeDataWidthB : integer := fifoRDWidth;
+constant readDataWidthB  : integer := fifoRDWidth;
 constant wenALen         : integer := integer(writeDataWidthA/byteWriteWidthA);
 constant wenBLen         : integer := integer(fifoRDWidth/byteWriteWidthB);
 --------------------------------------------------------------------
@@ -98,9 +100,11 @@ signal addrToRegA,
 signal dataFromRegA,
        dataToRegA   : std_logic_vector(devDataBytes*8-1 downto 0);
 
-signal addrToRegB   : std_logic_vector(bitsNum(fifoDepth)-1 downto 0);
+signal addrToRegB   : std_logic_vector(bitsNum(trgNum+addrNum)-1 downto 0);
 
-signal rmToBuf      : std_logic_vector(regSize-1 downto 0);
+signal addrUnsB     : unsigned(addrToRegB'left downto 0);
+
+signal rmToBuf      : std_logic_vector(fifoWDWidth-1 downto 0);
 
 signal dAddr        : integer;
 
@@ -112,7 +116,9 @@ signal cntTmr       : unsigned(cntTmrMax'length downto 0); -- MSB = overflow
 
 signal enRegA,
        enRegB,
+       addrBEnd,
        fifoDValid,
+       fifoDValidOld,
        fifoWAck,
        fifoRdEn,
        cntTmrSig,
@@ -129,10 +135,13 @@ cntTmrSig  <= cntTmr(cntTmr'left);
 
 devDataOut <= slvToDevData(dataFromRegA);
 
-rmToBuf(addrNum*regsLen-1 downto 0) <= (others => '0');
+addrBEnd   <= '1' when addrUnsB = fifoDepth else '0';
+
+addrToRegB <= std_logic_vector(addrUnsB(addrToRegB'left downto 0));
+
 rmToBufGen: for i in 0 to trgNum-1 generate
 begin
-    rmToBuf((i+addrNum+1)*regsLen-1 downto (i+addrNum)*regsLen) <= std_logic_vector(trgMeters(i));
+    rmToBuf((i+1)*regsLen-1 downto i*regsLen) <= std_logic_vector(trgMeters(trgNum-1-i));
 end generate;
 
 rateMetersCtrlFSM: process(clk, rst, devExec)
@@ -161,7 +170,7 @@ begin
                     addrToRegA <= devAddrToSlice(devAddr, bitsNum(trgNum+addrNum)-1, 0);
                     dataToRegA <= devDataToSlv(devDataIn);
 
-                    state     <= idle;
+                    state      <= idle;
 
                     if devExec = '1' and devId = rateMeters then
                         if dAddr > trgNum+addrNum-1 then
@@ -231,9 +240,7 @@ begin
     trgICnt: process(clk)
     begin
         if rising_edge(clk) then
-            if rst = '1' then
-                trgMeters(i) <= (others => '0');
-            elsif cntTmrSig = '1' then
+            if rst = '1' or fifoWAck = '1' then
                 trgMeters(i) <= (others => '0');
             elsif trgIn(i) = '1' then
                 trgMeters(i) <= trgMeters(i) + 1;
@@ -252,29 +259,55 @@ begin
         end if;
     end if;
 end process;
-            fifoDValid
-            fifoWAck
+
 fifoBufCtrl: process(clk, rst)
 begin
     if rising_edge(clk) then
         if rst = '1' then
-            fifoRdEn   <= '0';
-            enRegB     <= '0';
-            writeRegB  <= (others => '0');
+            fifoRdEn      <= '0';
+            enRegB        <= '0';
+            fifoDValidOld <= '0';
+            writeRegB     <= (others => '0');
+            addrUnsB      <= to_unsigned(addrNum-1, addrUnsB'length);
 
-            fcState    <= idle;
+            fcState       <= idle;
         else
-            case state is
+            fifoDValidOld <= fifoDValid;
+
+            case fcState is
                 when idle =>
                     fifoRdEn   <= '0';
                     enRegB     <= '0';
                     writeRegB  <= (others => '0');
-        
+                    addrUnsB   <= to_unsigned(addrNum-1, addrUnsB'length);
+
                     fcState    <= idle;
+
+                    if (fifoDValid and not fifoDValidOld) = '1' then
+                        writeRegB <= (others => '1');
+                        fifoRdEn  <= '1';
+                        enRegB    <= '1';
+
+                        fcState   <= writeBPort;
+                    end if;
+
                 when writeBport =>
+                    writeRegB <= (others => '1');
+                    addrUnsB  <= addrUnsB + 1;
+
+                    fcState   <= writeBPort;
+
+                    if addrBEnd = '1' then
+                        fifoRdEn <= '0';
+                        enRegB   <= '0';
+
+                        fcState  <= idle;
+                    end if;
+
                 when others =>
                     fifoRdEn   <= '0';
                     enRegB     <= '0';
+                    addrUnsB   <= to_unsigned(addrNum-1, addrUnsB'length);
                     writeRegB  <= (others => '0');
         
                     fcState    <= idle;
@@ -316,10 +349,10 @@ generic map(
     WRITE_DATA_WIDTH_A => writeDataWidthA,
     READ_LATENCY_A     => 1,
     WRITE_MODE_A       => "write_first",
-    ADDR_WIDTH_B       => fifoDepth,
+    ADDR_WIDTH_B       => bitsNum(trgNum+addrNum),
     BYTE_WRITE_WIDTH_B => byteWriteWidthB,
-    READ_DATA_WIDTH_B  => fifoRDWidth,
-    WRITE_DATA_WIDTH_B => fifoRDWidth,
+    READ_DATA_WIDTH_B  => readDataWidthB,
+    WRITE_DATA_WIDTH_B => writeDataWidthB,
     READ_LATENCY_B     => 1,
     WRITE_MODE_B       => "write_first",
     MEMORY_SIZE        => regSize,
