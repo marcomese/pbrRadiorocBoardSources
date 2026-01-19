@@ -15,15 +15,15 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="1,003,114.001 ns"></ZoomStartTime>
-      <ZoomEndTime time="1,003,873.502 ns"></ZoomEndTime>
-      <Cursor1Time time="1,003,464.001 ns"></Cursor1Time>
+      <ZoomStartTime time="48.515000 us"></ZoomStartTime>
+      <ZoomEndTime time="63.785001 us"></ZoomEndTime>
+      <Cursor1Time time="51.060000 us"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="226"></NameColumnWidth>
-      <ValueColumnWidth column_width="83"></ValueColumnWidth>
+      <ValueColumnWidth column_width="75"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="75" />
+   <WVObjectSize size="76" />
    <wvobject fp_name="/tb_rateMetersCtrl/rst" type="logic">
       <obj_property name="ElementShortName">rst</obj_property>
       <obj_property name="ObjectShortName">rst</obj_property>
@@ -230,6 +230,10 @@
       <obj_property name="ElementShortName">testRxPresent</obj_property>
       <obj_property name="ObjectShortName">testRxPresent</obj_property>
    </wvobject>
+   <wvobject fp_name="/tb_rateMetersCtrl/devInterfInst/state" type="other">
+      <obj_property name="ElementShortName">state</obj_property>
+      <obj_property name="ObjectShortName">state</obj_property>
+   </wvobject>
    <wvobject fp_name="/tb_rateMetersCtrl/devIntBusy" type="logic">
       <obj_property name="ElementShortName">devIntBusy</obj_property>
       <obj_property name="ObjectShortName">devIntBusy</obj_property>
@@ -275,8 +279,8 @@
       <obj_property name="ObjectShortName">web[0:0]</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_rateMetersCtrl/uut/regsRMInst/addrb" type="array">
-      <obj_property name="ElementShortName">addrb[5:0]</obj_property>
-      <obj_property name="ObjectShortName">addrb[5:0]</obj_property>
+      <obj_property name="ElementShortName">addrb[6:0]</obj_property>
+      <obj_property name="ObjectShortName">addrb[6:0]</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_rateMetersCtrl/uut/regsRMInst/dinb" type="array">
       <obj_property name="ElementShortName">dinb[63:0]</obj_property>
@@ -315,12 +319,12 @@
       <obj_property name="ObjectShortName">writeRegB[0:0]</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_rateMetersCtrl/uut/addrToRegB" type="array">
-      <obj_property name="ElementShortName">addrToRegB[5:0]</obj_property>
-      <obj_property name="ObjectShortName">addrToRegB[5:0]</obj_property>
+      <obj_property name="ElementShortName">addrToRegB[6:0]</obj_property>
+      <obj_property name="ObjectShortName">addrToRegB[6:0]</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_rateMetersCtrl/uut/addrUnsB" type="array">
-      <obj_property name="ElementShortName">addrUnsB[5:0]</obj_property>
-      <obj_property name="ObjectShortName">addrUnsB[5:0]</obj_property>
+      <obj_property name="ElementShortName">addrUnsB[6:0]</obj_property>
+      <obj_property name="ObjectShortName">addrUnsB[6:0]</obj_property>
       <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_rateMetersCtrl/uut/regsRMInst/xpm_memory_base_inst/mem" type="array">

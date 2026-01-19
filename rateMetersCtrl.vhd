@@ -77,6 +77,7 @@ constant wenBLen         : integer := integer(fifoRDWidth/byteWriteWidthB);
 --------------------------------------------------------------------
 
 type stateRMCtrl_t is (idle,
+                       waitRegWrite,
                        execute,
                        errAddr,
                        errReadOnly);
@@ -90,29 +91,29 @@ constant idleStatus     : std_logic_vector(regsLen-1 downto 0) := initSlv(regsLe
 constant errAddrStatus  : std_logic_vector(regsLen-1 downto 0) := initSlv(regsLen, 13, 0, "11" & x"500", '0');
 constant errROnlyStatus : std_logic_vector(regsLen-1 downto 0) := initSlv(regsLen, 13, 0, "11" & x"A00", '0');
 
-signal state        : stateRMCtrl_t;
+signal state         : stateRMCtrl_t;
 
-signal fcState      : stateFifoCtrl_t;
+signal fcState       : stateFifoCtrl_t;
 
 signal addrToRegA,
-       lastAddr     : std_logic_vector(bitsNum(trgNum+addrNum)-1 downto 0);
+       lastAddr      : std_logic_vector(bitsNum(trgNum+addrNum)-1 downto 0);
 
 signal dataFromRegA,
-       dataToRegA   : std_logic_vector(devDataBytes*8-1 downto 0);
+       dataToRegA    : std_logic_vector(devDataBytes*8-1 downto 0);
 
-signal addrToRegB   : std_logic_vector(bitsNum(trgNum+addrNum)-1 downto 0);
+signal addrToRegB    : std_logic_vector(bitsNum(trgNum+addrNum)-1 downto 0);
 
-signal addrUnsB     : unsigned(addrToRegB'left downto 0);
+signal addrUnsB      : unsigned(addrToRegB'left downto 0);
 
-signal rmToBuf      : std_logic_vector(fifoWDWidth-1 downto 0);
+signal rmToBuf       : std_logic_vector(fifoWDWidth-1 downto 0);
 
-signal dAddr        : integer;
+signal dAddr         : integer;
 
-signal trgMeters    : rateMeters_t;
+signal trgMeters     : rateMeters_t;
 
-signal cntTmrMax    : unsigned(devDataBytes*8-1 downto 0);
+signal cntTmrMax     : unsigned(devDataBytes*8-1 downto 0);
 
-signal cntTmr       : unsigned(cntTmrMax'length downto 0); -- MSB = overflow
+signal cntTmr        : unsigned(cntTmrMax'length downto 0); -- MSB = overflow
 
 signal enRegA,
        enRegB,
@@ -122,10 +123,10 @@ signal enRegA,
        fifoWAck,
        fifoRdEn,
        cntTmrSig,
-       cntTmrSet    : std_logic;
-signal fifoDOut     : std_logic_vector(fifoRDWidth-1 downto 0);
-signal writeRegA    : std_logic_vector(wenALen-1 downto 0);
-signal writeRegB    : std_logic_vector(wenBLen-1 downto 0);
+       cntTmrSet     : std_logic;
+signal fifoDOut      : std_logic_vector(fifoRDWidth-1 downto 0);
+signal writeRegA     : std_logic_vector(wenALen-1 downto 0);
+signal writeRegB     : std_logic_vector(wenBLen-1 downto 0);
 
 begin
 
@@ -176,12 +177,10 @@ begin
                         if dAddr > trgNum+addrNum-1 then
                             state    <= errAddr;
                         elsif devRw = devRead and devBrst = '0' then
-                            enRegA     <= '1';
-                            writeRegA  <= (others => '0');
-                            devReady   <= '1';
-                            busy       <= '1';
+                            lastAddr <= devAddrToSlice(devAddr, bitsNum(trgNum+addrNum)-1, 0);
+                            busy     <= '1';
 
-                            state      <= idle;
+                            state    <= waitRegWrite;
                         elsif devRw = devWrite and reg(dAddr).rMode = ro then
                             state    <= errReadOnly;
                         elsif devRw = devWrite and reg(dAddr).rMode = rw then
@@ -192,6 +191,18 @@ begin
 
                             state     <= execute;
                         end if;
+                    end if;
+
+                when waitRegWrite =>
+                    state <= waitRegWrite;
+
+                    if fifoRdEn = '0' then
+                        addrToRegA <= lastAddr;
+                        enRegA     <= '1';
+                        writeRegA  <= (others => '0');
+                        devReady   <= '1';
+
+                        state      <= idle;
                     end if;
 
                 when execute =>
@@ -309,7 +320,7 @@ begin
                     enRegB     <= '0';
                     addrUnsB   <= to_unsigned(addrNum-1, addrUnsB'length);
                     writeRegB  <= (others => '0');
-        
+
                     fcState    <= idle;
             end case;
         end if;
