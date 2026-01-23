@@ -42,15 +42,20 @@ end IO;
 
 architecture Behavioral of IO is
 
+signal tSig : std_logic_vector(63 downto 0);
+
 begin
 
 TRIG : for I in 0 to 63 generate
-   IBUF : IBUFDS_DIFF_OUT
+
+    T(I) <= not tSig(I);
+
+   IBUF : IBUFDS
    Generic map (
    DIFF_TERM => TRUE
    )
    Port map (
-   OB => T(I),--O => T(I) pour radio OB => T(I) pour psiroc
+   O => tSig(I),--T(I),--O => T(I) pour radio OB => T(I) pour psiroc
    I => T_p(I),
    IB => T_n(I)
    );
