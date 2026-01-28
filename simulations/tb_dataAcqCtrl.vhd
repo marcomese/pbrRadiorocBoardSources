@@ -209,11 +209,11 @@ signal start             : std_logic := '0';
 signal resetAcq          : std_logic    := '0';
 signal sdo_hg          : std_logic := '0';
 signal sdo_lg          : std_logic := '0';
-signal NORT1          : std_logic := '0';
-signal NORT2           : std_logic := '0';
-signal NORTQ             : std_logic := '0';
+signal NORT1          : std_logic := '1';
+signal NORT2           : std_logic := '1';
+signal NORTQ             : std_logic := '1';
 signal nb_acq            : std_logic_vector(7 downto 0)  := (others => '0');
-signal t           : std_logic_vector(63 downto 0) := (others => '0');
+signal t           : std_logic_vector(63 downto 0) := (others => '1');
 signal sel_adc           : std_logic_vector(63 downto 0) := (others => '0');
 signal rd_en           : std_logic := '0';
 signal dout           : std_logic_vector(7 downto 0)  := (others => '0');
@@ -357,9 +357,9 @@ begin
 
     wait for 10 us;
 
-    extTrg <= '1';
+    NORT1 <= '0';
     wait for clkPeriod100M;
-    extTrg <= '0';
+    NORT1 <= '1';
 
     wait for 100 us;
 
