@@ -44,7 +44,6 @@ component adc is
   clkN_100M : in std_logic;
   clk_200M : in std_logic;
   clkN_200M : in std_logic;
-  clk_500M : in std_logic;
   start    : in std_logic;
   sdo_hg  : IN STD_LOGIC;
   sdo_lg  : IN STD_LOGIC;
@@ -205,7 +204,6 @@ signal clk_100M          : std_logic := '1';
 signal clkN_100M          : std_logic := '0';
 signal clk_200M          : std_logic := '1';
 signal clkN_200M          : std_logic := '0';
-signal clk_500M          : std_logic := '0';
 signal clk_25M           : std_logic := '1';
 signal start             : std_logic := '0';
 signal resetAcq          : std_logic    := '0';
@@ -471,7 +469,6 @@ port map(
     clkN_100M          => clkN_100M,
     clk_200M          => clk_200M,
     clkN_200M          => clkN_200M,
-    clk_500M          => clk_500M,
     start             => start,
     sdo_hg            => sdo_hg,
     sdo_lg            => sdo_lg,
