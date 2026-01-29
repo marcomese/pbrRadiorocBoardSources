@@ -10,9 +10,7 @@ entity adc is
 	Port (
 		rst 	 : in std_logic;
 		clk_100M : in std_logic;
-		clkN_100M : in std_logic;
 		clk_200M : in std_logic;
-		clkN_200M : in std_logic;
 		start    : in std_logic;
 		sdo_hg	 : IN STD_LOGIC;
 		sdo_lg	 : IN STD_LOGIC;

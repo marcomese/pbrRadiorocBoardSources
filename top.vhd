@@ -358,9 +358,7 @@ adc: entity xil_defaultlib.adc
 port map(
     rst 	 => reset_acq,
     clk_100M => clk_100M,
-    clkN_100M => clkN_100M,
     clk_200M => clk_200M,
-    clkN_200M => clkN_200M,
     start    => start_acq,
     sdo_hg	 => ADC_HG,
     sdo_lg	 => ADC_LG,

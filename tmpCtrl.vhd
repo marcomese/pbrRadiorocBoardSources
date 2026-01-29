@@ -68,18 +68,13 @@ type state_t is (init,
                  waitReady,
                  store);
 
-constant readCount  : integer := integer(readPeriod*clkFreq);
-
 signal   state      : state_t;
-
-signal   readCnt    : integer range 0 to readCount-1;
 
 signal   dAddr      : integer;
 
 signal   exec,
          dataReady,
          rw,
-         autoRead,
          busyTmp    : std_logic;
 
 signal   rAddr      : std_logic_vector(7 downto 0);
@@ -102,7 +97,6 @@ begin
             exec       <= '0';
             rw         <= devRead;
             rAddr      <= (others => '0');
-            autoRead   <= '0';
             devReady   <= '0';
             busy       <= '1';
             devDataOut <= (others => (others => '0'));
@@ -113,7 +107,6 @@ begin
             case state is
                 when init =>
                     if busyTmp = '0' then
-                        autoRead <= '1';
                         busy     <= '0';
 
                         state    <= idle;
@@ -127,11 +120,10 @@ begin
 
                     state    <= idle;
 
-                    if readCnt = readCount-1 and busyTmp = '0' then
+                    if busyTmp = '0' then
                         exec     <= '1';
                         rw       <= devRead;
                         rAddr    <= (others => '0');
-                        autoRead <= '1';
                         busy     <= '1';
 
                         state    <= waitReady;
@@ -141,7 +133,6 @@ begin
                             rw       <= devRw;
                             rAddr    <= devAddr(0);
                             dataIn   <= devDataToSlv(devDataIn);
-                            autoRead <= '0';
                             busy     <= '1';
     
                             state    <= waitReady;
@@ -163,7 +154,7 @@ begin
 
                     state <= waitReady;
 
-                    if autoRead = '1' and dataReady = '1' then
+                    if dataReady = '1' then
                         writeReg(reg, rData, addr'pos(rTemp), dataOut32);
                         exec  <= '0';
 
@@ -175,7 +166,6 @@ begin
                     end if;
 
                 when store =>
-                    autoRead   <= '1';
                     devReady   <= '1';
                     devDataOut <= (dataOut32(31 downto 24),
                                    dataOut32(23 downto 16),
@@ -188,7 +178,6 @@ begin
                     exec     <= '0';
                     rw       <= devRead;
                     rAddr    <= (others => '0');
-                    autoRead <= '0';
                     devReady <= '0';
                     busy     <= '0';
 
@@ -219,16 +208,5 @@ port map(
     i2cBusy   => i2cBusy,
     i2cDataRd => i2cDataRd
 );
-
-readCounterInst: process(clk, rst)
-begin
-    if rising_edge(clk) then
-        if rst = '1' or readCnt = readCount-1 or autoRead = '0' then
-            readCnt <= 0;
-        elsif autoRead = '1' then
-            readCnt <= readCnt + 1;
-        end if;
-    end if;
-end process;
 
 end Behavioral;

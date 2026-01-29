@@ -41,9 +41,7 @@ component adc is
  Port (
   rst   : in std_logic;
   clk_100M : in std_logic;
-  clkN_100M : in std_logic;
   clk_200M : in std_logic;
-  clkN_200M : in std_logic;
   start    : in std_logic;
   sdo_hg  : IN STD_LOGIC;
   sdo_lg  : IN STD_LOGIC;
@@ -466,9 +464,7 @@ adcInst: adc
 port map(
     rst               => resetAcq,
     clk_100M          => clk_100M,
-    clkN_100M          => clkN_100M,
     clk_200M          => clk_200M,
-    clkN_200M          => clkN_200M,
     start             => start,
     sdo_hg            => sdo_hg,
     sdo_lg            => sdo_lg,
