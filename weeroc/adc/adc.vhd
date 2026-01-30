@@ -190,7 +190,7 @@ port map(
     cd <=   sel_adc(63 downto 56) & "000";  
     conv_delay <= to_integer(unsigned(cd));
     
-    trigger <= en_acq and (hit or extTrg or pulse);
+    trigger <= en_acq and hit;--(hit or extTrg or pulse);
     trigger_sft <= sel_adc(7);
 
 trgEdgeInst: entity work.edgeDetector
