@@ -97,7 +97,7 @@ architecture arch of radioroc_fw is
 
     -- LVDS
 	signal ADC_SCKHG, ADC_SCKLG, ADC_HG, ADC_LG : std_logic;
-	signal tEdge1, tEdge2 : std_logic_vector(63 downto 0);
+	signal T_1Buf, T_2Buf, tEdge1, tEdge2 : std_logic_vector(63 downto 0);
 	signal tEdge21 : std_logic_vector(127 downto 0);
 	-- Clock and reset
 	signal reset, locked_1, locked_2, locked_3                               : std_logic;
@@ -234,7 +234,8 @@ signal dbgOr : std_logic;
 signal dbgFF : std_logic_vector(3 downto 0);
 
 attribute mark_debug : string;
-attribute mark_debug of T_1,
+attribute mark_debug of T_1Buf,
+                        T_2Buf,
                         sc_holdext,
                         sc_trigext,
                         evtTrigger : signal is "true";
@@ -267,23 +268,23 @@ tEdge21 <= tEdge2 & tEdge1;
 
 inTrg1Sync: entity work.trgSync
 generic map(
-    trgNum => T_1'length
+    trgNum => T_1Buf'length
 )
 port map(
     clk  => clk_100M,
     rst  => reset,
-    tIn  => T_1,
+    tIn  => T_1Buf,
     tOut => tEdge1
 );
 
 inTrg2Sync: entity work.trgSync
 generic map(
-    trgNum => T_2'length
+    trgNum => T_2Buf'length
 )
 port map(
     clk  => clk_100M,
     rst  => reset,
-    tIn  => T_2,
+    tIn  => T_2Buf,
     tOut => tEdge2
 );
 
@@ -317,6 +318,10 @@ port map(
     ADC_HG_n    => ADC_HG_n,
     ADC_LG_p => ADC_LG_p,
     ADC_LG_n => ADC_LG_n,
+    T1    => T_1,
+    T1Buf => T_1Buf,
+    T2    => T_2,
+    T2Buf => T_2Buf,
     readRq   => readRq,
     readRq_p => readRq_p,
     readRq_n => readRq_n,
@@ -387,7 +392,7 @@ port map(
     NORT2 	 => sc_NORT2,
     NORTQ    => sc_NORTQ,
     nb_acq   => nb_acq,
-    t		 => T_1,
+    t		 => T_1Buf,
     sel_adc => sel_adc,
     rd_en 	 => rd_acq,
     dout 	 => dout_acq,
@@ -413,7 +418,7 @@ port map(
 
 trgSamplerInst: entity work.trgSamplerCtrl
 generic map(
-    trgNum        => T_1'length+T_2'length,
+    trgNum        => tEdge21'length,
     nSAfterTrgDef => 16
 )
 port map(
@@ -438,7 +443,7 @@ port map(
 
 rateMetersInst: entity work.rateMetersCtrl
 generic map(
-    trgNum     => T_1'length+T_2'length
+    trgNum     => tEdge21'length
 )
 port map(
     clk        => clk_100M,
