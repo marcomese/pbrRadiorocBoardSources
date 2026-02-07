@@ -98,7 +98,7 @@ architecture arch of radioroc_fw is
     -- LVDS
 	signal ADC_SCKHG, ADC_SCKLG, ADC_HG, ADC_LG : std_logic;
 	signal tEdge1, tEdge2 : std_logic_vector(63 downto 0);
-	signal tEdge12 : std_logic_vector(127 downto 0);
+	signal tEdge21 : std_logic_vector(127 downto 0);
 	-- Clock and reset
 	signal reset, locked_1, locked_2, locked_3                               : std_logic;
 	signal clk_2M, clk_10M, clk_50M, clk_100M, clk_200M, clkN_100M, clkN_200M : std_logic;
@@ -252,7 +252,7 @@ n_reset_i2c <= en_clki2c and npwr_reset;
 dbgOR <= '0';--dbgFF(3) or dbgFF(2) or dbgFF(1) or dbgFF(0);
 dbgFF <= (others => '0');
 
-tEdge12 <= tEdge1 & tEdge2;
+tEdge21 <= tEdge2 & tEdge1;
 
 --dbgFFInst: process(reset, clk_200M)
 --begin
@@ -421,7 +421,7 @@ port map(
     clkTmr     => clk_100M,
     rst        => reset,
     evtTrigger => evtTrigger,
-    trgIn      => tEdge12,
+    trgIn      => tEdge21,
     devExec    => devExec,
     devId      => devId,
     devRw      => devRw,
@@ -444,7 +444,7 @@ port map(
     clk        => clk_100M,
     clkTmr     => clk_100M,
     rst        => reset,
-    trgIn      => tEdge12,
+    trgIn      => tEdge21,
     devExec    => devExec,
     devId      => devId,
     devRw      => devRw,

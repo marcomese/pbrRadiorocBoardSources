@@ -226,6 +226,7 @@ set_property PACKAGE_PIN V5 [get_ports {dbgOut[0]}]
 set_property BITSTREAM.CONFIG.CONFIGRATE 50 [current_design]
 set_property BITSTREAM.GENERAL.COMPRESS TRUE [current_design]
 
+
 create_debug_core u_ila_0 ila
 set_property ALL_PROBE_SAME_MU true [get_debug_cores u_ila_0]
 set_property ALL_PROBE_SAME_MU_CNT 1 [get_debug_cores u_ila_0]
