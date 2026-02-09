@@ -3,12 +3,17 @@
 
 set_property PULLTYPE PULLUP [get_ports sc_clk_sm]
 
+set_property INTERNAL_VREF 0.6 [get_iobanks 15]
+set_property INTERNAL_VREF 0.6 [get_iobanks 16]
+set_property INTERNAL_VREF 0.6 [get_iobanks 34]
+set_property INTERNAL_VREF 0.6 [get_iobanks 35]
+
 set_property IOSTANDARD LVDS_25 [get_ports ADC_*]
 set_property IOSTANDARD LVCMOS25 [get_ports nCNV]
 set_property IOSTANDARD LVCMOS25 [get_ports nCMOS]
 set_property IOSTANDARD LVCMOS25 [get_ports {dbgOut[*]}]
-set_property IOSTANDARD LVCMOS25 [get_ports {T_2[*]}]
-set_property IOSTANDARD LVCMOS25 [get_ports {T_1[*]}]
+set_property IOSTANDARD HSUL_12 [get_ports {T_2[*]}]
+set_property IOSTANDARD HSUL_12 [get_ports {T_1[*]}]
 set_property IOSTANDARD LVDS_25 [get_ports CLK_*]
 set_property IOSTANDARD LVCMOS33 [get_ports npwr_reset]
 set_property IOSTANDARD LVCMOS33 [get_ports SCL_275]
