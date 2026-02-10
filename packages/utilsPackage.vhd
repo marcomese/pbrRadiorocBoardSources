@@ -6,6 +6,8 @@ use IEEE.MATH_REAL.ALL;
 package utilsPkg is
     type byteArray_t is array(integer range <>) of std_logic_vector(7 downto 0);
 
+    type wordArray_t is array(integer range <>) of std_logic_vector(31 downto 0);
+
     function refCMD(intRef: boolean) return std_logic_vector;
 
     function boolToStdLogic(val: boolean) return std_logic;
