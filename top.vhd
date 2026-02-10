@@ -97,7 +97,12 @@ architecture arch of radioroc_fw is
 
     -- LVDS
 	signal ADC_SCKHG, ADC_SCKLG, ADC_HG, ADC_LG : std_logic;
-	signal T_1Buf, T_2Buf, tEdge1, tEdge2 : std_logic_vector(63 downto 0);
+	signal T_1Buf, T_2Buf,
+	       T_1FF0, T_2FF0,
+	       T_1FF1, T_2FF1,
+	       T_1FF2, T_2FF2,
+	       T_1Sync, T_2Sync,
+	       tEdge1, tEdge2 : std_logic_vector(63 downto 0);
 	signal tEdge21 : std_logic_vector(127 downto 0);
 	-- Clock and reset
 	signal reset, locked_1, locked_2, locked_3                               : std_logic;
@@ -165,7 +170,7 @@ signal   devReadyPGen,
          devReadyRadioroc,
          devReadyAcq,
          devReadyRM,
-         devReadyTSmpl, 
+         devReadyTSmpl,
          devRw,
          devBrst,
          devBrstWrt,
@@ -233,13 +238,6 @@ signal dbgOr : std_logic;
 
 signal dbgFF : std_logic_vector(3 downto 0);
 
-attribute mark_debug : string;
-attribute mark_debug of T_1Buf,
-                        T_2Buf,
-                        sc_holdext,
-                        sc_trigext,
-                        evtTrigger : signal is "true";
-
 begin
 
 pulse <= pulseSig;
@@ -266,25 +264,51 @@ tEdge21 <= tEdge2 & tEdge1;
 --    end if;
 --end process;
 
+syncIn: process(clk_100M, reset)
+begin
+    if rising_edge(clk_100M) then
+        if reset = '1' then
+            T_1FF0  <= (others => '0');
+            T_1FF1  <= (others => '0');
+            T_1FF2  <= (others => '0');
+            T_2FF0  <= (others => '0');
+            T_2FF1  <= (others => '0');
+            T_2FF2  <= (others => '0');
+            T_1Sync <= (others => '0');
+            T_2Sync <= (others => '0');
+        else
+            T_1FF0 <= T_1Buf;
+            T_1FF1 <= T_1FF0;
+            T_1FF2 <= T_1FF1;
+            T_2FF0 <= T_2Buf;
+            T_2FF1 <= T_2FF0;
+            T_2FF2 <= T_2FF1;
+            
+            T_1Sync <= (T_1FF0 and T_1FF1) or (T_1FF1 and T_1FF2) or (T_1FF0 and T_1FF2);
+            T_2Sync <= (T_2FF0 and T_1FF1) or (T_2FF1 and T_2FF2) or (T_2FF0 and T_2FF2);
+        end if;
+    end if;
+end process;
+
 inTrg1Sync: entity work.trgSync
 generic map(
-    trgNum => T_1Buf'length
+    trgNum => T_1Sync'length
 )
 port map(
     clk  => clk_100M,
     rst  => reset,
-    tIn  => T_1Buf,
+    tIn  => T_1Sync,
     tOut => tEdge1
 );
 
 inTrg2Sync: entity work.trgSync
 generic map(
-    trgNum => T_2Buf'length
+    trgNum => T_2Sync'length
 )
 port map(
     clk  => clk_100M,
     rst  => reset,
-    tIn  => T_2Buf,
+    tIn  => T_2Sync,
     tOut => tEdge2
 );
 
@@ -392,7 +416,7 @@ port map(
     NORT2 	 => sc_NORT2,
     NORTQ    => sc_NORTQ,
     nb_acq   => nb_acq,
-    t		 => T_1Buf,
+    t		 => T_1Sync,
     sel_adc => sel_adc,
     rd_en 	 => rd_acq,
     dout 	 => dout_acq,
