@@ -62,18 +62,21 @@ constant regsNum         : integer := reg(reg'high).rAddr+1;
 
 constant regSize         : integer := (trgNum+addrNum)*regsLen;
 
-constant fifoWDWidth     : integer := trgNum*regsLen;
-constant fifoRDWidth     : integer := addrNum*regsLen;
+constant writeDataWidthA : integer := regsLen;
+constant byteWriteWidthA : integer := regsLen;
+constant readDataWidthA  : integer := regsLen;
+
+constant writeDataWidthB : integer := regSize/2;
+constant byteWriteWidthB : integer := writeDataWidthB;
+constant readDataWidthB  : integer := regsLen;
+
+constant wenALen         : integer := integer(writeDataWidthA/byteWriteWidthA);
+constant wenBLen         : integer := integer(writeDataWidthB/byteWriteWidthB);
+
+constant fifoWDWidth     : integer := regSize;
+constant fifoRDWidth     : integer := writeDataWidthB;
 constant fifoDepth       : integer := fifoWDWidth/fifoRDWidth;
 
-constant byteWriteWidthA : integer := regsLen;
-constant writeDataWidthA : integer := regsLen;
-constant readDataWidthA  : integer := regsLen;
-constant byteWriteWidthB : integer := fifoRDWidth;
-constant writeDataWidthB : integer := fifoRDWidth;
-constant readDataWidthB  : integer := fifoRDWidth;
-constant wenALen         : integer := integer(writeDataWidthA/byteWriteWidthA);
-constant wenBLen         : integer := integer(fifoRDWidth/byteWriteWidthB);
 --------------------------------------------------------------------
 
 type stateRMCtrl_t is (idle,
@@ -140,6 +143,7 @@ addrBEnd   <= '1' when addrUnsB = fifoDepth else '0';
 
 addrToRegB <= std_logic_vector(addrUnsB(addrToRegB'left downto 0));
 
+rmToBuf(rmToBuf'left downto trgNum) <= (others => '0');
 rmToBufGen: for i in 0 to trgNum-1 generate
 begin
     rmToBuf((i+1)*regsLen-1 downto i*regsLen) <= std_logic_vector(trgMeters(trgNum-1-i));
