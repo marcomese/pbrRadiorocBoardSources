@@ -103,7 +103,7 @@ architecture arch of radioroc_fw is
 	       T_1FF2, T_2FF2,
 	       T_1Sync, T_2Sync,
 	       tEdge1, tEdge2 : std_logic_vector(63 downto 0);
-	signal tEdge21 : std_logic_vector(127 downto 0);
+	signal tEdge21, TBuf21 : std_logic_vector(127 downto 0);
 	-- Clock and reset
 	signal reset, locked_1, locked_2, locked_3                               : std_logic;
 	signal clk_2M, clk_10M, clk_50M, clk_100M, clk_200M, clkN_100M, clkN_200M : std_logic;
@@ -252,7 +252,7 @@ dbgOR <= '0';--dbgFF(3) or dbgFF(2) or dbgFF(1) or dbgFF(0);
 dbgFF <= (others => '0');
 
 tEdge21 <= tEdge2 & tEdge1;
-
+TBuf21  <= T_2Buf & T_1Buf;
 --dbgFFInst: process(reset, clk_200M)
 --begin
 --    if rising_edge(clk_200M) then
@@ -442,7 +442,7 @@ port map(
 
 trgSamplerInst: entity work.trgSamplerCtrl
 generic map(
-    trgNum        => tEdge21'length,
+    trgNum        => TBuf21'length,
     nSAfterTrgDef => 16
 )
 port map(
@@ -450,7 +450,7 @@ port map(
     clkTmr     => clk_100M,
     rst        => reset,
     evtTrigger => evtTrigger,
-    trgIn      => tEdge21,
+    trgIn      => TBuf21,
     devExec    => devExec,
     devId      => devId,
     devRw      => devRw,
