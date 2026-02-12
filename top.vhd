@@ -238,6 +238,9 @@ signal dbgOr : std_logic;
 
 signal dbgFF : std_logic_vector(3 downto 0);
 
+attribute mark_debug : string;
+attribute mark_debug of evtTrigger : signal is "true";
+
 begin
 
 pulse <= pulseSig;

@@ -103,6 +103,13 @@ signal cntTmrSig,
        cntNSAftTrgSet,
        cntNSAftTrgEn   : std_logic;
 
+attribute mark_debug : string;
+attribute mark_debug of cntTmrSig,
+                        cntTmrSet,
+                        cntNSAftTrgSig,
+                        cntNSAftTrgSet,
+                        cntNSAftTrgEn  : signal is "true";
+
 begin
 
 dAddr          <= devAddrToInt(devAddr);
