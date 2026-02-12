@@ -24,12 +24,6 @@ pixelToCh = {v[1] : k for k,v in pixelmap.items()}
 
 pixelNameToPixel = {v[0] : v[1] for k,v in pixelmap.items()}
 
-matrix = [[None for _ in range(8)] for _ in range(8)]
-for (x, y), value in pixelToCh.items():
-    row = x
-    col = y
-    matrix[row][col] = int(value)
-
 with open(packageFile, "w") as f:
     f.write("library ieee;\n")
     f.write("use ieee.std_logic_1164.all;\n\n")
@@ -38,17 +32,18 @@ with open(packageFile, "w") as f:
 
     f.write("    type pixelmap_t is array (0 to 7, 0 to 7) of integer range 0 to 63;\n\n")
 
-    f.write("    constant pixelmap : pixelmap_t :=\n")
-    f.write("    (\n")
+    f.write("    constant pixelmap : pixelmap_t := (")
+    f.write("\n        (")
 
-    for r in range(8):
-        row_str = ", ".join(f"{matrix[r][c]:2d}" for c in range(8))
-        if r < 7:
-            f.write(f"        ( {row_str} ),\n")
+    rowStr = ''
+    for (r,c),value in sorted(pixelToCh.items()):
+        f.write(f"{value:2d}")
+        if c == 7 and r < 7:
+            f.write("),\n        (")
+        elif c == 7 and r == 7:
+            f.write(")\n    );\n\n")
         else:
-            f.write(f"        ( {row_str} )\n")
-
-    f.write("    );\n\n")
+            f.write(", ")
 
     f.write("    function pixel(name : string) return integer;\n\n")
 
@@ -60,8 +55,7 @@ with open(packageFile, "w") as f:
     f.write("    begin\n")
     f.write("        case name is\n")
 
-    for name in sorted(pixelNameToPixel.keys()):
-        r, c = pixelNameToPixel[name]
+    for name,(r,c) in sorted(pixelNameToPixel.items()):
         channel = pixelToCh[(r,c)]
         f.write(f'            when "{name}" => return {channel};\n')
 
