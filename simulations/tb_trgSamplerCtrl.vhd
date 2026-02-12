@@ -140,7 +140,8 @@ constant trgNum        : natural                      := 64;
 
 signal rst               : std_logic := '0';
 signal clk_100M          : std_logic := '1';
-signal t                 : std_logic_vector(63 downto 0) := (others => '1');
+signal t1,t2             : std_logic_vector(63 downto 0) := (others => '1');
+signal t21               : std_logic_vector(127 downto 0);
 signal devId             : devices_t    := none;
 signal devReadyTSmpl     : std_logic    := '0';
 signal devRw             : std_logic    := '0';
@@ -183,6 +184,9 @@ signal dataToMaster,
 signal rdDataCnt        : std_logic_vector(15 downto 0) := (others => '0');
 
 begin
+
+
+t21 <= t2 & t1;
 
 stimProc: process
 begin
@@ -263,7 +267,7 @@ begin
 
     wait for 50 us;
 
-    t(0) <= '0';
+    t1(0) <= '0';
     wait for clkPeriod100M*4;
 
     evtTrigger <= '1';
@@ -271,16 +275,16 @@ begin
     evtTrigger <= '0';
 
     wait for clkPeriod100M*3;
-    t(0) <= '1';
+    t1(0) <= '1';
     wait for clkPeriod100M;
-    t(0) <= '0';
+    t1(0) <= '0';
     wait for clkPeriod100M;
-    t(0) <= '1';
+    t1(0) <= '1';
     wait for clkPeriod100M;
-    t(0) <= '0';
+    t1(0) <= '0';
 
     wait for clkPeriod100M*5;
-    t(0) <= '1';
+    t1(0) <= '1';
 
     wait;
 end process;
