@@ -230,7 +230,7 @@ begin
         end if;
 
         if rst = '1' then
-            cntNSAfterTrg <= (others => '0');
+            cntNSAfterTrg <= resize(nSAfterTrgMax-2, cntNSAfterTrg'length);
         elsif cntNSAftTrgSig = '1' or cntNSAftTrgSet = '1' then
             cntNSAfterTrg <= reloadVal;
             cntNSAftTrgEn <= '0';
