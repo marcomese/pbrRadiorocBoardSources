@@ -291,7 +291,7 @@ end process;
 
 uut: trgSamplerCtrl
 generic map(
-    trgNum        => trgNum,
+    trgNum        => t21'length,
     nSAfterTrgDef => 16
 )
 port map(
@@ -299,7 +299,7 @@ port map(
     clkTmr     => clk_100M,
     rst        => rst,
     evtTrigger => evtTrigger,
-    trgIn      => t,
+    trgIn      => t21,
     devExec    => devExec,
     devId      => devId,
     devRw      => devRw,

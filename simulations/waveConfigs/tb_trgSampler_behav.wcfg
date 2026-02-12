@@ -15,27 +15,18 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="0.000 ns"></ZoomStartTime>
-      <ZoomEndTime time="3,390.001 ns"></ZoomEndTime>
-      <Cursor1Time time="0.002 ns"></Cursor1Time>
+      <ZoomStartTime time="99,701.000 ns"></ZoomStartTime>
+      <ZoomEndTime time="101,017.001 ns"></ZoomEndTime>
+      <Cursor1Time time="100,720.000 ns"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="201"></NameColumnWidth>
-      <ValueColumnWidth column_width="99"></ValueColumnWidth>
+      <ValueColumnWidth column_width="95"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="27" />
-   <wave_markers>
-      <marker time="100870000" label="" />
-      <marker time="100550000" label="" />
-      <marker time="100710000" label="" />
-   </wave_markers>
+   <WVObjectSize size="25" />
    <wvobject fp_name="/tb_trgSampler/rst" type="logic">
       <obj_property name="ElementShortName">rst</obj_property>
       <obj_property name="ObjectShortName">rst</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_trgSampler/t" type="array">
-      <obj_property name="ElementShortName">t[63:0]</obj_property>
-      <obj_property name="ObjectShortName">t[63:0]</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_trgSampler/devId" type="other">
       <obj_property name="ElementShortName">devId</obj_property>
@@ -65,10 +56,6 @@
       <obj_property name="ElementShortName">clk_100M</obj_property>
       <obj_property name="ObjectShortName">clk_100M</obj_property>
    </wvobject>
-   <wvobject fp_name="/tb_trgSampler/t[0]" type="logic">
-      <obj_property name="ElementShortName">[0]</obj_property>
-      <obj_property name="ObjectShortName">[0]</obj_property>
-   </wvobject>
    <wvobject fp_name="/tb_trgSampler/uut/rData[2]" type="array">
       <obj_property name="ElementShortName">[2][31:0]</obj_property>
       <obj_property name="ObjectShortName">[2][31:0]</obj_property>
@@ -80,16 +67,14 @@
    <wvobject fp_name="/tb_trgSampler/uut/cntTmr" type="array">
       <obj_property name="ElementShortName">cntTmr[16:0]</obj_property>
       <obj_property name="ObjectShortName">cntTmr[16:0]</obj_property>
-      <obj_property name="isExpanded"></obj_property>
    </wvobject>
    <wvobject fp_name="/tb_trgSampler/uut/cntNSAfterTrg" type="array">
       <obj_property name="ElementShortName">cntNSAfterTrg[16:0]</obj_property>
       <obj_property name="ObjectShortName">cntNSAfterTrg[16:0]</obj_property>
-      <obj_property name="isExpanded"></obj_property>
    </wvobject>
    <wvobject fp_name="/tb_trgSampler/uut/sampledTrg" type="array">
-      <obj_property name="ElementShortName">sampledTrg[0:63][31:0]</obj_property>
-      <obj_property name="ObjectShortName">sampledTrg[0:63][31:0]</obj_property>
+      <obj_property name="ElementShortName">sampledTrg[0:127][31:0]</obj_property>
+      <obj_property name="ObjectShortName">sampledTrg[0:127][31:0]</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_trgSampler/uut/cntTmrSet" type="logic">
       <obj_property name="ElementShortName">cntTmrSet</obj_property>
@@ -116,12 +101,12 @@
       <obj_property name="ObjectShortName">[1][31:0]</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_trgSampler/uut/rData" type="array">
-      <obj_property name="ElementShortName">rData[65:0][31:0]</obj_property>
-      <obj_property name="ObjectShortName">rData[65:0][31:0]</obj_property>
+      <obj_property name="ElementShortName">rData[129:0][31:0]</obj_property>
+      <obj_property name="ObjectShortName">rData[129:0][31:0]</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_trgSampler/uut/trgIn" type="array">
-      <obj_property name="ElementShortName">trgIn[63:0]</obj_property>
-      <obj_property name="ObjectShortName">trgIn[63:0]</obj_property>
+      <obj_property name="ElementShortName">trgIn[127:0]</obj_property>
+      <obj_property name="ObjectShortName">trgIn[127:0]</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_trgSampler/devBrstWrt" type="logic">
       <obj_property name="ElementShortName">devBrstWrt</obj_property>
