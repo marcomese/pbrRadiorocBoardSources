@@ -229,7 +229,9 @@ begin
             reloadVal := resize(nSAfterTrgMax-2, cntNSAfterTrg'length);
         end if;
 
-        if rst = '1' or cntNSAftTrgSig = '1' or cntNSAftTrgSet = '1' then
+        if rst = '1' then
+            cntNSAfterTrg <= (others => '0');
+        elsif cntNSAftTrgSig = '1' or cntNSAftTrgSet = '1' then
             cntNSAfterTrg <= reloadVal;
             cntNSAftTrgEn <= '0';
         elsif evtTrigger = '1' then
@@ -250,7 +252,9 @@ begin
             reloadVal := resize(cntTmrMax - 2, cntTmr'length);
         end if;
 
-        if rst = '1' or cntTmrSig = '1' or cntTmrSet = '1' then
+        if rst = '1' then
+            cntTmr <= (others => '1');
+        elsif cntTmrSig = '1' or cntTmrSet = '1' then
             cntTmr <= reloadVal;
         elsif cntTmrMax >= 2 then
             cntTmr <= cntTmr - 1;

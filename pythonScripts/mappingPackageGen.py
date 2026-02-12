@@ -32,6 +32,12 @@ with open(packageFile, "w") as f:
 
     f.write("    type pixelmap_t is array (0 to 7, 0 to 7) of integer range 0 to 63;\n\n")
 
+    f.write("    type pixelCols_t is "
+            f"({', '.join([chr(i) for i in range(ord('A'),ord('H')+1,1)])});"
+            "\n\n")
+
+    f.write(f"    type pixelRows_t is ({', '.join([f'_{n}' for n in range(8)])})\n\n")
+
     f.write("    constant pixelmap : pixelmap_t := (")
     f.write("\n        (")
 
@@ -45,25 +51,15 @@ with open(packageFile, "w") as f:
         else:
             f.write(", ")
 
-    f.write("    function pixel(name : string) return integer;\n\n")
+    f.write("    function pixel(c : pixelCols_t; r : pixelRows_t) return integer;\n\n")
 
     f.write("end package pixelMappingPkg;\n\n")
 
     f.write("package body pixelMappingPkg is\n\n")
 
-    f.write("    function pixel(name : string) return integer is\n")
+    f.write("    function pixel(c : pixelChars_t; r : pixelRows_t) return integer is\n")
     f.write("    begin\n")
-    f.write("        case name is\n")
-
-    for name,(r,c) in sorted(pixelNameToPixel.items()):
-        channel = pixelToCh[(r,c)]
-        f.write(f'            when "{name}" => return {channel};\n')
-
-    f.write("            when others =>\n")
-    f.write('                report "Invalid pixel name" severity failure;\n')
-    f.write("                return 0;\n")
-
-    f.write("        end case;\n")
+    f.write("        return pixelmap(c, r-1);\n")
     f.write("    end function;\n\n")
 
     f.write("end package body pixelMappingPkg;\n")
