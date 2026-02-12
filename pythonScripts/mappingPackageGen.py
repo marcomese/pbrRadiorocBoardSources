@@ -2,7 +2,7 @@
 """
 Created on Wed Feb 11 15:09:27 2026
 
-@author: LabSpazio
+@author: Marco Mese
 """
 
 import numpy as np
@@ -62,7 +62,7 @@ with open(packageFile, "w") as f:
 
     for name in sorted(pixelNameToPixel.keys()):
         r, c = pixelNameToPixel[name]
-        channel = matrix[r][c]
+        channel = pixelToCh[(r,c)]
         f.write(f'            when "{name}" => return {channel};\n')
 
     f.write("            when others =>\n")
@@ -73,3 +73,4 @@ with open(packageFile, "w") as f:
     f.write("    end function;\n\n")
 
     f.write("end package body pixelMappingPkg;\n")
+
