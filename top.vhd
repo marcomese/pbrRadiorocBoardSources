@@ -130,12 +130,10 @@ architecture arch of radioroc_fw is
 -- CONSTANTS for deviceInterface, tmpCtrl and PulseGentCtrl
 
 constant clkFreq        : real      := 100.0e6;
-constant sclkFreq       : real      := 25.0e6;
 constant timeout        : real      := 1.0;
 constant sleepOnPwrOn   : boolean   := True;
 constant pwrOnTime      : real      := 20.0e-6;
 constant settlingTime   : real      := 5.0e-6;
-constant readPeriod     : real      := 1.0;
 
 constant tmpAddr        : std_logic_vector(6 downto 0) := "1001000";
 constant sipmHvAddr     : std_logic_vector(6 downto 0) := "1110011";
@@ -620,7 +618,6 @@ port map(
 tmpCtrlInst: entity work.tmpCtrl
 generic map(
     clkFreq    => clkFreq,
-    readPeriod => readPeriod,
     tmpAddr    => tmpAddr
 )
 port map(

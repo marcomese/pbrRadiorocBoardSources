@@ -22,7 +22,6 @@ use work.registersPkg.all;
 entity tmpCtrl is
 generic(
     clkFreq    : real;
-    readPeriod : real;
     tmpAddr    : std_logic_vector(6 downto 0)
 );
 port(
