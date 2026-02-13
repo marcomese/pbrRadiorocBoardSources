@@ -450,7 +450,6 @@ generic map(
 )
 port map(
     clk        => clk_100M,
-    clkTmr     => clk_100M,
     rst        => reset,
     evtTrigger => evtTrigger,
     trgIn      => TBuf21,
