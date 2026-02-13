@@ -15,18 +15,25 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="0.434 ns"></ZoomStartTime>
-      <ZoomEndTime time="117.835 ns"></ZoomEndTime>
-      <Cursor1Time time="14.334 ns"></Cursor1Time>
+      <ZoomStartTime time="50,337.500 ns"></ZoomStartTime>
+      <ZoomEndTime time="51,001.501 ns"></ZoomEndTime>
+      <Cursor1Time time="50,770.000 ns"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="172"></NameColumnWidth>
-      <ValueColumnWidth column_width="120"></ValueColumnWidth>
+      <ValueColumnWidth column_width="112"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="24" />
+   <WVObjectSize size="22" />
+   <wave_markers>
+      <marker time="50570000" label="" />
+   </wave_markers>
    <wvobject fp_name="/tb_trgSampler/rst" type="logic">
       <obj_property name="ElementShortName">rst</obj_property>
       <obj_property name="ObjectShortName">rst</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_trgSampler/clk_100M" type="logic">
+      <obj_property name="ElementShortName">clk_100M</obj_property>
+      <obj_property name="ObjectShortName">clk_100M</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_trgSampler/devId" type="other">
       <obj_property name="ElementShortName">devId</obj_property>
@@ -48,13 +55,9 @@
       <obj_property name="ElementShortName">evtTrigger</obj_property>
       <obj_property name="ObjectShortName">evtTrigger</obj_property>
    </wvobject>
-   <wvobject fp_name="/tb_trgSampler/uut/cntTmrSig" type="logic">
-      <obj_property name="ElementShortName">cntTmrSig</obj_property>
-      <obj_property name="ObjectShortName">cntTmrSig</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_trgSampler/clk_100M" type="logic">
-      <obj_property name="ElementShortName">clk_100M</obj_property>
-      <obj_property name="ObjectShortName">clk_100M</obj_property>
+   <wvobject fp_name="/tb_trgSampler/uut/trgIn[0]" type="logic">
+      <obj_property name="ElementShortName">[0]</obj_property>
+      <obj_property name="ObjectShortName">[0]</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_trgSampler/uut/rData[2]" type="array">
       <obj_property name="ElementShortName">[2][31:0]</obj_property>
@@ -64,10 +67,6 @@
       <obj_property name="ElementShortName">[0][31:0]</obj_property>
       <obj_property name="ObjectShortName">[0][31:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/tb_trgSampler/uut/cntTmr" type="array">
-      <obj_property name="ElementShortName">cntTmr[16:0]</obj_property>
-      <obj_property name="ObjectShortName">cntTmr[16:0]</obj_property>
-   </wvobject>
    <wvobject fp_name="/tb_trgSampler/uut/cntNSAfterTrg" type="array">
       <obj_property name="ElementShortName">cntNSAfterTrg[16:0]</obj_property>
       <obj_property name="ObjectShortName">cntNSAfterTrg[16:0]</obj_property>
@@ -75,10 +74,6 @@
    <wvobject fp_name="/tb_trgSampler/uut/sampledTrg" type="array">
       <obj_property name="ElementShortName">sampledTrg[0:127][31:0]</obj_property>
       <obj_property name="ObjectShortName">sampledTrg[0:127][31:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_trgSampler/uut/cntTmrSet" type="logic">
-      <obj_property name="ElementShortName">cntTmrSet</obj_property>
-      <obj_property name="ObjectShortName">cntTmrSet</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_trgSampler/uut/cntNSAftTrgSig" type="logic">
       <obj_property name="ElementShortName">cntNSAftTrgSig</obj_property>

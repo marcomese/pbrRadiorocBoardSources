@@ -15,7 +15,6 @@ generic(
 );
 port(
     clk        : in  std_logic;
-    clkTmr     : in  std_logic;
     rst        : in  std_logic;
     evtTrigger : in  std_logic;
     trgIn      : in  std_logic_vector(trgNum-1 downto 0);
@@ -175,7 +174,8 @@ signal readRq,
        devIntBusy,
        devBrstRstTSmpl,
        rdValid,
-       evtTrigger       : std_logic                    := '0';
+       evtTrigger,
+       trigger       : std_logic                    := '0';
 signal dataToMaster,
        testDataIn,
        testDataOut,
@@ -187,6 +187,20 @@ begin
 
 
 t21 <= t2 & t1;
+
+trigger <= not t1(0);
+
+trgEdge10nsInst: entity work.edgeDetector
+generic map(
+    clockEdge => "rising",
+    edge      => "rising"
+)
+port map(
+    clk       => clk_100M,
+    rst       => rst,
+    signalIn  => trigger,
+    signalOut => evtTrigger
+);
 
 stimProc: process
 begin
@@ -224,41 +238,6 @@ begin
     testTxWrite <= '1';
     wait for clkPeriod100M;
     testTxWrite <= '0';
-    testDataIn <= x"00"; -- reset every 1e8*10ns = 1s
-    testTxWrite <= '1';
-    wait for clkPeriod100M;
-    testTxWrite <= '0';
-    wait for clkPeriod100M*delay;
-
-    wait for 50 us;
-
-    testDataIn <= x"57";
-    wait for clkPeriod100M*delay;
-    testTxWrite <= '1';
-    wait for clkPeriod100M;
-    testTxWrite <= '0';
-    wait for clkPeriod100M*delay;
-    testDataIn <= x"00";
-    testTxWrite <= '1';
-    wait for clkPeriod100M;
-    testTxWrite <= '0';
-    wait for clkPeriod100M*delay;
-    testDataIn <= x"02";
-    testTxWrite <= '1';
-    wait for clkPeriod100M;
-    testTxWrite <= '0';
-    testDataIn <= x"00";
-    testTxWrite <= '1';
-    wait for clkPeriod100M;
-    testTxWrite <= '0';
-    testDataIn <= x"00";
-    testTxWrite <= '1';
-    wait for clkPeriod100M;
-    testTxWrite <= '0';
-    testDataIn <= x"00";
-    testTxWrite <= '1';
-    wait for clkPeriod100M;
-    testTxWrite <= '0';
     testDataIn <= x"10"; -- reset every 1e8*10ns = 1s
     testTxWrite <= '1';
     wait for clkPeriod100M;
@@ -270,9 +249,9 @@ begin
     t1(0) <= '0';
     wait for clkPeriod100M*4;
 
-    evtTrigger <= '1';
-    wait for clkPeriod100M;
-    evtTrigger <= '0';
+--    evtTrigger <= '1';
+--    wait for clkPeriod100M;
+--    evtTrigger <= '0';
 
     wait for clkPeriod100M*3;
     t1(0) <= '1';
@@ -296,7 +275,6 @@ generic map(
 )
 port map(
     clk        => clk_100M,
-    clkTmr     => clk_100M,
     rst        => rst,
     evtTrigger => evtTrigger,
     trgIn      => t21,
