@@ -23,7 +23,6 @@ generic(
 );
 port(
     clk        : in  std_logic;
-    clkTmr     : in  std_logic;
     rst        : in  std_logic;
     trgIn      : in  std_logic_vector(trgNum-1 downto 0);
     devExec    : in  std_logic;
@@ -190,9 +189,9 @@ begin
     end process;
 end generate;
 
-cntTmrGen: process(clkTmr, rst)
+cntTmrGen: process(clk, rst)
 begin
-    if rising_edge(clkTmr) then
+    if rising_edge(clk) then
         if rst = '1' or cntTmrSig = '1' or cntTmrSet = '1' then
             cntTmr <= resize(cntTmrMax-2, cntTmr'length);
         else

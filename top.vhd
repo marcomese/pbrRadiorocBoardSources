@@ -85,8 +85,6 @@ architecture arch of radioroc_fw is
       clk_out1          : out    std_logic;
       clk_out2          : out    std_logic;
       clk_out3          : out    std_logic;
-      clk_out4          : out    std_logic;
-      clk_out5          : out    std_logic;
       -- Status and control signals
       reset             : in     std_logic;
       locked            : out    std_logic;
@@ -106,7 +104,7 @@ architecture arch of radioroc_fw is
 	signal tEdge21, TBuf21 : std_logic_vector(127 downto 0);
 	-- Clock and reset
 	signal reset, locked_1, locked_2, locked_3                               : std_logic;
-	signal clk_2M, clk_10M, clk_50M, clk_100M, clk_200M, clkN_100M, clkN_200M : std_logic;
+	signal clk_2M, clk_10M, clk_50M, clk_100M, clk_200M : std_logic;
 	signal clk_500M : std_logic;
 	signal clk_100k                                                          : std_logic;
 	-- I2C
@@ -234,38 +232,40 @@ signal rstI2CCnt : unsigned(bitsNum(rstRadI2CLen) downto 0);
 
 signal endAcq, rdValid : std_logic;
 
-signal dbgOr : std_logic;
-
-signal dbgFF : std_logic_vector(3 downto 0);
-
 attribute mark_debug : string;
 attribute mark_debug of T_1Buf : signal is "true";
 
 begin
 
-pulse <= pulseSig;
+sc_val_evt    <= '1';
 
-reset <= not(npwr_reset);
+sc_reset_n    <= reset_n_acq;
 
-nCMOS <= '1';
+sc_rstn_read  <= rstn_read_acq;
 
-n_reset_i2c <= en_clki2c and npwr_reset;
+sc_rstb_i2c   <= rstI2CCnt(rstI2CCnt'left);
 
-dbgOR <= '0';--dbgFF(3) or dbgFF(2) or dbgFF(1) or dbgFF(0);
-dbgFF <= (others => '0');
+sc_rstb_sc    <= rstI2CCnt(rstI2CCnt'left);
 
-tEdge21 <= tEdge2 & tEdge1;
-TBuf21  <= T_2Buf & T_1Buf;
---dbgFFInst: process(reset, clk_200M)
---begin
---    if rising_edge(clk_200M) then
---        if reset = '1' then
---            dbgFF <= (others => '0');
---        else
---            dbgFF <= sc_outd_probe & sc_NORT2 & sc_NORT1 & sc_NORTQ;
---        end if;
---    end if;
---end process;
+sc_rstb_probe <= rstI2CCnt(rstI2CCnt'left);
+
+pulse         <= pulseSig;
+
+reset         <= not(npwr_reset);
+
+nCMOS         <= '1';
+
+n_reset_i2c   <= en_clki2c and npwr_reset;
+
+tEdge21       <= tEdge2 & tEdge1;
+
+TBuf21        <= T_2Buf & T_1Buf;
+
+dbgOut        <= (others => '0');
+
+ADC_SCKHG     <= adc_sck;
+
+ADC_SCKLG     <= adc_sck;
 
 syncIn: process(clk_100M, reset)
 begin
@@ -372,10 +372,8 @@ port map(
     clk_in1_n  => CLK_100M_N,
     reset    => reset,
     clk_out1 => clk_10M,
-    clk_out2 => clkN_100M,
-    clk_out3 => clkN_200M,
-    clk_out4 => clk_100M,
-    clk_out5 => clk_200M,
+    clk_out2 => clk_100M,
+    clk_out3 => clk_200M,
     locked   => locked_1
 );
 
@@ -404,8 +402,6 @@ port map(
     CE => en_clki2c,
     I => clk_10M
 );
-
-dbgOut <= (others => '0');--dout_acq(dout_acq'left downto 1) & dbgOR;
 
 adc: entity xil_defaultlib.adc
 port map(
@@ -473,7 +469,6 @@ generic map(
 )
 port map(
     clk        => clk_100M,
-    clkTmr     => clk_100M,
     rst        => reset,
     trgIn      => tEdge21,
     devExec    => devExec,
@@ -518,18 +513,6 @@ port map(
     doutAcq     => dout_acq
 );
 
-sc_val_evt <= '1';
-
-sc_reset_n   <= reset_n_acq;
-
-sc_rstn_read <= rstn_read_acq;
-
-sc_rstb_i2c  <= rstI2CCnt(rstI2CCnt'left);
-
-sc_rstb_sc  <= rstI2CCnt(rstI2CCnt'left);
-
-sc_rstb_probe <= rstI2CCnt(rstI2CCnt'left);
-
 radiorocI2CRst: process(clk_100M, reset, rstI2CCnt)
 begin
     if rising_edge(clk_100M) then
@@ -540,9 +523,6 @@ begin
         end if;
     end if;
 end process;
-
-ADC_SCKHG <= adc_sck;
-ADC_SCKLG <= adc_sck;
 
 i2cTmpModule: entity work.i2cMaster
 generic map(
