@@ -78,7 +78,7 @@ architecture Behavioral of adc is
 	signal din, din_l : std_logic_vector(31 downto 0);
 	
 	signal en_adc_sck, adc_sck_s, rstb_rd_s, rst_n : std_logic;
-	signal t0, trigger, trigger_sft,  holdext, trgEdge, trgEdge10ns, trgSftEdge : std_logic;
+	signal t0, trigger, trigger_sft,  holdext, trgEdge, trgSftEdge : std_logic;
 	
 	signal adc_sck_vector :  std_logic_vector(1 downto 0);
 	
@@ -87,31 +87,15 @@ architecture Behavioral of adc is
 	signal  en_trigext : std_logic;
 	signal hd : std_logic_vector(11 downto 0);
     signal cd : std_logic_vector(10 downto 0);
-    
-    signal endAcqSig, endAcqOut : std_logic_vector(0 downto 0);
     signal rdValidSig : std_logic;
 
 begin
 
-evtTrigger   <= trgEdge10ns;
+evtTrigger   <= trgEdge;
 trig_out     <= trigger_sft;
-endAcqSig(0) <= end_acq;
-endAcq       <= endAcqOut(0);
+endAcq       <= end_acq;
 rdValid      <= rdValidSig;
 NORT_FPGA    <= and_reduce(t);
-
-clkSyncEndAcqInst: entity work.pulseSync
-generic map(
-    width       => endAcqSig'length
-)
-port map(
-    clkOrig => clk_200M,
-    rstOrig => rst,
-    clkDest => clk_100M,
-    rstDest => rst,
-    sigOrig => endAcqSig,
-    sigDest => endAcqOut
-);
 
 ma : entity xil_defaultlib.multi_acq
 Port map (
@@ -150,7 +134,7 @@ port map(
 	port map (
 		rst    => rst,
 		wr_clk => clk_200M,
-		rd_clk => clk_100M,
+		rd_clk => clk_200M,
 		din    => din_l,
 		wr_en  => wr_en,
 		rd_en  => rd_en,
@@ -203,18 +187,6 @@ port map(
     rst       => rst,
     signalIn  => trigger,
     signalOut => trgEdge
-);
-
-trgEdge10nsInst: entity work.edgeDetector
-generic map(
-    clockEdge => "rising",
-    edge      => "rising"
-)
-port map(
-    clk       => clk_100M,
-    rst       => rst,
-    signalIn  => trigger,
-    signalOut => trgEdge10ns
 );
 
 trgSftEdgeInst: entity work.edgeDetector

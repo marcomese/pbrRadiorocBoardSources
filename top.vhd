@@ -265,9 +265,9 @@ ADC_SCKHG     <= adc_sck;
 
 ADC_SCKLG     <= adc_sck;
 
-syncIn: process(clk_100M, reset)
+syncIn: process(clk_200M, reset)
 begin
-    if rising_edge(clk_100M) then
+    if rising_edge(clk_200M) then
         if reset = '1' then
             T_1FF0  <= (others => '0');
             T_1FF1  <= (others => '0');
@@ -296,7 +296,7 @@ generic map(
     trgNum => T_1Sync'length
 )
 port map(
-    clk  => clk_100M,
+    clk  => clk_200M,
     rst  => reset,
     tIn  => T_1Sync,
     tOut => tEdge1
@@ -307,7 +307,7 @@ generic map(
     trgNum => T_2Sync'length
 )
 port map(
-    clk  => clk_100M,
+    clk  => clk_200M,
     rst  => reset,
     tIn  => T_2Sync,
     tOut => tEdge2
@@ -377,11 +377,11 @@ port map(
 
 i2cRadModule: entity work.i2cMaster
 generic map(
-    input_clk => 100000000,
+    input_clk => 200000000,
     bus_clk   => 500000
 )
 port map(
-    clk       => clk_100M,
+    clk       => clk_200M,
     reset_n   => npwr_reset,
     ena       => i2cEnaRad,
     addr      => i2cAddrRad,
@@ -443,7 +443,7 @@ generic map(
     nSAfterTrgDef => 16
 )
 port map(
-    clk        => clk_100M,
+    clk        => clk_200M,
     rst        => reset,
     evtTrigger => evtTrigger,
     trgIn      => TBuf21,
@@ -466,7 +466,7 @@ generic map(
     trgNum     => tEdge21'length
 )
 port map(
-    clk        => clk_100M,
+    clk        => clk_200M,
     rst        => reset,
     trgIn      => tEdge21,
     devExec    => devExec,
@@ -485,7 +485,7 @@ port map(
 
 dataAcqCtrlInst : entity work.dataAcqCtrl
 port map(
-    clk100M     => clk_100M,
+    clk100M     => clk_200M,
     rst         => reset,
     devExec     => devExec,
     devId       => devId,
@@ -511,9 +511,9 @@ port map(
     doutAcq     => dout_acq
 );
 
-radiorocI2CRst: process(clk_100M, reset, rstI2CCnt)
+radiorocI2CRst: process(clk_200M, reset, rstI2CCnt)
 begin
-    if rising_edge(clk_100M) then
+    if rising_edge(clk_200M) then
         if reset = '1' then
             rstI2CCnt <= to_unsigned(rstRadI2CLen-1, rstI2CCnt'length);
         elsif rstI2CCnt(rstI2CCnt'left) = '0' then
@@ -524,11 +524,11 @@ end process;
 
 i2cTmpModule: entity work.i2cMaster
 generic map(
-    input_clk => 100000000,
+    input_clk => 200000000,
     bus_clk   => 400000
 )
 port map(
-    clk       => clk_100M,
+    clk       => clk_200M,
     reset_n   => npwr_reset,
     ena       => i2cEna,
     addr      => i2cAddr,
@@ -543,7 +543,7 @@ port map(
 
 spiSlaveInst: entity work.SPISlave
 port map(
-    clk          => clk_100M,
+    clk          => clk_200M,
     rst          => reset,
     data_out     => dataFromMaster,
     data_in      => dataToMaster,
@@ -573,7 +573,7 @@ generic map(
     settlingTime => settlingTime
 )
 port map(
-    clk          => clk_100M,
+    clk          => clk_200M,
     rst          => reset,
     devId        => devId,
     devReady     => devReadyPGen,
@@ -595,7 +595,7 @@ generic map(
     chipID     => chipID
 )
 port map(
-    clk        => clk_100M,
+    clk        => clk_200M,
     rst        => reset,
     devExec    => devExec,
     devId      => devId,
@@ -617,11 +617,10 @@ port map(
 
 tmpCtrlInst: entity work.tmpCtrl
 generic map(
-    clkFreq    => clkFreq,
     tmpAddr    => tmpAddr
 )
 port map(
-    clk        => clk_100M,
+    clk        => clk_200M,
     rst        => reset,
     devExec    => devExec,
     devId      => devId,
@@ -678,7 +677,7 @@ generic map(
     maxBrstLen => maxBrstLen
 )
 port map(
-    clk        => clk_100M,
+    clk        => clk_200M,
     rst        => reset,
     dataIn     => dataFromMaster,
     dataOut    => dataToMaster,
