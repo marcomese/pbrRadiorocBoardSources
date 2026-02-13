@@ -104,11 +104,11 @@ signal cntTmrSig,
        cntNSAftTrgEn   : std_logic;
 
 attribute mark_debug : string;
-attribute mark_debug of cntTmrSig,
-                        cntTmrSet,
-                        cntNSAftTrgSig,
-                        cntNSAftTrgSet,
-                        cntNSAftTrgEn  : signal is "true";
+attribute mark_debug of cntNSAfterTrg : signal is "true";
+
+attribute mark_debug of evtTrigger,
+                        cntNSAftTrgSig : signal is "true";
+
 
 begin
 
