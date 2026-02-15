@@ -530,8 +530,6 @@ port map(
 
 tmpCtrlInst: entity work.tmpCtrl
 generic map(
-    clkFreq    => clkFreq,
-    readPeriod => readPeriod,
     tmpAddr    => tmpAddr
 )
 port map(

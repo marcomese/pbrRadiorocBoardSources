@@ -27,6 +27,7 @@ port(
     tx_full      : out std_logic;
     rx_reset     : in  std_logic;
     tx_reset     : in  std_logic;
+    read_rq      : in  std_logic;
     cs           : out std_logic;
     sclk         : out std_logic;
     miso         : in  std_logic;
@@ -34,10 +35,10 @@ port(
 );
 end component;
 
-constant clkPeriod    : time := 10 ns;
-constant sclkPeriod   : time := 80 ns;
-constant clkFreq      : real := 100.0e6;
-constant sclkFreq     : real := 12.5e6;
+constant clkPeriod    : time := 5 ns;
+constant sclkPeriod   : time := 100 ns;
+constant clkFreq      : real := 200.0e6;
+constant sclkFreq     : real := 10.0e6;
 
 signal   clk          : std_logic := '1';
 signal   rst          : std_logic := '1';

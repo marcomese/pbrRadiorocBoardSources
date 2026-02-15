@@ -214,11 +214,6 @@ set_property PACKAGE_PIN J16 [get_ports nCMOS]
 set_property PACKAGE_PIN N15 [get_ports SCL_275]
 set_property PACKAGE_PIN AB22 [get_ports SDA_275]
 
-
-
-
-
-
 set_property PACKAGE_PIN R4 [get_ports {dbgOut[7]}]
 set_property PACKAGE_PIN T4 [get_ports {dbgOut[6]}]
 set_property PACKAGE_PIN T5 [get_ports {dbgOut[5]}]
@@ -231,7 +226,6 @@ set_property PACKAGE_PIN V5 [get_ports {dbgOut[0]}]
 set_property BITSTREAM.CONFIG.CONFIGRATE 50 [current_design]
 set_property BITSTREAM.GENERAL.COMPRESS TRUE [current_design]
 
-
 create_debug_core u_ila_0 ila
 set_property ALL_PROBE_SAME_MU true [get_debug_cores u_ila_0]
 set_property ALL_PROBE_SAME_MU_CNT 1 [get_debug_cores u_ila_0]
@@ -242,22 +236,54 @@ set_property C_INPUT_PIPE_STAGES 0 [get_debug_cores u_ila_0]
 set_property C_TRIGIN_EN false [get_debug_cores u_ila_0]
 set_property C_TRIGOUT_EN false [get_debug_cores u_ila_0]
 set_property port_width 1 [get_debug_ports u_ila_0/clk]
-connect_debug_port u_ila_0/clk [get_nets [list pll1/inst/clk_out5]]
+connect_debug_port u_ila_0/clk [get_nets [list pll1/inst/clk_out3]]
 set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe0]
-set_property port_width 64 [get_debug_ports u_ila_0/probe0]
-connect_debug_port u_ila_0/probe0 [get_nets [list {T_1Buf[0]} {T_1Buf[1]} {T_1Buf[2]} {T_1Buf[3]} {T_1Buf[4]} {T_1Buf[5]} {T_1Buf[6]} {T_1Buf[7]} {T_1Buf[8]} {T_1Buf[9]} {T_1Buf[10]} {T_1Buf[11]} {T_1Buf[12]} {T_1Buf[13]} {T_1Buf[14]} {T_1Buf[15]} {T_1Buf[16]} {T_1Buf[17]} {T_1Buf[18]} {T_1Buf[19]} {T_1Buf[20]} {T_1Buf[21]} {T_1Buf[22]} {T_1Buf[23]} {T_1Buf[24]} {T_1Buf[25]} {T_1Buf[26]} {T_1Buf[27]} {T_1Buf[28]} {T_1Buf[29]} {T_1Buf[30]} {T_1Buf[31]} {T_1Buf[32]} {T_1Buf[33]} {T_1Buf[34]} {T_1Buf[35]} {T_1Buf[36]} {T_1Buf[37]} {T_1Buf[38]} {T_1Buf[39]} {T_1Buf[40]} {T_1Buf[41]} {T_1Buf[42]} {T_1Buf[43]} {T_1Buf[44]} {T_1Buf[45]} {T_1Buf[46]} {T_1Buf[47]} {T_1Buf[48]} {T_1Buf[49]} {T_1Buf[50]} {T_1Buf[51]} {T_1Buf[52]} {T_1Buf[53]} {T_1Buf[54]} {T_1Buf[55]} {T_1Buf[56]} {T_1Buf[57]} {T_1Buf[58]} {T_1Buf[59]} {T_1Buf[60]} {T_1Buf[61]} {T_1Buf[62]} {T_1Buf[63]}]]
+set_property port_width 8 [get_debug_ports u_ila_0/probe0]
+connect_debug_port u_ila_0/probe0 [get_nets [list {spiSlaveInst/buffIn[0]} {spiSlaveInst/buffIn[1]} {spiSlaveInst/buffIn[2]} {spiSlaveInst/buffIn[3]} {spiSlaveInst/buffIn[4]} {spiSlaveInst/buffIn[5]} {spiSlaveInst/buffIn[6]} {spiSlaveInst/buffIn[7]}]]
 create_debug_port u_ila_0 probe
 set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe1]
-set_property port_width 17 [get_debug_ports u_ila_0/probe1]
-connect_debug_port u_ila_0/probe1 [get_nets [list {trgSamplerInst/cntNSAfterTrg[0]} {trgSamplerInst/cntNSAfterTrg[1]} {trgSamplerInst/cntNSAfterTrg[2]} {trgSamplerInst/cntNSAfterTrg[3]} {trgSamplerInst/cntNSAfterTrg[4]} {trgSamplerInst/cntNSAfterTrg[5]} {trgSamplerInst/cntNSAfterTrg[6]} {trgSamplerInst/cntNSAfterTrg[7]} {trgSamplerInst/cntNSAfterTrg[8]} {trgSamplerInst/cntNSAfterTrg[9]} {trgSamplerInst/cntNSAfterTrg[10]} {trgSamplerInst/cntNSAfterTrg[11]} {trgSamplerInst/cntNSAfterTrg[12]} {trgSamplerInst/cntNSAfterTrg[13]} {trgSamplerInst/cntNSAfterTrg[14]} {trgSamplerInst/cntNSAfterTrg[15]} {trgSamplerInst/cntNSAfterTrg[16]}]]
+set_property port_width 8 [get_debug_ports u_ila_0/probe1]
+connect_debug_port u_ila_0/probe1 [get_nets [list {spiSlaveInst/txFifoDout[0]} {spiSlaveInst/txFifoDout[1]} {spiSlaveInst/txFifoDout[2]} {spiSlaveInst/txFifoDout[3]} {spiSlaveInst/txFifoDout[4]} {spiSlaveInst/txFifoDout[5]} {spiSlaveInst/txFifoDout[6]} {spiSlaveInst/txFifoDout[7]}]]
 create_debug_port u_ila_0 probe
 set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe2]
 set_property port_width 1 [get_debug_ports u_ila_0/probe2]
-connect_debug_port u_ila_0/probe2 [get_nets [list trgSamplerInst/cntNSAftTrgSig]]
+connect_debug_port u_ila_0/probe2 [get_nets [list spiSlaveInst/csFall]]
 create_debug_port u_ila_0 probe
 set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe3]
 set_property port_width 1 [get_debug_ports u_ila_0/probe3]
-connect_debug_port u_ila_0/probe3 [get_nets [list trgSamplerInst/evtTrigger]]
+connect_debug_port u_ila_0/probe3 [get_nets [list spiSlaveInst/csRise]]
+create_debug_port u_ila_0 probe
+set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe4]
+set_property port_width 1 [get_debug_ports u_ila_0/probe4]
+connect_debug_port u_ila_0/probe4 [get_nets [list spiSlaveInst/lastBit]]
+create_debug_port u_ila_0 probe
+set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe5]
+set_property port_width 1 [get_debug_ports u_ila_0/probe5]
+connect_debug_port u_ila_0/probe5 [get_nets [list spiSlaveInst/loadBuff]]
+create_debug_port u_ila_0 probe
+set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe6]
+set_property port_width 1 [get_debug_ports u_ila_0/probe6]
+connect_debug_port u_ila_0/probe6 [get_nets [list spiSlaveInst/loadRxFifo]]
+create_debug_port u_ila_0 probe
+set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe7]
+set_property port_width 1 [get_debug_ports u_ila_0/probe7]
+connect_debug_port u_ila_0/probe7 [get_nets [list spiSlaveInst/loadTxFifo]]
+create_debug_port u_ila_0 probe
+set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe8]
+set_property port_width 1 [get_debug_ports u_ila_0/probe8]
+connect_debug_port u_ila_0/probe8 [get_nets [list spiSlaveInst/rxEna_2]]
+create_debug_port u_ila_0 probe
+set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe9]
+set_property port_width 1 [get_debug_ports u_ila_0/probe9]
+connect_debug_port u_ila_0/probe9 [get_nets [list spiSlaveInst/sclkFall]]
+create_debug_port u_ila_0 probe
+set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe10]
+set_property port_width 1 [get_debug_ports u_ila_0/probe10]
+connect_debug_port u_ila_0/probe10 [get_nets [list spiSlaveInst/sclkRise]]
+create_debug_port u_ila_0 probe
+set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe11]
+set_property port_width 1 [get_debug_ports u_ila_0/probe11]
+connect_debug_port u_ila_0/probe11 [get_nets [list spiSlaveInst/txPres]]
 set_property C_CLK_INPUT_FREQ_HZ 300000000 [get_debug_cores dbg_hub]
 set_property C_ENABLE_CLK_DIVIDER false [get_debug_cores dbg_hub]
 set_property C_USER_SCAN_CHAIN 1 [get_debug_cores dbg_hub]
