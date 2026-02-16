@@ -97,8 +97,13 @@ architecture arch of radioroc_fw is
 
     -- LVDS
 	signal ADC_SCKHG, ADC_SCKLG, ADC_HG, ADC_LG : std_logic;
-	signal tEdge1, tEdge2 : std_logic_vector(63 downto 0);
-	signal tEdge12 : std_logic_vector(127 downto 0);
+	signal T_1Buf, T_2Buf,
+	       T_1FF0, T_2FF0,
+	       T_1FF1, T_2FF1,
+	       T_1FF2, T_2FF2,
+	       T_1Sync, T_2Sync,
+	       tEdge1, tEdge2 : std_logic_vector(63 downto 0);
+	signal tEdge21, TBuf21 : std_logic_vector(127 downto 0);
 	-- Clock and reset
 	signal reset, locked_1, locked_2, locked_3                               : std_logic;
 	signal clk_2M, clk_10M, clk_50M, clk_100M, clk_200M, clkN_100M, clkN_200M : std_logic;
@@ -165,7 +170,7 @@ signal   devReadyPGen,
          devReadyRadioroc,
          devReadyAcq,
          devReadyRM,
-         devReadyTSmpl, 
+         devReadyTSmpl,
          devRw,
          devBrst,
          devBrstWrt,
@@ -234,10 +239,7 @@ signal dbgOr : std_logic;
 signal dbgFF : std_logic_vector(3 downto 0);
 
 attribute mark_debug : string;
-attribute mark_debug of T_1,
-                        sc_holdext,
-                        sc_trigext,
-                        evtTrigger : signal is "true";
+attribute mark_debug of T_1Buf : signal is "true";
 
 begin
 
@@ -252,8 +254,8 @@ n_reset_i2c <= en_clki2c and npwr_reset;
 dbgOR <= '0';--dbgFF(3) or dbgFF(2) or dbgFF(1) or dbgFF(0);
 dbgFF <= (others => '0');
 
-tEdge12 <= tEdge1 & tEdge2;
-
+tEdge21 <= tEdge2 & tEdge1;
+TBuf21  <= T_2Buf & T_1Buf;
 --dbgFFInst: process(reset, clk_200M)
 --begin
 --    if rising_edge(clk_200M) then
@@ -265,25 +267,51 @@ tEdge12 <= tEdge1 & tEdge2;
 --    end if;
 --end process;
 
+syncIn: process(clk_100M, reset)
+begin
+    if rising_edge(clk_100M) then
+        if reset = '1' then
+            T_1FF0  <= (others => '0');
+            T_1FF1  <= (others => '0');
+            T_1FF2  <= (others => '0');
+            T_2FF0  <= (others => '0');
+            T_2FF1  <= (others => '0');
+            T_2FF2  <= (others => '0');
+            T_1Sync <= (others => '0');
+            T_2Sync <= (others => '0');
+        else
+            T_1FF0 <= T_1Buf;
+            T_1FF1 <= T_1FF0;
+            T_1FF2 <= T_1FF1;
+            T_2FF0 <= T_2Buf;
+            T_2FF1 <= T_2FF0;
+            T_2FF2 <= T_2FF1;
+            
+            T_1Sync <= (T_1FF0 and T_1FF1) or (T_1FF1 and T_1FF2) or (T_1FF0 and T_1FF2);
+            T_2Sync <= (T_2FF0 and T_1FF1) or (T_2FF1 and T_2FF2) or (T_2FF0 and T_2FF2);
+        end if;
+    end if;
+end process;
+
 inTrg1Sync: entity work.trgSync
 generic map(
-    trgNum => T_1'length
+    trgNum => T_1Sync'length
 )
 port map(
     clk  => clk_100M,
     rst  => reset,
-    tIn  => T_1,
+    tIn  => T_1Sync,
     tOut => tEdge1
 );
 
 inTrg2Sync: entity work.trgSync
 generic map(
-    trgNum => T_2'length
+    trgNum => T_2Sync'length
 )
 port map(
     clk  => clk_100M,
     rst  => reset,
-    tIn  => T_2,
+    tIn  => T_2Sync,
     tOut => tEdge2
 );
 
@@ -317,6 +345,10 @@ port map(
     ADC_HG_n    => ADC_HG_n,
     ADC_LG_p => ADC_LG_p,
     ADC_LG_n => ADC_LG_n,
+    T1    => T_1,
+    T1Buf => T_1Buf,
+    T2    => T_2,
+    T2Buf => T_2Buf,
     readRq   => readRq,
     readRq_p => readRq_p,
     readRq_n => readRq_n,
@@ -387,7 +419,7 @@ port map(
     NORT2 	 => sc_NORT2,
     NORTQ    => sc_NORTQ,
     nb_acq   => nb_acq,
-    t		 => T_1,
+    t		 => T_1Sync,
     sel_adc => sel_adc,
     rd_en 	 => rd_acq,
     dout 	 => dout_acq,
@@ -413,15 +445,14 @@ port map(
 
 trgSamplerInst: entity work.trgSamplerCtrl
 generic map(
-    trgNum        => T_1'length+T_2'length,
+    trgNum        => TBuf21'length,
     nSAfterTrgDef => 16
 )
 port map(
     clk        => clk_100M,
-    clkTmr     => clk_100M,
     rst        => reset,
     evtTrigger => evtTrigger,
-    trgIn      => tEdge12,
+    trgIn      => TBuf21,
     devExec    => devExec,
     devId      => devId,
     devRw      => devRw,
@@ -438,13 +469,13 @@ port map(
 
 rateMetersInst: entity work.rateMetersCtrl
 generic map(
-    trgNum     => T_1'length+T_2'length
+    trgNum     => tEdge21'length
 )
 port map(
     clk        => clk_100M,
     clkTmr     => clk_100M,
     rst        => reset,
-    trgIn      => tEdge12,
+    trgIn      => tEdge21,
     devExec    => devExec,
     devId      => devId,
     devRw      => devRw,

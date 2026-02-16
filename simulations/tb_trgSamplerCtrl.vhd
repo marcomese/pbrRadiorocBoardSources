@@ -15,7 +15,6 @@ generic(
 );
 port(
     clk        : in  std_logic;
-    clkTmr     : in  std_logic;
     rst        : in  std_logic;
     evtTrigger : in  std_logic;
     trgIn      : in  std_logic_vector(trgNum-1 downto 0);
@@ -140,7 +139,8 @@ constant trgNum        : natural                      := 64;
 
 signal rst               : std_logic := '0';
 signal clk_100M          : std_logic := '1';
-signal t                 : std_logic_vector(63 downto 0) := (others => '1');
+signal t1,t2             : std_logic_vector(63 downto 0) := (others => '1');
+signal t21               : std_logic_vector(127 downto 0);
 signal devId             : devices_t    := none;
 signal devReadyTSmpl     : std_logic    := '0';
 signal devRw             : std_logic    := '0';
@@ -174,7 +174,8 @@ signal readRq,
        devIntBusy,
        devBrstRstTSmpl,
        rdValid,
-       evtTrigger       : std_logic                    := '0';
+       evtTrigger,
+       trigger       : std_logic                    := '0';
 signal dataToMaster,
        testDataIn,
        testDataOut,
@@ -183,6 +184,23 @@ signal dataToMaster,
 signal rdDataCnt        : std_logic_vector(15 downto 0) := (others => '0');
 
 begin
+
+
+t21 <= t2 & t1;
+
+trigger <= not t1(0);
+
+trgEdge10nsInst: entity work.edgeDetector
+generic map(
+    clockEdge => "rising",
+    edge      => "rising"
+)
+port map(
+    clk       => clk_100M,
+    rst       => rst,
+    signalIn  => trigger,
+    signalOut => evtTrigger
+);
 
 stimProc: process
 begin
@@ -220,41 +238,6 @@ begin
     testTxWrite <= '1';
     wait for clkPeriod100M;
     testTxWrite <= '0';
-    testDataIn <= x"00"; -- reset every 1e8*10ns = 1s
-    testTxWrite <= '1';
-    wait for clkPeriod100M;
-    testTxWrite <= '0';
-    wait for clkPeriod100M*delay;
-
-    wait for 50 us;
-
-    testDataIn <= x"57";
-    wait for clkPeriod100M*delay;
-    testTxWrite <= '1';
-    wait for clkPeriod100M;
-    testTxWrite <= '0';
-    wait for clkPeriod100M*delay;
-    testDataIn <= x"00";
-    testTxWrite <= '1';
-    wait for clkPeriod100M;
-    testTxWrite <= '0';
-    wait for clkPeriod100M*delay;
-    testDataIn <= x"02";
-    testTxWrite <= '1';
-    wait for clkPeriod100M;
-    testTxWrite <= '0';
-    testDataIn <= x"00";
-    testTxWrite <= '1';
-    wait for clkPeriod100M;
-    testTxWrite <= '0';
-    testDataIn <= x"00";
-    testTxWrite <= '1';
-    wait for clkPeriod100M;
-    testTxWrite <= '0';
-    testDataIn <= x"00";
-    testTxWrite <= '1';
-    wait for clkPeriod100M;
-    testTxWrite <= '0';
     testDataIn <= x"10"; -- reset every 1e8*10ns = 1s
     testTxWrite <= '1';
     wait for clkPeriod100M;
@@ -263,39 +246,38 @@ begin
 
     wait for 50 us;
 
-    t(0) <= '0';
+    t1(0) <= '0';
     wait for clkPeriod100M*4;
 
-    evtTrigger <= '1';
-    wait for clkPeriod100M;
-    evtTrigger <= '0';
+--    evtTrigger <= '1';
+--    wait for clkPeriod100M;
+--    evtTrigger <= '0';
 
     wait for clkPeriod100M*3;
-    t(0) <= '1';
+    t1(0) <= '1';
     wait for clkPeriod100M;
-    t(0) <= '0';
+    t1(0) <= '0';
     wait for clkPeriod100M;
-    t(0) <= '1';
+    t1(0) <= '1';
     wait for clkPeriod100M;
-    t(0) <= '0';
+    t1(0) <= '0';
 
     wait for clkPeriod100M*5;
-    t(0) <= '1';
+    t1(0) <= '1';
 
     wait;
 end process;
 
 uut: trgSamplerCtrl
 generic map(
-    trgNum        => trgNum,
+    trgNum        => t21'length,
     nSAfterTrgDef => 16
 )
 port map(
     clk        => clk_100M,
-    clkTmr     => clk_100M,
     rst        => rst,
     evtTrigger => evtTrigger,
-    trgIn      => t,
+    trgIn      => t21,
     devExec    => devExec,
     devId      => devId,
     devRw      => devRw,

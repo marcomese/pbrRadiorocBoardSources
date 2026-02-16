@@ -19,6 +19,10 @@ entity IO is
     ADC_HG_n    : in std_logic;
     ADC_LG_p : in std_logic;
     ADC_LG_n : in std_logic;
+    T1       : in std_logic_vector(63 downto 0);
+    T2       : in std_logic_vector(63 downto 0);
+    T1Buf    : out std_logic_vector(63 downto 0);
+    T2Buf    : out std_logic_vector(63 downto 0);
     readRq   : in std_logic;
     readRq_p : out std_logic;
     readRq_n : out std_logic;
@@ -39,9 +43,28 @@ end IO;
 
 architecture Behavioral of IO is
 
-signal tSig : std_logic_vector(63 downto 0);
-
 begin
+
+TBuffInst: for i in 0 to 63 generate
+begin
+   IBUF_T1_inst : IBUF
+   generic map (
+      IBUF_LOW_PWR => FALSE,
+      IOSTANDARD => "DEFAULT")
+   port map (
+      O => T1Buf(i),
+      I => T1(i)
+   );
+
+   IBUF_T2_inst : IBUF
+   generic map (
+      IBUF_LOW_PWR => FALSE,
+      IOSTANDARD => "DEFAULT")
+   port map (
+      O => T2Buf(i),
+      I => T2(i)
+   );
+end generate;
 
 OBUF2 : OBUFDS
 Port map (

@@ -24,7 +24,6 @@ generic(
 );
 port(
     clk        : in  std_logic;
-    clkTmr     : in  std_logic;
     rst        : in  std_logic;
     evtTrigger : in  std_logic;
     trgIn      : in  std_logic_vector(trgNum-1 downto 0);
@@ -48,19 +47,16 @@ architecture Behavioral of trgSamplerCtrl is
 --------------------- registers definitions ------------------------
 
 type addr is (regStatus,
-              regTmrBase,
               regSAfterTrg);
 
 constant addrNum    : natural := addr'pos(addr'right)+1;
 
 constant regModes   : regModeRec_t(0 to trgNum+addrNum-1) := (0      => ro,  -- regStatus
-                                                              1      => rw,  -- regTmrBase
-                                                              2      => rw,  -- regSAfterTrg
+                                                              1      => rw,  -- regSAfterTrg
                                                               others => ro); -- sampled channels
 
 constant regBorders : rBorders_t(0 to trgNum+addrNum-1) := (0      => (rAddr => 0,         rBegin => 31, rEnd =>  0),
-                                                            1      => (rAddr => 1,         rBegin => 31, rEnd => 16),
-                                                            2      => (rAddr => 1,         rBegin => 15, rEnd =>  0),
+                                                            1      => (rAddr => 1,         rBegin => 31, rEnd =>  0),
                                                             others => (rAddr => AUTO_ADDR, rBegin => 31, rEnd =>  0));
 
 constant reg        : regsRec_t := initRegs(regModes, regBorders);
@@ -71,7 +67,8 @@ signal   rData      : regsData_t(regsNum-1 downto 0);
 
 --------------------------------------------------------------------
 
-type state_t is (idle,
+type state_t is (init,
+                 idle,
                  execute,
                  errAddr,
                  errReadOnly);
@@ -90,24 +87,23 @@ signal dAddr           : integer;
 
 signal sampledTrg      : sampledTrg_t;
 
-signal cntTmrMax,
-       nSAfterTrgMax   : unsigned(15 downto 0);
-
-signal cntTmr          : unsigned(cntTmrMax'length downto 0); -- MSB = overflow
+signal nSAfterTrgMax   : unsigned(15 downto 0);
 
 signal cntNSAfterTrg   : unsigned(nSAfterTrgMax'length downto 0); -- MSB = overflow
 
-signal cntTmrSig,
-       cntTmrSet,
-       cntNSAftTrgSig,
+signal cntNSAftTrgSig,
        cntNSAftTrgSet,
        cntNSAftTrgEn   : std_logic;
+
+attribute mark_debug : string;
+attribute mark_debug of cntNSAfterTrg : signal is "true";
+
+attribute mark_debug of evtTrigger,
+                        cntNSAftTrgSig : signal is "true";
 
 begin
 
 dAddr          <= devAddrToInt(devAddr);
-
-cntTmrSig      <= cntTmr(cntTmr'left);
 
 cntNSAftTrgSig <= cntNSAfterTrg(cntNSAfterTrg'left);
 
@@ -119,14 +115,12 @@ begin
             busy           <= '0';
             devDataOut     <= (others => (others => '0'));
             devBrstRst     <= '0';
-            cntTmrMax      <= (others => '0');
-            cntTmrSet      <= '0';
-            nSAfterTrgMax  <= to_unsigned(nSAfterTrgDef, nSAfterTrgMax'length);
+            nSAfterTrgMax  <= to_unsigned(nSAfterTrgDef-2, nSAfterTrgMax'length);
             cntNSAftTrgSet <= '0';
             rData          <= (1 => initSlv(32, 15, 0, std_logic_vector(nSAfterTrgMax), '0'),
                                others => (others => '0'));
 
-            state          <= idle;
+            state          <= init;
         else
 
             trgMtrsToRDataLoop: for i in 0 to trgNum-1 loop
@@ -136,10 +130,14 @@ begin
             end loop;
 
             case state is
+                when init =>
+                    writeReg(reg, rData, addr'pos(regStatus), idleStatus);
+                    writeReg(reg, rData, addr'pos(regSAfterTrg), nSAfterTrgDef);
+
+                    state <= idle;
                 when idle =>
                     devReady       <= '0';
                     busy           <= '0';
-                    cntTmrSet      <= '0';
                     cntNSAftTrgSet <= '0';
 
                     state          <= idle;
@@ -168,10 +166,7 @@ begin
                 when execute =>
                     state <= idle;
 
-                    if readReg(reg, rData, addr'pos(regStatus)) = addrToSlv(addr'pos(regTmrBase)) then
-                        cntTmrMax <= resize(readReg(reg, rData, addr'pos(regTmrBase)), cntTmrMax'length);
-                        cntTmrSet <= '1';
-                    elsif readReg(reg, rData, addr'pos(regStatus)) = addrToSlv(addr'pos(regSAfterTrg)) then
+                    if readReg(reg, rData, addr'pos(regStatus)) = addrToSlv(addr'pos(regSAfterTrg)) then
                         nSAfterTrgMax  <= resize(readReg(reg, rData, addr'pos(regSAfterTrg)), nsAfterTrgMax'length);
                         cntNSAftTrgSet <= '1';
                     end if;
@@ -205,48 +200,26 @@ begin
         if rising_edge(clk) then
             if rst = '1' then
                 sampledTrg(i) <= (others => '0');
-            elsif cntTmrSig = '1' then
+            else
                 sampledTrg(i) <= sampledTrg(i)(sampledTrg(i)'left-1 downto 0) & trgIn(i);
             end if;
         end if;
     end process;
 end generate;
 
-nSAfterTrgProc: process(clkTmr, rst)
-variable reloadVal : unsigned(cntTmr'range);
+nSAfterTrgProc: process(clk, rst)
 begin
-    if rising_edge(clkTmr) then
-        if nSAfterTrgMax < 2 then
-            reloadVal := (others => '0');
-        else
-            reloadVal := resize(nSAfterTrgMax-2, cntNSAfterTrg'length);
-        end if;
-
-        if rst = '1' or cntNSAftTrgSig = '1' or cntNSAftTrgSet = '1' then
-            cntNSAfterTrg <= reloadVal;
+    if rising_edge(clk) then
+        if rst = '1' then
+            cntNSAfterTrg <= to_unsigned(nSAfterTrgDef-2, cntNSAfterTrg'length);
             cntNSAftTrgEn <= '0';
-        elsif evtTrigger = '1' then
+        elsif cntNSAftTrgSig = '1' or cntNSAftTrgSet = '1' then
+            cntNSAfterTrg <=  resize(nSAfterTrgMax-2, cntNSAfterTrg'length);
+            cntNSAftTrgEn <= '0';
+        elsif evtTrigger = '1' and cntNSAftTrgEn = '0' then
             cntNSAftTrgEn <= '1';
-        elsif cntNSAftTrgEn = '1' and cntTmrSig = '1' then
+        elsif cntNSAftTrgEn = '1' then
             cntNSAfterTrg <= cntNSAfterTrg - 1;
-        end if;
-    end if;
-end process;
-
-cntTmrGen: process(clkTmr, rst)
-variable reloadVal : unsigned(cntTmr'range);
-begin
-    if rising_edge(clkTmr) then
-        if cntTmrMax < 2 then
-            reloadVal := (others => '1'); -- cntTmrSig always at '1'
-        else
-            reloadVal := resize(cntTmrMax - 2, cntTmr'length);
-        end if;
-
-        if rst = '1' or cntTmrSig = '1' or cntTmrSet = '1' then
-            cntTmr <= reloadVal;
-        elsif cntTmrMax >= 2 then
-            cntTmr <= cntTmr - 1;
         end if;
     end if;
 end process;
