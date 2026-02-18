@@ -482,7 +482,7 @@ port map(
 
 dataAcqCtrlInst : entity work.dataAcqCtrl
 port map(
-    clk100M     => clk_200M,
+    clk         => clk_200M,
     rst         => reset,
     devExec     => devExec,
     devId       => devId,

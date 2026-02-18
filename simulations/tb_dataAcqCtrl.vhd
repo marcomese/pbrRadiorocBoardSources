@@ -10,7 +10,7 @@ architecture Behavioral of tb_dataAcqCtrl is
 
 component dataAcqCtrl is
 port(
-    clk100M    : in  std_logic;
+    clk        : in  std_logic;
     rst        : in  std_logic;
     devExec    : in  std_logic;
     devId      : in  devices_t;
@@ -434,7 +434,7 @@ end process;
 
 dataAcqCtrlInst : dataAcqCtrl
 port map(
-    clk100M     => clk_100M,
+    clk         => clk_100M,
     rst         => rst,
     devExec     => devExec,
     devId       => devId,
