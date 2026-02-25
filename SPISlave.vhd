@@ -156,7 +156,7 @@ end process;
 
 shiftRegOutInst: process(clk, rst, sclkRise, txPres, bitCount)
 begin
-    if rising_edge(clk) then
+    if falling_edge(clk) then
         if rst = '1' then
             buffOut <= (others => '0');
         elsif loadBuff = '1' and txPres = '1' then
