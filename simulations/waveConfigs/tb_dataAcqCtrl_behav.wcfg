@@ -9,22 +9,21 @@
             <top_module name="glbl" />
             <top_module name="registerspkg" />
             <top_module name="tb_dataAcqCtrl" />
-            <top_module name="types" />
             <top_module name="utilspkg" />
             <top_module name="vcomponents" />
          </top_modules>
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="210,285.000 ns"></ZoomStartTime>
-      <ZoomEndTime time="218,295.001 ns"></ZoomEndTime>
-      <Cursor1Time time="214,135.000 ns"></Cursor1Time>
+      <ZoomStartTime time="154.168 ns"></ZoomStartTime>
+      <ZoomEndTime time="5,969.169 ns"></ZoomEndTime>
+      <Cursor1Time time="5,000.002 ns"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
-      <NameColumnWidth column_width="168"></NameColumnWidth>
+      <NameColumnWidth column_width="164"></NameColumnWidth>
       <ValueColumnWidth column_width="58"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="78" />
+   <WVObjectSize size="74" />
    <wvobject fp_name="/tb_dataAcqCtrl/clk_100M" type="logic">
       <obj_property name="ElementShortName">clk_100M</obj_property>
       <obj_property name="ObjectShortName">clk_100M</obj_property>
@@ -96,14 +95,6 @@
    <wvobject fp_name="/tb_dataAcqCtrl/adcInst/end_acq" type="logic">
       <obj_property name="ElementShortName">end_acq</obj_property>
       <obj_property name="ObjectShortName">end_acq</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl/adcInst/endAcqSig" type="array">
-      <obj_property name="ElementShortName">endAcqSig[0:0]</obj_property>
-      <obj_property name="ObjectShortName">endAcqSig[0:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl/adcInst/endAcqOut" type="array">
-      <obj_property name="ElementShortName">endAcqOut[0:0]</obj_property>
-      <obj_property name="ObjectShortName">endAcqOut[0:0]</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_dataAcqCtrl/adcInst/endAcq" type="logic">
       <obj_property name="ElementShortName">endAcq</obj_property>
@@ -219,8 +210,8 @@
       <obj_property name="ObjectShortName">devExec</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/devBusy" type="array">
-      <obj_property name="ElementShortName">devBusy[0:5]</obj_property>
-      <obj_property name="ObjectShortName">devBusy[0:5]</obj_property>
+      <obj_property name="ElementShortName">devBusy[0:7]</obj_property>
+      <obj_property name="ObjectShortName">devBusy[0:7]</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/byteCnt" type="array">
       <obj_property name="ElementShortName">byteCnt[14:0]</obj_property>
@@ -308,18 +299,6 @@
       <obj_property name="ElementShortName">trigger</obj_property>
       <obj_property name="ObjectShortName">trigger</obj_property>
    </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl/adcInst/trigger_shrunk" type="logic">
-      <obj_property name="ElementShortName">trigger_shrunk</obj_property>
-      <obj_property name="ObjectShortName">trigger_shrunk</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl/adcInst/trigger_latched" type="logic">
-      <obj_property name="ElementShortName">trigger_latched</obj_property>
-      <obj_property name="ObjectShortName">trigger_latched</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl/adcInst/trigger_latched2" type="logic">
-      <obj_property name="ElementShortName">trigger_latched2</obj_property>
-      <obj_property name="ObjectShortName">trigger_latched2</obj_property>
-   </wvobject>
    <wvobject fp_name="/tb_dataAcqCtrl/dataAcqCtrlInst/rstAcqSig" type="logic">
       <obj_property name="ElementShortName">rstAcqSig</obj_property>
       <obj_property name="ObjectShortName">rstAcqSig</obj_property>
@@ -367,5 +346,9 @@
    <wvobject fp_name="/tb_dataAcqCtrl/mosi" type="logic">
       <obj_property name="ElementShortName">mosi</obj_property>
       <obj_property name="ObjectShortName">mosi</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl/dataFromMaster" type="array">
+      <obj_property name="ElementShortName">dataFromMaster[7:0]</obj_property>
+      <obj_property name="ObjectShortName">dataFromMaster[7:0]</obj_property>
    </wvobject>
 </wave_config>

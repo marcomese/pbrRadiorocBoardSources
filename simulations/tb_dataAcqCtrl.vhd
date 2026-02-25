@@ -186,7 +186,6 @@ end component;
 
 constant clkPeriod100M : time                         := 10 ns;
 constant clkPeriod200M : time                         := 5 ns;
-constant clkPeriod25M  : time                         := 40 ns;
 constant clkFreq       : real                         := 200.0e6;
 constant sclkFreq      : real                         := 40.0e6;
 constant timeout       : real                         := 1.0;
@@ -199,10 +198,7 @@ constant delay         : natural                      := 1;--50000;
 
 signal rst               : std_logic := '0';
 signal clk_100M          : std_logic := '1';
-signal clkN_100M          : std_logic := '0';
 signal clk_200M          : std_logic := '1';
-signal clkN_200M          : std_logic := '0';
-signal clk_25M           : std_logic := '1';
 signal start             : std_logic := '0';
 signal resetAcq          : std_logic    := '0';
 signal sdo_hg          : std_logic := '0';
@@ -277,182 +273,182 @@ begin
 stimProc: process
 begin
     rst <= '1';
-    wait for clkPeriod100M*5;
+    wait for clkPeriod200M*5;
     rst <= '0';
-    wait for clkPeriod100M*5;
+    wait for clkPeriod200M*5;
 
     wait for 350 ns;
 
     testDataIn <= x"55";
-    wait for clkPeriod100M*delay;
+    wait for clkPeriod200M*delay;
     testTxWrite <= '1';
-    wait for clkPeriod100M;
+    wait for clkPeriod200M;
     testTxWrite <= '0';
-    wait for clkPeriod100M*delay;
+    wait for clkPeriod200M*delay;
     testDataIn <= x"00";
     testTxWrite <= '1';
-    wait for clkPeriod100M;
+    wait for clkPeriod200M;
     testTxWrite <= '0';
-    wait for clkPeriod100M*delay;
+    wait for clkPeriod200M*delay;
     testDataIn <= x"04";
     testTxWrite <= '1';
-    wait for clkPeriod100M;
+    wait for clkPeriod200M;
     testTxWrite <= '0';
-    testDataIn <= x"00";
+    testDataIn <= x"AB";
     testTxWrite <= '1';
-    wait for clkPeriod100M;
+    wait for clkPeriod200M;
     testTxWrite <= '0';
-    testDataIn <= x"00";
+    testDataIn <= x"CD";
     testTxWrite <= '1';
-    wait for clkPeriod100M;
+    wait for clkPeriod200M;
     testTxWrite <= '0';
-    testDataIn <= x"00";
+    testDataIn <= x"EF";
     testTxWrite <= '1';
-    wait for clkPeriod100M;
+    wait for clkPeriod200M;
     testTxWrite <= '0';
-    testDataIn <= x"04";
+    testDataIn <= x"12";
     testTxWrite <= '1';
-    wait for clkPeriod100M;
+    wait for clkPeriod200M;
     testTxWrite <= '0';
-    wait for clkPeriod100M*delay;
+    wait for clkPeriod200M*delay;
 
     wait for 5 us;
     testDataIn <= x"A5";
-    wait for clkPeriod100M*delay;
+    wait for clkPeriod200M*delay;
     testTxWrite <= '1';
-    wait for clkPeriod100M;
+    wait for clkPeriod200M;
     testTxWrite <= '0';
-    wait for clkPeriod100M*delay;
+    wait for clkPeriod200M*delay;
     testDataIn <= x"00";
     testTxWrite <= '1';
-    wait for clkPeriod100M;
+    wait for clkPeriod200M;
     testTxWrite <= '0';
-    wait for clkPeriod100M*delay;
+    wait for clkPeriod200M*delay;
     testDataIn <= x"04";
     testTxWrite <= '1';
-    wait for clkPeriod100M;
+    wait for clkPeriod200M;
     testTxWrite <= '0';
-    wait for clkPeriod100M*delay;
+    wait for clkPeriod200M*delay;
 
     wait for 100 us;
 
     testRxRead <= '1';
 
     testDataIn <= x"55";
-    wait for clkPeriod100M*delay;
+    wait for clkPeriod200M*delay;
     testTxWrite <= '1';
-    wait for clkPeriod100M;
+    wait for clkPeriod200M;
     testTxWrite <= '0';
-    wait for clkPeriod100M*delay;
+    wait for clkPeriod200M*delay;
     testDataIn <= x"00";
     testTxWrite <= '1';
-    wait for clkPeriod100M;
+    wait for clkPeriod200M;
     testTxWrite <= '0';
-    wait for clkPeriod100M*delay;
+    wait for clkPeriod200M*delay;
     testDataIn <= x"01";
     testTxWrite <= '1';
-    wait for clkPeriod100M;
+    wait for clkPeriod200M;
     testTxWrite <= '0';
     testDataIn <= x"00";
     testTxWrite <= '1';
-    wait for clkPeriod100M;
+    wait for clkPeriod200M;
     testTxWrite <= '0';
     testDataIn <= x"00";
     testTxWrite <= '1';
-    wait for clkPeriod100M;
+    wait for clkPeriod200M;
     testTxWrite <= '0';
     testDataIn <= x"00";
     testTxWrite <= '1';
-    wait for clkPeriod100M;
+    wait for clkPeriod200M;
     testTxWrite <= '0';
     testDataIn <= x"01";
     testTxWrite <= '1';
-    wait for clkPeriod100M;
+    wait for clkPeriod200M;
     testTxWrite <= '0';
-    wait for clkPeriod100M*delay;
+    wait for clkPeriod200M*delay;
 
     wait for 10 us;
 
     NORT1 <= '0';
-    wait for clkPeriod100M;
+    wait for clkPeriod200M;
     NORT1 <= '1';
 
     wait for 100 us;
 
     testDataIn <= x"b5";
-    wait for clkPeriod100M*delay;
+    wait for clkPeriod200M*delay;
     testTxWrite <= '1';
-    wait for clkPeriod100M;
+    wait for clkPeriod200M;
     testTxWrite <= '0';
-    wait for clkPeriod100M*delay;
+    wait for clkPeriod200M*delay;
     testDataIn <= x"00";
     testTxWrite <= '1';
-    wait for clkPeriod100M;
+    wait for clkPeriod200M;
     testTxWrite <= '0';
-    wait for clkPeriod100M*delay;
+    wait for clkPeriod200M*delay;
     testDataIn <= x"00";
     testTxWrite <= '1';
-    wait for clkPeriod100M;
-    testTxWrite <= '0';
-    testDataIn <= x"00";
-    testTxWrite <= '1';
-    wait for clkPeriod100M;
+    wait for clkPeriod200M;
     testTxWrite <= '0';
     testDataIn <= x"00";
     testTxWrite <= '1';
-    wait for clkPeriod100M;
+    wait for clkPeriod200M;
+    testTxWrite <= '0';
+    testDataIn <= x"00";
+    testTxWrite <= '1';
+    wait for clkPeriod200M;
     testTxWrite <= '0';
     testDataIn <= x"01";
     testTxWrite <= '1';
-    wait for clkPeriod100M;
+    wait for clkPeriod200M;
     testTxWrite <= '0';
     testDataIn <= x"05";
     testTxWrite <= '1';
-    wait for clkPeriod100M;
+    wait for clkPeriod200M;
     testTxWrite <= '0';
-    wait for clkPeriod100M*delay;
+    wait for clkPeriod200M*delay;
 
     wait for 600 us;
 
     testDataIn <= x"b5";
-    wait for clkPeriod100M*delay;
+    wait for clkPeriod200M*delay;
     testTxWrite <= '1';
-    wait for clkPeriod100M;
+    wait for clkPeriod200M;
     testTxWrite <= '0';
-    wait for clkPeriod100M*delay;
+    wait for clkPeriod200M*delay;
     testDataIn <= x"00";
     testTxWrite <= '1';
-    wait for clkPeriod100M;
+    wait for clkPeriod200M;
     testTxWrite <= '0';
-    wait for clkPeriod100M*delay;
+    wait for clkPeriod200M*delay;
     testDataIn <= x"00";
     testTxWrite <= '1';
-    wait for clkPeriod100M;
-    testTxWrite <= '0';
-    testDataIn <= x"00";
-    testTxWrite <= '1';
-    wait for clkPeriod100M;
+    wait for clkPeriod200M;
     testTxWrite <= '0';
     testDataIn <= x"00";
     testTxWrite <= '1';
-    wait for clkPeriod100M;
+    wait for clkPeriod200M;
+    testTxWrite <= '0';
+    testDataIn <= x"00";
+    testTxWrite <= '1';
+    wait for clkPeriod200M;
     testTxWrite <= '0';
     testDataIn <= x"01";
     testTxWrite <= '1';
-    wait for clkPeriod100M;
+    wait for clkPeriod200M;
     testTxWrite <= '0';
     testDataIn <= x"00";
     testTxWrite <= '1';
-    wait for clkPeriod100M;
+    wait for clkPeriod200M;
     testTxWrite <= '0';
-    wait for clkPeriod100M*delay;
+    wait for clkPeriod200M*delay;
 
     wait;
 end process;
 
 dataAcqCtrlInst : dataAcqCtrl
 port map(
-    clk100M     => clk_100M,
+    clk100M     => clk_200M,
     rst         => rst,
     devExec     => devExec,
     devId       => devId,
@@ -515,9 +511,7 @@ port map(
 );
 
 clk_100M <= not clk_100M after clkPeriod100M/2;
-clkN_100M <= not clkN_100M after clkPeriod100M/2;
 clk_200M <= not clk_200M after clkPeriod200M/2;
-clkN_200M <= not clkN_200M after clkPeriod200M/2;
 
 devDataInVec(acqSystem) <= dataFromAcq;
 devReadyVec(acqSystem)  <= devReadyAcq;
@@ -535,7 +529,7 @@ generic map(
     maxBrstLen   => maxBrstLen
 )
 port map(
-    clk          => clk_100M,
+    clk          => clk_200M,
     rst          => rst,
     dataIn       => dataFromMaster,
     dataOut      => dataToMaster,
@@ -563,7 +557,7 @@ port map(
 
 spiSlaveInst: entity work.SPISlave
 port map(
-    clk          => clk_100M,
+    clk          => clk_200M,
     rst          => rst,
     data_out     => dataFromMaster,
     data_in      => dataToMaster,
@@ -591,7 +585,7 @@ generic map(
     sclkFreq     => sclkFreq
 )
 port map(
-    clk          => clk_100M,
+    clk          => clk_200M,
     rst          => rst,
     data_out     => testDataOut,
     data_in      => testDataIn,
