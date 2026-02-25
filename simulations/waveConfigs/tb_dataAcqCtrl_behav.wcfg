@@ -16,14 +16,17 @@
    </db_ref_list>
    <zoom_setting>
       <ZoomStartTime time="0.000000 us"></ZoomStartTime>
-      <ZoomEndTime time="15.000002 us"></ZoomEndTime>
-      <Cursor1Time time="6.185000 us"></Cursor1Time>
+      <ZoomEndTime time="10.000003 us"></ZoomEndTime>
+      <Cursor1Time time="6.952500 us"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
-      <NameColumnWidth column_width="160"></NameColumnWidth>
+      <NameColumnWidth column_width="156"></NameColumnWidth>
       <ValueColumnWidth column_width="58"></ValueColumnWidth>
    </column_width_setting>
    <WVObjectSize size="77" />
+   <wave_markers>
+      <marker time="6950000" label="" />
+   </wave_markers>
    <wvobject fp_name="/tb_dataAcqCtrl/clk_100M" type="logic">
       <obj_property name="ElementShortName">clk_100M</obj_property>
       <obj_property name="ObjectShortName">clk_100M</obj_property>
