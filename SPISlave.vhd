@@ -74,7 +74,9 @@ port(
 end component;
 
 signal sclkRise,
+       sclkFF,
        sclkFall,
+       csFF,
        csRise,
        csFall,
        txPres,
@@ -90,6 +92,12 @@ signal buffIn,
 
 begin
 
+sclkRise <= sclk and not sclkFF;
+
+sclkFall <= not sclk and sclkFF;
+
+csRise   <= cs and not csFF;
+
 miso       <= buffOut(7);
 
 lastBit    <= bitCount(bitCount'left);
@@ -99,6 +107,19 @@ loadBuff   <= and_reduce(std_logic_vector(bitCount(2 downto 0)));
 loadRxFifo <= lastBit and rxEna;
 
 loadTxFifo <= lastBit;
+
+sclkCsFF: process(clk, rst)
+begin
+    if rising_edge(clk) then
+        if rst = '1' then
+            sclkFF <= '0';
+            csFF   <= '0';
+        else
+            sclkFF <= sclk;
+            csFF   <= cs;
+        end if;
+    end if;
+end process;
 
 txPresInst: process(clk, rst, txPres)
 begin
@@ -110,42 +131,6 @@ begin
         end if;
     end if;
 end process;
-
-sclkRiseInst: entity work.edgeDetector
-generic map(
-    clockEdge => "falling",
-    edge      => "rising"
-)
-port map(
-    clk       => clk,
-    rst       => rst,
-    signalIn  => sclk,
-    signalOut => sclkRise
-);
-
-sclkFallInst: entity work.edgeDetector
-generic map(
-    clockEdge => "falling",
-    edge      => "falling"
-)
-port map(
-    clk       => clk,
-    rst       => rst,
-    signalIn  => sclk,
-    signalOut => sclkFall
-);
-
-csRiseInst: entity work.edgeDetector
-generic map(
-    clockEdge => "falling",
-    edge      => "rising"
-)
-port map(
-    clk       => clk,
-    rst       => rst,
-    signalIn  => cs,
-    signalOut => csRise
-);
 
 rxEnaProc: process(clk, rst, csRise, rx_ena)
 begin

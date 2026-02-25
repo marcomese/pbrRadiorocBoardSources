@@ -15,30 +15,22 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="154.168 ns"></ZoomStartTime>
-      <ZoomEndTime time="5,969.169 ns"></ZoomEndTime>
-      <Cursor1Time time="5,000.002 ns"></Cursor1Time>
+      <ZoomStartTime time="0.000000 us"></ZoomStartTime>
+      <ZoomEndTime time="15.000002 us"></ZoomEndTime>
+      <Cursor1Time time="6.185000 us"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
-      <NameColumnWidth column_width="164"></NameColumnWidth>
+      <NameColumnWidth column_width="160"></NameColumnWidth>
       <ValueColumnWidth column_width="58"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="74" />
+   <WVObjectSize size="77" />
    <wvobject fp_name="/tb_dataAcqCtrl/clk_100M" type="logic">
       <obj_property name="ElementShortName">clk_100M</obj_property>
       <obj_property name="ObjectShortName">clk_100M</obj_property>
    </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl/clkN_100M" type="logic">
-      <obj_property name="ElementShortName">clkN_100M</obj_property>
-      <obj_property name="ObjectShortName">clkN_100M</obj_property>
-   </wvobject>
    <wvobject fp_name="/tb_dataAcqCtrl/clk_200M" type="logic">
       <obj_property name="ElementShortName">clk_200M</obj_property>
       <obj_property name="ObjectShortName">clk_200M</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl/clkN_200M" type="logic">
-      <obj_property name="ElementShortName">clkN_200M</obj_property>
-      <obj_property name="ObjectShortName">clkN_200M</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_dataAcqCtrl/adcInst/wr_en" type="logic">
       <obj_property name="ElementShortName">wr_en</obj_property>
@@ -335,9 +327,21 @@
       <obj_property name="ElementShortName">cs</obj_property>
       <obj_property name="ObjectShortName">cs</obj_property>
    </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl/spiSlaveInst/csRise" type="logic">
+      <obj_property name="ElementShortName">csRise</obj_property>
+      <obj_property name="ObjectShortName">csRise</obj_property>
+   </wvobject>
    <wvobject fp_name="/tb_dataAcqCtrl/sclk" type="logic">
       <obj_property name="ElementShortName">sclk</obj_property>
       <obj_property name="ObjectShortName">sclk</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl/spiSlaveInst/sclkRise" type="logic">
+      <obj_property name="ElementShortName">sclkRise</obj_property>
+      <obj_property name="ObjectShortName">sclkRise</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl/spiSlaveInst/sclkFall" type="logic">
+      <obj_property name="ElementShortName">sclkFall</obj_property>
+      <obj_property name="ObjectShortName">sclkFall</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_dataAcqCtrl/miso" type="logic">
       <obj_property name="ElementShortName">miso</obj_property>
@@ -350,5 +354,13 @@
    <wvobject fp_name="/tb_dataAcqCtrl/dataFromMaster" type="array">
       <obj_property name="ElementShortName">dataFromMaster[7:0]</obj_property>
       <obj_property name="ObjectShortName">dataFromMaster[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl/dataToMaster" type="array">
+      <obj_property name="ElementShortName">dataToMaster[7:0]</obj_property>
+      <obj_property name="ObjectShortName">dataToMaster[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl/dataAcqCtrlInst/rData" type="array">
+      <obj_property name="ElementShortName">rData[3:0][31:0]</obj_property>
+      <obj_property name="ObjectShortName">rData[3:0][31:0]</obj_property>
    </wvobject>
 </wave_config>

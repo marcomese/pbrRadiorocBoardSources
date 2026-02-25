@@ -290,7 +290,7 @@ begin
     wait for clkPeriod200M;
     testTxWrite <= '0';
     wait for clkPeriod200M*delay;
-    testDataIn <= x"04";
+    testDataIn <= x"05";
     testTxWrite <= '1';
     wait for clkPeriod200M;
     testTxWrite <= '0';
@@ -324,7 +324,7 @@ begin
     wait for clkPeriod200M;
     testTxWrite <= '0';
     wait for clkPeriod200M*delay;
-    testDataIn <= x"04";
+    testDataIn <= x"05";
     testTxWrite <= '1';
     wait for clkPeriod200M;
     testTxWrite <= '0';
