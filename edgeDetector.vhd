@@ -33,8 +33,8 @@ riseEdgeGen: if clockEdge = "rising" generate
     edgeProc: process(clk,rst)
     begin
         if rst = '1' then
-            ff1 <= '0';
-            ff2 <= '0';
+            ff1 <= signalIn;
+            ff2 <= signalIn;
         elsif rising_edge(clk) then
             ff1 <= signalIn;
             ff2 <= ff1;
@@ -46,8 +46,8 @@ fallEdgeGen: if clockEdge = "falling" generate
     edgeProc: process(clk,rst)
     begin
         if rst = '1' then
-            ff1 <= '0';
-            ff2 <= '0';
+            ff1 <= signalIn;
+            ff2 <= signalIn;
         elsif falling_edge(clk) then
             ff1 <= signalIn;
             ff2 <= ff1;
