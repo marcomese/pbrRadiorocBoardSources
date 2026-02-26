@@ -15,15 +15,15 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="5,919.500 ns"></ZoomStartTime>
-      <ZoomEndTime time="6,509.001 ns"></ZoomEndTime>
-      <Cursor1Time time="6,215.000 ns"></Cursor1Time>
+      <ZoomStartTime time="0.000000 us"></ZoomStartTime>
+      <ZoomEndTime time="20.000003 us"></ZoomEndTime>
+      <Cursor1Time time="6.095000 us"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
-      <NameColumnWidth column_width="148"></NameColumnWidth>
+      <NameColumnWidth column_width="140"></NameColumnWidth>
       <ValueColumnWidth column_width="58"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="77" />
+   <WVObjectSize size="80" />
    <wvobject fp_name="/tb_dataAcqCtrl/clk_100M" type="logic">
       <obj_property name="ElementShortName">clk_100M</obj_property>
       <obj_property name="ObjectShortName">clk_100M</obj_property>
@@ -322,6 +322,18 @@
    <wvobject fp_name="/tb_dataAcqCtrl/dataAcqCtrlInst/nbAcqSig" type="array">
       <obj_property name="ElementShortName">nbAcqSig[7:0]</obj_property>
       <obj_property name="ObjectShortName">nbAcqSig[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl/spiSlaveInst/loadTxFifo" type="logic">
+      <obj_property name="ElementShortName">loadTxFifo</obj_property>
+      <obj_property name="ObjectShortName">loadTxFifo</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl/spiSlaveInst/tx_write" type="logic">
+      <obj_property name="ElementShortName">tx_write</obj_property>
+      <obj_property name="ObjectShortName">tx_write</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl/spiSlaveInst/tx_present" type="logic">
+      <obj_property name="ElementShortName">tx_present</obj_property>
+      <obj_property name="ObjectShortName">tx_present</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_dataAcqCtrl/cs" type="logic">
       <obj_property name="ElementShortName">cs</obj_property>

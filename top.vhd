@@ -230,6 +230,14 @@ signal rstI2CCnt : unsigned(bitsNum(rstRadI2CLen) downto 0);
 
 signal endAcq, rdValid : std_logic;
 
+attribute mark_debug : string;
+attribute mark_debug of txWrite,
+                        readRq,
+                        cs,    
+                        sclk,  
+                        mosi,  
+                        miso   : signal is "true";
+
 begin
 
 sc_val_evt    <= '1';

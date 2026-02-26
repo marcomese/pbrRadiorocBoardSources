@@ -77,7 +77,7 @@ signal sclkRise,
        sclkFall,
        csRise,
        csFall,
-       txPres,
+       txEmpty,
        loadBuff,
        loadTxFifo,
        loadRxFifo,
@@ -87,6 +87,22 @@ signal bitCount   : unsigned(3 downto 0);
 signal buffIn,
        buffOut,
        txFifoDout : std_logic_vector(7 downto 0);
+
+attribute mark_debug : string;
+attribute mark_debug of sclkRise,  
+                        sclkFall,  
+                        csRise,    
+                        csFall,    
+                        txEmpty,   
+                        loadBuff,  
+                        loadTxFifo,
+                        loadRxFifo,
+                        rxEna,     
+                        lastBit,
+                        buffOut,
+                        buffIn,
+                        sclk,
+                        cs     : signal is "true";
 
 begin
 
@@ -100,13 +116,13 @@ loadRxFifo <= lastBit and rxEna;
 
 loadTxFifo <= lastBit;
 
-txPresInst: process(clk, rst, txPres)
+txPresInst: process(clk, rst, txEmpty)
 begin
     if rising_edge(clk) then
         if rst = '1' then
             tx_present <= '0';
         else
-            tx_present <= txPres;
+            tx_present <= not txEmpty;
         end if;
     end if;
 end process;
@@ -169,12 +185,12 @@ begin
     end if;
 end process;
 
-shiftRegOutInst: process(clk, rst, sclkRise, txPres, bitCount)
+shiftRegOutInst: process(clk, rst, sclkRise, txEmpty, bitCount)
 begin
     if rising_edge(clk) then
         if rst = '1' then
             buffOut <= (others => '0');
-        elsif loadBuff = '1' and txPres = '1' then
+        elsif loadBuff = '1' and txEmpty = '0' then
             buffOut <= txFifoDout;
         elsif cs = '0' and sclkRise = '1' then
             buffOut <= buffOut(6 downto 0) & '0';
@@ -217,8 +233,8 @@ port map(
     dout      => txFifoDout,
     full      => tx_full,
     wr_ack    => tx_wr_ack,
-    empty     => open,
-    valid     => txPres,
+    empty     => txEmpty,
+    valid     => open,
     prog_full => tx_half_full
 );
 
