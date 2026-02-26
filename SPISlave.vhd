@@ -113,7 +113,7 @@ end process;
 
 sclkRiseInst: entity work.edgeDetector
 generic map(
-    clockEdge => "falling",
+    clockEdge => "rising",
     edge      => "rising"
 )
 port map(
@@ -125,7 +125,7 @@ port map(
 
 sclkFallInst: entity work.edgeDetector
 generic map(
-    clockEdge => "falling",
+    clockEdge => "rising",
     edge      => "falling"
 )
 port map(
@@ -137,7 +137,7 @@ port map(
 
 csRiseInst: entity work.edgeDetector
 generic map(
-    clockEdge => "falling",
+    clockEdge => "rising",
     edge      => "rising"
 )
 port map(
