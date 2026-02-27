@@ -270,52 +270,28 @@ ADC_SCKHG     <= adc_sck;
 
 ADC_SCKLG     <= adc_sck;
 
-syncIn: process(clk_200M, reset)
-begin
-    if rising_edge(clk_200M) then
-        if reset = '1' then
-            T_1FF0  <= (others => '0');
-            T_1FF1  <= (others => '0');
-            T_1FF2  <= (others => '0');
-            T_2FF0  <= (others => '0');
-            T_2FF1  <= (others => '0');
-            T_2FF2  <= (others => '0');
-            T_1Sync <= (others => '0');
-            T_2Sync <= (others => '0');
-        else
-            T_1FF0 <= T_1Buf;
-            T_1FF1 <= T_1FF0;
-            T_1FF2 <= T_1FF1;
-            T_2FF0 <= T_2Buf;
-            T_2FF1 <= T_2FF0;
-            T_2FF2 <= T_2FF1;
-            
-            T_1Sync <= (T_1FF0 and T_1FF1) or (T_1FF1 and T_1FF2) or (T_1FF0 and T_1FF2);
-            T_2Sync <= (T_2FF0 and T_1FF1) or (T_2FF1 and T_2FF2) or (T_2FF0 and T_2FF2);
-        end if;
-    end if;
-end process;
-
 inTrg1Sync: entity work.trgSync
 generic map(
-    trgNum => T_1Sync'length
+    trgNum => T_1'length
 )
 port map(
-    clk  => clk_200M,
-    rst  => reset,
-    tIn  => T_1Sync,
-    tOut => tEdge1
+    clk   => clk_200M,
+    rst   => reset,
+    tIn   => T_1,
+    tOut  => T_1Sync,
+    tEdge => tEdge1
 );
 
 inTrg2Sync: entity work.trgSync
 generic map(
-    trgNum => T_2Sync'length
+    trgNum => T_2'length
 )
 port map(
     clk  => clk_200M,
     rst  => reset,
-    tIn  => T_2Sync,
-    tOut => tEdge2
+    tIn   => T_2,
+    tOut  => T_2Sync,
+    tEdge => tEdge2
 );
 
 extTrgFF  <= '0';

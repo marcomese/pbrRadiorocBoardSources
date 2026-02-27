@@ -19,30 +19,39 @@ generic(
     trgNum : natural
 );
 port(
-    clk  : in  std_logic;
-    rst  : in  std_logic;
-    tIn  : in  std_logic_vector(trgNum-1 downto 0);
-    tOut : out std_logic_vector(trgNum-1 downto 0)
+    clk   : in  std_logic;
+    rst   : in  std_logic;
+    tIn   : in  std_logic_vector(trgNum-1 downto 0);
+    tOut  : out std_logic_vector(trgNum-1 downto 0);
+    tEdge : out std_logic_vector(trgNum-1 downto 0)
 );
 end trgSync;
 
 architecture Behavioral of trgSync is
 
+signal TFF,
+       TS,
+       TSFF : std_logic_vector(trgNum-1 downto 0);
+
 begin
 
-trgEdgeGen: for i in 0 to trgNum-1 generate
+tOut  <= tS;
+
+tEdge <= tS and not tSFF;
+
+trgSyncInst: process(clk, rst)
 begin
-    trgEdgeInst: entity work.edgeDetector
-    generic map(
-        clockEdge => "rising",
-        edge      => "falling"
-    )
-    port map(
-        clk       => clk,
-        rst       => rst,
-        signalIn  => tIn(i),
-        signalOut => tOut(i)
-    );
-end generate;
+    if rising_edge(clk) then
+        if rst = '1' then
+            TFF  <= tIn;
+            tS   <= tIn;
+            tSFF <= tIn;
+        else
+            TFF  <= tIn;
+            tS   <= TFF;
+            tSFF <= tS;
+        end if;
+    end if;
+end process;
 
 end Behavioral;
