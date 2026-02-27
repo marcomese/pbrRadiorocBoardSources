@@ -78,7 +78,6 @@ signal sclkRise,
        csRise,
        csFall,
        txEmpty,
-       loadBuff,
        loadTxFifo,
        loadRxFifo,
        rxEna,
@@ -94,7 +93,6 @@ attribute mark_debug of sclkRise,
                         csRise,    
                         csFall,    
                         txEmpty,   
-                        loadBuff,  
                         loadTxFifo,
                         loadRxFifo,
                         rxEna,     
@@ -109,8 +107,6 @@ begin
 miso       <= buffOut(7);
 
 lastBit    <= bitCount(bitCount'left);
-
-loadBuff   <= and_reduce(std_logic_vector(bitCount(2 downto 0)));
 
 loadRxFifo <= lastBit and rxEna;
 
@@ -190,7 +186,7 @@ begin
     if rising_edge(clk) then
         if rst = '1' then
             buffOut <= (others => '0');
-        elsif loadBuff = '1' and txEmpty = '0' then
+        elsif lastBit = '1' and txEmpty = '0' then
             buffOut <= txFifoDout;
         elsif cs = '0' and sclkRise = '1' then
             buffOut <= buffOut(6 downto 0) & '0';
