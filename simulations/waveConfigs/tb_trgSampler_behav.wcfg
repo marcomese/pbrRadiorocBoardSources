@@ -15,18 +15,15 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="50,337.500 ns"></ZoomStartTime>
-      <ZoomEndTime time="51,001.501 ns"></ZoomEndTime>
-      <Cursor1Time time="50,770.000 ns"></Cursor1Time>
+      <ZoomStartTime time="0.000 ns"></ZoomStartTime>
+      <ZoomEndTime time="1,065.001 ns"></ZoomEndTime>
+      <Cursor1Time time="0.000 ns"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="172"></NameColumnWidth>
-      <ValueColumnWidth column_width="112"></ValueColumnWidth>
+      <ValueColumnWidth column_width="108"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="22" />
-   <wave_markers>
-      <marker time="50570000" label="" />
-   </wave_markers>
+   <WVObjectSize size="24" />
    <wvobject fp_name="/tb_trgSampler/rst" type="logic">
       <obj_property name="ElementShortName">rst</obj_property>
       <obj_property name="ObjectShortName">rst</obj_property>
@@ -51,13 +48,21 @@
       <obj_property name="ElementShortName">devBrst</obj_property>
       <obj_property name="ObjectShortName">devBrst</obj_property>
    </wvobject>
+   <wvobject fp_name="/tb_trgSampler/uut/trgIn[0]" type="logic">
+      <obj_property name="ElementShortName">[0]</obj_property>
+      <obj_property name="ObjectShortName">[0]</obj_property>
+   </wvobject>
    <wvobject fp_name="/tb_trgSampler/evtTrigger" type="logic">
       <obj_property name="ElementShortName">evtTrigger</obj_property>
       <obj_property name="ObjectShortName">evtTrigger</obj_property>
    </wvobject>
-   <wvobject fp_name="/tb_trgSampler/uut/trgIn[0]" type="logic">
-      <obj_property name="ElementShortName">[0]</obj_property>
-      <obj_property name="ObjectShortName">[0]</obj_property>
+   <wvobject fp_name="/tb_trgSampler/trgEdge10nsInst/ff1" type="logic">
+      <obj_property name="ElementShortName">ff1</obj_property>
+      <obj_property name="ObjectShortName">ff1</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_trgSampler/trgEdge10nsInst/ff2" type="logic">
+      <obj_property name="ElementShortName">ff2</obj_property>
+      <obj_property name="ObjectShortName">ff2</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_trgSampler/uut/rData[2]" type="array">
       <obj_property name="ElementShortName">[2][31:0]</obj_property>

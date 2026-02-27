@@ -179,6 +179,7 @@ port map(
 
 trgEdgeInst: entity work.edgeDetector
 generic map(
+    inputFF   => True,
     clockEdge => "falling",
     edge      => "rising"
 )
@@ -191,6 +192,7 @@ port map(
 
 trgSftEdgeInst: entity work.edgeDetector
 generic map(
+    inputFF   => True,
     clockEdge => "falling",
     edge      => "rising"
 )

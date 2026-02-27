@@ -192,6 +192,7 @@ trigger <= not t1(0);
 
 trgEdge10nsInst: entity work.edgeDetector
 generic map(
+    inputFF   => False,
     clockEdge => "rising",
     edge      => "rising"
 )
@@ -208,6 +209,10 @@ begin
     wait for clkPeriod100M*5;
     rst <= '0';
     wait for clkPeriod100M*5;
+
+    t1(0) <= '0';
+    wait for clkPeriod100M*10;
+    t1(0) <= '1';
 
     wait for 350 ns;
 
