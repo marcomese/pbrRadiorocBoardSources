@@ -179,28 +179,30 @@ port map(
 
 trgEdgeInst: entity work.edgeDetector
 generic map(
-    inputFF   => True,
-    clockEdge => "falling",
-    edge      => "rising"
+    inputFF  => 0,
+    edge     => "rising"
 )
 port map(
-    clk       => clk_200M,
-    rst       => rst,
-    signalIn  => trigger,
-    signalOut => trgEdge
+    clk      => clk_200M,
+    rst      => rst,
+    signalIn => trigger,
+    edgeOut  => trgEdge,
+    syncOut  => open,
+    nExtFF   => "0"
 );
 
 trgSftEdgeInst: entity work.edgeDetector
 generic map(
-    inputFF   => True,
-    clockEdge => "falling",
-    edge      => "rising"
+    inputFF  => 0,
+    edge     => "rising"
 )
 port map(
-    clk       => clk_200M,
-    rst       => rst,
-    signalIn  => trigger_sft,
-    signalOut => trgSftEdge
+    clk      => clk_200M,
+    rst      => rst,
+    signalIn => trigger_sft,
+    edgeOut  => trgSftEdge,
+    syncOut  => open,
+    nExtFF   => "0"
 );
 
 	process(rst, clk_200M)

@@ -147,6 +147,8 @@ constant maxBrstLen : integer                      := 512;
 
 constant rstRadI2CLen : integer := 5;
 
+constant trgExtFF : integer := 5;
+
 signal   dataToDev,
          dataFromPGen,
          dataFromTmp,
@@ -218,6 +220,8 @@ signal   testTxWrite,
 signal   dataToMaster,
          dataFromMaster : std_logic_vector(7 downto 0);
 
+signal   nExtFF         : std_logic_vector(bitsNum(trgExtFF,1)-1 downto 0);
+
 signal extTrgFF, extTrgSig : std_logic;
 
 signal readRq,
@@ -272,26 +276,30 @@ ADC_SCKLG     <= adc_sck;
 
 inTrg1Sync: entity work.trgSync
 generic map(
-    trgNum => T_1'length
+    trgNum     => T_1'length,
+    extenderFF => trgExtFF
 )
 port map(
-    clk   => clk_200M,
-    rst   => reset,
-    tIn   => T_1,
-    tOut  => T_1Sync,
-    tEdge => tEdge1
+    clk    => clk_200M,
+    rst    => reset,
+    tIn    => T_1,
+    tOut   => T_1Sync,
+    tEdge  => tEdge1,
+    nExtFF => nExtFF
 );
 
 inTrg2Sync: entity work.trgSync
 generic map(
-    trgNum => T_2'length
+    trgNum     => T_2'length,
+    extenderFF => trgExtFF
 )
 port map(
-    clk  => clk_200M,
-    rst  => reset,
-    tIn   => T_2,
-    tOut  => T_2Sync,
-    tEdge => tEdge2
+    clk    => clk_200M,
+    rst    => reset,
+    tIn    => T_2,
+    tOut   => T_2Sync,
+    tEdge  => tEdge2,
+    nExtFF => nExtFF
 );
 
 extTrgFF  <= '0';

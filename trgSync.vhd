@@ -13,45 +13,44 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.ALL;
+use work.utilsPkg.all;
 
 entity trgSync is
 generic(
-    trgNum : natural
+    trgNum     : natural;
+    extenderFF : integer
 );
 port(
-    clk   : in  std_logic;
-    rst   : in  std_logic;
-    tIn   : in  std_logic_vector(trgNum-1 downto 0);
-    tOut  : out std_logic_vector(trgNum-1 downto 0);
-    tEdge : out std_logic_vector(trgNum-1 downto 0)
+    clk    : in  std_logic;
+    rst    : in  std_logic;
+    tIn    : in  std_logic_vector(trgNum-1 downto 0);
+    tOut   : out std_logic_vector(trgNum-1 downto 0);
+    tEdge  : out std_logic_vector(trgNum-1 downto 0);
+    nExtFF : in  std_logic_vector(bitsNum(extenderFF, 1)-1 downto 0)
 );
 end trgSync;
 
 architecture Behavioral of trgSync is
 
-signal TFF,
-       TS,
-       TSFF : std_logic_vector(trgNum-1 downto 0);
-
 begin
 
-tOut  <= tS;
-
-tEdge <= tS and not tSFF;
-
-trgSyncInst: process(clk, rst)
+trgEdgeGen: for i in 0 to trgNum-1 generate
 begin
-    if rising_edge(clk) then
-        if rst = '1' then
-            TFF  <= tIn;
-            tS   <= tIn;
-            tSFF <= tIn;
-        else
-            TFF  <= tIn;
-            tS   <= TFF;
-            tSFF <= tS;
-        end if;
-    end if;
-end process;
+    trgEdgeDetInst: entity work.edgeDetector
+    generic map(
+        inputFF     => 2,
+        edge        => "falling",
+        inputRstVal => '1',
+        extenderFF  => extenderFF
+    )
+    port map(
+        clk      => clk,
+        rst      => rst,
+        signalIn => tIn(i),
+        edgeOut  => tEdge(i),
+        syncOut  => tOut(i),
+        nExtFF   => nExtFF
+    );
+end generate;
 
 end Behavioral;

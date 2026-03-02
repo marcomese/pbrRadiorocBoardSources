@@ -125,41 +125,45 @@ end process;
 
 sclkRiseInst: entity work.edgeDetector
 generic map(
-    inputFF   => True,
-    clockEdge => "rising",
-    edge      => "rising"
+    inputFF     => 1,
+    edge        => "rising"
 )
 port map(
-    clk       => clk,
-    rst       => rst,
-    signalIn  => sclk,
-    signalOut => sclkRise
+    clk      => clk,
+    rst      => rst,
+    signalIn => sclk,
+    edgeOut  => sclkRise,
+    syncOut  => open,
+    nExtFF   => "0"
 );
 
 sclkFallInst: entity work.edgeDetector
 generic map(
-    inputFF   => True,
-    clockEdge => "rising",
-    edge      => "falling"
+    inputFF     => 1,
+    edge        => "falling"
 )
 port map(
-    clk       => clk,
-    rst       => rst,
-    signalIn  => sclk,
-    signalOut => sclkFall
+    clk      => clk,
+    rst      => rst,
+    signalIn => sclk,
+    edgeOut  => sclkFall,
+    syncOut  => open,
+    nExtFF   => "0"
 );
 
 csRiseInst: entity work.edgeDetector
 generic map(
-    inputFF   => True,
-    clockEdge => "rising",
-    edge      => "rising"
+    inputFF     => 1,
+    edge        => "rising",
+    inputRstVal => '1'
 )
 port map(
-    clk       => clk,
-    rst       => rst,
-    signalIn  => cs,
-    signalOut => csRise
+    clk      => clk,
+    rst      => rst,
+    signalIn => cs,
+    edgeOut  => csRise,
+    syncOut  => open,
+    nExtFF   => "0"
 );
 
 rxEnaProc: process(clk, rst, csRise, rx_ena)

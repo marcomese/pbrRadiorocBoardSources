@@ -2,6 +2,7 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.ALL;
 use work.devicesPkg.all;
+use work.utilsPkg.all;
 
 entity tb_trgSampler is
 end tb_trgSampler;
@@ -136,7 +137,7 @@ constant burstRdCmd    : std_logic_vector(3 downto 0) := x"B";
 constant maxBrstLen    : natural                      := 14000;
 constant delay         : natural                      := 1;--50000;
 constant trgNum        : natural                      := 64;
-
+constant extenderFF    : integer := 0;
 signal rst               : std_logic := '0';
 signal clk_100M          : std_logic := '1';
 signal t1,t2             : std_logic_vector(63 downto 0) := (others => '1');
@@ -192,15 +193,18 @@ trigger <= not t1(0);
 
 trgEdge10nsInst: entity work.edgeDetector
 generic map(
-    inputFF   => False,
-    clockEdge => "rising",
-    edge      => "rising"
+    inputFF     => 2,
+    edge        => "rising",
+    inputRstVal => '0',
+    extenderFF  => extenderFF
 )
 port map(
-    clk       => clk_100M,
-    rst       => rst,
-    signalIn  => trigger,
-    signalOut => evtTrigger
+    clk      => clk_100M,
+    rst      => rst,
+    signalIn => trigger,
+    edgeOut  => evtTrigger,
+    syncOut  => open,
+    nExtFF   => intToSlv(2,bitsNum(extenderFF))
 );
 
 stimProc: process

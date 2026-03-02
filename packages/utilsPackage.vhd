@@ -16,7 +16,9 @@ package utilsPkg is
 
     function slvToInt(val: std_logic_vector) return integer;
 
-    function bitsNum(val: integer) return integer;
+    function bitsNum(val: integer; minBits: integer := 1) return integer;
+
+    function intToSlv(val: integer; len: integer := 0) return std_logic_vector;
 
     function max(a,b: integer) return integer;
 
@@ -74,10 +76,24 @@ package body utilsPkg is
         return to_integer(unsigned(val));
     end slvToInt;
 
-    function bitsNum(val: integer) return integer is
+    function bitsNum(val: integer; minBits: integer := 1) return integer is
     begin
+        if val < 1 then
+            return minBits;
+        end if;
+
         return integer(ceil(log2(real(val + 1))));
     end bitsNum;
+
+    function intToSlv(val: integer; len: integer := 0) return std_logic_vector is
+        variable n      : integer := bitsNum(val);
+    begin
+        if len = 0 then
+            return std_logic_vector(to_unsigned(val, n));
+        else
+            return std_logic_vector(to_unsigned(val, len));
+        end if;
+    end intToSlv;
 
     function max(a,b: integer) return integer is
     begin

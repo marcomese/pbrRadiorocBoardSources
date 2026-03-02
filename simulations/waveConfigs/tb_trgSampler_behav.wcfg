@@ -16,14 +16,17 @@
    </db_ref_list>
    <zoom_setting>
       <ZoomStartTime time="0.000 ns"></ZoomStartTime>
-      <ZoomEndTime time="1,065.001 ns"></ZoomEndTime>
-      <Cursor1Time time="0.000 ns"></Cursor1Time>
+      <ZoomEndTime time="718.249 ns"></ZoomEndTime>
+      <Cursor1Time time="100.000 ns"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="172"></NameColumnWidth>
-      <ValueColumnWidth column_width="108"></ValueColumnWidth>
+      <ValueColumnWidth column_width="64"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="24" />
+   <WVObjectSize size="27" />
+   <wave_markers>
+      <marker time="120000" label="" />
+   </wave_markers>
    <wvobject fp_name="/tb_trgSampler/rst" type="logic">
       <obj_property name="ElementShortName">rst</obj_property>
       <obj_property name="ObjectShortName">rst</obj_property>
@@ -52,17 +55,25 @@
       <obj_property name="ElementShortName">[0]</obj_property>
       <obj_property name="ObjectShortName">[0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/tb_trgSampler/evtTrigger" type="logic">
-      <obj_property name="ElementShortName">evtTrigger</obj_property>
-      <obj_property name="ObjectShortName">evtTrigger</obj_property>
+   <wvobject fp_name="/tb_trgSampler/trgEdge10nsInst/signalIn" type="logic">
+      <obj_property name="ElementShortName">signalIn</obj_property>
+      <obj_property name="ObjectShortName">signalIn</obj_property>
    </wvobject>
-   <wvobject fp_name="/tb_trgSampler/trgEdge10nsInst/ff1" type="logic">
-      <obj_property name="ElementShortName">ff1</obj_property>
-      <obj_property name="ObjectShortName">ff1</obj_property>
+   <wvobject fp_name="/tb_trgSampler/trgEdge10nsInst/sync" type="logic">
+      <obj_property name="ElementShortName">sync</obj_property>
+      <obj_property name="ObjectShortName">sync</obj_property>
    </wvobject>
-   <wvobject fp_name="/tb_trgSampler/trgEdge10nsInst/ff2" type="logic">
-      <obj_property name="ElementShortName">ff2</obj_property>
-      <obj_property name="ObjectShortName">ff2</obj_property>
+   <wvobject fp_name="/tb_trgSampler/trgEdge10nsInst/ff" type="array">
+      <obj_property name="ElementShortName">ff[2:0]</obj_property>
+      <obj_property name="ObjectShortName">ff[2:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_trgSampler/trgEdge10nsInst/edgeOut" type="logic">
+      <obj_property name="ElementShortName">edgeOut</obj_property>
+      <obj_property name="ObjectShortName">edgeOut</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_trgSampler/trgEdge10nsInst/syncOut" type="logic">
+      <obj_property name="ElementShortName">syncOut</obj_property>
+      <obj_property name="ObjectShortName">syncOut</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_trgSampler/uut/rData[2]" type="array">
       <obj_property name="ElementShortName">[2][31:0]</obj_property>
@@ -79,6 +90,10 @@
    <wvobject fp_name="/tb_trgSampler/uut/sampledTrg" type="array">
       <obj_property name="ElementShortName">sampledTrg[0:127][31:0]</obj_property>
       <obj_property name="ObjectShortName">sampledTrg[0:127][31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_trgSampler/evtTrigger" type="logic">
+      <obj_property name="ElementShortName">evtTrigger</obj_property>
+      <obj_property name="ObjectShortName">evtTrigger</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_trgSampler/uut/cntNSAftTrgSig" type="logic">
       <obj_property name="ElementShortName">cntNSAftTrgSig</obj_property>
