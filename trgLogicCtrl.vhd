@@ -33,6 +33,10 @@ port(
     id         : in  std_logic_vector(2 downto 0);
     t1In       : in  std_logic_vector(t1Len-1 downto 0);
     t2In       : in  std_logic_vector(t2Len-1 downto 0);
+    t1Sync     : out std_logic_vector(t1Len-1 downto 0);
+    t1Edge     : out std_logic_vector(t1Len-1 downto 0);
+    t2Sync     : out std_logic_vector(t2Len-1 downto 0);
+    t2Edge     : out std_logic_vector(t2Len-1 downto 0);
     nExtFF     : out std_logic_vector(bitsNum(extenderFF,1)-1 downto 0);
     devExec    : in  std_logic;
     devId      : in  devices_t;
@@ -73,5 +77,34 @@ constant errAddrStatus  : std_logic_vector(31 downto 0) := initSlv(32, 13, 0, "1
 constant errROnlyStatus : std_logic_vector(31 downto 0) := initSlv(32, 13, 0, "11" & x"A00", '0');
 
 begin
+
+
+inTrg1Sync: entity work.trgSync
+generic map(
+    trgNum     => T_1'length,
+    extenderFF => trgExtFF
+)
+port map(
+    clk    => clk,
+    rst    => rst,
+    tIn    => t1In,
+    tOut   => t1Sync,
+    tEdge  => t1Edge,
+    nExtFF => nExtFF
+);
+
+inTrg2Sync: entity work.trgSync
+generic map(
+    trgNum     => T_2'length,
+    extenderFF => trgExtFF
+)
+port map(
+    clk    => clk,
+    rst    => rst,
+    tIn    => t2In,
+    tOut   => t2Sync,
+    tEdge  => t2Edge,
+    nExtFF => nExtFF
+);
 
 end Behavioral;

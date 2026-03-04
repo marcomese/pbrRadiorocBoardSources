@@ -101,9 +101,9 @@ architecture arch of radioroc_fw is
 	       T_1FF0, T_2FF0,
 	       T_1FF1, T_2FF1,
 	       T_1FF2, T_2FF2,
-	       T_1Sync, T_2Sync,
-	       tEdge1, tEdge2 : std_logic_vector(63 downto 0);
-	signal tEdge21, TBuf21 : std_logic_vector(127 downto 0);
+	       t1Sync, T2Sync,
+	       t1Edge, t2Edge : std_logic_vector(63 downto 0);
+	signal t21Edge, T21Buf : std_logic_vector(127 downto 0);
 	-- Clock and reset
 	signal reset, locked_1, locked_2, locked_3                               : std_logic;
 	signal clk_2M, clk_10M, clk_50M, clk_100M, clk_200M : std_logic;
@@ -157,7 +157,8 @@ signal   dataToDev,
          dataFromRadioroc,
          dataFromAcq,
          dataFromRM,
-         dataFromTSmpl     : devData_t;
+         dataFromTSmpl,
+         dataFromTrgLogic  : devData_t;
 signal   devDataInVec      : devDataVec_t;
 signal   devReadyVec,
          devBusyVec,
@@ -171,6 +172,7 @@ signal   devReadyPGen,
          devReadyAcq,
          devReadyRM,
          devReadyTSmpl,
+         devReadyTrgLogic,
          devRw,
          devBrst,
          devBrstWrt,
@@ -182,12 +184,14 @@ signal   devReadyPGen,
          devBusyAcq,
          devBusyRM,
          devBusyTSmpl,
+         devBusyTrgLogic,
          devBrstRstPGen,
          devBrstRstTmp,
          devBrstRstRadioroc,
          devBrstRstAcq,
          devBrstRstRM,
          devBrstRstTSmpl,
+         devBrstRstTrgLogic,
          devIntBusy,
          pulseSig,
          pulsingSig,
@@ -266,43 +270,15 @@ nCMOS         <= '1';
 
 n_reset_i2c   <= en_clki2c and npwr_reset;
 
-tEdge21       <= tEdge2 & tEdge1;
+t21Edge       <= t2Edge & t1Edge;
 
-TBuf21        <= T_2Buf & T_1Buf;
+T21Buf        <= T_2Buf & T_1Buf;
 
 dbgOut        <= (others => '0');
 
 ADC_SCKHG     <= adc_sck;
 
 ADC_SCKLG     <= adc_sck;
-
-inTrg1Sync: entity work.trgSync
-generic map(
-    trgNum     => T_1'length,
-    extenderFF => trgExtFF
-)
-port map(
-    clk    => clk_200M,
-    rst    => reset,
-    tIn    => T_1,
-    tOut   => T_1Sync,
-    tEdge  => tEdge1,
-    nExtFF => nExtFF
-);
-
-inTrg2Sync: entity work.trgSync
-generic map(
-    trgNum     => T_2'length,
-    extenderFF => trgExtFF
-)
-port map(
-    clk    => clk_200M,
-    rst    => reset,
-    tIn    => T_2,
-    tOut   => T_2Sync,
-    tEdge  => tEdge2,
-    nExtFF => nExtFF
-);
 
 extTrgFF  <= '0';
 extTrgSig <= '0';
@@ -319,6 +295,37 @@ extTrgSig <= '0';
 --        end if;
 --    end if;
 --end process;
+
+trgLogicInst: entity work.trgLogicCtrl
+generic map(
+    t1Len      => T_1Buf'length,
+    t2Len      => T_2Buf'length,
+    extenderFF => trgExtFF
+)
+port map(
+    clk        => clk_200M,
+    rst        => reset,
+    id         => id,
+    t1In       => T_1Buf,
+    t2In       => T_2Buf,
+    t1Sync     => T1Sync,
+    t1Edge     => t1Edge,
+    t2Sync     => t2Sync,
+    t2Edge     => t2Edge,
+    nExtFF     => nExtFF,
+    devExec    => devExec,
+    devId      => devId,
+    devRw      => devRw,
+    devBrst    => devBrst,
+    devBrstWrt => devBrstWrt,
+    devBrstSnd => devBrstSnd,
+    devBrstRst => devBrstRstTrgLogic,
+    devAddr    => devAddr,
+    devDataIn  => dataToDev,
+    devDataOut => dataFromTrgLogic,
+    devReady   => devReadyTrgLogic,
+    busy       => devBusyTrgLogic
+);
 
 IOs : entity xil_defaultlib.IO
 port map(
@@ -404,7 +411,7 @@ port map(
     NORT2 	 => sc_NORT2,
     NORTQ    => sc_NORTQ,
     nb_acq   => nb_acq,
-    t		 => T_1Sync,
+    t		 => T1Sync,
     sel_adc => sel_adc,
     rd_en 	 => rd_acq,
     dout 	 => dout_acq,
@@ -430,14 +437,14 @@ port map(
 
 trgSamplerInst: entity work.trgSamplerCtrl
 generic map(
-    trgNum        => TBuf21'length,
+    trgNum        => T21Buf'length,
     nSAfterTrgDef => 16
 )
 port map(
     clk        => clk_200M,
     rst        => reset,
     evtTrigger => evtTrigger,
-    trgIn      => TBuf21,
+    trgIn      => T21Buf,
     devExec    => devExec,
     devId      => devId,
     devRw      => devRw,
@@ -454,12 +461,12 @@ port map(
 
 rateMetersInst: entity work.rateMetersCtrl
 generic map(
-    trgNum     => tEdge21'length
+    trgNum     => t21Edge'length
 )
 port map(
     clk        => clk_200M,
     rst        => reset,
-    trgIn      => tEdge21,
+    trgIn      => t21Edge,
     devExec    => devExec,
     devId      => devId,
     devRw      => devRw,
@@ -635,6 +642,7 @@ devDataInVec(radioroc)  <= dataFromRadioroc;
 devDataInVec(acqSystem) <= dataFromAcq;
 devDataInVec(rateMeters)<= dataFromRM;
 devDataInVec(trgSampler)<= dataFromTSmpl;
+devDataInVec(trgLogic)  <= dataFromTrgLogic;
 
 devReadyVec(pulseGen)   <= devReadyPGen;
 devReadyVec(tmp275)     <= devReadyTmp;
@@ -642,6 +650,7 @@ devReadyVec(radioroc)   <= devReadyRadioroc;
 devReadyVec(acqSystem)  <= devReadyAcq;
 devReadyVec(rateMeters) <= devReadyRM;
 devReadyVec(trgSampler) <= devReadyTSmpl;
+devReadyVec(trgLogic)   <= devReadyTrgLogic;
 
 devBusyVec(pulseGen)    <= devBusyPGen;
 devBusyVec(tmp275)      <= devBusyTmp;
@@ -649,6 +658,7 @@ devBusyVec(radioroc)    <= devBusyRadioroc;
 devBusyVec(acqSystem)   <= devBusyAcq;
 devBusyVec(rateMeters)  <= devBusyRM;
 devBusyVec(trgSampler)  <= devBusyTSmpl;
+devBusyVec(trgLogic)    <= devBusyTrgLogic;
 
 devBrstRst(pulseGen)    <= devBrstRstPGen;
 devBrstRst(tmp275)      <= devBrstRstTmp;
@@ -656,6 +666,7 @@ devBrstRst(radioroc)    <= devBrstRstRadioroc;
 devBrstRst(acqSystem)   <= devBrstRstAcq;
 devBrstRst(rateMeters)  <= devBrstRstRM;
 devBrstRst(trgSampler)  <= devBrstRstTSmpl;
+devBrstRst(trgLogic)    <= devBrstRstTrgLogic;
 
 devInterfInst: entity work.deviceInterface
 generic map(
