@@ -28,6 +28,7 @@ set_property IOSTANDARD LVCMOS25 [get_ports nCMOS]
 set_property IOSTANDARD LVCMOS33 [get_ports npwr_reset]
 set_property IOSTANDARD LVCMOS33 [get_ports SCL_275]
 set_property IOSTANDARD LVCMOS33 [get_ports SDA_275]
+set_property IOSTANDARD LVCMOS33 [get_ports id[*]]
 set_property IOSTANDARD LVCMOS12 [get_ports sc_NORT1]
 set_property IOSTANDARD LVCMOS12 [get_ports sc_NORT2]
 set_property IOSTANDARD LVCMOS12 [get_ports sc_NORTQ]
@@ -213,6 +214,10 @@ set_property PACKAGE_PIN J16 [get_ports nCMOS]
 
 set_property PACKAGE_PIN N15 [get_ports SCL_275]
 set_property PACKAGE_PIN AB22 [get_ports SDA_275]
+
+set_property PACKAGE_PIN Y18 [get_ports {id[0]}]
+set_property PACKAGE_PIN Y19 [get_ports {id[1]}]
+set_property PACKAGE_PIN V18 [get_ports {id[2]}]
 
 set_property PACKAGE_PIN R4 [get_ports {dbgOut[7]}]
 set_property PACKAGE_PIN T4 [get_ports {dbgOut[6]}]

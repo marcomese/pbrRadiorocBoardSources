@@ -70,6 +70,8 @@ entity radioroc_fw is
         miso_p        : out std_logic;
         miso_n        : out std_logic;
 
+        id            : in  std_logic_vector(2 downto 0);
+
         dbgOut        : out std_logic_vector(7 downto 0);
 
 		extTrg        : in std_logic

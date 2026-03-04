@@ -25,7 +25,8 @@ package devicesPkg is
                        dataReg,
                        acqSystem,
                        rateMeters,
-                       trgSampler);
+                       trgSampler,
+                       trgLogic);
 
     constant  devDataBytes : integer   := 4;
     constant  devAddrBytes : integer   := 2;
