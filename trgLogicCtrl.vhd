@@ -1,7 +1,7 @@
 ----------------------------------------------------------------------------------
 -- PBR Cherenkov Telescope MPPC acquisition board
 --
--- Module Name: rateMetersCtrl
+-- Module Name: trgLogicCtrl
 -- Create Date: 02.03.2026 15:50:25
 -- Target Devices: Artix 7 xc7a200tfbg484-2
 --
@@ -73,6 +73,5 @@ constant errAddrStatus  : std_logic_vector(31 downto 0) := initSlv(32, 13, 0, "1
 constant errROnlyStatus : std_logic_vector(31 downto 0) := initSlv(32, 13, 0, "11" & x"A00", '0');
 
 begin
-
 
 end Behavioral;
