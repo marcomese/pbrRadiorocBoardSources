@@ -312,7 +312,6 @@ port map(
     t1Edge     => t1Edge,
     t2Sync     => t2Sync,
     t2Edge     => t2Edge,
-    nExtFF     => nExtFF,
     devExec    => devExec,
     devId      => devId,
     devRw      => devRw,

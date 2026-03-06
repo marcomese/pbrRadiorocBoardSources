@@ -2,38 +2,68 @@ library ieee;
 use ieee.std_logic_1164.all;
 
 package pixelMappingPkg is
-    type pixelmap_t is array (0 to 7, 0 to 7) of integer range 0 to 63;
+   constant nRows : integer := 8;
 
-    type pixelCols_t is (pA, pB, pC, pD, pE, pF, pG, pH);
+   constant nCols : integer := 8;
 
-    type pixelRows_t is (p1, p2, p3, p4, p5, p6, p7, p8);
+   type pixelmap_t is array(integer range <>, integer range <>)  of integer range 0 to (nRows*nCols)-1;
 
-    constant pixelmap : pixelmap_t := (
-        (53, 58, 13, 26, 31,  8,  4, 23),
-        (51, 44, 39, 52, 56,  7, 11,  1),
-        (62, 47, 61, 63, 32, 10,  6,  5),
-        (57, 54, 55, 59, 30,  3,  2,  0),
-        (49, 50, 46, 38, 36, 25, 18,  9),
-        (43, 40, 60, 27, 28, 17, 16, 15),
-        (45, 41, 42, 22, 24, 37, 14, 12),
-        (48, 33, 35, 34, 29, 21, 20, 19)
+   type pixels_t is array(integer range <>, integer range <>)  of std_logic;
+
+   constant pixelmap : pixelmap_t(0 to nRows-1, 0 to nCols-1) := (
+        (53, 51, 62, 57, 49, 43, 45, 48),
+        (58, 44, 47, 54, 50, 40, 41, 33),
+        (13, 39, 61, 55, 46, 60, 42, 35),
+        (26, 52, 63, 59, 38, 27, 22, 34),
+        (31, 56, 32, 30, 36, 28, 24, 29),
+        ( 8,  7, 10,  3, 25, 17, 37, 21),
+        ( 4, 11,  6,  2, 18, 16, 14, 20),
+        (23,  1,  5,  0,  9, 15, 12, 19)
     );
 
-    function pixel(c: pixelCols_t; r: pixelRows_t) return integer;
+   function "and"(a : pixels_t; b : pixels_t) return pixels_t;
 
-    function pixel(c: integer; r: integer) return integer;
+   function initPixels(rows: integer := nRows; cols: integer := nCols; initVal: std_logic := '0') return pixels_t;
 
+   function slvToPixels(slv:  std_logic_vector;
+                        rows: integer := nRows;
+                        cols: integer := nCols) return pixels_t;
 end package pixelMappingPkg;
 
 package body pixelMappingPkg is
+   function "and"(a : pixels_t; b : pixels_t) return pixels_t is
+       variable result : pixels_t;
+   begin
+       for r in 0 to nRows-1 loop
+           for c in 0 to nCols-1 loop
+               result(r, c) := a(r, c) and b(r, c);
+           end loop;
+       end loop;
+       return result;
+   end function;
 
-    function pixel(c: pixelCols_t; r: pixelRows_t) return integer is
-    begin
-        return pixelmap(pixelCols_t'pos(c), pixelRows_t'pos(r)-1);
-    end function;
+   function initPixels(rows: integer := nRows; cols: integer := nCols; initVal: std_logic := '0') return pixels_t is
+       variable result : pixels_t;
+   begin
+       for r in 0 to rows-1 loop
+           for c in 0 to cols-1 loop
+               result(r, c) := initVal;
+           end loop;
+       end loop;
+       return result;
+   end function;
 
-    function pixel(c: integer; r: integer) return integer is
+   function slvToPixels(slv:  std_logic_vector;
+                        rows: integer := nRows;
+                        cols: integer := nCols) return pixels_t is
+        variable res : pixels_t(0 to rows-1, 0 to cols-1);
     begin
-        return pixelmap(c, r-1);
+        for r in 0 to rows-1 loop
+            for c in 0 to cols-1 loop
+                res(r, c) := slv(pixelmap(r, c));
+            end loop;
+        end loop;
+
+        return res;
     end function;
 end package body pixelMappingPkg;
