@@ -95,12 +95,6 @@ signal cntNSAftTrgSig,
        cntNSAftTrgSet,
        cntNSAftTrgEn   : std_logic;
 
-attribute mark_debug : string;
-attribute mark_debug of cntNSAfterTrg : signal is "true";
-
-attribute mark_debug of evtTrigger,
-                        cntNSAftTrgSig : signal is "true";
-
 begin
 
 dAddr          <= devAddrToInt(devAddr);

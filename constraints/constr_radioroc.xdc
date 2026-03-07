@@ -230,35 +230,3 @@ set_property PACKAGE_PIN V5 [get_ports {dbgOut[0]}]
 
 set_property BITSTREAM.CONFIG.CONFIGRATE 50 [current_design]
 set_property BITSTREAM.GENERAL.COMPRESS TRUE [current_design]
-
-
-create_debug_core u_ila_0 ila
-set_property ALL_PROBE_SAME_MU true [get_debug_cores u_ila_0]
-set_property ALL_PROBE_SAME_MU_CNT 1 [get_debug_cores u_ila_0]
-set_property C_ADV_TRIGGER false [get_debug_cores u_ila_0]
-set_property C_DATA_DEPTH 65536 [get_debug_cores u_ila_0]
-set_property C_EN_STRG_QUAL false [get_debug_cores u_ila_0]
-set_property C_INPUT_PIPE_STAGES 0 [get_debug_cores u_ila_0]
-set_property C_TRIGIN_EN false [get_debug_cores u_ila_0]
-set_property C_TRIGOUT_EN false [get_debug_cores u_ila_0]
-set_property port_width 1 [get_debug_ports u_ila_0/clk]
-connect_debug_port u_ila_0/clk [get_nets [list pll1/inst/clk_out5]]
-set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe0]
-set_property port_width 64 [get_debug_ports u_ila_0/probe0]
-connect_debug_port u_ila_0/probe0 [get_nets [list {T_1Buf[0]} {T_1Buf[1]} {T_1Buf[2]} {T_1Buf[3]} {T_1Buf[4]} {T_1Buf[5]} {T_1Buf[6]} {T_1Buf[7]} {T_1Buf[8]} {T_1Buf[9]} {T_1Buf[10]} {T_1Buf[11]} {T_1Buf[12]} {T_1Buf[13]} {T_1Buf[14]} {T_1Buf[15]} {T_1Buf[16]} {T_1Buf[17]} {T_1Buf[18]} {T_1Buf[19]} {T_1Buf[20]} {T_1Buf[21]} {T_1Buf[22]} {T_1Buf[23]} {T_1Buf[24]} {T_1Buf[25]} {T_1Buf[26]} {T_1Buf[27]} {T_1Buf[28]} {T_1Buf[29]} {T_1Buf[30]} {T_1Buf[31]} {T_1Buf[32]} {T_1Buf[33]} {T_1Buf[34]} {T_1Buf[35]} {T_1Buf[36]} {T_1Buf[37]} {T_1Buf[38]} {T_1Buf[39]} {T_1Buf[40]} {T_1Buf[41]} {T_1Buf[42]} {T_1Buf[43]} {T_1Buf[44]} {T_1Buf[45]} {T_1Buf[46]} {T_1Buf[47]} {T_1Buf[48]} {T_1Buf[49]} {T_1Buf[50]} {T_1Buf[51]} {T_1Buf[52]} {T_1Buf[53]} {T_1Buf[54]} {T_1Buf[55]} {T_1Buf[56]} {T_1Buf[57]} {T_1Buf[58]} {T_1Buf[59]} {T_1Buf[60]} {T_1Buf[61]} {T_1Buf[62]} {T_1Buf[63]}]]
-create_debug_port u_ila_0 probe
-set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe1]
-set_property port_width 17 [get_debug_ports u_ila_0/probe1]
-connect_debug_port u_ila_0/probe1 [get_nets [list {trgSamplerInst/cntNSAfterTrg[0]} {trgSamplerInst/cntNSAfterTrg[1]} {trgSamplerInst/cntNSAfterTrg[2]} {trgSamplerInst/cntNSAfterTrg[3]} {trgSamplerInst/cntNSAfterTrg[4]} {trgSamplerInst/cntNSAfterTrg[5]} {trgSamplerInst/cntNSAfterTrg[6]} {trgSamplerInst/cntNSAfterTrg[7]} {trgSamplerInst/cntNSAfterTrg[8]} {trgSamplerInst/cntNSAfterTrg[9]} {trgSamplerInst/cntNSAfterTrg[10]} {trgSamplerInst/cntNSAfterTrg[11]} {trgSamplerInst/cntNSAfterTrg[12]} {trgSamplerInst/cntNSAfterTrg[13]} {trgSamplerInst/cntNSAfterTrg[14]} {trgSamplerInst/cntNSAfterTrg[15]} {trgSamplerInst/cntNSAfterTrg[16]}]]
-create_debug_port u_ila_0 probe
-set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe2]
-set_property port_width 1 [get_debug_ports u_ila_0/probe2]
-connect_debug_port u_ila_0/probe2 [get_nets [list trgSamplerInst/cntNSAftTrgSig]]
-create_debug_port u_ila_0 probe
-set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe3]
-set_property port_width 1 [get_debug_ports u_ila_0/probe3]
-connect_debug_port u_ila_0/probe3 [get_nets [list trgSamplerInst/evtTrigger]]
-set_property C_CLK_INPUT_FREQ_HZ 300000000 [get_debug_cores dbg_hub]
-set_property C_ENABLE_CLK_DIVIDER false [get_debug_cores dbg_hub]
-set_property C_USER_SCAN_CHAIN 1 [get_debug_cores dbg_hub]
-connect_debug_port dbg_hub/clk [get_nets clk_200M]
