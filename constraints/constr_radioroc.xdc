@@ -25,6 +25,7 @@ set_property INTERNAL_VREF 0.6 [get_iobanks 35]
 set_property IOSTANDARD LVCMOS25 [get_ports nCNV]
 set_property IOSTANDARD LVCMOS25 [get_ports nCMOS]
 set_property IOSTANDARD LVCMOS33 [get_ports npwr_reset]
+set_property IOSTANDARD LVCMOS33 [get_ports id[*]]
 set_property IOSTANDARD LVCMOS33 [get_ports SCL_275]
 set_property IOSTANDARD LVCMOS33 [get_ports SDA_275]
 set_property IOSTANDARD LVCMOS12 [get_ports sc_NORT1]
@@ -51,6 +52,10 @@ set_property PACKAGE_PIN V4 [get_ports sysClk_p]
 set_property PACKAGE_PIN W4 [get_ports sysClk_n]
 
 set_property PACKAGE_PIN AB21 [get_ports npwr_reset]
+
+set_property PACKAGE_PIN Y18 [get_ports id[0]]
+set_property PACKAGE_PIN Y19 [get_ports id[1]]
+set_property PACKAGE_PIN V18 [get_ports id[2]]
 
 #RADIOROC
 set_property PACKAGE_PIN T14 [get_ports sc_scl]

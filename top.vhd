@@ -19,6 +19,8 @@ entity radioroc_fw is
 		sysClk_n    : in std_logic;
 		npwr_reset    : in std_logic;
 
+        id            : in std_logic_vector(2 downto 0);
+
 		sc_scl        : inout std_logic;
 		sc_sda        : inout std_logic;
 		sc_clk_sm     : out   std_logic;
