@@ -19,6 +19,10 @@ architecture Behavioral of edgeDetector is
 signal ff1,
        ff2 : std_logic;
 
+attribute ASYNC_REG : string;
+attribute ASYNC_REG of ff1,
+                       ff2   : signal is "true";
+
 begin
 
 risingEdgeGen: if edge = "rising" generate

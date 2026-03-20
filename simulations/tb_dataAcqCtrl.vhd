@@ -78,6 +78,8 @@ component deviceInterface is
 generic(
     clkFreq     : real;
     timeout     : real;
+    idHeader    : std_logic_vector(3 downto 0);
+    broadcastId : std_logic_vector(3 downto 0);
     readCmd     : std_logic_vector(3 downto 0);
     writeCmd    : std_logic_vector(3 downto 0);
     burstWrCmd  : std_logic_vector(3 downto 0);
@@ -87,6 +89,7 @@ generic(
 port(
     clk         : in  std_logic;
     rst         : in  std_logic;
+    id          : in  std_logic_vector(3 downto 0);
     dataIn      : in  std_logic_vector(7 downto 0);
     dataOut     : out std_logic_vector(7 downto 0);
     rxRead      : out std_logic;
@@ -190,6 +193,8 @@ constant clkPeriod25M  : time                         := 40 ns;
 constant clkFreq       : real                         := 100.0e6;
 constant sclkFreq      : real                         := 20.0e6;
 constant timeout       : real                         := 1.0;
+constant idHeader      : std_logic_vector(3 downto 0) := x"7";
+constant broadcastId   : std_logic_vector(3 downto 0) := x"F";
 constant readCmd       : std_logic_vector(3 downto 0) := x"A";
 constant writeCmd      : std_logic_vector(3 downto 0) := x"5";
 constant burstWrCmd    : std_logic_vector(3 downto 0) := x"3";
@@ -271,6 +276,7 @@ signal dataToMaster,
        testData,
        dataFromMaster : std_logic_vector(7 downto 0)  := (others => '0');
 signal rdDataCnt      : std_logic_vector(15 downto 0) := (others => '0');
+signal id             : std_logic_vector(3 downto 0) := (others => '0');
 
 begin
 
@@ -279,10 +285,17 @@ begin
     rst <= '1';
     wait for clkPeriod100M*5;
     rst <= '0';
-    wait for clkPeriod100M*5;
+    id  <= "0110";
+    wait for clkPeriod200M*5;
 
     wait for 350 ns;
 
+    testDataIn <= x"73";
+    wait for clkPeriod200M*delay;
+    testTxWrite <= '1';
+    wait for clkPeriod200M;
+    testTxWrite <= '0';
+    wait for clkPeriod200M*delay;
     testDataIn <= x"55";
     wait for clkPeriod100M*delay;
     testTxWrite <= '1';
@@ -298,6 +311,38 @@ begin
     testTxWrite <= '1';
     wait for clkPeriod100M;
     testTxWrite <= '0';
+    testDataIn <= x"AC";
+    testTxWrite <= '1';
+    wait for clkPeriod200M;
+    testTxWrite <= '0';
+    testDataIn <= x"80";
+    testTxWrite <= '1';
+    wait for clkPeriod200M;
+    testTxWrite <= '0';
+    testDataIn <= x"EF";
+    testTxWrite <= '1';
+    wait for clkPeriod200M;
+    testTxWrite <= '0';
+    testDataIn <= x"12";
+    testTxWrite <= '1';
+    wait for clkPeriod200M;
+    testTxWrite <= '0';
+    wait for clkPeriod200M*delay;
+
+    wait for 5 us;
+
+    testDataIn <= x"76";
+    wait for clkPeriod200M*delay;
+    testTxWrite <= '1';
+    wait for clkPeriod200M;
+    testTxWrite <= '0';
+    wait for clkPeriod200M*delay;
+    testDataIn <= x"A5";
+    wait for clkPeriod200M*delay;
+    testTxWrite <= '1';
+    wait for clkPeriod200M;
+    testTxWrite <= '0';
+    wait for clkPeriod200M*delay;
     testDataIn <= x"00";
     testTxWrite <= '1';
     wait for clkPeriod100M;
@@ -320,6 +365,12 @@ begin
 
     testRxRead <= '1';
 
+    testDataIn <= x"76";
+    wait for clkPeriod200M*delay;
+    testTxWrite <= '1';
+    wait for clkPeriod200M;
+    testTxWrite <= '0';
+    wait for clkPeriod200M*delay;
     testDataIn <= x"55";
     wait for clkPeriod100M*delay;
     testTxWrite <= '1';
@@ -361,6 +412,12 @@ begin
 
     wait for 100 us;
 
+    testDataIn <= x"76";
+    wait for clkPeriod200M*delay;
+    testTxWrite <= '1';
+    wait for clkPeriod200M;
+    testTxWrite <= '0';
+    wait for clkPeriod200M*delay;
     testDataIn <= x"b5";
     wait for clkPeriod100M*delay;
     testTxWrite <= '1';
@@ -396,6 +453,12 @@ begin
 
     wait for 600 us;
 
+    testDataIn <= x"76";
+    wait for clkPeriod200M*delay;
+    testTxWrite <= '1';
+    wait for clkPeriod200M;
+    testTxWrite <= '0';
+    wait for clkPeriod200M*delay;
     testDataIn <= x"b5";
     wait for clkPeriod100M*delay;
     testTxWrite <= '1';
@@ -510,6 +573,8 @@ devInterfInst: deviceInterface
 generic map(
     clkFreq      => clkFreq,
     timeout      => timeout,
+    idHeader     => idHeader,
+    broadcastId  => broadcastId,
     readCmd      => readCmd,
     writeCmd     => writeCmd,
     burstWrCmd   => burstWrCmd,
@@ -519,6 +584,7 @@ generic map(
 port map(
     clk          => clk_100M,
     rst          => rst,
+    id           => id,
     dataIn       => dataFromMaster,
     dataOut      => dataToMaster,
     rxRead       => rxRead,

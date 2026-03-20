@@ -16,15 +16,18 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="210,285.000 ns"></ZoomStartTime>
-      <ZoomEndTime time="218,295.001 ns"></ZoomEndTime>
-      <Cursor1Time time="214,135.000 ns"></Cursor1Time>
+      <ZoomStartTime time="0.000000 us"></ZoomStartTime>
+      <ZoomEndTime time="12.000003 us"></ZoomEndTime>
+      <Cursor1Time time="0.845100 us"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
-      <NameColumnWidth column_width="168"></NameColumnWidth>
+      <NameColumnWidth column_width="219"></NameColumnWidth>
       <ValueColumnWidth column_width="58"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="78" />
+   <WVObjectSize size="102" />
+   <wave_markers>
+      <marker time="5505000" label="" />
+   </wave_markers>
    <wvobject fp_name="/tb_dataAcqCtrl/clk_100M" type="logic">
       <obj_property name="ElementShortName">clk_100M</obj_property>
       <obj_property name="ObjectShortName">clk_100M</obj_property>
@@ -351,6 +354,39 @@
    <wvobject fp_name="/tb_dataAcqCtrl/dataAcqCtrlInst/nbAcqSig" type="array">
       <obj_property name="ElementShortName">nbAcqSig[7:0]</obj_property>
       <obj_property name="ObjectShortName">nbAcqSig[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/validId" type="logic">
+      <obj_property name="ElementShortName">validId</obj_property>
+      <obj_property name="ObjectShortName">validId</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/rwSig" type="logic">
+      <obj_property name="ElementShortName">rwSig</obj_property>
+      <obj_property name="ObjectShortName">rwSig</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/brstSig" type="logic">
+      <obj_property name="ElementShortName">brstSig</obj_property>
+      <obj_property name="ObjectShortName">brstSig</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/validSig" type="logic">
+      <obj_property name="ElementShortName">validSig</obj_property>
+      <obj_property name="ObjectShortName">validSig</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/state" type="other">
+      <obj_property name="ElementShortName">state</obj_property>
+      <obj_property name="ObjectShortName">state</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/devAddr" type="array">
+      <obj_property name="ElementShortName">devAddr[1:0][7:0]</obj_property>
+      <obj_property name="ObjectShortName">devAddr[1:0][7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/devDataIn" type="array">
+      <obj_property name="ElementShortName">devDataIn[0:7][3:0][7:0]</obj_property>
+      <obj_property name="ObjectShortName">devDataIn[0:7][3:0][7:0]</obj_property>
+      <obj_property name="isExpanded"></obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/devDataOut" type="array">
+      <obj_property name="ElementShortName">devDataOut[3:0][7:0]</obj_property>
+      <obj_property name="ObjectShortName">devDataOut[3:0][7:0]</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_dataAcqCtrl/cs" type="logic">
       <obj_property name="ElementShortName">cs</obj_property>

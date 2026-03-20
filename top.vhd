@@ -83,7 +83,6 @@ architecture arch of radioroc_fw is
 	signal T_1Buf, T_2Buf,
 	       T_1FF0, T_2FF0,
 	       T_1FF1, T_2FF1,
-	       T_1FF2, T_2FF2,
 	       T_1Sync, T_2Sync,
 	       tEdge1, tEdge2 : std_logic_vector(63 downto 0);
 	signal tEdge21, TBuf21 : std_logic_vector(127 downto 0);
@@ -123,11 +122,13 @@ constant tmpAddr        : std_logic_vector(6 downto 0) := "1001000";
 constant sipmHvAddr     : std_logic_vector(6 downto 0) := "1110011";
 constant chipID         : std_logic_vector(3 downto 0) := "0000";
 
-constant readCmd    : std_logic_vector(3 downto 0) := x"A";
-constant writeCmd   : std_logic_vector(3 downto 0) := x"5";
-constant burstWrCmd : std_logic_vector(3 downto 0) := x"3";
-constant burstRdCmd : std_logic_vector(3 downto 0) := x"B";
-constant maxBrstLen : integer                      := 512;
+constant idHeader    : std_logic_vector(3 downto 0) := x"7";
+constant broadcastId : std_logic_vector(3 downto 0) := x"F";
+constant readCmd     : std_logic_vector(3 downto 0) := x"A";
+constant writeCmd    : std_logic_vector(3 downto 0) := x"5";
+constant burstRdCmd  : std_logic_vector(3 downto 0) := x"B";
+constant burstWrCmd  : std_logic_vector(3 downto 0) := x"3";
+constant maxBrstLen  : integer                      := 512;
 
 constant rstRadI2CLen : integer := 5;
 
@@ -204,6 +205,8 @@ signal   dataToMaster,
 
 signal extTrgFF, extTrgSig : std_logic;
 
+signal idFF, idSync : std_logic_vector(3 downto 0);
+
 signal readRq,
        cs,
        sclk,
@@ -219,6 +222,12 @@ signal readRq,
 signal rstI2CCnt : unsigned(bitsNum(rstRadI2CLen) downto 0);
 
 signal endAcq, rdValid : std_logic;
+
+attribute ASYNC_REG : string;
+attribute ASYNC_REG of T_1FF0,
+                       T_2FF0,
+                       T_1Sync,
+                       T_2Sync : signal is "true";
 
 begin
 
@@ -254,24 +263,19 @@ syncIn: process(clk_200M, reset)
 begin
     if rising_edge(clk_200M) then
         if reset = '1' then
+            idFF    <= (others => '0');
+            idSync  <= (others => '0');
             T_1FF0  <= (others => '0');
-            T_1FF1  <= (others => '0');
-            T_1FF2  <= (others => '0');
             T_2FF0  <= (others => '0');
-            T_2FF1  <= (others => '0');
-            T_2FF2  <= (others => '0');
             T_1Sync <= (others => '0');
             T_2Sync <= (others => '0');
         else
-            T_1FF0 <= T_1Buf;
-            T_1FF1 <= T_1FF0;
-            T_1FF2 <= T_1FF1;
-            T_2FF0 <= T_2Buf;
-            T_2FF1 <= T_2FF0;
-            T_2FF2 <= T_2FF1;
-            
-            T_1Sync <= (T_1FF0 and T_1FF1) or (T_1FF1 and T_1FF2) or (T_1FF0 and T_1FF2);
-            T_2Sync <= (T_2FF0 and T_1FF1) or (T_2FF1 and T_2FF2) or (T_2FF0 and T_2FF2);
+            idFF    <= '0' & id;
+            idSync  <= idFF;
+            T_1FF0  <= T_1Buf;
+            T_1Sync <= T_1FF0;
+            T_2FF0  <= T_2Buf;
+            T_2Sync <= T_2FF0;
         end if;
     end if;
 end process;
@@ -715,17 +719,20 @@ devBrstRst(trgSampler)  <= devBrstRstTSmpl;
 
 devInterfInst: entity work.deviceInterface
 generic map(
-    clkFreq    => clkFreq,
-    timeout    => timeout,
-    readCmd    => readCmd,
-    writeCmd   => writeCmd,
-    burstWrCmd => burstWrCmd,
-    burstRdCmd => burstRdCmd,
-    maxBrstLen => maxBrstLen
+    clkFreq     => clkFreq,
+    timeout     => timeout,
+    idHeader    => idHeader,
+    broadcastId => broadcastId,
+    readCmd     => readCmd,
+    writeCmd    => writeCmd,
+    burstWrCmd  => burstWrCmd,
+    burstRdCmd  => burstRdCmd,
+    maxBrstLen  => maxBrstLen
 )
 port map(
     clk        => clk_200M,
     rst        => reset,
+    id         => idSync,
     dataIn     => dataFromMaster,
     dataOut    => dataToMaster,
     rxRead     => rxRead,

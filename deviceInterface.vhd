@@ -25,6 +25,8 @@ entity deviceInterface is
 generic(
     clkFreq     : real;
     timeout     : real;
+    idHeader    : std_logic_vector(3 downto 0);
+    broadcastId : std_logic_vector(3 downto 0);
     readCmd     : std_logic_vector(3 downto 0);
     writeCmd    : std_logic_vector(3 downto 0);
     burstWrCmd  : std_logic_vector(3 downto 0);
@@ -34,6 +36,7 @@ generic(
 port(
     clk         : in  std_logic;
     rst         : in  std_logic;
+    id          : in  std_logic_vector(3 downto 0);
     dataIn      : in  std_logic_vector(7 downto 0);
     dataOut     : out std_logic_vector(7 downto 0);
     rxRead      : out std_logic;
@@ -63,6 +66,7 @@ end deviceInterface;
 architecture Behavioral of deviceInterface is
 
 type state_t is (idle,
+                 getCmd,
                  getDev,
                  getAddr,
                  getData,
@@ -78,10 +82,12 @@ type state_t is (idle,
 
 constant tOut          : integer := integer(clkFreq*timeout);
 constant bytesNum      : integer := maxBrstLen;
+constant brdcstId      : std_logic_vector(7 downto 0) := idHeader & broadcastId;
 
 signal   state         : state_t;
 signal   tOutRst,
          tOutSig,
+         validId,
          rwSig,
          rxRdSig,
          brstSig,
@@ -106,6 +112,7 @@ signal   brstBuff      : byteArray_t(maxBrstLen-1 downto 0);
 signal   devDataOutSig : devData_t;
 signal   dataToFifoSel : std_logic_vector(1 downto 0);
 signal   dataToFifo    : std_logic_vector(7 downto 0);
+signal   idSig         : std_logic_vector(7 downto 0);
 
 begin
 
@@ -118,8 +125,20 @@ devDataOut  <= devDataOutSig;
 endCnt      <= byteCnt(byteCnt'left);
 tOutSig     <= tOutCnt(tOutCnt'left);
 lastBrst    <= not or_reduce(std_logic_vector(byteCnt(byteCnt'left downto 2)));
+idSig       <= idHeader & id;
 
-devRwDecProc: process(dataIn(7 downto 4))
+validIdMux: process(dataIn)
+begin
+    if dataIn = idSig then
+        validId <= '1';
+    elsif dataIn = brdcstId then
+        validId <= '1';
+    else
+        validId <= '0';
+    end if;
+end process;
+
+devRwDecMux: process(dataIn(7 downto 4))
 begin
     case dataIn(7 downto 4) is
         when readCmd =>
@@ -203,12 +222,24 @@ begin
 
                     state   <= idle;
 
+                    if rxPresent = '1' and validId = '1' then
+                        busy  <= '1';
+
+                        state <= getCmd;
+                    end if;
+
+                when getCmd =>
+                    tOutRst <= '0';
+                    rxRdSig <= rxPresent;
+
+                    state   <= getCmd;
+
                     if rxPresent = '1' and validSig = '1' then
+                        tOutRst       <= '1';
                         devRwSig      <= rwSig;
                         devBrstSig    <= brstSig;
                         dataToFifoSel <= rwSig & brstSig;
                         devIdSig      <= slvToDev(dataIn(3 downto 0));
-                        busy          <= '1';
                         error         <= (others => '0');
 
                         state         <= getDev;
