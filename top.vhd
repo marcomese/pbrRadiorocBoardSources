@@ -15,8 +15,8 @@ use work.devicesPkg.all;
 entity radioroc_fw is
 	port
 	(
-		CLK_100M_p    : in std_logic;
-		CLK_100M_n    : in std_logic;
+		sysClk_p    : in std_logic;
+		sysClk_n    : in std_logic;
 		npwr_reset    : in std_logic;
 
 		sc_scl        : inout std_logic;
@@ -70,8 +70,6 @@ entity radioroc_fw is
         miso_p        : out std_logic;
         miso_n        : out std_logic;
 
-        dbgOut        : out std_logic_vector(7 downto 0);
-
 		extTrg        : in std_logic
 	);
 end entity;
@@ -83,13 +81,10 @@ architecture arch of radioroc_fw is
      (-- Clock in ports
       -- Clock out ports
       clk_out1          : out    std_logic;
-      clk_out2          : out    std_logic;
-      clk_out3          : out    std_logic;
       -- Status and control signals
       reset             : in     std_logic;
       locked            : out    std_logic;
-      clk_in1_p         : in     std_logic;
-      clk_in1_n         : in     std_logic
+      clk_in1           : in     std_logic
      );
     end component;
 
@@ -104,9 +99,8 @@ architecture arch of radioroc_fw is
 	signal tEdge21, TBuf21 : std_logic_vector(127 downto 0);
 	-- Clock and reset
 	signal reset, locked_1, locked_2, locked_3                               : std_logic;
-	signal clk_2M, clk_10M, clk_50M, clk_100M, clk_200M : std_logic;
-	signal clk_500M : std_logic;
-	signal clk_100k                                                          : std_logic;
+	signal clk_10M, clk_100M, clk_200M : std_logic;
+	signal sysClkDS : std_logic;
 	-- I2C
 --	signal end_i2c, n_reset_i2c, rd55, wr_i2c, en_clki2c, sda_i, sda_o, sda_oen : std_logic;
     signal end_i2c, n_reset_i2c, rd55, wr_i2c, en_clki2c : std_logic;
@@ -256,8 +250,6 @@ tEdge21       <= tEdge2 & tEdge1;
 
 TBuf21        <= T_2Buf & T_1Buf;
 
-dbgOut        <= (others => '0');
-
 ADC_SCKHG     <= adc_sck;
 
 ADC_SCKLG     <= adc_sck;
@@ -361,14 +353,41 @@ port map(
     miso_n   => miso_n
 );
 
+sysClkIBUFDS: IBUFDS
+generic map(
+    DIFF_TERM    => TRUE, 
+    IBUF_LOW_PWR => FALSE,
+    IOSTANDARD   => "LVDS_25"
+)
+port map(
+    I  => sysClk_p,
+    IB => sysClk_n,
+    O  => sysClkDS
+);
+
+sysClkBUFG: BUFG
+port map(
+    I => sysClkDS,
+    O => clk_200M
+);
+
+BUFR_inst : BUFR
+generic map(
+    BUFR_DIVIDE => "2"
+)
+port map(
+    I   => clk_200M,
+    CE  => '1',
+    CLR => reset,
+    O   => clk_100M
+);
+
+
 pll1 : PLL_RADIOROC_1
 port map(
-    clk_in1_p  => CLK_100M_P,
-    clk_in1_n  => CLK_100M_N,
+    clk_in1  => clk_200M,
     reset    => reset,
     clk_out1 => clk_10M,
-    clk_out2 => clk_100M,
-    clk_out3 => clk_200M,
     locked   => locked_1
 );
 

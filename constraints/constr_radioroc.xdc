@@ -2,7 +2,7 @@ set_property IOSTANDARD LVDS_25 [get_ports ADC_*]
 set_property IOSTANDARD LVCMOS25 [get_ports {dbgOut[*]}]
 set_property IOSTANDARD HSUL_12 [get_ports {T_2[*]}]
 set_property IOSTANDARD HSUL_12 [get_ports {T_1[*]}]
-set_property IOSTANDARD LVDS_25 [get_ports CLK_*]
+set_property IOSTANDARD LVDS_25 [get_ports sysClk_*]
 set_property -dict {IOSTANDARD LVCMOS33 PACKAGE_PIN P19} [get_ports pulse]
 set_property -dict {IOSTANDARD LVCMOS33 PACKAGE_PIN AB18} [get_ports extTrg]
 set_property -dict {IOSTANDARD LVCMOS33 PACKAGE_PIN R17} [get_ports dacSDI]
@@ -48,8 +48,8 @@ set_property IOSTANDARD LVCMOS12 [get_ports sc_val_evt]
 
 # Package pins
 # Clock capable pins (MRCC / SRCC)
-set_property PACKAGE_PIN V4 [get_ports CLK_100M_p]
-set_property PACKAGE_PIN W4 [get_ports CLK_100M_n]
+set_property PACKAGE_PIN V4 [get_ports sysClk_p]
+set_property PACKAGE_PIN W4 [get_ports sysClk_n]
 
 set_property PACKAGE_PIN AB21 [get_ports npwr_reset]
 
@@ -214,19 +214,7 @@ set_property PACKAGE_PIN J16 [get_ports nCMOS]
 set_property PACKAGE_PIN N15 [get_ports SCL_275]
 set_property PACKAGE_PIN AB22 [get_ports SDA_275]
 
-
-
-
-
-
-set_property PACKAGE_PIN R4 [get_ports {dbgOut[7]}]
-set_property PACKAGE_PIN T4 [get_ports {dbgOut[6]}]
-set_property PACKAGE_PIN T5 [get_ports {dbgOut[5]}]
-set_property PACKAGE_PIN U5 [get_ports {dbgOut[4]}]
-set_property PACKAGE_PIN W6 [get_ports {dbgOut[3]}]
-set_property PACKAGE_PIN W5 [get_ports {dbgOut[2]}]
-set_property PACKAGE_PIN U6 [get_ports {dbgOut[1]}]
-set_property PACKAGE_PIN V5 [get_ports {dbgOut[0]}]
+create_clock -name clk_200M -period 5.0 [get_ports sysClk_p]
 
 set_property BITSTREAM.CONFIG.CONFIGRATE 50 [current_design]
 set_property BITSTREAM.GENERAL.COMPRESS TRUE [current_design]
