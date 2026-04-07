@@ -70,23 +70,11 @@ entity radioroc_fw is
         miso_p        : out std_logic;
         miso_n        : out std_logic;
 
-		extTrg        : in std_logic
+		extTrg        : out std_logic
 	);
 end entity;
 
 architecture arch of radioroc_fw is
-
-    component PLL_Radioroc_1
-    port
-     (-- Clock in ports
-      -- Clock out ports
-      clk_out1          : out    std_logic;
-      -- Status and control signals
-      reset             : in     std_logic;
-      locked            : out    std_logic;
-      clk_in1           : in     std_logic
-     );
-    end component;
 
     -- LVDS
 	signal ADC_SCKHG, ADC_SCKLG, ADC_HG, ADC_LG : std_logic;
@@ -99,7 +87,7 @@ architecture arch of radioroc_fw is
 	signal tEdge21, TBuf21 : std_logic_vector(127 downto 0);
 	-- Clock and reset
 	signal reset, locked_1, locked_2, locked_3                               : std_logic;
-	signal clk_10M, clk_100M, clk_200M : std_logic;
+	signal clk_10M, clk_50M, clk_100M, clk_200M : std_logic;
 	signal sysClkDS : std_logic;
 	-- I2C
 --	signal end_i2c, n_reset_i2c, rd55, wr_i2c, en_clki2c, sda_i, sda_o, sda_oen : std_logic;
@@ -218,7 +206,13 @@ signal readRq,
        cs,
        sclk,
        mosi,
-       miso    : std_logic;
+       miso,
+       csFF,
+       sclkFF,
+       mosiFF,
+       csSync,
+       sclkSync,
+       mosiSync  : std_logic;
 
 signal rstI2CCnt : unsigned(bitsNum(rstRadI2CLen) downto 0);
 
@@ -305,6 +299,7 @@ port map(
 extTrgFF  <= '0';
 extTrgSig <= '0';
 
+extTrg <= miso;
 --extTrgSync: process(reset, clk_200M)
 --begin
 --    if rising_edge(clk_200M) then
@@ -371,7 +366,7 @@ port map(
     O => clk_200M
 );
 
-BUFR_inst : BUFR
+bufr100MInst: BUFR
 generic map(
     BUFR_DIVIDE => "2"
 )
@@ -382,13 +377,26 @@ port map(
     O   => clk_100M
 );
 
-
-pll1 : PLL_RADIOROC_1
+bufr50Inst: BUFR
+generic map(
+    BUFR_DIVIDE => "4"
+)
 port map(
-    clk_in1  => clk_200M,
-    reset    => reset,
-    clk_out1 => clk_10M,
-    locked   => locked_1
+    I => clk_200M,
+    CE => '1',
+    CLR => reset,
+    O => clk_50M
+);
+
+bufr10Inst: BUFR
+generic map(
+    BUFR_DIVIDE => "5"
+)
+port map(
+    I => clk_50M,
+    CE => '1',
+    CLR => reset,
+    O => clk_10M
 );
 
 i2cRadModule: entity work.i2cMaster
@@ -557,6 +565,27 @@ port map(
     scl       => SCL_275
 );
 
+spiSyncProc: process(clk_200M)
+begin
+    if rising_edge(clk_200M) then
+        if reset = '1' then
+            csFF     <= '1';
+            sclkFF   <= '0';
+            mosiFF   <= '0';
+            csSync   <= '1';
+            sclkSync <= '0';
+            mosiSync <= '0';
+        else
+            csFF     <= cs;
+            sclkFF   <= sclk;
+            mosiFF   <= mosi;
+            csSync   <= csFF;
+            sclkSync <= sclkFF;
+            mosiSync <= mosiFF;
+        end if;
+    end if;
+end process;
+
 spiSlaveInst: entity work.SPISlave
 port map(
     clk          => clk_200M,
@@ -575,10 +604,10 @@ port map(
     tx_wr_ack    => txWrAck,
     rx_reset     => reset,
     tx_reset     => reset,
-    cs           => cs,
-    sclk         => sclk,
+    cs           => csSync,
+    sclk         => sclkSync,
     miso         => miso,
-    mosi         => mosi
+    mosi         => mosiSync
 );
 
 pGenInst: entity work.pulseGenCtrl

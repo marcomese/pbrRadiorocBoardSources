@@ -1,5 +1,4 @@
 set_property IOSTANDARD LVDS_25 [get_ports ADC_*]
-set_property IOSTANDARD LVCMOS25 [get_ports {dbgOut[*]}]
 set_property IOSTANDARD HSUL_12 [get_ports {T_2[*]}]
 set_property IOSTANDARD HSUL_12 [get_ports {T_1[*]}]
 set_property IOSTANDARD LVDS_25 [get_ports sysClk_*]
@@ -215,6 +214,16 @@ set_property PACKAGE_PIN N15 [get_ports SCL_275]
 set_property PACKAGE_PIN AB22 [get_ports SDA_275]
 
 create_clock -name clk_200M -period 5.0 [get_ports sysClk_p]
+
+create_generated_clock -name clk_100M -source [get_ports sysClk_p] -divide_by 1 [get_pins bufr100MInst/O]
+
+create_generated_clock -name clk_50M -source [get_ports sysClk_p] -divide_by 4 [get_pins bufr50Inst/O]
+
+create_generated_clock -name clk_10M -source [get_pins bufr50Inst/O] -divide_by 5 [get_pins bufr10Inst/O]
+
+create_clock -name sclk -period 50 [get_ports sclk_p]
+
+set_clock_groups -asynchronous -group {clk_200M} -group {sclk}
 
 set_property BITSTREAM.CONFIG.CONFIGRATE 50 [current_design]
 set_property BITSTREAM.GENERAL.COMPRESS TRUE [current_design]
