@@ -224,7 +224,13 @@ signal rstI2CCnt : unsigned(bitsNum(rstRadI2CLen) downto 0);
 signal endAcq, rdValid : std_logic;
 
 attribute ASYNC_REG : string;
-attribute ASYNC_REG of T_1FF0,
+attribute ASYNC_REG of csFF,
+                       sclkFF,
+                       mosiFF,
+                       csSync,
+                       sclkSync,
+                       mosiSync,
+                       T_1FF0,
                        T_2FF0,
                        T_1Sync,
                        T_2Sync : signal is "true";
@@ -356,7 +362,7 @@ port map(
 
 sysClkIBUFDS: IBUFDS
 generic map(
-    DIFF_TERM    => TRUE, 
+    DIFF_TERM    => TRUE,
     IBUF_LOW_PWR => FALSE,
     IOSTANDARD   => "LVDS_25"
 )
