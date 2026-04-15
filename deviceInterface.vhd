@@ -90,6 +90,12 @@ signal   tOutRst,
          validId,
          rwSig,
          rxRdSig,
+         loadBrstBuff,
+         readBrstBuff,
+         rstDataOut,
+         loadDataIn,
+         loadLastBrst,
+         brstBuffValid,
          brstSig,
          validSig,
          devRwSig,
@@ -108,11 +114,11 @@ signal   devIdSig      : devices_t;
 signal   tOutCnt       : unsigned(bitsNum(tOut) downto 0);
 signal   byteCnt       : unsigned(bitsNum(bytesNum) downto 0);
 signal   brstByteNum   : unsigned(bitsNum(bytesNum)-1 downto 0);
-signal   brstBuff      : byteArray_t(maxBrstLen-1 downto 0);
 signal   devDataOutSig : devData_t;
 signal   dataToFifoSel : std_logic_vector(1 downto 0);
 signal   dataToFifo    : std_logic_vector(7 downto 0);
 signal   idSig         : std_logic_vector(7 downto 0);
+signal   dataBrstOut   : std_logic_vector(31 downto 0);
 
 begin
 
@@ -126,6 +132,24 @@ endCnt      <= byteCnt(byteCnt'left);
 tOutSig     <= tOutCnt(tOutCnt'left);
 lastBrst    <= not or_reduce(std_logic_vector(byteCnt(byteCnt'left downto 2)));
 idSig       <= idHeader & id;
+
+devDataOutCtrl: process(clk)
+begin
+    if rising_edge(clk) then
+        if rstDataOut = '1' then
+            devDataOutSig <= (others => (others => '0'));
+        else
+            if loadDataIn = '1' then
+                devDataOutSig <= devDataOutSig(devDataOutSig'left-1 downto 0) & dataIn;
+            elsif loadLastBrst = '1' then
+                devDataOutSig <= (0      => std_logic_vector(resize(brstByteNum(1 downto 0), 8)),
+                                  others => (others => '0'));
+            elsif brstBuffValid = '1' then
+                devDataOutSig <= slvToDevData(dataBrstOut);
+            end if;
+        end if;
+    end if;
+end process;
 
 validIdMux: process(dataIn)
 begin
@@ -198,12 +222,16 @@ begin
             devBrstWrt    <= '0';
             devBrstSnd    <= '0';
             devAddr       <= (others => (others => '0'));
-            devDataOutSig <= (others => (others => '0'));
             devExec       <= '0';
             busy          <= '0';
             brstByteNum   <= (others => '0');
-            brstBuff      <= (others => (others => '0'));
             brstCollect   <= '0';
+            loadBrstBuff  <= '0';
+            readBrstBuff  <= '0';
+            rstDataOut    <= '1';
+            loadDataIn    <= '0';
+            loadLastBrst  <= '0';
+            brstBuffValid <= '0';
             wEnFifo       <= '0';
             rEnFifo       <= '0';
             txWSig        <= '0';
@@ -215,12 +243,13 @@ begin
         else
             case state is
                 when idle =>
-                    tOutRst <= '1';
-                    busy    <= '0';
-                    devExec <= '0';
-                    rxRdSig <= rxPresent;
+                    tOutRst    <= '1';
+                    rstDataOut <= '0';
+                    busy       <= '0';
+                    devExec    <= '0';
+                    rxRdSig    <= rxPresent;
 
-                    state   <= idle;
+                    state      <= idle;
 
                     if rxPresent = '1' and validId = '1' then
                         busy  <= '1';
@@ -305,9 +334,11 @@ begin
                 when getData =>
                     i := to_integer(byteCnt);
 
-                    tOutRst <= '0';
+                    tOutRst      <= '0';
+                    loadBrstBuff <= '0';
+                    loadDataIn   <= '0';
 
-                    state   <= getData;
+                    state        <= getData;
 
                     if endCnt = '1' and devBrstSig = '0' then
                         tOutRst <= '1';
@@ -330,13 +361,13 @@ begin
                     elsif rxPresent = '1' and brstCollect = '0' then
                         tOutRst          <= '1';
                         rxRdSig          <= '1';
+                        loadDataIn       <= '1';
                         byteCnt          <= byteCnt - 1;
-                        devDataOutSig(i) <= dataIn;
                     elsif rxPresent = '1' and brstCollect = '1' then
-                        tOutRst     <= '1';
-                        rxRdSig     <= '1';
-                        byteCnt     <= byteCnt - 1;
-                        brstBuff(i) <= dataIn;
+                        tOutRst      <= '1';
+                        rxRdSig      <= '1';
+                        loadBrstBuff <= '1';
+                        byteCnt      <= byteCnt - 1;
                     elsif tOutSig = '1' then
                         tOutRst <= '1';
                         rxRdSig <= '0';
@@ -367,30 +398,26 @@ begin
                     end if;
 
                 when sendBrst =>
-                    i := to_integer(byteCnt);
+                    devExec       <= '0';
+                    readBrstBuff  <= '0';
+                    loadLastBrst  <= '0';
 
-                    devExec <= '0';
-
-                    state   <= sendBrst;
+                    state         <= sendBrst;
 
                     if devReady(devIdSig) = '1' and lastBrst = '0' then
-                        devExec <= '1';
-                        byteCnt <= byteCnt - devDataBytes;
-
-                        byteArrCpy(devDataOutSig, brstBuff, i);
+                        devExec      <= '1';
+                        readBrstBuff <= '1';
+                        byteCnt      <= byteCnt - devDataBytes;
                     elsif devReady(devIdSig) = '1' and lastBrst = '1' and devBrstSig = '1' then
                         devBrstSig    <= '0';
-                        devDataOutSig <= (0      => std_logic_vector(resize(brstByteNum(1 downto 0), 8)),
-                                          others => (others => '0'));
+                        loadLastBrst  <= '1';
                     elsif lastBrst = '1' and devBrstSig = '0' then
-                        devDataOutSig <= (others => (others => '0'));
+                        readBrstBuff  <= '1';
 
-                        byteArrCpy(devDataOutSig, brstBuff, i);
-
-                        state <= done;
+                        state         <= done;
                     elsif devBrstRst(devIdSig) = '1' then
                         devBrstSig    <= '0';
-                        devDataOutSig <= (others => (others => '0'));
+                        rstDataOut    <= '1';
 
                         state         <= done;
                     end if;
@@ -495,7 +522,6 @@ begin
                     flushTxFifo   <= '0';
                     devIdSig      <= none;
                     devAddr       <= (others => (others => '0'));
-                    devDataOutSig <= (others => (others => '0'));
                     devBrstSig    <= '0';
                     busy          <= '0';
                     error         <= "001";
@@ -512,7 +538,6 @@ begin
                     flushTxFifo   <= '0';
                     devIdSig      <= none;
                     devAddr       <= (others => (others => '0'));
-                    devDataOutSig <= (others => (others => '0'));
                     devBrstSig    <= '0';
                     busy          <= '0';
                     error         <= "010";
@@ -529,7 +554,6 @@ begin
                     flushTxFifo   <= '0';
                     devIdSig      <= none;
                     devAddr       <= (others => (others => '0'));
-                    devDataOutSig <= (others => (others => '0'));
                     devBrstSig    <= '0';
                     busy          <= '0';
                     error         <= "011";
@@ -546,7 +570,6 @@ begin
                     flushTxFifo   <= '0';
                     devIdSig      <= none;
                     devAddr       <= (others => (others => '0'));
-                    devDataOutSig <= (others => (others => '0'));
                     devBrstSig    <= '0';
                     busy          <= '0';
                     error         <= "111";
@@ -568,43 +591,53 @@ begin
     end if;
 end process;
 
-xpm_fifo_sync_inst : xpm_fifo_sync
+brstBuffInst: xpm_fifo_sync
 generic map(
-    FIFO_MEMORY_TYPE  => "block",
+    FIFO_WRITE_DEPTH  => maxBrstLen,
+    READ_DATA_WIDTH   => 32,
+    WRITE_DATA_WIDTH  => 8,
+    READ_MODE         => "std",
+    USE_ADV_FEATURES  => "0010",
+    FIFO_MEMORY_TYPE  => "block"
+)
+port map(
+    wr_clk        => clk,
+    rst           => rstFifo,
+    din           => dataIn,
+    wr_en         => loadBrstBuff,
+    dout          => dataBrstOut,
+    rd_en         => readBrstBuff,
+    empty         => open,
+    full          => open,
+    sleep         => '0',
+    injectdbiterr => '0',
+    injectsbiterr => '0'
+);
+
+dataFifoInst : xpm_fifo_sync
+generic map(
     FIFO_WRITE_DEPTH  => maxBrstLen,
     PROG_FULL_THRESH  => 4,
     READ_DATA_WIDTH   => 8,
+    WRITE_DATA_WIDTH  => 8,
     READ_MODE         => "std",
     USE_ADV_FEATURES  => "0012",
-    WRITE_DATA_WIDTH  => 8
+    FIFO_MEMORY_TYPE  => "block"
 )
 port map(
-    dout          => dataOut,
-    empty         => emptyFifo,
-    full          => open,
+    wr_clk        => clk,
+    rst           => rstFifo,
     din           => dataToFifo,
     wr_en         => wEnFifo,
-    wr_clk        => clk,
+    dout          => dataOut,
     rd_en         => rEnFifo,
-    rst           => rstFifo,
-    data_valid    => open,
     wr_ack        => wAckFifo,
-    sleep         => '0',
-    almost_empty  => open,
-    almost_full   => open,
-    dbiterr       => open,
-    overflow      => open,
-    prog_empty    => open,
+    empty         => emptyFifo,
+    full          => open,
     prog_full     => wordWrt,
-    rd_data_count => open,
-    rd_rst_busy   => open,
-    sbiterr       => open,
-    underflow     => open,
-    wr_data_count => open,
-    wr_rst_busy   => open,
+    sleep         => '0',
     injectdbiterr => '0',
     injectsbiterr => '0'
-
 );
 
 end Behavioral;

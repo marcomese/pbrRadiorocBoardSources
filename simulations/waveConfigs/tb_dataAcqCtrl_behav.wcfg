@@ -9,7 +9,6 @@
             <top_module name="glbl" />
             <top_module name="registerspkg" />
             <top_module name="tb_dataAcqCtrl" />
-            <top_module name="types" />
             <top_module name="utilspkg" />
             <top_module name="vcomponents" />
          </top_modules>
@@ -17,343 +16,126 @@
    </db_ref_list>
    <zoom_setting>
       <ZoomStartTime time="0.000000 us"></ZoomStartTime>
-      <ZoomEndTime time="12.000003 us"></ZoomEndTime>
-      <Cursor1Time time="0.845100 us"></Cursor1Time>
+      <ZoomEndTime time="150.000003 us"></ZoomEndTime>
+      <Cursor1Time time="7.130000 us"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
-      <NameColumnWidth column_width="219"></NameColumnWidth>
+      <NameColumnWidth column_width="199"></NameColumnWidth>
       <ValueColumnWidth column_width="58"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="102" />
-   <wave_markers>
-      <marker time="5505000" label="" />
-   </wave_markers>
-   <wvobject fp_name="/tb_dataAcqCtrl/clk_100M" type="logic">
-      <obj_property name="ElementShortName">clk_100M</obj_property>
-      <obj_property name="ObjectShortName">clk_100M</obj_property>
+   <WVObjectSize size="63" />
+   <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/clk" type="logic">
+      <obj_property name="ElementShortName">clk</obj_property>
+      <obj_property name="ObjectShortName">clk</obj_property>
    </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl/clkN_100M" type="logic">
-      <obj_property name="ElementShortName">clkN_100M</obj_property>
-      <obj_property name="ObjectShortName">clkN_100M</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl/clk_200M" type="logic">
-      <obj_property name="ElementShortName">clk_200M</obj_property>
-      <obj_property name="ObjectShortName">clk_200M</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl/clkN_200M" type="logic">
-      <obj_property name="ElementShortName">clkN_200M</obj_property>
-      <obj_property name="ObjectShortName">clkN_200M</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl/adcInst/wr_en" type="logic">
-      <obj_property name="ElementShortName">wr_en</obj_property>
-      <obj_property name="ObjectShortName">wr_en</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl/rst" type="logic">
+   <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/rst" type="logic">
       <obj_property name="ElementShortName">rst</obj_property>
       <obj_property name="ObjectShortName">rst</obj_property>
    </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl/start" type="logic">
-      <obj_property name="ElementShortName">start</obj_property>
-      <obj_property name="ObjectShortName">start</obj_property>
+   <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/id" type="array">
+      <obj_property name="ElementShortName">id[3:0]</obj_property>
+      <obj_property name="ObjectShortName">id[3:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl/resetAcq" type="logic">
-      <obj_property name="ElementShortName">resetAcq</obj_property>
-      <obj_property name="ObjectShortName">resetAcq</obj_property>
+   <wvobject fp_name="/tb_dataAcqCtrl/testDataIn" type="array">
+      <obj_property name="ElementShortName">testDataIn[7:0]</obj_property>
+      <obj_property name="ObjectShortName">testDataIn[7:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl/nb_acq" type="array">
-      <obj_property name="ElementShortName">nb_acq[7:0]</obj_property>
-      <obj_property name="ObjectShortName">nb_acq[7:0]</obj_property>
+   <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/dataOut" type="array">
+      <obj_property name="ElementShortName">dataOut[7:0]</obj_property>
+      <obj_property name="ObjectShortName">dataOut[7:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl/dataAcqCtrlInst/rdAcqSig" type="logic">
-      <obj_property name="ElementShortName">rdAcqSig</obj_property>
-      <obj_property name="ObjectShortName">rdAcqSig</obj_property>
+   <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/rxRead" type="logic">
+      <obj_property name="ElementShortName">rxRead</obj_property>
+      <obj_property name="ObjectShortName">rxRead</obj_property>
    </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl/rd_en" type="logic">
-      <obj_property name="ElementShortName">rd_en</obj_property>
-      <obj_property name="ObjectShortName">rd_en</obj_property>
+   <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/rxPresent" type="logic">
+      <obj_property name="ElementShortName">rxPresent</obj_property>
+      <obj_property name="ObjectShortName">rxPresent</obj_property>
    </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl/dataAcqCtrlInst/devReady" type="logic">
-      <obj_property name="ElementShortName">devReady</obj_property>
-      <obj_property name="ObjectShortName">devReady</obj_property>
+   <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/txWrite" type="logic">
+      <obj_property name="ElementShortName">txWrite</obj_property>
+      <obj_property name="ObjectShortName">txWrite</obj_property>
    </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl/dataAcqCtrlInst/rdValid" type="logic">
-      <obj_property name="ElementShortName">rdValid</obj_property>
-      <obj_property name="ObjectShortName">rdValid</obj_property>
+   <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/txWrAck" type="logic">
+      <obj_property name="ElementShortName">txWrAck</obj_property>
+      <obj_property name="ObjectShortName">txWrAck</obj_property>
    </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl/adcInst/ff/valid" type="logic">
-      <obj_property name="ElementShortName">valid</obj_property>
-      <obj_property name="ObjectShortName">valid</obj_property>
+   <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/rxEna" type="logic">
+      <obj_property name="ElementShortName">rxEna</obj_property>
+      <obj_property name="ObjectShortName">rxEna</obj_property>
    </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl/dout" type="array">
-      <obj_property name="ElementShortName">dout[7:0]</obj_property>
-      <obj_property name="ObjectShortName">dout[7:0]</obj_property>
+   <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/flushRxFifo" type="logic">
+      <obj_property name="ElementShortName">flushRxFifo</obj_property>
+      <obj_property name="ObjectShortName">flushRxFifo</obj_property>
    </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl/extTrg" type="logic">
-      <obj_property name="ElementShortName">extTrg</obj_property>
-      <obj_property name="ObjectShortName">extTrg</obj_property>
+   <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/flushTxFifo" type="logic">
+      <obj_property name="ElementShortName">flushTxFifo</obj_property>
+      <obj_property name="ObjectShortName">flushTxFifo</obj_property>
    </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl/dataAcqCtrlInst/strtAcqSig" type="logic">
-      <obj_property name="ElementShortName">strtAcqSig</obj_property>
-      <obj_property name="ObjectShortName">strtAcqSig</obj_property>
+   <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/devId" type="other">
+      <obj_property name="ElementShortName">devId</obj_property>
+      <obj_property name="ObjectShortName">devId</obj_property>
    </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl/adcInst/end_acq" type="logic">
-      <obj_property name="ElementShortName">end_acq</obj_property>
-      <obj_property name="ObjectShortName">end_acq</obj_property>
+   <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/devReady" type="array">
+      <obj_property name="ElementShortName">devReady[0:7]</obj_property>
+      <obj_property name="ObjectShortName">devReady[0:7]</obj_property>
+      <obj_property name="isExpanded"></obj_property>
    </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl/adcInst/endAcqSig" type="array">
-      <obj_property name="ElementShortName">endAcqSig[0:0]</obj_property>
-      <obj_property name="ObjectShortName">endAcqSig[0:0]</obj_property>
+   <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/devBusy" type="array">
+      <obj_property name="ElementShortName">devBusy[0:7]</obj_property>
+      <obj_property name="ObjectShortName">devBusy[0:7]</obj_property>
    </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl/adcInst/endAcqOut" type="array">
-      <obj_property name="ElementShortName">endAcqOut[0:0]</obj_property>
-      <obj_property name="ObjectShortName">endAcqOut[0:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl/adcInst/endAcq" type="logic">
-      <obj_property name="ElementShortName">endAcq</obj_property>
-      <obj_property name="ObjectShortName">endAcq</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl/dataAcqCtrlInst/endAcq" type="logic">
-      <obj_property name="ElementShortName">endAcq</obj_property>
-      <obj_property name="ObjectShortName">endAcq</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl/dataAcqCtrlInst/emptyAcq" type="logic">
-      <obj_property name="ElementShortName">emptyAcq</obj_property>
-      <obj_property name="ObjectShortName">emptyAcq</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl/adcInst/dout" type="array">
-      <obj_property name="ElementShortName">dout[7:0]</obj_property>
-      <obj_property name="ObjectShortName">dout[7:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl/dataAcqCtrlInst/devBrstSnd" type="logic">
-      <obj_property name="ElementShortName">devBrstSnd</obj_property>
-      <obj_property name="ObjectShortName">devBrstSnd</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl/dataAcqCtrlInst/rdAcqSig" type="logic">
-      <obj_property name="ElementShortName">rdAcqSig</obj_property>
-      <obj_property name="ObjectShortName">rdAcqSig</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl/dataAcqCtrlInst/rdAcq" type="logic">
-      <obj_property name="ElementShortName">rdAcq</obj_property>
-      <obj_property name="ObjectShortName">rdAcq</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl/adcInst/ch" type="other">
-      <obj_property name="ElementShortName">ch</obj_property>
-      <obj_property name="ObjectShortName">ch</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl/rd_data_count_acq" type="array">
-      <obj_property name="ElementShortName">rd_data_count_acq[15:0]</obj_property>
-      <obj_property name="ObjectShortName">rd_data_count_acq[15:0]</obj_property>
-      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl/adcInst/rd_data_count_acq" type="array">
-      <obj_property name="ElementShortName">rd_data_count_acq[15:0]</obj_property>
-      <obj_property name="ObjectShortName">rd_data_count_acq[15:0]</obj_property>
-      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl/adcInst/ff/rd_data_count" type="array">
-      <obj_property name="ElementShortName">rd_data_count[15:0]</obj_property>
-      <obj_property name="ObjectShortName">rd_data_count[15:0]</obj_property>
-      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+   <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/devRw" type="logic">
+      <obj_property name="ElementShortName">devRw</obj_property>
+      <obj_property name="ObjectShortName">devRw</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/devBrst" type="logic">
       <obj_property name="ElementShortName">devBrst</obj_property>
       <obj_property name="ObjectShortName">devBrst</obj_property>
    </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl/adcInst/ff/valid" type="logic">
-      <obj_property name="ElementShortName">valid</obj_property>
-      <obj_property name="ObjectShortName">valid</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl/adcInst/ff/empty" type="logic">
-      <obj_property name="ElementShortName">empty</obj_property>
-      <obj_property name="ObjectShortName">empty</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl/devReadyAcq" type="logic">
-      <obj_property name="ElementShortName">devReadyAcq</obj_property>
-      <obj_property name="ObjectShortName">devReadyAcq</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/wEnFifo" type="logic">
-      <obj_property name="ElementShortName">wEnFifo</obj_property>
-      <obj_property name="ObjectShortName">wEnFifo</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/wAckFifo" type="logic">
-      <obj_property name="ElementShortName">wAckFifo</obj_property>
-      <obj_property name="ObjectShortName">wAckFifo</obj_property>
-   </wvobject>
    <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/devBrstWrt" type="logic">
       <obj_property name="ElementShortName">devBrstWrt</obj_property>
       <obj_property name="ObjectShortName">devBrstWrt</obj_property>
    </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl/dataAcqCtrlInst/devRw" type="logic">
-      <obj_property name="ElementShortName">devRw</obj_property>
-      <obj_property name="ObjectShortName">devRw</obj_property>
+   <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/devBrstSnd" type="logic">
+      <obj_property name="ElementShortName">devBrstSnd</obj_property>
+      <obj_property name="ObjectShortName">devBrstSnd</obj_property>
    </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/state" type="other">
-      <obj_property name="DisplayName">label</obj_property>
-      <obj_property name="ElementShortName">state</obj_property>
-      <obj_property name="ObjectShortName">state</obj_property>
-      <obj_property name="label">stateDevInterf</obj_property>
+   <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/devBrstRst" type="array">
+      <obj_property name="ElementShortName">devBrstRst[0:7]</obj_property>
+      <obj_property name="ObjectShortName">devBrstRst[0:7]</obj_property>
    </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl/dataAcqCtrlInst/state" type="other">
-      <obj_property name="DisplayName">label</obj_property>
-      <obj_property name="ElementShortName">state</obj_property>
-      <obj_property name="ObjectShortName">state</obj_property>
-      <obj_property name="label">stateDataAcqCtrl</obj_property>
+   <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/devAddr" type="array">
+      <obj_property name="ElementShortName">devAddr[1:0][7:0]</obj_property>
+      <obj_property name="ObjectShortName">devAddr[1:0][7:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl/adcInst/current_state" type="other">
-      <obj_property name="DisplayName">label</obj_property>
-      <obj_property name="ElementShortName">current_state</obj_property>
-      <obj_property name="ObjectShortName">current_state</obj_property>
-      <obj_property name="label">stateAdcInst</obj_property>
+   <wvobject fp_name="/tb_dataAcqCtrl/dataFromMaster" type="array">
+      <obj_property name="ElementShortName">dataFromMaster[7:0]</obj_property>
+      <obj_property name="ObjectShortName">dataFromMaster[7:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl/dataAcqCtrlInst/emptyAcq" type="logic">
-      <obj_property name="ElementShortName">emptyAcq</obj_property>
-      <obj_property name="ObjectShortName">emptyAcq</obj_property>
+   <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/devDataIn" type="array">
+      <obj_property name="ElementShortName">devDataIn[0:7][3:0][7:0]</obj_property>
+      <obj_property name="ObjectShortName">devDataIn[0:7][3:0][7:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl/extTrg" type="logic">
-      <obj_property name="ElementShortName">extTrg</obj_property>
-      <obj_property name="ObjectShortName">extTrg</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl/dataAcqCtrlInst/devBrstRst" type="logic">
-      <obj_property name="ElementShortName">devBrstRst</obj_property>
-      <obj_property name="ObjectShortName">devBrstRst</obj_property>
+   <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/devDataOut" type="array">
+      <obj_property name="ElementShortName">devDataOut[3:0][7:0]</obj_property>
+      <obj_property name="ObjectShortName">devDataOut[3:0][7:0]</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/devExec" type="logic">
       <obj_property name="ElementShortName">devExec</obj_property>
       <obj_property name="ObjectShortName">devExec</obj_property>
    </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/devBusy" type="array">
-      <obj_property name="ElementShortName">devBusy[0:5]</obj_property>
-      <obj_property name="ObjectShortName">devBusy[0:5]</obj_property>
+   <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/busy" type="logic">
+      <obj_property name="ElementShortName">busy</obj_property>
+      <obj_property name="ObjectShortName">busy</obj_property>
    </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/byteCnt" type="array">
-      <obj_property name="ElementShortName">byteCnt[14:0]</obj_property>
-      <obj_property name="ObjectShortName">byteCnt[14:0]</obj_property>
-      <obj_property name="Radix">HEXRADIX</obj_property>
+   <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/dataIn" type="array">
+      <obj_property name="ElementShortName">dataIn[7:0]</obj_property>
+      <obj_property name="ObjectShortName">dataIn[7:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/rEnFifo" type="logic">
-      <obj_property name="ElementShortName">rEnFifo</obj_property>
-      <obj_property name="ObjectShortName">rEnFifo</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/txWSig" type="logic">
-      <obj_property name="ElementShortName">txWSig</obj_property>
-      <obj_property name="ObjectShortName">txWSig</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/xpm_fifo_sync_inst/FIFO_WRITE_DEPTH" type="array">
-      <obj_property name="ElementShortName">FIFO_WRITE_DEPTH[31:0]</obj_property>
-      <obj_property name="ObjectShortName">FIFO_WRITE_DEPTH[31:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/emptyFifo" type="logic">
-      <obj_property name="ElementShortName">emptyFifo</obj_property>
-      <obj_property name="ObjectShortName">emptyFifo</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl/adcInst/en_acq" type="logic">
-      <obj_property name="ElementShortName">en_acq</obj_property>
-      <obj_property name="ObjectShortName">en_acq</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl/t" type="array">
-      <obj_property name="ElementShortName">t[63:0]</obj_property>
-      <obj_property name="ObjectShortName">t[63:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="vbus398" type="vbus">
-      <obj_property name="label">selHit0</obj_property>
-      <obj_property name="DisplayName">label</obj_property>
-      <obj_property name="Radix">BINARYRADIX</obj_property>
-      <wvobject fp_name="/tb_dataAcqCtrl/sel_adc[31]" type="logic">
-         <obj_property name="ElementShortName">[31]</obj_property>
-         <obj_property name="ObjectShortName">[31]</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb_dataAcqCtrl/sel_adc[30]" type="logic">
-         <obj_property name="ElementShortName">[30]</obj_property>
-         <obj_property name="ObjectShortName">[30]</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb_dataAcqCtrl/sel_adc[29]" type="logic">
-         <obj_property name="ElementShortName">[29]</obj_property>
-         <obj_property name="ObjectShortName">[29]</obj_property>
-      </wvobject>
-   </wvobject>
-   <wvobject fp_name="vbus401" type="vbus">
-      <obj_property name="label">selHit</obj_property>
-      <obj_property name="DisplayName">label</obj_property>
-      <wvobject fp_name="/tb_dataAcqCtrl/sel_adc[25]" type="logic">
-         <obj_property name="ElementShortName">[25]</obj_property>
-         <obj_property name="ObjectShortName">[25]</obj_property>
-      </wvobject>
-      <wvobject fp_name="/tb_dataAcqCtrl/sel_adc[24]" type="logic">
-         <obj_property name="ElementShortName">[24]</obj_property>
-         <obj_property name="ObjectShortName">[24]</obj_property>
-      </wvobject>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl/dataAcqCtrlInst/selAdc" type="array">
-      <obj_property name="ElementShortName">selAdc[63:0]</obj_property>
-      <obj_property name="ObjectShortName">selAdc[63:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl/sel_adc" type="array">
-      <obj_property name="ElementShortName">sel_adc[63:0]</obj_property>
-      <obj_property name="ObjectShortName">sel_adc[63:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl/adcInst/rdValid" type="logic">
-      <obj_property name="ElementShortName">rdValid</obj_property>
-      <obj_property name="ObjectShortName">rdValid</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl/adcInst/ff/rd_en" type="logic">
-      <obj_property name="ElementShortName">rd_en</obj_property>
-      <obj_property name="ObjectShortName">rd_en</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl/adcInst/hit" type="logic">
-      <obj_property name="ElementShortName">hit</obj_property>
-      <obj_property name="ObjectShortName">hit</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl/adcInst/hit0" type="logic">
-      <obj_property name="ElementShortName">hit0</obj_property>
-      <obj_property name="ObjectShortName">hit0</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl/adcInst/trigger" type="logic">
-      <obj_property name="ElementShortName">trigger</obj_property>
-      <obj_property name="ObjectShortName">trigger</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl/adcInst/trigger_shrunk" type="logic">
-      <obj_property name="ElementShortName">trigger_shrunk</obj_property>
-      <obj_property name="ObjectShortName">trigger_shrunk</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl/adcInst/trigger_latched" type="logic">
-      <obj_property name="ElementShortName">trigger_latched</obj_property>
-      <obj_property name="ObjectShortName">trigger_latched</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl/adcInst/trigger_latched2" type="logic">
-      <obj_property name="ElementShortName">trigger_latched2</obj_property>
-      <obj_property name="ObjectShortName">trigger_latched2</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl/dataAcqCtrlInst/rstAcqSig" type="logic">
-      <obj_property name="ElementShortName">rstAcqSig</obj_property>
-      <obj_property name="ObjectShortName">rstAcqSig</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl/dataAcqCtrlInst/resetAcq" type="logic">
-      <obj_property name="ElementShortName">resetAcq</obj_property>
-      <obj_property name="ObjectShortName">resetAcq</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/validSig" type="logic">
-      <obj_property name="ElementShortName">validSig</obj_property>
-      <obj_property name="ObjectShortName">validSig</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl/devId" type="other">
-      <obj_property name="ElementShortName">devId</obj_property>
-      <obj_property name="ObjectShortName">devId</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl/devRw" type="logic">
-      <obj_property name="ElementShortName">devRw</obj_property>
-      <obj_property name="ObjectShortName">devRw</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl/devAddr" type="array">
-      <obj_property name="ElementShortName">devAddr[1:0][7:0]</obj_property>
-      <obj_property name="ObjectShortName">devAddr[1:0][7:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl/devExec" type="logic">
-      <obj_property name="ElementShortName">devExec</obj_property>
-      <obj_property name="ObjectShortName">devExec</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl/dataAcqCtrlInst/nbAcqSig" type="array">
-      <obj_property name="ElementShortName">nbAcqSig[7:0]</obj_property>
-      <obj_property name="ObjectShortName">nbAcqSig[7:0]</obj_property>
+   <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/state" type="other">
+      <obj_property name="ElementShortName">state</obj_property>
+      <obj_property name="ObjectShortName">state</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/validId" type="logic">
       <obj_property name="ElementShortName">validId</obj_property>
@@ -363,6 +145,34 @@
       <obj_property name="ElementShortName">rwSig</obj_property>
       <obj_property name="ObjectShortName">rwSig</obj_property>
    </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/rxRdSig" type="logic">
+      <obj_property name="ElementShortName">rxRdSig</obj_property>
+      <obj_property name="ObjectShortName">rxRdSig</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/loadBrstBuff" type="logic">
+      <obj_property name="ElementShortName">loadBrstBuff</obj_property>
+      <obj_property name="ObjectShortName">loadBrstBuff</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/readBrstBuff" type="logic">
+      <obj_property name="ElementShortName">readBrstBuff</obj_property>
+      <obj_property name="ObjectShortName">readBrstBuff</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/rstDataOut" type="logic">
+      <obj_property name="ElementShortName">rstDataOut</obj_property>
+      <obj_property name="ObjectShortName">rstDataOut</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/loadDataIn" type="logic">
+      <obj_property name="ElementShortName">loadDataIn</obj_property>
+      <obj_property name="ObjectShortName">loadDataIn</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/loadLastBrst" type="logic">
+      <obj_property name="ElementShortName">loadLastBrst</obj_property>
+      <obj_property name="ObjectShortName">loadLastBrst</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/brstBuffValid" type="logic">
+      <obj_property name="ElementShortName">brstBuffValid</obj_property>
+      <obj_property name="ObjectShortName">brstBuffValid</obj_property>
+   </wvobject>
    <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/brstSig" type="logic">
       <obj_property name="ElementShortName">brstSig</obj_property>
       <obj_property name="ObjectShortName">brstSig</obj_property>
@@ -371,37 +181,100 @@
       <obj_property name="ElementShortName">validSig</obj_property>
       <obj_property name="ObjectShortName">validSig</obj_property>
    </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/state" type="other">
-      <obj_property name="ElementShortName">state</obj_property>
-      <obj_property name="ObjectShortName">state</obj_property>
+   <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/devRwSig" type="logic">
+      <obj_property name="ElementShortName">devRwSig</obj_property>
+      <obj_property name="ObjectShortName">devRwSig</obj_property>
    </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/devAddr" type="array">
-      <obj_property name="ElementShortName">devAddr[1:0][7:0]</obj_property>
-      <obj_property name="ObjectShortName">devAddr[1:0][7:0]</obj_property>
+   <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/devBrstSig" type="logic">
+      <obj_property name="ElementShortName">devBrstSig</obj_property>
+      <obj_property name="ObjectShortName">devBrstSig</obj_property>
    </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/devDataIn" type="array">
-      <obj_property name="ElementShortName">devDataIn[0:7][3:0][7:0]</obj_property>
-      <obj_property name="ObjectShortName">devDataIn[0:7][3:0][7:0]</obj_property>
-      <obj_property name="isExpanded"></obj_property>
+   <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/brstCollect" type="logic">
+      <obj_property name="ElementShortName">brstCollect</obj_property>
+      <obj_property name="ObjectShortName">brstCollect</obj_property>
    </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/devDataOut" type="array">
-      <obj_property name="ElementShortName">devDataOut[3:0][7:0]</obj_property>
-      <obj_property name="ObjectShortName">devDataOut[3:0][7:0]</obj_property>
+   <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/lastBrst" type="logic">
+      <obj_property name="ElementShortName">lastBrst</obj_property>
+      <obj_property name="ObjectShortName">lastBrst</obj_property>
    </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl/cs" type="logic">
-      <obj_property name="ElementShortName">cs</obj_property>
-      <obj_property name="ObjectShortName">cs</obj_property>
+   <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/wEnFifo" type="logic">
+      <obj_property name="ElementShortName">wEnFifo</obj_property>
+      <obj_property name="ObjectShortName">wEnFifo</obj_property>
    </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl/sclk" type="logic">
-      <obj_property name="ElementShortName">sclk</obj_property>
-      <obj_property name="ObjectShortName">sclk</obj_property>
+   <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/rEnFifo" type="logic">
+      <obj_property name="ElementShortName">rEnFifo</obj_property>
+      <obj_property name="ObjectShortName">rEnFifo</obj_property>
    </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl/miso" type="logic">
-      <obj_property name="ElementShortName">miso</obj_property>
-      <obj_property name="ObjectShortName">miso</obj_property>
+   <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/txWSig" type="logic">
+      <obj_property name="ElementShortName">txWSig</obj_property>
+      <obj_property name="ObjectShortName">txWSig</obj_property>
    </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl/mosi" type="logic">
-      <obj_property name="ElementShortName">mosi</obj_property>
-      <obj_property name="ObjectShortName">mosi</obj_property>
+   <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/rstFifo" type="logic">
+      <obj_property name="ElementShortName">rstFifo</obj_property>
+      <obj_property name="ObjectShortName">rstFifo</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/wordWrt" type="logic">
+      <obj_property name="ElementShortName">wordWrt</obj_property>
+      <obj_property name="ObjectShortName">wordWrt</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/wAckFifo" type="logic">
+      <obj_property name="ElementShortName">wAckFifo</obj_property>
+      <obj_property name="ObjectShortName">wAckFifo</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/emptyFifo" type="logic">
+      <obj_property name="ElementShortName">emptyFifo</obj_property>
+      <obj_property name="ObjectShortName">emptyFifo</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/endCnt" type="logic">
+      <obj_property name="ElementShortName">endCnt</obj_property>
+      <obj_property name="ObjectShortName">endCnt</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/devIdSig" type="other">
+      <obj_property name="ElementShortName">devIdSig</obj_property>
+      <obj_property name="ObjectShortName">devIdSig</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl/dataToMaster" type="array">
+      <obj_property name="ElementShortName">dataToMaster[7:0]</obj_property>
+      <obj_property name="ObjectShortName">dataToMaster[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl/dataToDev" type="array">
+      <obj_property name="ElementShortName">dataToDev[3:0][7:0]</obj_property>
+      <obj_property name="ObjectShortName">dataToDev[3:0][7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl/dataFromAcq" type="array">
+      <obj_property name="ElementShortName">dataFromAcq[3:0][7:0]</obj_property>
+      <obj_property name="ObjectShortName">dataFromAcq[3:0][7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/devDataOutSig" type="array">
+      <obj_property name="ElementShortName">devDataOutSig[3:0][7:0]</obj_property>
+      <obj_property name="ObjectShortName">devDataOutSig[3:0][7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl/dataAcqCtrlInst/rData" type="array">
+      <obj_property name="ElementShortName">rData[3:0][31:0]</obj_property>
+      <obj_property name="ObjectShortName">rData[3:0][31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/dataToFifoSel" type="array">
+      <obj_property name="ElementShortName">dataToFifoSel[1:0]</obj_property>
+      <obj_property name="ObjectShortName">dataToFifoSel[1:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/dataToFifo" type="array">
+      <obj_property name="ElementShortName">dataToFifo[7:0]</obj_property>
+      <obj_property name="ObjectShortName">dataToFifo[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/idSig" type="array">
+      <obj_property name="ElementShortName">idSig[7:0]</obj_property>
+      <obj_property name="ObjectShortName">idSig[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/dataBrstOut" type="array">
+      <obj_property name="ElementShortName">dataBrstOut[31:0]</obj_property>
+      <obj_property name="ObjectShortName">dataBrstOut[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/byteCnt" type="array">
+      <obj_property name="ElementShortName">byteCnt[14:0]</obj_property>
+      <obj_property name="ObjectShortName">byteCnt[14:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/brstByteNum" type="array">
+      <obj_property name="ElementShortName">brstByteNum[13:0]</obj_property>
+      <obj_property name="ObjectShortName">brstByteNum[13:0]</obj_property>
    </wvobject>
 </wave_config>
