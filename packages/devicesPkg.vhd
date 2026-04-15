@@ -17,6 +17,8 @@ use IEEE.NUMERIC_STD.ALL;
 use work.utilsPkg.all;
 
 package devicesPkg is
+    constant LITTLE_ENDIAN : std_logic := '0';
+    constant BIG_ENDIAN    : std_logic := '1';
 
     type devices_t is (none,
                        tmp275,
@@ -41,7 +43,7 @@ package devicesPkg is
 
     function slvToDev(s: std_logic_vector) return devices_t;
 
-    function slvToDevData(s: std_logic_vector) return devData_t;
+    function slvToDevData(s: std_logic_vector; endianness: std_logic := BIG_ENDIAN) return devData_t;
 
     function devAddrToSlv(a: devAddr_t) return std_logic_vector;
 
@@ -79,15 +81,20 @@ package body devicesPkg is
         return devices_t'val(sInt);
     end function slvToDev;
 
-    function slvToDevData(s: std_logic_vector) return devData_t is
-        variable dData : devData_t;
-    begin
+function slvToDevData(s: std_logic_vector; endianness: std_logic := BIG_ENDIAN) return devData_t is
+    variable dData : devData_t;
+begin
+    if endianness = BIG_ENDIAN then
         for i in 0 to devDataBytes-1 loop
             dData(i) := s(8*i+7 downto 8*i);
         end loop;
-
-        return dData;
-    end function slvToDevData;
+    else
+        for i in 0 to devDataBytes-1 loop
+            dData(i) := s(8*(devDataBytes-1-i)+7 downto 8*(devDataBytes-1-i));
+        end loop;
+    end if;
+    return dData;
+end function slvToDevData;
 
     function devAddrToSlv(a: devAddr_t) return std_logic_vector is
         variable sAddr : std_logic_vector(devAddrBytes*8-1 downto 0);

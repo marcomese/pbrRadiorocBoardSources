@@ -145,7 +145,7 @@ begin
                 devDataOutSig <= (0      => std_logic_vector(resize(brstByteNum(1 downto 0), 8)),
                                   others => (others => '0'));
             elsif brstBuffValid = '1' then
-                devDataOutSig <= slvToDevData(dataBrstOut);
+                devDataOutSig <= slvToDevData(dataBrstOut, LITTLE_ENDIAN);
             end if;
         end if;
     end if;
@@ -231,7 +231,6 @@ begin
             rstDataOut    <= '1';
             loadDataIn    <= '0';
             loadLastBrst  <= '0';
-            brstBuffValid <= '0';
             wEnFifo       <= '0';
             rEnFifo       <= '0';
             txWSig        <= '0';
@@ -597,7 +596,7 @@ generic map(
     READ_DATA_WIDTH   => 32,
     WRITE_DATA_WIDTH  => 8,
     READ_MODE         => "std",
-    USE_ADV_FEATURES  => "0010",
+    USE_ADV_FEATURES  => "1010",
     FIFO_MEMORY_TYPE  => "block"
 )
 port map(
@@ -607,6 +606,7 @@ port map(
     wr_en         => loadBrstBuff,
     dout          => dataBrstOut,
     rd_en         => readBrstBuff,
+    data_valid    => brstBuffValid,
     empty         => open,
     full          => open,
     sleep         => '0',

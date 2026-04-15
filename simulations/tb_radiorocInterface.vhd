@@ -8,151 +8,17 @@ end tb_radiorocInterface;
 
 architecture Behavioral of tb_radiorocInterface is
 
-component radiorocInterface is
-generic(
-    chipID     : std_logic_vector(3 downto 0)
-);
-port(
-    clk        : in  std_logic;
-    rst        : in  std_logic;
-    devExec    : in  std_logic;
-    devId      : in  devices_t;
-    devRw      : in  std_logic;
-    devBrst    : in  std_logic;
-    devAddr    : in  devAddr_t;
-    devDataIn  : in  devData_t;
-    devDataOut : out devData_t;
-    devReady   : out std_logic;
-    busy       : out std_logic;
-    i2cEnClk   : out std_logic;
-    i2cEna     : out std_logic;
-    i2cAddr    : out std_logic_vector(6 downto 0);
-    i2cRw      : out std_logic;
-    i2cDataWr  : out std_logic_vector(7 downto 0);
-    i2cBusy    : in  std_logic;
-    i2cDataRd  : in  std_logic_vector(7 downto 0)
-);
-end component;
-
-component deviceInterface is
-generic(
-    clkFreq     : real;
-    timeout     : real;
-    readCmd     : std_logic_vector(3 downto 0);
-    writeCmd    : std_logic_vector(3 downto 0);
-    burstWrCmd  : std_logic_vector(3 downto 0);
-    burstRdCmd  : std_logic_vector(3 downto 0);
-    maxBrstLen  : natural -- maximum number of bytes to read/write in burst mode
-);
-port(
-    clk         : in  std_logic;
-    rst         : in  std_logic;
-    dataIn      : in  std_logic_vector(7 downto 0);
-    dataOut     : out std_logic_vector(7 downto 0);
-    rxRead      : out std_logic;
-    rxPresent   : in  std_logic;
-    txWrite     : out std_logic;
-    txWrAck     : in  std_logic;
-    rxEna       : out std_logic;
-    flushRxFifo : out std_logic;
-    flushTxFifo : out std_logic;
-    devId       : out devices_t;
-    devReady    : in  devStdLogic_t;
-    devBusy     : in  devStdLogic_t;
-    devRw       : out std_logic;
-    devBrst     : out std_logic;
-    devBrstWrt  : out std_logic;
-    devBrstSnd  : out std_logic;
-    devBrstRst  : in  devStdLogic_t;
-    devAddr     : out devAddr_t;
-    devDataIn   : in  devDataVec_t;
-    devDataOut  : out devData_t;
-    devExec     : out std_logic;
-    busy        : out std_logic;
-    error       : out std_logic_vector(2 downto 0)
-);
-end component;
-
-component SPIMaster is
-generic(
-    clkFreq      : real;
-    sclkFreq     : real
-);
-port(
-    clk          : in  std_logic;
-    rst          : in  std_logic;
-    data_out     : out std_logic_vector(7 downto 0);
-    data_in      : in  std_logic_vector(7 downto 0);
-    rx_read      : in  std_logic;
-    rx_present   : out std_logic;
-    rx_half_full : out std_logic;
-    rx_full      : out std_logic;
-    tx_write     : in  std_logic;
-    tx_present   : out std_logic;
-    tx_half_full : out std_logic;
-    tx_full      : out std_logic;
-    rx_reset     : in  std_logic;
-    tx_reset     : in  std_logic;
-    read_rq      : in  std_logic;
-    cs           : out std_logic;
-    sclk         : out std_logic;
-    miso         : in  std_logic;
-    mosi         : out std_logic
-);
-end component;
-
-COMPONENT i2cMaster IS
-  GENERIC(
-    input_clk : INTEGER := 50_000_000; --input clock speed from user logic in Hz
-    bus_clk   : INTEGER := 400_000);   --speed the i2c bus (scl) will run at in Hz
-  PORT(
-    clk       : IN     STD_LOGIC;                    --system clock
-    reset_n   : IN     STD_LOGIC;                    --active low reset
-    ena       : IN     STD_LOGIC;                    --latch in command
-    addr      : IN     STD_LOGIC_VECTOR(6 DOWNTO 0); --address of target slave
-    rw        : IN     STD_LOGIC;                    --'0' is write, '1' is read
-    data_wr   : IN     STD_LOGIC_VECTOR(7 DOWNTO 0); --data to write to slave
-    busy      : OUT    STD_LOGIC;                    --indicates transaction in progress
-    data_rd   : OUT    STD_LOGIC_VECTOR(7 DOWNTO 0); --data read from slave
-    ack_error : BUFFER STD_LOGIC;                    --flag if improper acknowledge from slave
-    sda       : INOUT  STD_LOGIC;                    --serial data output of i2c bus
-    scl       : INOUT  STD_LOGIC);                   --serial clock output of i2c bus
-END COMPONENT;
-
-component SPISlave is
-port(
-    clk          : in  std_logic;
-    rst          : in  std_logic;
-    data_out     : out std_logic_vector(7 downto 0);
-    data_in      : in  std_logic_vector(7 downto 0);
-    rx_read      : in  std_logic;
-    rx_ena       : in  std_logic;
-    rx_present   : out std_logic;
-    rx_half_full : out std_logic;
-    rx_full      : out std_logic;
-    tx_write     : in  std_logic;
-    tx_present   : out std_logic;
-    tx_half_full : out std_logic;
-    tx_full      : out std_logic;
-    tx_wr_ack    : out std_logic;
-    rx_reset     : in  std_logic;
-    tx_reset     : in  std_logic;
-    cs           : in  std_logic;
-    sclk         : in  std_logic;
-    miso         : out std_logic;
-    mosi         : in  std_logic
-);
-end component;
-
-constant clkPeriod      : time                         := 10 ns;
-constant clkFreq        : real                         := 100.0e6;
+constant clkPeriod      : time                         := 5 ns;
+constant clkFreq        : real                         := 200.0e6;
 constant sclkFreq       : real                         := 20.0e6;
 constant timeout        : real                         := 1.0;
 constant chipID         : std_logic_vector(3 downto 0) := "0000";
-constant readCmd        : std_logic_vector(3 downto 0) := x"A";
-constant writeCmd       : std_logic_vector(3 downto 0) := x"5";
-constant burstWrCmd     : std_logic_vector(3 downto 0) := x"3";
-constant burstRdCmd     : std_logic_vector(3 downto 0) := x"B";
+constant idHeader      : std_logic_vector(3 downto 0) := x"7";
+constant broadcastId   : std_logic_vector(3 downto 0) := x"F";
+constant readCmd       : std_logic_vector(3 downto 0) := x"A";
+constant writeCmd      : std_logic_vector(3 downto 0) := x"5";
+constant burstWrCmd    : std_logic_vector(3 downto 0) := x"3";
+constant burstRdCmd    : std_logic_vector(3 downto 0) := x"B";
 constant maxBrstLen     : natural                      := 40;--677;
 constant delay          : natural                      := 1;--50000;
 
@@ -203,6 +69,7 @@ signal   dataToMaster,
          testDataOut,
          testData,
          dataFromMaster : std_logic_vector(7 downto 0) := (others => '0');
+signal   id             : std_logic_vector(3 downto 0) := (others => '0');
 
 begin
 
@@ -213,41 +80,66 @@ begin
     rst <= '1';
     wait for clkPeriod*5;
     rst <= '0';
+    id  <= "0110";
     wait for clkPeriod*5;
 
     wait for clkPeriod*5;
 
-    testRxRead <= '1';
+--    testRxRead <= '1';
 
-    testDataIn <= x"A2";
-    wait for clkPeriod;
-    testTxWrite <= '1';
-    wait for clkPeriod;
-    testDataIn <= x"00";
-    wait for clkPeriod;
-    testDataIn <= x"00";
-    wait for clkPeriod;
-    testDataIn <= x"00";
-    wait for clkPeriod;
-    testDataIn <= x"00";
-    wait for clkPeriod;
-    testDataIn <= x"00";
-    wait for clkPeriod;
-    testDataIn <= x"00";
-    wait for clkPeriod;
-    testTxWrite <= '0';
+--    testDataIn <= x"76";
+--    wait for clkPeriod;
+--    testTxWrite <= '1';
+--    wait for clkPeriod;
+--    testTxWrite <= '0';
+--    testDataIn <= x"A2";
+--    wait for clkPeriod;
+--    testTxWrite <= '1';
+--    wait for clkPeriod;
+--    testTxWrite <= '0';
+--    wait for clkPeriod;
+--    testDataIn <= x"00";
+--    wait for clkPeriod;
+--    testTxWrite <= '1';
+--    wait for clkPeriod;
+--    testTxWrite <= '0';
+--    testDataIn <= x"00";
+--    wait for clkPeriod;
+--    testTxWrite <= '1';
+--    wait for clkPeriod;
+--    testTxWrite <= '0';
+--    testDataIn <= x"00";
+--    wait for clkPeriod;
+--    testTxWrite <= '1';
+--    wait for clkPeriod;
+--    testTxWrite <= '0';
+--    testDataIn <= x"00";
+--    wait for clkPeriod;
+--    testTxWrite <= '1';
+--    wait for clkPeriod;
+--    testTxWrite <= '0';
+--    testDataIn <= x"00";
+--    wait for clkPeriod;
+--    testTxWrite <= '1';
+--    wait for clkPeriod;
+--    testTxWrite <= '0';
+--    testDataIn <= x"00";
+--    wait for clkPeriod;
+--    testTxWrite <= '1';
+--    wait for clkPeriod;
+--    testTxWrite <= '0';
 
-    wait until i2cBusy = '0';
+--    wait until i2cBusy = '0';
 
-    wait until i2cBusy = '0';
+--    wait until i2cBusy = '0';
 
-    wait until i2cBusy = '0';
+--    wait until i2cBusy = '0';
 
-    wait until i2cBusy = '0';
+--    wait until i2cBusy = '0';
     
-    testData <= x"BB";
+--    testData <= x"BB";
 
-    wait for 10 us;
+--    wait for 10 us;
 
 --    testRxRead <= '1';
 
@@ -321,83 +213,89 @@ begin
 --    wait for clkPeriod;
 --    testTxWrite <= '0';
 
---    wait for 350 us;
+    wait for 5 us;
 
---    testRxRead <= '1';
+    testRxRead <= '1';
 
---    testDataIn <= x"32";
---    wait for clkPeriod*delay;
---    testTxWrite <= '1';
---    wait for clkPeriod;
---    testTxWrite <= '0';
---    wait for clkPeriod*delay;
---    testDataIn <= x"11";
---    testTxWrite <= '1';
---    wait for clkPeriod;
---    testTxWrite <= '0';
---    wait for clkPeriod*delay;
---    testDataIn <= x"22";
---    testTxWrite <= '1';
---    wait for clkPeriod;
---    testTxWrite <= '0';
---    wait for clkPeriod*delay;
---    testDataIn <= x"00";
---    testTxWrite <= '1';
---    wait for clkPeriod;
---    testTxWrite <= '0';
---    wait for clkPeriod*delay;
---    testDataIn <= x"00";
---    testTxWrite <= '1';
---    wait for clkPeriod;
---    testTxWrite <= '0';
---    wait for clkPeriod*delay;
---    testDataIn <= x"00";
---    testTxWrite <= '1';
---    wait for clkPeriod;
---    testTxWrite <= '0';
---    wait for clkPeriod*delay;
---    testDataIn <= x"07"; -- send 0xNN bytes in burst mode
---    testTxWrite <= '1';
---    wait for clkPeriod;
---    testTxWrite <= '0';
---    wait for clkPeriod*delay;
+    testDataIn <= x"76";
+    wait for clkPeriod*delay;
+    testTxWrite <= '1';
+    wait for clkPeriod*delay;
+    testTxWrite <= '0';
+    wait for clkPeriod*delay;
+    testDataIn <= x"32";
+    wait for clkPeriod*delay;
+    testTxWrite <= '1';
+    wait for clkPeriod;
+    testTxWrite <= '0';
+    wait for clkPeriod*delay;
+    testDataIn <= x"11";
+    testTxWrite <= '1';
+    wait for clkPeriod;
+    testTxWrite <= '0';
+    wait for clkPeriod*delay;
+    testDataIn <= x"22";
+    testTxWrite <= '1';
+    wait for clkPeriod;
+    testTxWrite <= '0';
+    wait for clkPeriod*delay;
+    testDataIn <= x"00";
+    testTxWrite <= '1';
+    wait for clkPeriod;
+    testTxWrite <= '0';
+    wait for clkPeriod*delay;
+    testDataIn <= x"00";
+    testTxWrite <= '1';
+    wait for clkPeriod;
+    testTxWrite <= '0';
+    wait for clkPeriod*delay;
+    testDataIn <= x"00";
+    testTxWrite <= '1';
+    wait for clkPeriod;
+    testTxWrite <= '0';
+    wait for clkPeriod*delay;
+    testDataIn <= x"07"; -- send 0xNN bytes in burst mode
+    testTxWrite <= '1';
+    wait for clkPeriod;
+    testTxWrite <= '0';
+    wait for clkPeriod*delay;
 
---    testDataIn <= x"84";
---    testTxWrite <= '1';
---    wait for clkPeriod;
---    testTxWrite <= '0';
---    wait for clkPeriod*delay;
---    testDataIn <= x"c4";
---    testTxWrite <= '1';
---    wait for clkPeriod;
---    testTxWrite <= '0';
---    wait for clkPeriod*delay;
---    testDataIn <= x"48"; --0x33 0x00 0x00 0x00 0x00 0x00 0x06 0x84 0xc4 0x48 0x15 0x03 0x04
---    testTxWrite <= '1';
---    wait for clkPeriod;
---    testTxWrite <= '0';
---    wait for clkPeriod*delay;
---    testDataIn <= x"15";
---    testTxWrite <= '1';
---    wait for clkPeriod;
---    testTxWrite <= '0';
---    wait for clkPeriod*delay;
+    testDataIn <= x"84";
+    testTxWrite <= '1';
+    wait for clkPeriod;
+    testTxWrite <= '0';
+    wait for clkPeriod*delay;
+    testDataIn <= x"c4";
+    testTxWrite <= '1';
+    wait for clkPeriod;
+    testTxWrite <= '0';
+    wait for clkPeriod*delay;
+    testDataIn <= x"48"; --0x33 0x00 0x00 0x00 0x00 0x00 0x06 0x84 0xc4 0x48 0x15 0x03 0x04
+    testTxWrite <= '1';
+    wait for clkPeriod;
+    testTxWrite <= '0';
+    wait for clkPeriod*delay;
+    testDataIn <= x"15";
+    testTxWrite <= '1';
+    wait for clkPeriod;
+    testTxWrite <= '0';
+    wait for clkPeriod*delay;
 
---    testDataIn <= x"03";
---    testTxWrite <= '1';
---    wait for clkPeriod;
---    testTxWrite <= '0';
---    wait for clkPeriod*delay;
---    testDataIn <= x"04";
---    testTxWrite <= '1';
---    wait for clkPeriod;
---    testTxWrite <= '0';
---    wait for clkPeriod*delay;
---    testDataIn <= x"88";
---    testTxWrite <= '1';
---    wait for clkPeriod;
---    testTxWrite <= '0';
---    wait for clkPeriod*delay;
+    testDataIn <= x"03";
+    testTxWrite <= '1';
+    wait for clkPeriod;
+    testTxWrite <= '0';
+    wait for clkPeriod*delay;
+    testDataIn <= x"04";
+    testTxWrite <= '1';
+    wait for clkPeriod;
+    testTxWrite <= '0';
+    wait for clkPeriod*delay;
+    testDataIn <= x"88";
+    testTxWrite <= '1';
+    wait for clkPeriod;
+    testTxWrite <= '0';
+    wait for clkPeriod*delay;
 --    testDataIn <= x"99";
 --    testTxWrite <= '1';
 --    wait for clkPeriod;
@@ -555,90 +453,90 @@ begin
 
 --    wait until radBusy = '0';
 
-    wait for 50 us;
+--    wait for 50 us;
 
-    testRxRead <= '1';
+--    testRxRead <= '1';
 
-    testDataIn <= x"B2";
-    wait for clkPeriod;
-    testTxWrite <= '1';
-    wait for clkPeriod;
-    testDataIn <= x"00";
-    wait for clkPeriod;
-    testDataIn <= x"00";
-    wait for clkPeriod;
-    testDataIn <= x"00";
-    wait for clkPeriod;
-    testDataIn <= x"00";
-    wait for clkPeriod;
-    testDataIn <= x"00";
-    wait for clkPeriod;
-    testDataIn <= x"11";
-    wait for clkPeriod;
-    testTxWrite <= '0';
+--    testDataIn <= x"B2";
+--    wait for clkPeriod;
+--    testTxWrite <= '1';
+--    wait for clkPeriod;
+--    testDataIn <= x"00";
+--    wait for clkPeriod;
+--    testDataIn <= x"00";
+--    wait for clkPeriod;
+--    testDataIn <= x"00";
+--    wait for clkPeriod;
+--    testDataIn <= x"00";
+--    wait for clkPeriod;
+--    testDataIn <= x"00";
+--    wait for clkPeriod;
+--    testDataIn <= x"11";
+--    wait for clkPeriod;
+--    testTxWrite <= '0';
 
-    --wait until i2cBusy = '0';
+--    --wait until i2cBusy = '0';
 
-    wait until i2cBusy = '0';
+--    wait until i2cBusy = '0';
 
-    wait until i2cBusy = '0';
+--    wait until i2cBusy = '0';
 
-    wait until i2cBusy = '0';
+--    wait until i2cBusy = '0';
 
-    testData <= x"AA";
+--    testData <= x"AA";
     
-    wait until i2cBusy = '0';
+--    wait until i2cBusy = '0';
 
-    testData <= x"BB";
+--    testData <= x"BB";
 
-    wait until i2cBusy = '0';
+--    wait until i2cBusy = '0';
 
-    testData <= x"CC";
+--    testData <= x"CC";
 
-    wait until i2cBusy = '0';
+--    wait until i2cBusy = '0';
 
-    testData <= x"DD";
+--    testData <= x"DD";
 
-    wait until i2cBusy = '0';
+--    wait until i2cBusy = '0';
 
-    testData <= x"EE";
+--    testData <= x"EE";
 
-    wait until i2cBusy = '0';
+--    wait until i2cBusy = '0';
 
-    testData <= x"AB";
+--    testData <= x"AB";
     
-    wait until i2cBusy = '0';
+--    wait until i2cBusy = '0';
 
-    testData <= x"CD";
+--    testData <= x"CD";
 
-    wait until i2cBusy = '0';
+--    wait until i2cBusy = '0';
 
-    testData <= x"EF";
+--    testData <= x"EF";
 
-    wait until i2cBusy = '0';
+--    wait until i2cBusy = '0';
 
-    testData <= x"12";
+--    testData <= x"12";
 
-    wait until i2cBusy = '0';
+--    wait until i2cBusy = '0';
 
-    testData <= x"13";
+--    testData <= x"13";
 
-    wait until i2cBusy = '0';
+--    wait until i2cBusy = '0';
 
-    testData <= x"14";
+--    testData <= x"14";
 
-    wait until i2cBusy = '0';
+--    wait until i2cBusy = '0';
 
-    testData <= x"15";
+--    testData <= x"15";
 
-    wait for 10 us;
+--    wait for 10 us;
 
     wait;
 end process;
 
 clk <= not clk after clkPeriod/2;
 
-uut: radiorocInterface
+uut: entity work.radiorocInterface
 generic map(
     chipID     => chipID
 )
@@ -667,10 +565,12 @@ devDataInVec(radioroc) <= dataFromRad;
 devReadyVec(radioroc)  <= devReadyRad;
 devBusyVec(radioroc)   <= radBusy;
 
-devInterfInst: deviceInterface
+devInterfInst: entity work.deviceInterface
 generic map(
     clkFreq      => clkFreq,
     timeout      => timeout,
+    idHeader     => idHeader,
+    broadcastId  => broadcastId,
     readCmd      => readCmd,
     writeCmd     => writeCmd,
     burstWrCmd   => burstWrCmd,
@@ -680,6 +580,7 @@ generic map(
 port map(
     clk          => clk,
     rst          => rst,
+    id           => id,
     dataIn       => dataFromMaster,
     dataOut      => dataToMaster,
     rxRead       => rxRead,
@@ -728,7 +629,7 @@ port map(
     mosi         => mosi
 );
 
-spiInst: SPIMaster
+spiInst: entity work.SPIMaster
 generic map(
     clkFreq      => clkFreq,
     sclkFreq     => sclkFreq
@@ -755,9 +656,9 @@ port map(
     mosi         => mosi
 );
 
-i2cModule: i2cMaster
+i2cModule: entity work.i2cMaster
 generic map(
-    input_clk => 100000000,
+    input_clk => 200000000,
     bus_clk   => 400000
 )
 port map(
