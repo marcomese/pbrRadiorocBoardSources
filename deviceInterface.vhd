@@ -544,13 +544,11 @@ begin
                         devExec    <= not devRwSig;
                         rxEna      <= '1';
                         busy       <= '0';
-                        rstDataOut <= '1';
 
                         state      <= waitDevBusy;
                     elsif devBrstSig = '1' and devReady(devIdSig) = '1' then
                         rxEna      <= '1';
                         busy       <= '0';
-                        rstDataOut <= '1';
 
                         state      <= waitDevBusy;
                     end if;
@@ -561,7 +559,9 @@ begin
                     state <= waitDevBusy;
 
                     if devBusy(devIdSig) = '0' then
-                        state <= idle;
+                        rstDataOut <= '1';
+                        
+                        state      <= idle;
                     end if;
 
                 when errTOut =>
