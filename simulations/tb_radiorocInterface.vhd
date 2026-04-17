@@ -299,7 +299,7 @@ begin
 
 
 ----------------------------------------------------------------------
-    wait for 500 us;
+    wait for 100 us;
 
     testDataIn <= x"76";
     wait for clkPeriod*delay;
@@ -313,12 +313,12 @@ begin
     wait for clkPeriod;
     testTxWrite <= '0';
     wait for clkPeriod*delay;
-    testDataIn <= x"11";
+    testDataIn <= x"49";
     testTxWrite <= '1';
     wait for clkPeriod;
     testTxWrite <= '0';
     wait for clkPeriod*delay;
-    testDataIn <= x"22";
+    testDataIn <= x"af";
     testTxWrite <= '1';
     wait for clkPeriod;
     testTxWrite <= '0';

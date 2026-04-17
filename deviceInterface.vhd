@@ -77,6 +77,7 @@ type state_t is (idle,
                  readDev,
                  sendDevData,
                  done,
+                 waitDevBusy,
                  errFifo,
                  errTOut,
                  errBrstPar);
@@ -91,6 +92,8 @@ signal   tOutRst,
          validId,
          rwSig,
          rxRdSig,
+         rstAddr,
+         loadAddr,
          loadBrstBuff,
          readBrstBuff,
          rstDataOut,
@@ -118,6 +121,7 @@ signal   byteCnt       : unsigned(bitsNum(bytesNum) downto 0);
 signal   brstByteNum   : unsigned(bitsNum(bytesNum)-1 downto 0);
 signal   paddCnt       : unsigned(1 downto 0);
 signal   devDataOutSig : devData_t;
+signal   devAddrSig    : devAddr_t;
 signal   dataToFifoSel : std_logic_vector(1 downto 0);
 signal   dataToFifo    : std_logic_vector(7 downto 0);
 signal   idSig         : std_logic_vector(7 downto 0);
@@ -131,10 +135,22 @@ devRw       <= devRwSig;
 devBrst     <= devBrstSig;
 devId       <= devIdSig;
 devDataOut  <= devDataOutSig;
+devAddr     <= devAddrSig;
 endCnt      <= byteCnt(byteCnt'left);
 tOutSig     <= tOutCnt(tOutCnt'left);
 lastBrst    <= not or_reduce(std_logic_vector(byteCnt(byteCnt'left downto 2)));
 idSig       <= idHeader & id;
+
+devAddrCtrl: process(clk)
+begin
+    if rising_edge(clk) then
+        if rstAddr = '1' then
+            devAddrSig <= (others => (others => '0'));
+        elsif loadAddr = '1' then
+            devAddrSig <= devAddrSig(devAddrSig'left-1 downto 0) & dataIn;
+        end if;
+    end if;
+end process;
 
 devDataOutCtrl: process(clk)
 begin
@@ -225,7 +241,8 @@ begin
             devBrstSig    <= '0';
             devBrstWrt    <= '0';
             devBrstSnd    <= '0';
-            devAddr       <= (others => (others => '0'));
+            rstAddr       <= '1';
+            loadAddr      <= '0';
             devExec       <= '0';
             busy          <= '0';
             brstByteNum   <= (others => '0');
@@ -248,10 +265,10 @@ begin
             case state is
                 when idle =>
                     tOutRst     <= '1';
-                    rstDataOut  <= '0';
                     busy        <= '0';
                     devExec     <= '0';
                     rstBrstBuff <= '1';
+                    rstAddr     <= '1';
                     rxRdSig     <= rxPresent;
 
                     state       <= idle;
@@ -259,6 +276,8 @@ begin
                     if rxPresent = '1' and validId = '1' then
                         busy        <= '1';
                         rstBrstBuff <= '0';
+                        rstAddr     <= '0';
+                        rstDataOut  <= '0';
 
                         state       <= getCmd;
                     end if;
@@ -292,7 +311,9 @@ begin
                         busy    <= '0';
 
                         state   <= idle;
-                    elsif rxPresent = '1' then
+                    elsif rxPresent = '1' and devBusy(devIdSig) = '1' then
+                        state <= getDev;
+                    elsif rxPresent = '1' and devBusy(devIdSig) = '0' then
                         tOutRst    <= '1';
                         rxRdSig    <= '1';
 
@@ -307,7 +328,8 @@ begin
                 when getAddr =>
                     i := to_integer(byteCnt);
 
-                    tOutRst <= '0';
+                    tOutRst  <= '0';
+                    loadAddr <= '0';
 
                     state   <= getAddr;
 
@@ -329,7 +351,7 @@ begin
                     elsif rxPresent = '1' then
                         tOutRst    <= '1';
                         byteCnt    <= byteCnt - 1;
-                        devAddr(i) <= dataIn;
+                        loadAddr   <= '1';
                     elsif tOutSig = '1' then
                         tOutRst <= '1';
                         rxRdSig <= '0';
@@ -436,7 +458,6 @@ begin
                         state         <= done;
                     elsif devBrstRst(devIdSig) = '1' then
                         devBrstSig    <= '0';
-                        rstDataOut    <= '1';
 
                         state         <= done;
                     end if;
@@ -520,16 +541,27 @@ begin
                     state         <= done;
 
                     if devBrstSig = '0' then
-                        devExec <= not devRwSig;
-                        rxEna   <= '1';
-                        busy    <= '0';
+                        devExec    <= not devRwSig;
+                        rxEna      <= '1';
+                        busy       <= '0';
+                        rstDataOut <= '1';
 
-                        state   <= idle;
+                        state      <= waitDevBusy;
                     elsif devBrstSig = '1' and devReady(devIdSig) = '1' then
-                        rxEna   <= '1';
-                        busy    <= '0';
+                        rxEna      <= '1';
+                        busy       <= '0';
+                        rstDataOut <= '1';
 
-                        state   <= idle;
+                        state      <= waitDevBusy;
+                    end if;
+
+                when waitDevBusy =>
+                    devExec <= '0';
+
+                    state <= waitDevBusy;
+
+                    if devBusy(devIdSig) = '0' then
+                        state <= idle;
                     end if;
 
                 when errTOut =>
@@ -541,9 +573,9 @@ begin
                     flushRxFifo   <= '0';
                     flushTxFifo   <= '0';
                     devIdSig      <= none;
-                    devAddr       <= (others => (others => '0'));
                     devBrstSig    <= '0';
                     busy          <= '0';
+                    rstDataOut    <= '1';
                     error         <= "001";
 
                     state         <= idle;
@@ -557,9 +589,9 @@ begin
                     flushRxFifo   <= '0';
                     flushTxFifo   <= '0';
                     devIdSig      <= none;
-                    devAddr       <= (others => (others => '0'));
                     devBrstSig    <= '0';
                     busy          <= '0';
+                    rstDataOut    <= '1';
                     error         <= "010";
 
                     state         <= idle;
@@ -573,9 +605,9 @@ begin
                     flushRxFifo   <= '0';
                     flushTxFifo   <= '0';
                     devIdSig      <= none;
-                    devAddr       <= (others => (others => '0'));
                     devBrstSig    <= '0';
                     busy          <= '0';
+                    rstDataOut    <= '1';
                     error         <= "011";
 
                     state         <= idle;
@@ -589,9 +621,9 @@ begin
                     flushRxFifo   <= '0';
                     flushTxFifo   <= '0';
                     devIdSig      <= none;
-                    devAddr       <= (others => (others => '0'));
                     devBrstSig    <= '0';
                     busy          <= '0';
+                    rstDataOut    <= '1';
                     error         <= "111";
 
                     state         <= idle;
