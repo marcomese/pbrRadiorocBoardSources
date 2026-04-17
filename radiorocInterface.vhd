@@ -58,11 +58,7 @@ signal   dataReady,
          exec,
          busyRad    : std_logic;
 
-signal   rAddr      : devAddr_t;
-
 signal   dataOut    : devData_t;
-
-signal   dataIn     : devData_t;
 
 begin
 
@@ -74,8 +70,6 @@ begin
         if rst = '1' then
             exec       <= '0';
             rw         <= readCmd;
-            rAddr      <= (others => (others => '0'));
-            dataIn     <= (others => (others => '0'));
             devReady   <= '0';
             busy       <= '0';
             i2cEnClk   <= '0';
@@ -86,8 +80,6 @@ begin
                 when idle =>
                     exec     <= '0';
                     rw       <= devRw;
-                    rAddr    <= (others => (others => '0'));
-                    dataIn   <= (others => (others => '0'));
                     devReady <= '0';
                     busy     <= '0';
                     i2cEnClk <= '0';
@@ -96,8 +88,6 @@ begin
 
                     if devExec = '1' and devId = radioroc and busyRad = '0' then
                         exec     <= '1';
-                        rAddr    <= devAddr;
-                        dataIn   <= devDataIn;
                         devReady <= '0';
                         busy     <= '1';
                         i2cEnClk <= '1';
@@ -108,7 +98,6 @@ begin
                 when waitReady =>
                     exec     <= devExec and brstOn and not dataReady;
                     devReady <= dataReady and brstOn;
-                    dataIn   <= devDataIn;
 
                     state    <= waitReady;
 
@@ -128,7 +117,6 @@ begin
                 when others =>
                     exec     <= '0';
                     rw       <= readCmd;
-                    rAddr    <= (others => (others => '0'));
                     devReady <= '0';
                     busy     <= '0';
                     i2cEnClk <= '0';
@@ -150,8 +138,8 @@ port map(
     exec         => exec,
     rw           => rw,
     brst         => devBrst,
-    addr         => rAddr,
-    dataIn       => dataIn,
+    addr         => devAddr,
+    dataIn       => devDataIn,
     dataOut      => dataOut,
     busy         => busyRad,
     brstOn       => brstOn,

@@ -254,7 +254,7 @@ begin
     wait for clkPeriod;
     testTxWrite <= '0';
     wait for clkPeriod*delay;
-    testDataIn <= x"07"; -- send 0xNN bytes in burst mode
+    testDataIn <= x"03"; -- send 0xNN bytes in burst mode
     testTxWrite <= '1';
     wait for clkPeriod;
     testTxWrite <= '0';
@@ -275,27 +275,27 @@ begin
     wait for clkPeriod;
     testTxWrite <= '0';
     wait for clkPeriod*delay;
-    testDataIn <= x"15";
-    testTxWrite <= '1';
-    wait for clkPeriod;
-    testTxWrite <= '0';
-    wait for clkPeriod*delay;
+--    testDataIn <= x"15";
+--    testTxWrite <= '1';
+--    wait for clkPeriod;
+--    testTxWrite <= '0';
+--    wait for clkPeriod*delay;
 
-    testDataIn <= x"03";
-    testTxWrite <= '1';
-    wait for clkPeriod;
-    testTxWrite <= '0';
-    wait for clkPeriod*delay;
-    testDataIn <= x"04";
-    testTxWrite <= '1';
-    wait for clkPeriod;
-    testTxWrite <= '0';
-    wait for clkPeriod*delay;
-    testDataIn <= x"88";
-    testTxWrite <= '1';
-    wait for clkPeriod;
-    testTxWrite <= '0';
-    wait for clkPeriod*delay;
+--    testDataIn <= x"03";
+--    testTxWrite <= '1';
+--    wait for clkPeriod;
+--    testTxWrite <= '0';
+--    wait for clkPeriod*delay;
+--    testDataIn <= x"04";
+--    testTxWrite <= '1';
+--    wait for clkPeriod;
+--    testTxWrite <= '0';
+--    wait for clkPeriod*delay;
+--    testDataIn <= x"88";
+--    testTxWrite <= '1';
+--    wait for clkPeriod;
+--    testTxWrite <= '0';
+--    wait for clkPeriod*delay;
 --    testDataIn <= x"99";
 --    testTxWrite <= '1';
 --    wait for clkPeriod;
