@@ -41,6 +41,7 @@ port(
     dataOut     : out std_logic_vector(7 downto 0);
     rxRead      : out std_logic;
     rxPresent   : in  std_logic;
+    rxValid     : in  std_logic;
     txWrite     : out std_logic;
     txWrAck     : in  std_logic;
     rxEna       : out std_logic;
@@ -146,7 +147,7 @@ begin
     if rising_edge(clk) then
         if rstAddr = '1' then
             devAddrSig <= (others => (others => '0'));
-        elsif loadAddr = '1' then
+        elsif loadAddr = '1' and rxValid = '1' and endCnt = '0' then
             devAddrSig <= devAddrSig(devAddrSig'left-1 downto 0) & dataIn;
         end if;
     end if;
@@ -224,7 +225,6 @@ begin
 end process;
 
 devFSM: process(clk, rst, rxPresent)
-    variable i : integer := 0;
 begin
     if rising_edge(clk) then
         if rst = '1' then
@@ -234,8 +234,8 @@ begin
             rxRdSig       <= '0';
             txWSig        <= '0';
             rxEna         <= '1';
-            flushRxFifo   <= '0';
-            flushTxFifo   <= '0';
+            flushRxFifo   <= '1';
+            flushTxFifo   <= '1';
             devIdSig      <= none;
             devRwSig      <= '0';
             devBrstSig    <= '0';
@@ -269,7 +269,9 @@ begin
                     devExec     <= '0';
                     rstBrstBuff <= '1';
                     rstAddr     <= '1';
-                    rxRdSig     <= rxPresent;
+                    flushRxFifo <= '0';
+                    flushTxFifo <= '0';
+                    rxRdSig     <= rxPresent and not rxValid;
 
                     state       <= idle;
 
@@ -284,7 +286,7 @@ begin
 
                 when getCmd =>
                     tOutRst <= '0';
-                    rxRdSig <= rxPresent;
+                    rxRdSig <= '0';
 
                     state   <= getCmd;
 
@@ -302,56 +304,57 @@ begin
                 when getDev =>
                     tOutRst <= '0';
                     rstFifo <= '0';
+                    rxRdSig <= '0';
 
                     state   <= getDev;
 
                     if devIdSig = none then
                         tOutRst <= '1';
-                        rxRdSig <= '0';
                         busy    <= '0';
 
                         state   <= idle;
                     elsif rxPresent = '1' and devBusy(devIdSig) = '1' then
                         state <= getDev;
                     elsif rxPresent = '1' and devBusy(devIdSig) = '0' then
-                        tOutRst    <= '1';
-                        rxRdSig    <= '1';
+                        tOutRst  <= '1';
+                        rxRdSig  <= '1';
+                        loadAddr <= '1';
 
-                        state      <= getAddr;
+                        state    <= getAddr;
                     elsif tOutSig = '1'  then
                         tOutRst <= '1';
-                        rxRdSig <= '0';
 
                         state   <= errFifo;
                     end if;
 
                 when getAddr =>
-                    i := to_integer(byteCnt);
-
-                    tOutRst  <= '0';
-                    loadAddr <= '0';
+                    tOutRst <= '0';
 
                     state   <= getAddr;
 
                     if endCnt = '1' and devRwSig = devWrite then
-                        tOutRst <= '1';
-                        byteCnt <= to_unsigned(devDataBytes-1, byteCnt'length);
+                        tOutRst  <= '1';
+                        rxRdSig  <= '0';
+                        loadAddr <= '0';
+                        byteCnt  <= to_unsigned(devDataBytes-1, byteCnt'length);
 
-                        state   <= getData;
+                        state    <= getData;
                     elsif endCnt = '1' and devRwSig = devRead then
-                        tOutRst <= '1';
-                        byteCnt <= to_unsigned(devDataBytes-1, byteCnt'length);
-                        devExec <= not devBrstSig;
+                        tOutRst  <= '1';
+                        rxRdSig  <= '0';
+                        loadAddr <= '0';
+                        byteCnt  <= to_unsigned(devDataBytes-1, byteCnt'length);
+                        devExec  <= not devBrstSig;
 
-                        state   <= getData;
+                        state    <= getData;
 
                         if devBrstSig = '0' then
                             state         <= readDev;
                         end if;
-                    elsif rxPresent = '1' then
-                        tOutRst    <= '1';
-                        byteCnt    <= byteCnt - 1;
-                        loadAddr   <= '1';
+                    elsif rxValid = '1' then
+                        tOutRst  <= '1';
+                        rxRdSig  <= '1';
+                        byteCnt  <= byteCnt - 1;
                     elsif tOutSig = '1' then
                         tOutRst <= '1';
                         rxRdSig <= '0';
@@ -360,11 +363,10 @@ begin
                     end if;
 
                 when getData =>
-                    i := to_integer(byteCnt);
-
                     tOutRst      <= '0';
+                    loadAddr     <= '0';
                     loadBrstBuff <= '0';
-                    loadDataIn   <= '0';
+                    rxRdSig      <= '1';
 
                     state        <= getData;
 
@@ -385,12 +387,12 @@ begin
                         byteCnt      <= resize(brstByteNum, byteCnt'length);
 
                         state        <= addPadding;
-                    elsif rxPresent = '1' and brstCollect = '0' then
+                    elsif rxValid = '1' and brstCollect = '0' then
                         tOutRst          <= '1';
                         rxRdSig          <= '1';
                         loadDataIn       <= '1';
                         byteCnt          <= byteCnt - 1;
-                    elsif rxPresent = '1' and brstCollect = '1' then
+                    elsif rxValid = '1' and brstCollect = '1' then
                         tOutRst      <= '1';
                         rxRdSig      <= '1';
                         loadBrstBuff <= '1';
@@ -463,15 +465,15 @@ begin
                     end if;
 
                 when readDev =>
-                    i := to_integer(byteCnt);
+                    tOutRst  <= '0';
+                    loadAddr <= '0';
+                    devExec  <= '0';
+                    rxEna    <= '0';
+                    loadAddr <= '0';
+                    wEnFifo  <= devReady(devIdSig) or wAckFifo;
+                    byteCnt  <= byteCnt - stdLogicToInt(wAckFifo);
 
-                    tOutRst    <= '0';
-                    devExec    <= '0';
-                    rxEna      <= '0';
-                    wEnFifo    <= devReady(devIdSig) or wAckFifo;
-                    byteCnt    <= byteCnt - stdLogicToInt(wAckFifo);
-
-                    state      <= readDev;
+                    state    <= readDev;
 
                     if byteCnt = 0 then
                         rEnFifo <= '1';

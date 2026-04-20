@@ -24,6 +24,7 @@ port(
     rx_read      : in  std_logic;
     rx_ena       : in  std_logic;
     rx_present   : out std_logic;
+    rx_valid     : out std_logic;
     rx_half_full : out std_logic;
     rx_full      : out std_logic;
     tx_write     : in  std_logic;
@@ -84,6 +85,7 @@ signal sclkFF,
        loadTxFifo,
        loadRxFifo,
        rxEna,
+       rxEmpty,
        lastBit    : std_logic;
 signal bitCount   : unsigned(3 downto 0);
 signal buffIn,
@@ -99,6 +101,8 @@ loadBuff   <= and_reduce(std_logic_vector(bitCount(2 downto 0)));
 loadRxFifo <= lastBit and rxEna;
 
 loadTxFifo <= lastBit;
+
+rx_present <= not rxEmpty;
 
 misoRegProc: process(clk)
 begin
@@ -200,8 +204,8 @@ rxFifoInst: rxFifo
     rd_en     => rx_read,
     dout      => data_out,
     full      => rx_full,
-    empty     => open,
-    valid     => rx_present,
+    empty     => rxEmpty,
+    valid     => rx_valid,
     prog_full => rx_half_full
   );
 

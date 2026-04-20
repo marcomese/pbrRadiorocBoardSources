@@ -43,6 +43,7 @@ signal   devBusyVec     : devStdLogic_t                := (others => '0');
 signal   error          : std_logic_vector(2 downto 0) := "000";
 signal   rxRead         : std_logic                    := '0';
 signal   rxPresent      : std_logic                    := '0';
+signal   rxValid        : std_logic                    := '0';
 signal   txWrite        : std_logic                    := '0';
 signal   txWrAck        : std_logic                    := '0';
 signal   flushRxFifo    : std_logic                    := '0';
@@ -78,7 +79,7 @@ resetn <= not rst;
 stimProc: process
 begin
     rst <= '1';
-    wait for clkPeriod*5;
+    wait for clkPeriod*50;
     rst <= '0';
     id  <= "0110";
     wait for clkPeriod*5;
@@ -323,17 +324,17 @@ begin
     wait for clkPeriod;
     testTxWrite <= '0';
     wait for clkPeriod*delay;
-    testDataIn <= x"00";
+    testDataIn <= x"aa";
     testTxWrite <= '1';
     wait for clkPeriod;
     testTxWrite <= '0';
     wait for clkPeriod*delay;
-    testDataIn <= x"00";
+    testDataIn <= x"bb";
     testTxWrite <= '1';
     wait for clkPeriod;
     testTxWrite <= '0';
     wait for clkPeriod*delay;
-    testDataIn <= x"00";
+    testDataIn <= x"cc";
     testTxWrite <= '1';
     wait for clkPeriod;
     testTxWrite <= '0';
@@ -691,6 +692,7 @@ port map(
     dataOut      => dataToMaster,
     rxRead       => rxRead,
     rxPresent    => rxPresent,
+    rxValid      => rxValid,
     txWrite      => txWrite,
     rxEna        => rxEna,
     txWrAck      => txWrAck,
@@ -720,6 +722,7 @@ port map(
     rx_read      => rxRead,
     rx_ena       => rxEna,
     rx_present   => rxPresent,
+    rx_valid     => rxValid,
     rx_half_full => open,
     rx_full      => open,
     tx_write     => txWrite,
