@@ -201,14 +201,14 @@ begin
     end if;
 end process;
 
-brstBuffInst: xpm_fifo_sync
+rxFifoInst: xpm_fifo_sync
 generic map(
     FIFO_WRITE_DEPTH => maxBrstLen,
     READ_DATA_WIDTH  => 8,
     WRITE_DATA_WIDTH => 8,
     PROG_FULL_THRESH => 7,
     READ_MODE        => "std",
-    USE_ADV_FEATURES => "1010",
+    USE_ADV_FEATURES => "1002",
     FIFO_MEMORY_TYPE => "block"
 )
 port map(

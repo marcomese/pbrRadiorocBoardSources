@@ -329,6 +329,7 @@ begin
 
                 when getAddr =>
                     tOutRst <= '0';
+                    rxRdSig <= rxPresent and not rxValid;
 
                     state   <= getAddr;
 
@@ -393,11 +394,9 @@ begin
                         state       <= addPadding;
                     elsif rxValid = '1' and brstCollect = '0' then
                         tOutRst <= '1';
-                        rxRdSig <= '1';
                         byteCnt <= byteCnt - 1;
                     elsif rxValid = '1' and brstCollect = '1' then
                         tOutRst      <= '1';
-                        rxRdSig      <= '1';
                         loadBrstBuff <= '1';
                         byteCnt      <= byteCnt - 1;
                     elsif tOutSig = '1' then
@@ -422,7 +421,7 @@ begin
                     end if;
 
                 when checkBrstPar =>
-                    rxRdSig     <= '1';
+                    --rxRdSig     <= '1';
                     brstByteNum <= resize(devDataToUnsigned(devDataOutSig)-1, brstByteNum'length);
                     byteCnt     <= resize(devDataToUnsigned(devDataOutSig)-1, byteCnt'length);
                     paddCnt     <= resize(4-devDataToUnsigned(devDataOutSig), paddCnt'length);
