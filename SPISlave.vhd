@@ -15,7 +15,13 @@ use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.STD_LOGIC_MISC.ALL;
 use IEEE.NUMERIC_STD.ALL;
 
+library xpm;
+use xpm.vcomponents.all;
+
 entity SPISlave is
+generic(
+    maxBrstLen   : natural
+);
 port(
     clk          : in  std_logic;
     rst          : in  std_logic;
@@ -195,19 +201,31 @@ begin
     end if;
 end process;
 
-rxFifoInst: rxFifo
-  PORT MAP (
-    clk       => clk,
-    srst      => rx_reset,
-    din       => buffIn,
-    wr_en     => loadRxFifo,
-    rd_en     => rx_read,
-    dout      => data_out,
-    full      => rx_full,
-    empty     => rxEmpty,
-    valid     => rx_valid,
-    prog_full => rx_half_full
-  );
+brstBuffInst: xpm_fifo_sync
+generic map(
+    FIFO_WRITE_DEPTH => maxBrstLen,
+    READ_DATA_WIDTH  => 8,
+    WRITE_DATA_WIDTH => 8,
+    PROG_FULL_THRESH => 7,
+    READ_MODE        => "std",
+    USE_ADV_FEATURES => "1010",
+    FIFO_MEMORY_TYPE => "block"
+)
+port map(
+    wr_clk        => clk,
+    rst           => rx_reset,
+    din           => buffIn,
+    wr_en         => loadRxFifo,
+    dout          => data_out,
+    rd_en         => rx_read,
+    data_valid    => rx_valid,
+    empty         => rxEmpty,
+    full          => rx_full,
+    prog_full     => rx_half_full,
+    sleep         => '0',
+    injectdbiterr => '0',
+    injectsbiterr => '0'
+);
 
 txFifoInst: txFifo
 port map(

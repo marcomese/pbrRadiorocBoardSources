@@ -159,7 +159,7 @@ begin
         if rstDataOut = '1' then
             devDataOutSig <= (others => (others => '0'));
         else
-            if loadDataIn = '1' then
+            if loadDataIn = '1' and rxValid = '1' and endCnt = '0' then
                 devDataOutSig <= devDataOutSig(devDataOutSig'left-1 downto 0) & dataIn;
             elsif loadLastBrst = '1' then
                 devDataOutSig <= (0      => std_logic_vector(resize(brstByteNum(1 downto 0), 8)),
@@ -333,27 +333,28 @@ begin
                     state   <= getAddr;
 
                     if endCnt = '1' and devRwSig = devWrite then
-                        tOutRst  <= '1';
-                        rxRdSig  <= '0';
-                        loadAddr <= '0';
-                        byteCnt  <= to_unsigned(devDataBytes-1, byteCnt'length);
+                        tOutRst    <= '1';
+                        rxRdSig    <= '0';
+                        loadAddr   <= '0';
+                        loadDataIn <= '1';
+                        byteCnt    <= to_unsigned(devDataBytes-1, byteCnt'length);
 
                         state    <= getData;
                     elsif endCnt = '1' and devRwSig = devRead then
-                        tOutRst  <= '1';
-                        rxRdSig  <= '0';
-                        loadAddr <= '0';
-                        byteCnt  <= to_unsigned(devDataBytes-1, byteCnt'length);
-                        devExec  <= not devBrstSig;
+                        tOutRst    <= '1';
+                        rxRdSig    <= '0';
+                        loadAddr   <= '0';
+                        loadDataIn <= '1';
+                        byteCnt    <= to_unsigned(devDataBytes-1, byteCnt'length);
+                        devExec    <= not devBrstSig;
 
-                        state    <= getData;
+                        state      <= getData;
 
                         if devBrstSig = '0' then
-                            state         <= readDev;
+                            state <= readDev;
                         end if;
                     elsif rxValid = '1' then
                         tOutRst  <= '1';
-                        rxRdSig  <= '1';
                         byteCnt  <= byteCnt - 1;
                     elsif tOutSig = '1' then
                         tOutRst <= '1';
@@ -366,42 +367,45 @@ begin
                     tOutRst      <= '0';
                     loadAddr     <= '0';
                     loadBrstBuff <= '0';
-                    rxRdSig      <= '1';
+                    rxRdSig      <= rxPresent;
 
                     state        <= getData;
 
                     if endCnt = '1' and devBrstSig = '0' then
-                        tOutRst <= '1';
-                        rxRdSig <= '0';
+                        tOutRst    <= '1';
+                        rxRdSig    <= '0';
+                        loadDataIn <= '0';
 
-                        state   <= done;
+                        state      <= done;
                     elsif endCnt = '1' and devBrstSig = '1' and brstCollect = '0' then
-                        tOutRst <= '1';
-                        rxRdSig <= '0';
+                        tOutRst    <= '1';
+                        rxRdSig    <= '0';
+                        loadDataIn <= '0';
 
-                        state   <= checkBrstPar;
+                        state      <= checkBrstPar;
                     elsif endCnt = '1' and devBrstSig = '1' and brstCollect = '1' then
-                        tOutRst      <= '1';
-                        rxRdSig      <= '0';
-                        brstCollect  <= '0';
-                        byteCnt      <= resize(brstByteNum, byteCnt'length);
+                        tOutRst     <= '1';
+                        rxRdSig     <= '0';
+                        brstCollect <= '0';
+                        loadDataIn  <= '0';
+                        byteCnt     <= resize(brstByteNum, byteCnt'length);
 
-                        state        <= addPadding;
+                        state       <= addPadding;
                     elsif rxValid = '1' and brstCollect = '0' then
-                        tOutRst          <= '1';
-                        rxRdSig          <= '1';
-                        loadDataIn       <= '1';
-                        byteCnt          <= byteCnt - 1;
+                        tOutRst <= '1';
+                        rxRdSig <= '1';
+                        byteCnt <= byteCnt - 1;
                     elsif rxValid = '1' and brstCollect = '1' then
                         tOutRst      <= '1';
                         rxRdSig      <= '1';
                         loadBrstBuff <= '1';
                         byteCnt      <= byteCnt - 1;
                     elsif tOutSig = '1' then
-                        tOutRst <= '1';
-                        rxRdSig <= '0';
+                        tOutRst    <= '1';
+                        rxRdSig    <= '0';
+                        loadDataIn <= '0';
 
-                        state   <= errTOut;
+                        state      <= errTOut;
                     end if;
 
                 when addPadding =>

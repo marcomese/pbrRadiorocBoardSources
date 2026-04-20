@@ -181,6 +181,7 @@ signal   dataIn         : std_logic_vector(7 downto 0);
 signal   dataOut        : std_logic_vector(7 downto 0);
 signal   rxRead         : std_logic;
 signal   rxPresent      : std_logic;
+signal   rxValid        : std_logic;
 signal   txWrite        : std_logic;
 signal   rxEna          : std_logic;
 signal   txWrAck        : std_logic;
@@ -599,6 +600,9 @@ begin
 end process;
 
 spiSlaveInst: entity work.SPISlave
+generic map(
+    maxBrstLen   => maxBrstLen
+)
 port map(
     clk          => clk_200M,
     rst          => reset,
@@ -607,6 +611,7 @@ port map(
     rx_read      => rxRead,
     rx_ena       => rxEna,
     rx_present   => rxPresent,
+    rx_valid     => rxValid,
     rx_half_full => open,
     rx_full      => open,
     tx_write     => txWrite,
@@ -744,6 +749,7 @@ port map(
     rxRead     => rxRead,
     rxEna      => rxEna,
     rxPresent  => rxPresent,
+    rxValid    => rxValid,
     txWrite    => txWrite,
     txWrAck    => txWrAck,
     devId      => devId,

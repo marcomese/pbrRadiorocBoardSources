@@ -714,6 +714,9 @@ port map(
 );
 
 spiSlaveInst: entity work.SPISlave
+generic map(
+    maxBrstLen  => maxBrstLen
+)
 port map(
     clk          => clk,
     rst          => rst,
