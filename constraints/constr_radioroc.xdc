@@ -25,7 +25,7 @@ set_property INTERNAL_VREF 0.6 [get_iobanks 35]
 set_property IOSTANDARD LVCMOS25 [get_ports nCNV]
 set_property IOSTANDARD LVCMOS25 [get_ports nCMOS]
 set_property IOSTANDARD LVCMOS33 [get_ports npwr_reset]
-set_property IOSTANDARD LVCMOS33 [get_ports id[*]]
+set_property IOSTANDARD LVCMOS33 [get_ports {id[*]}]
 set_property IOSTANDARD LVCMOS33 [get_ports SCL_275]
 set_property IOSTANDARD LVCMOS33 [get_ports SDA_275]
 set_property IOSTANDARD LVCMOS12 [get_ports sc_NORT1]
@@ -53,9 +53,9 @@ set_property PACKAGE_PIN W4 [get_ports sysClk_n]
 
 set_property PACKAGE_PIN AB21 [get_ports npwr_reset]
 
-set_property PACKAGE_PIN Y18 [get_ports id[0]]
-set_property PACKAGE_PIN Y19 [get_ports id[1]]
-set_property PACKAGE_PIN V18 [get_ports id[2]]
+set_property PACKAGE_PIN Y18 [get_ports {id[0]}]
+set_property PACKAGE_PIN Y19 [get_ports {id[1]}]
+set_property PACKAGE_PIN V18 [get_ports {id[2]}]
 
 #RADIOROC
 set_property PACKAGE_PIN T14 [get_ports sc_scl]
@@ -218,7 +218,7 @@ set_property PACKAGE_PIN J16 [get_ports nCMOS]
 set_property PACKAGE_PIN N15 [get_ports SCL_275]
 set_property PACKAGE_PIN AB22 [get_ports SDA_275]
 
-create_clock -name clk_200M -period 5.0 [get_ports sysClk_p]
+create_clock -period 5.000 -name clk_200M [get_ports sysClk_p]
 
 #create_generated_clock -name clk_100M -source [get_ports sysClk_p] -divide_by 1 [get_pins bufr100MInst/O]
 
@@ -226,9 +226,9 @@ create_clock -name clk_200M -period 5.0 [get_ports sysClk_p]
 
 #create_generated_clock -name clk_10M -source [get_pins bufr50Inst/O] -divide_by 5 [get_pins bufr10Inst/O]
 
-create_clock -name sclk -period 50 [get_ports sclk_p]
+create_clock -period 50.000 -name sclk [get_ports sclk_p]
 
-set_clock_groups -asynchronous -group {clk_200M} -group {sclk}
+set_clock_groups -asynchronous -group clk_200M -group sclk
 
 set_property BITSTREAM.CONFIG.CONFIGRATE 50 [current_design]
 set_property BITSTREAM.GENERAL.COMPRESS TRUE [current_design]

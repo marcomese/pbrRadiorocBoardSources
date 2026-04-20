@@ -17,6 +17,12 @@ use work.utilsPkg.all;
 use work.devicesPkg.all;
 use work.registersPkg.all;
 
+library UNISIM;
+use UNISIM.vcomponents.all;
+
+library UNIMACRO;
+use UNIMACRO.vcomponents.all;
+
 entity rateMetersCtrl is
 generic(
     trgNum     : natural
@@ -66,7 +72,7 @@ type state_t is (idle,
                  errAddr,
                  errReadOnly);
 
-type rateMeters_t is array(0 to trgNum-1) of unsigned(31 downto 0);
+type rateMeters_t is array(0 to trgNum-1) of std_logic_vector(31 downto 0);
 
 constant idleStatus     : std_logic_vector(31 downto 0) := initSlv(32, 13, 0, "00" & x"001", '0');
 constant errAddrStatus  : std_logic_vector(31 downto 0) := initSlv(32, 13, 0, "11" & x"500", '0');
@@ -110,7 +116,7 @@ begin
 
             trgMtrsToRDataLoop: for i in 0 to trgNum-1 loop
                 if cntTmrSig = '1' then
-                    rData(i+addrNum) <= std_logic_vector(trgMeters(i));
+                    rData(i+addrNum) <= trgMeters(i);
                 end if;
             end loop;
 
@@ -175,18 +181,21 @@ end process;
 
 trgCntGen: for i in 0 to trgNum-1 generate
 begin
-    trgICnt: process(clk)
-    begin
-        if rising_edge(clk) then
-            if rst = '1' then
-                trgMeters(i) <= (others => '0');
-            elsif cntTmrSig = '1' then
-                trgMeters(i) <= (others => '0');
-            elsif trgIn(i) = '1' then
-                trgMeters(i) <= trgMeters(i) + 1;
-            end if;
-        end if;
-    end process;
+   trgICntInst: COUNTER_LOAD_MACRO
+   generic map (
+        COUNT_BY   => X"000000000001",
+        DEVICE     => "7SERIES",
+        WIDTH_DATA => 32
+    )
+    port map(
+        CLK       => clk,
+        RST       => rst,
+        Q         => trgMeters(i),
+        CE        => trgIn(i),
+        DIRECTION => '1',
+        LOAD      => cntTmrSig,
+        LOAD_DATA => x"00000000" 
+    );
 end generate;
 
 cntTmrGen: process(clk, rst)

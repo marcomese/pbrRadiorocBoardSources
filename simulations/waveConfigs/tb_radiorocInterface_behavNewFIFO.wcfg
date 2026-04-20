@@ -14,15 +14,15 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="8,329.000 ns"></ZoomStartTime>
-      <ZoomEndTime time="9,488.001 ns"></ZoomEndTime>
-      <Cursor1Time time="9,345.000 ns"></Cursor1Time>
+      <ZoomStartTime time="303,913.000 ns"></ZoomStartTime>
+      <ZoomEndTime time="304,234.201 ns"></ZoomEndTime>
+      <Cursor1Time time="304,055.000 ns"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
-      <NameColumnWidth column_width="168"></NameColumnWidth>
+      <NameColumnWidth column_width="164"></NameColumnWidth>
       <ValueColumnWidth column_width="58"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="81" />
+   <WVObjectSize size="89" />
    <wvobject fp_name="/tb_radiorocInterface/clk" type="logic">
       <obj_property name="ElementShortName">clk</obj_property>
       <obj_property name="ObjectShortName">clk</obj_property>
@@ -110,6 +110,38 @@
    <wvobject fp_name="/tb_radiorocInterface/devInterfInst/brstBuffInst/xpm_fifo_base_inst/wr_en" type="logic">
       <obj_property name="ElementShortName">wr_en</obj_property>
       <obj_property name="ObjectShortName">wr_en</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_radiorocInterface/devInterfInst/rstBrstBuff" type="logic">
+      <obj_property name="ElementShortName">rstBrstBuff</obj_property>
+      <obj_property name="ObjectShortName">rstBrstBuff</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_radiorocInterface/devInterfInst/brstWrRstBusy" type="logic">
+      <obj_property name="ElementShortName">brstWrRstBusy</obj_property>
+      <obj_property name="ObjectShortName">brstWrRstBusy</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_radiorocInterface/devInterfInst/brstRdRstBusy" type="logic">
+      <obj_property name="ElementShortName">brstRdRstBusy</obj_property>
+      <obj_property name="ObjectShortName">brstRdRstBusy</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_radiorocInterface/devInterfInst/brstFifoRstBusy" type="logic">
+      <obj_property name="ElementShortName">brstFifoRstBusy</obj_property>
+      <obj_property name="ObjectShortName">brstFifoRstBusy</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_radiorocInterface/devInterfInst/rstFifo" type="logic">
+      <obj_property name="ElementShortName">rstFifo</obj_property>
+      <obj_property name="ObjectShortName">rstFifo</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_radiorocInterface/devInterfInst/dataWrRstBusy" type="logic">
+      <obj_property name="ElementShortName">dataWrRstBusy</obj_property>
+      <obj_property name="ObjectShortName">dataWrRstBusy</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_radiorocInterface/devInterfInst/dataRdRstBusy" type="logic">
+      <obj_property name="ElementShortName">dataRdRstBusy</obj_property>
+      <obj_property name="ObjectShortName">dataRdRstBusy</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_radiorocInterface/devInterfInst/dataFifoRstBusy" type="logic">
+      <obj_property name="ElementShortName">dataFifoRstBusy</obj_property>
+      <obj_property name="ObjectShortName">dataFifoRstBusy</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_radiorocInterface/devInterfInst/state" type="other">
       <obj_property name="DisplayName">label</obj_property>

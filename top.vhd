@@ -150,6 +150,7 @@ signal   devReadyVec,
 signal   devId          : devices_t;
 
 signal   pwrOnRst,
+         pwrOnRstSig,
          pwrOnRstN,
          devReadyPGen,
          devReadyTmp,
@@ -243,9 +244,7 @@ attribute ASYNC_REG of csFF,
 
 begin
 
-pwrOnRst <= rstPORCnt(rstPORCnt'left);
-
-pwrOnRstN <= not rstPORCnt(rstPORCnt'left);
+pwrOnRstSig   <= not rstPORCnt(rstPORCnt'left);
 
 sc_val_evt    <= '1';
 
@@ -253,15 +252,15 @@ sc_reset_n    <= reset_n_acq;
 
 sc_rstn_read  <= rstn_read_acq;
 
-sc_rstb_i2c   <= pwrOnRst;
+sc_rstb_i2c   <= pwrOnRstN;
 
-sc_rstb_sc    <= pwrOnRst;
+sc_rstb_sc    <= pwrOnRstN;
 
-sc_rstb_probe <= pwrOnRst;
+sc_rstb_probe <= pwrOnRstN;
 
 pulse         <= pulseSig;
 
-areset         <= not(npwr_reset);
+areset         <= not npwr_reset;
 
 nCMOS         <= '1';
 
@@ -287,7 +286,7 @@ port map(
     dest_arst => reset
 );
 
-porRstCntProc: process(clk_200M, reset, rstPORCnt)
+porRstCntProc: process(clk_200M)
 begin
     if rising_edge(clk_200M) then
         if reset = '1' then
@@ -298,7 +297,19 @@ begin
     end if;
 end process;
 
-syncIn: process(clk_200M, pwrOnRst)
+porRstBUFG: BUFG
+port map(
+    I => pwrOnRstSig,
+    O => pwrOnRst
+);
+
+portRstNBUFG: BUFG
+port map(
+    I => rstPORCnt(rstPORCnt'left),
+    O => pwrOnRstN
+);
+
+syncIn: process(clk_200M)
 begin
     if rising_edge(clk_200M) then
         if pwrOnRst = '1' then
@@ -345,7 +356,7 @@ extTrgFF  <= '0';
 extTrgSig <= '0';
 
 extTrg <= miso;
---extTrgSync: process(pwrOnRst, clk_200M)
+--extTrgSync: process(clk_200M)
 --begin
 --    if rising_edge(clk_200M) then
 --        if pwrOnRst = '1' then
@@ -602,7 +613,7 @@ port map(
 spiSyncProc: process(clk_200M)
 begin
     if rising_edge(clk_200M) then
-        if reset = '1' then
+        if pwrOnRst = '1' then
             csFF     <= '1';
             sclkFF   <= '0';
             mosiFF   <= '0';

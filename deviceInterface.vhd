@@ -79,6 +79,7 @@ type state_t is (idle,
                  sendDevData,
                  done,
                  waitDevBusy,
+                 waitRstFifo,
                  errFifo,
                  errTOut,
                  errBrstPar);
@@ -90,6 +91,12 @@ constant brdcstId      : std_logic_vector(7 downto 0) := idHeader & broadcastId;
 signal   state         : state_t;
 signal   tOutRst,
          tOutSig,
+         brstWrRstBusy,
+         brstRdRstBusy,
+         brstFifoRstBusy,
+         dataWrRstBusy,
+         dataRdRstBusy,
+         dataFifoRstBusy,
          validId,
          rwSig,
          rxRdSig,
@@ -131,18 +138,20 @@ signal   dataBrstOut   : std_logic_vector(31 downto 0);
 
 begin
 
-rxRead       <= rxRdSig;
-txWrite      <= txWSig;
-devRw        <= devRwSig;
-devBrst      <= devBrstSig;
-devId        <= devIdSig;
-devDataOut   <= devDataOutSig;
-devAddr      <= devAddrSig;
-endCnt       <= byteCnt(byteCnt'left);
-tOutSig      <= tOutCnt(tOutCnt'left);
-loadBrstBuff <= (rxValid and brstCollect) or paddCollect;
-lastBrst     <= not or_reduce(std_logic_vector(byteCnt(byteCnt'left downto 2)));
-idSig        <= idHeader & id;
+rxRead          <= rxRdSig;
+txWrite         <= txWSig;
+devRw           <= devRwSig;
+devBrst         <= devBrstSig;
+devId           <= devIdSig;
+devDataOut      <= devDataOutSig;
+devAddr         <= devAddrSig;
+endCnt          <= byteCnt(byteCnt'left);
+tOutSig         <= tOutCnt(tOutCnt'left);
+dataFifoRstBusy <= dataWrRstBusy or dataRdRstBusy;
+brstFifoRstBusy <= brstWrRstBusy or brstRdRstBusy;
+loadBrstBuff    <= (rxValid and brstCollect) or paddCollect;
+lastBrst        <= not or_reduce(std_logic_vector(byteCnt(byteCnt'left downto 2)));
+idSig           <= idHeader & id;
 
 devAddrCtrl: process(clk)
 begin
@@ -210,7 +219,7 @@ begin
     end case;
 end process;
 
-dataToFifoMux: process(dataToFifoSel, devDataIn, byteCnt)
+dataToFifoMux: process(dataToFifoSel, devDataIn, byteCnt, devIdSig)
 begin
     case dataToFifoSel is
         when "00" =>
@@ -269,7 +278,8 @@ begin
                     tOutRst     <= '1';
                     busy        <= '0';
                     devExec     <= '0';
-                    rstBrstBuff <= '1';
+                    rstFifo     <= '0';
+                    rstBrstBuff <= '0';
                     rstAddr     <= '1';
                     flushRxFifo <= '0';
                     flushTxFifo <= '0';
@@ -279,7 +289,6 @@ begin
 
                     if rxPresent = '1' and validId = '1' then
                         busy        <= '1';
-                        rstBrstBuff <= '0';
                         rstAddr     <= '0';
                         rstDataOut  <= '0';
 
@@ -305,7 +314,6 @@ begin
 
                 when getDev =>
                     tOutRst <= '0';
-                    rstFifo <= '0';
                     rxRdSig <= '0';
 
                     state   <= getDev;
@@ -558,14 +566,26 @@ begin
                     end if;
 
                 when waitDevBusy =>
-                    devExec <= '0';
+                    devExec     <= '0';
+                    rstFifo     <= '1';
+                    rstBrstBuff <= '1';
 
                     state <= waitDevBusy;
 
                     if devBusy(devIdSig) = '0' then
                         rstDataOut <= '1';
-                        
-                        state      <= idle;
+
+                        state      <= waitRstFifo;
+                    end if;
+
+                when waitRstFifo =>
+                    rstFifo     <= '0';
+                    rstBrstBuff <= '0';
+
+                    state       <= waitRstFifo;
+
+                    if brstFifoRstBusy = '0' and dataFifoRstBusy = '0' then
+                        state <= idle;
                     end if;
 
                 when errTOut =>
@@ -580,6 +600,8 @@ begin
                     devBrstSig    <= '0';
                     busy          <= '0';
                     rstDataOut    <= '1';
+                    rstFifo       <= '1';
+                    rstBrstBuff   <= '1';
                     error         <= "001";
 
                     state         <= idle;
@@ -596,6 +618,8 @@ begin
                     devBrstSig    <= '0';
                     busy          <= '0';
                     rstDataOut    <= '1';
+                    rstFifo       <= '1';
+                    rstBrstBuff   <= '1';
                     error         <= "010";
 
                     state         <= idle;
@@ -612,6 +636,8 @@ begin
                     devBrstSig    <= '0';
                     busy          <= '0';
                     rstDataOut    <= '1';
+                    rstFifo       <= '1';
+                    rstBrstBuff   <= '1';
                     error         <= "011";
 
                     state         <= idle;
@@ -628,6 +654,8 @@ begin
                     devBrstSig    <= '0';
                     busy          <= '0';
                     rstDataOut    <= '1';
+                    rstFifo       <= '1';
+                    rstBrstBuff   <= '1';
                     error         <= "111";
 
                     state         <= idle;
@@ -664,6 +692,8 @@ port map(
     dout          => dataBrstOut,
     rd_en         => readBrstBuff,
     data_valid    => brstBuffValid,
+    wr_rst_busy   => brstWrRstBusy,
+    rd_rst_busy   => brstRdRstBusy,
     empty         => open,
     full          => open,
     sleep         => '0',
@@ -689,6 +719,8 @@ port map(
     dout          => dataOut,
     rd_en         => rEnFifo,
     wr_ack        => wAckFifo,
+    wr_rst_busy   => dataWrRstBusy,
+    rd_rst_busy   => dataRdRstBusy,
     empty         => emptyFifo,
     full          => open,
     prog_full     => wordWrt,
