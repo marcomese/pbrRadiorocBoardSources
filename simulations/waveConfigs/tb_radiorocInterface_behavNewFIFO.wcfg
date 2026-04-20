@@ -14,15 +14,15 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="6,706.000 ns"></ZoomStartTime>
-      <ZoomEndTime time="8,080.001 ns"></ZoomEndTime>
-      <Cursor1Time time="6,935.000 ns"></Cursor1Time>
+      <ZoomStartTime time="8,329.000 ns"></ZoomStartTime>
+      <ZoomEndTime time="9,488.001 ns"></ZoomEndTime>
+      <Cursor1Time time="9,345.000 ns"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
-      <NameColumnWidth column_width="180"></NameColumnWidth>
+      <NameColumnWidth column_width="168"></NameColumnWidth>
       <ValueColumnWidth column_width="58"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="80" />
+   <WVObjectSize size="81" />
    <wvobject fp_name="/tb_radiorocInterface/clk" type="logic">
       <obj_property name="ElementShortName">clk</obj_property>
       <obj_property name="ObjectShortName">clk</obj_property>
@@ -67,6 +67,10 @@
       <obj_property name="ElementShortName">rxRdSig</obj_property>
       <obj_property name="ObjectShortName">rxRdSig</obj_property>
    </wvobject>
+   <wvobject fp_name="/tb_radiorocInterface/devInterfInst/brstCollect" type="logic">
+      <obj_property name="ElementShortName">brstCollect</obj_property>
+      <obj_property name="ObjectShortName">brstCollect</obj_property>
+   </wvobject>
    <wvobject fp_name="/tb_radiorocInterface/devInterfInst/rxValid" type="logic">
       <obj_property name="ElementShortName">rxValid</obj_property>
       <obj_property name="ObjectShortName">rxValid</obj_property>
@@ -94,6 +98,18 @@
    <wvobject fp_name="/tb_radiorocInterface/devInterfInst/loadDataIn" type="logic">
       <obj_property name="ElementShortName">loadDataIn</obj_property>
       <obj_property name="ObjectShortName">loadDataIn</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_radiorocInterface/devInterfInst/brstBuffInst/xpm_fifo_base_inst/din" type="array">
+      <obj_property name="ElementShortName">din[7:0]</obj_property>
+      <obj_property name="ObjectShortName">din[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_radiorocInterface/devInterfInst/brstBuffInst/xpm_fifo_base_inst/\gen_sdpram.xpm_memory_base_inst /mem" type="array">
+      <obj_property name="ElementShortName">mem[0:39][7:0]</obj_property>
+      <obj_property name="ObjectShortName">mem[0:39][7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_radiorocInterface/devInterfInst/brstBuffInst/xpm_fifo_base_inst/wr_en" type="logic">
+      <obj_property name="ElementShortName">wr_en</obj_property>
+      <obj_property name="ObjectShortName">wr_en</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_radiorocInterface/devInterfInst/state" type="other">
       <obj_property name="DisplayName">label</obj_property>
@@ -152,18 +168,6 @@
    <wvobject fp_name="/tb_radiorocInterface/devInterfInst/brstBuffInst/xpm_fifo_base_inst/dout" type="array">
       <obj_property name="ElementShortName">dout[31:0]</obj_property>
       <obj_property name="ObjectShortName">dout[31:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_radiorocInterface/devInterfInst/brstBuffInst/xpm_fifo_base_inst/din" type="array">
-      <obj_property name="ElementShortName">din[7:0]</obj_property>
-      <obj_property name="ObjectShortName">din[7:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_radiorocInterface/devInterfInst/brstBuffInst/xpm_fifo_base_inst/wr_en" type="logic">
-      <obj_property name="ElementShortName">wr_en</obj_property>
-      <obj_property name="ObjectShortName">wr_en</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_radiorocInterface/devInterfInst/brstBuffInst/xpm_fifo_base_inst/\gen_sdpram.xpm_memory_base_inst /mem" type="array">
-      <obj_property name="ElementShortName">mem[0:39][7:0]</obj_property>
-      <obj_property name="ObjectShortName">mem[0:39][7:0]</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_radiorocInterface/devInterfInst/loadLastBrst" type="logic">
       <obj_property name="ElementShortName">loadLastBrst</obj_property>

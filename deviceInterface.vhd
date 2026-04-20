@@ -106,6 +106,7 @@ signal   tOutRst,
          devRwSig,
          devBrstSig,
          brstCollect,
+         paddCollect,
          lastBrst,
          wEnFifo,
          rEnFifo,
@@ -130,17 +131,18 @@ signal   dataBrstOut   : std_logic_vector(31 downto 0);
 
 begin
 
-rxRead      <= rxRdSig and not endCnt;
-txWrite     <= txWSig;
-devRw       <= devRwSig;
-devBrst     <= devBrstSig;
-devId       <= devIdSig;
-devDataOut  <= devDataOutSig;
-devAddr     <= devAddrSig;
-endCnt      <= byteCnt(byteCnt'left);
-tOutSig     <= tOutCnt(tOutCnt'left);
-lastBrst    <= not or_reduce(std_logic_vector(byteCnt(byteCnt'left downto 2)));
-idSig       <= idHeader & id;
+rxRead       <= rxRdSig;
+txWrite      <= txWSig;
+devRw        <= devRwSig;
+devBrst      <= devBrstSig;
+devId        <= devIdSig;
+devDataOut   <= devDataOutSig;
+devAddr      <= devAddrSig;
+endCnt       <= byteCnt(byteCnt'left);
+tOutSig      <= tOutCnt(tOutCnt'left);
+loadBrstBuff <= (rxValid and brstCollect) or paddCollect;
+lastBrst     <= not or_reduce(std_logic_vector(byteCnt(byteCnt'left downto 2)));
+idSig        <= idHeader & id;
 
 devAddrCtrl: process(clk)
 begin
@@ -247,7 +249,7 @@ begin
             busy          <= '0';
             brstByteNum   <= (others => '0');
             brstCollect   <= '0';
-            loadBrstBuff  <= '0';
+            paddCollect   <= '0';
             readBrstBuff  <= '0';
             rstDataOut    <= '1';
             loadDataIn    <= '0';
@@ -367,8 +369,7 @@ begin
                 when getData =>
                     tOutRst      <= '0';
                     loadAddr     <= '0';
-                    loadBrstBuff <= '0';
-                    rxRdSig      <= rxPresent;
+                    rxRdSig      <= rxPresent and not rxValid;
 
                     state        <= getData;
 
@@ -388,6 +389,7 @@ begin
                         tOutRst     <= '1';
                         rxRdSig     <= '0';
                         brstCollect <= '0';
+                        paddCollect <= '1';
                         loadDataIn  <= '0';
                         byteCnt     <= resize(brstByteNum, byteCnt'length);
 
@@ -397,7 +399,6 @@ begin
                         byteCnt <= byteCnt - 1;
                     elsif rxValid = '1' and brstCollect = '1' then
                         tOutRst      <= '1';
-                        loadBrstBuff <= '1';
                         byteCnt      <= byteCnt - 1;
                     elsif tOutSig = '1' then
                         tOutRst    <= '1';
@@ -408,20 +409,18 @@ begin
                     end if;
 
                 when addPadding =>
-                    loadBrstBuff <= '1';
-                    paddCnt      <= paddCnt - 1;
+                    paddCnt <= paddCnt - 1;
 
-                    state        <= addPadding;
+                    state   <= addPadding;
 
                     if paddCnt = 0 then
-                        devExec      <= '1';
-                        loadBrstBuff <= '0';
+                        paddCollect <= '0';
+                        devExec     <= '1';
 
-                        state        <= sendBrst;
+                        state       <= sendBrst;
                     end if;
 
                 when checkBrstPar =>
-                    --rxRdSig     <= '1';
                     brstByteNum <= resize(devDataToUnsigned(devDataOutSig)-1, brstByteNum'length);
                     byteCnt     <= resize(devDataToUnsigned(devDataOutSig)-1, byteCnt'length);
                     paddCnt     <= resize(4-devDataToUnsigned(devDataOutSig), paddCnt'length);
