@@ -7,6 +7,9 @@ use IEEE.STD_LOGIC_MISC.ALL;
 library UNISIM;
 use UNISIM.VComponents.all;
 
+library xpm;
+use xpm.vcomponents.all;
+
 library xil_defaultlib;
 
 use work.utilsPkg.all;
@@ -130,7 +133,7 @@ constant burstRdCmd  : std_logic_vector(3 downto 0) := x"B";
 constant burstWrCmd  : std_logic_vector(3 downto 0) := x"3";
 constant maxBrstLen  : integer                      := 512;
 
-constant rstRadI2CLen : integer := 5;
+constant rstPORLen : integer := 10;
 
 signal   dataToDev,
          dataFromPGen,
@@ -146,7 +149,9 @@ signal   devReadyVec,
 
 signal   devId          : devices_t;
 
-signal   devReadyPGen,
+signal   pwrOnRst,
+         pwrOnRstN,
+         devReadyPGen,
          devReadyTmp,
          devReadyRadioroc,
          devReadyAcq,
@@ -197,7 +202,7 @@ signal   i2cRwRad       : std_logic;
 signal   i2cDataWrRad   : std_logic_vector(7 downto 0);
 signal   i2cBusyRad     : std_logic;
 signal   i2cDataRdRad   : std_logic_vector(7 downto 0);
-signal   resetn         : std_logic;
+signal   areset         : std_logic;
 signal   testTxWrite,
          testRxRead,
          testRxPresent  : std_logic;
@@ -220,7 +225,7 @@ signal readRq,
        sclkSync,
        mosiSync  : std_logic;
 
-signal rstI2CCnt : unsigned(bitsNum(rstRadI2CLen) downto 0);
+signal rstPORCnt : unsigned(bitsNum(rstPORLen) downto 0);
 
 signal endAcq, rdValid : std_logic;
 
@@ -238,21 +243,25 @@ attribute ASYNC_REG of csFF,
 
 begin
 
+pwrOnRst <= rstPORCnt(rstPORCnt'left);
+
+pwrOnRstN <= not rstPORCnt(rstPORCnt'left);
+
 sc_val_evt    <= '1';
 
 sc_reset_n    <= reset_n_acq;
 
 sc_rstn_read  <= rstn_read_acq;
 
-sc_rstb_i2c   <= rstI2CCnt(rstI2CCnt'left);
+sc_rstb_i2c   <= pwrOnRst;
 
-sc_rstb_sc    <= rstI2CCnt(rstI2CCnt'left);
+sc_rstb_sc    <= pwrOnRst;
 
-sc_rstb_probe <= rstI2CCnt(rstI2CCnt'left);
+sc_rstb_probe <= pwrOnRst;
 
 pulse         <= pulseSig;
 
-reset         <= not(npwr_reset);
+areset         <= not(npwr_reset);
 
 nCMOS         <= '1';
 
@@ -266,10 +275,33 @@ ADC_SCKHG     <= adc_sck;
 
 ADC_SCKLG     <= adc_sck;
 
-syncIn: process(clk_200M, reset)
+resetSync: xpm_cdc_async_rst
+generic map(
+  DEST_SYNC_FF    => 4,
+  INIT_SYNC_FF    => 0,
+  RST_ACTIVE_HIGH => 1
+)
+port map(
+    dest_clk  => clk_200M,
+    src_arst  => areset,
+    dest_arst => reset
+);
+
+porRstCntProc: process(clk_200M, reset, rstPORCnt)
 begin
     if rising_edge(clk_200M) then
         if reset = '1' then
+            rstPORCnt <= to_unsigned(rstPORLen-1, rstPORCnt'length);
+        elsif rstPORCnt(rstPORCnt'left) = '0' then
+            rstPORCnt <= rstPORCnt - 1;
+        end if;
+    end if;
+end process;
+
+syncIn: process(clk_200M, pwrOnRst)
+begin
+    if rising_edge(clk_200M) then
+        if pwrOnRst = '1' then
             idFF    <= (others => '0');
             idSync  <= (others => '0');
             T_1FF0  <= (others => '0');
@@ -293,7 +325,7 @@ generic map(
 )
 port map(
     clk  => clk_200M,
-    rst  => reset,
+    rst  => pwrOnRst,
     tIn  => T_1Sync,
     tOut => tEdge1
 );
@@ -304,7 +336,7 @@ generic map(
 )
 port map(
     clk  => clk_200M,
-    rst  => reset,
+    rst  => pwrOnRst,
     tIn  => T_2Sync,
     tOut => tEdge2
 );
@@ -313,10 +345,10 @@ extTrgFF  <= '0';
 extTrgSig <= '0';
 
 extTrg <= miso;
---extTrgSync: process(reset, clk_200M)
+--extTrgSync: process(pwrOnRst, clk_200M)
 --begin
 --    if rising_edge(clk_200M) then
---        if reset = '1' then
+--        if pwrOnRst = '1' then
 --            extTrgFF  <= '0';
 --            extTrgSig <= '0';
 --        else
@@ -419,7 +451,7 @@ generic map(
 )
 port map(
     clk       => clk_200M,
-    reset_n   => npwr_reset,
+    reset_n   => pwrOnRstN,
     ena       => i2cEnaRad,
     addr      => i2cAddrRad,
     rw        => i2cRwRad,
@@ -481,7 +513,7 @@ generic map(
 )
 port map(
     clk        => clk_200M,
-    rst        => reset,
+    rst        => pwrOnRst,
     evtTrigger => evtTrigger,
     trgIn      => TBuf21,
     devExec    => devExec,
@@ -504,7 +536,7 @@ generic map(
 )
 port map(
     clk        => clk_200M,
-    rst        => reset,
+    rst        => pwrOnRst,
     trgIn      => tEdge21,
     devExec    => devExec,
     devId      => devId,
@@ -523,7 +555,7 @@ port map(
 dataAcqCtrlInst : entity work.dataAcqCtrl
 port map(
     clk100M     => clk_200M,
-    rst         => reset,
+    rst         => pwrOnRst,
     devExec     => devExec,
     devId       => devId,
     devRw       => devRw,
@@ -548,17 +580,6 @@ port map(
     doutAcq     => dout_acq
 );
 
-radiorocI2CRst: process(clk_200M, reset, rstI2CCnt)
-begin
-    if rising_edge(clk_200M) then
-        if reset = '1' then
-            rstI2CCnt <= to_unsigned(rstRadI2CLen-1, rstI2CCnt'length);
-        elsif rstI2CCnt(rstI2CCnt'left) = '0' then
-            rstI2CCnt <= rstI2CCnt - 1;
-        end if;
-    end if;
-end process;
-
 i2cTmpModule: entity work.i2cMaster
 generic map(
     input_clk => 200000000,
@@ -566,7 +587,7 @@ generic map(
 )
 port map(
     clk       => clk_200M,
-    reset_n   => npwr_reset,
+    reset_n   => pwrOnRstN,
     ena       => i2cEna,
     addr      => i2cAddr,
     rw        => i2cRw,
@@ -605,7 +626,7 @@ generic map(
 )
 port map(
     clk          => clk_200M,
-    rst          => reset,
+    rst          => pwrOnRst,
     data_out     => dataFromMaster,
     data_in      => dataToMaster,
     rx_read      => rxRead,
@@ -619,8 +640,8 @@ port map(
     tx_half_full => open,
     tx_full      => open,
     tx_wr_ack    => txWrAck,
-    rx_reset     => reset,
-    tx_reset     => reset,
+    rx_reset     => pwrOnRst,
+    tx_reset     => pwrOnRst,
     cs           => csSync,
     sclk         => sclkSync,
     miso         => miso,
@@ -636,7 +657,7 @@ generic map(
 )
 port map(
     clk          => clk_200M,
-    rst          => reset,
+    rst          => pwrOnRst,
     devId        => devId,
     devReady     => devReadyPGen,
     devRw        => devRw,
@@ -658,7 +679,7 @@ generic map(
 )
 port map(
     clk        => clk_200M,
-    rst        => reset,
+    rst        => pwrOnRst,
     devExec    => devExec,
     devId      => devId,
     devRw      => devRw,
@@ -683,7 +704,7 @@ generic map(
 )
 port map(
     clk        => clk_200M,
-    rst        => reset,
+    rst        => pwrOnRst,
     devExec    => devExec,
     devId      => devId,
     devRw      => devRw,
@@ -742,7 +763,7 @@ generic map(
 )
 port map(
     clk        => clk_200M,
-    rst        => reset,
+    rst        => pwrOnRst,
     id         => idSync,
     dataIn     => dataFromMaster,
     dataOut    => dataToMaster,

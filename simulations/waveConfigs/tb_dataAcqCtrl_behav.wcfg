@@ -15,15 +15,15 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="0.000000 us"></ZoomStartTime>
-      <ZoomEndTime time="150.000003 us"></ZoomEndTime>
-      <Cursor1Time time="7.130000 us"></Cursor1Time>
+      <ZoomStartTime time="0.470 ns"></ZoomStartTime>
+      <ZoomEndTime time="23.111 ns"></ZoomEndTime>
+      <Cursor1Time time="9.030 ns"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
-      <NameColumnWidth column_width="199"></NameColumnWidth>
+      <NameColumnWidth column_width="195"></NameColumnWidth>
       <ValueColumnWidth column_width="58"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="63" />
+   <WVObjectSize size="69" />
    <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/clk" type="logic">
       <obj_property name="ElementShortName">clk</obj_property>
       <obj_property name="ObjectShortName">clk</obj_property>
@@ -79,7 +79,6 @@
    <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/devReady" type="array">
       <obj_property name="ElementShortName">devReady[0:7]</obj_property>
       <obj_property name="ObjectShortName">devReady[0:7]</obj_property>
-      <obj_property name="isExpanded"></obj_property>
    </wvobject>
    <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/devBusy" type="array">
       <obj_property name="ElementShortName">devBusy[0:7]</obj_property>
@@ -133,9 +132,39 @@
       <obj_property name="ElementShortName">dataIn[7:0]</obj_property>
       <obj_property name="ObjectShortName">dataIn[7:0]</obj_property>
    </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl/cs" type="logic">
+      <obj_property name="ElementShortName">cs</obj_property>
+      <obj_property name="ObjectShortName">cs</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl/sclk" type="logic">
+      <obj_property name="ElementShortName">sclk</obj_property>
+      <obj_property name="ObjectShortName">sclk</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl/miso" type="logic">
+      <obj_property name="ElementShortName">miso</obj_property>
+      <obj_property name="ObjectShortName">miso</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl/mosi" type="logic">
+      <obj_property name="ElementShortName">mosi</obj_property>
+      <obj_property name="ObjectShortName">mosi</obj_property>
+   </wvobject>
    <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/state" type="other">
+      <obj_property name="DisplayName">label</obj_property>
       <obj_property name="ElementShortName">state</obj_property>
       <obj_property name="ObjectShortName">state</obj_property>
+      <obj_property name="label">devInterfState</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl/dataAcqCtrlInst/state" type="other">
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="ElementShortName">state</obj_property>
+      <obj_property name="ObjectShortName">state</obj_property>
+      <obj_property name="label">acqCtrlState</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl/dataAcqCtrlInst/busy" type="logic">
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="ElementShortName">busy</obj_property>
+      <obj_property name="ObjectShortName">busy</obj_property>
+      <obj_property name="label">acqCtrlBusy</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/validId" type="logic">
       <obj_property name="ElementShortName">validId</obj_property>

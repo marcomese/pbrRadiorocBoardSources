@@ -8,148 +8,6 @@ end tb_dataAcqCtrl;
 
 architecture Behavioral of tb_dataAcqCtrl is
 
-component dataAcqCtrl is
-port(
-    clk100M    : in  std_logic;
-    rst        : in  std_logic;
-    devExec    : in  std_logic;
-    devId      : in  devices_t;
-    devRw      : in  std_logic;
-    devBrst    : in  std_logic;
-    devBrstWrt : in  std_logic;
-    devBrstSnd : in  std_logic;
-    devBrstRst : out std_logic;
-    devAddr    : in  devAddr_t;
-    devDataIn  : in  devData_t;
-    devDataOut : out devData_t;
-    devReady   : out std_logic;
-    busy       : out std_logic;
-    resetAcq   : out std_logic;
-    startAcq   : out std_logic;
-    endAcq     : in  std_logic;
-    rdValid    : in  std_logic;
-    rdAcq      : out std_logic;
-    rdDataCnt  : in  std_logic_vector(15 downto 0);
-    emptyAcq   : in  std_logic;
-    nbAcq      : out std_logic_vector(7 downto 0);
-    selAdc     : out std_logic_vector(63 downto 0);
-    doutAcq    : in  std_logic_vector(7 downto 0)
-);
-end component;
-
-component deviceInterface is
-generic(
-    clkFreq     : real;
-    timeout     : real;
-    idHeader    : std_logic_vector(3 downto 0);
-    broadcastId : std_logic_vector(3 downto 0);
-    readCmd     : std_logic_vector(3 downto 0);
-    writeCmd    : std_logic_vector(3 downto 0);
-    burstWrCmd  : std_logic_vector(3 downto 0);
-    burstRdCmd  : std_logic_vector(3 downto 0);
-    maxBrstLen  : natural -- maximum number of bytes to read/write in burst mode
-);
-port(
-    clk         : in  std_logic;
-    rst         : in  std_logic;
-    id          : in  std_logic_vector(3 downto 0);
-    dataIn      : in  std_logic_vector(7 downto 0);
-    dataOut     : out std_logic_vector(7 downto 0);
-    rxRead      : out std_logic;
-    rxPresent   : in  std_logic;
-    txWrite     : out std_logic;
-    txWrAck     : in  std_logic;
-    rxEna       : out std_logic;
-    flushRxFifo : out std_logic;
-    flushTxFifo : out std_logic;
-    devId       : out devices_t;
-    devReady    : in  devStdLogic_t;
-    devBusy     : in  devStdLogic_t;
-    devRw       : out std_logic;
-    devBrst     : out std_logic;
-    devBrstWrt  : out std_logic;
-    devBrstSnd  : out std_logic;
-    devBrstRst  : in  devStdLogic_t;
-    devAddr     : out devAddr_t;
-    devDataIn   : in  devDataVec_t;
-    devDataOut  : out devData_t;
-    devExec     : out std_logic;
-    busy        : out std_logic;
-    error       : out std_logic_vector(2 downto 0)
-);
-end component;
-
-component SPIMaster is
-generic(
-    clkFreq      : real;
-    sclkFreq     : real
-);
-port(
-    clk          : in  std_logic;
-    rst          : in  std_logic;
-    data_out     : out std_logic_vector(7 downto 0);
-    data_in      : in  std_logic_vector(7 downto 0);
-    rx_read      : in  std_logic;
-    rx_present   : out std_logic;
-    rx_half_full : out std_logic;
-    rx_full      : out std_logic;
-    tx_write     : in  std_logic;
-    tx_present   : out std_logic;
-    tx_half_full : out std_logic;
-    tx_full      : out std_logic;
-    rx_reset     : in  std_logic;
-    tx_reset     : in  std_logic;
-    read_rq      : in  std_logic;
-    cs           : out std_logic;
-    sclk         : out std_logic;
-    miso         : in  std_logic;
-    mosi         : out std_logic
-);
-end component;
-
-COMPONENT i2cMaster IS
-  GENERIC(
-    input_clk : INTEGER := 50_000_000; --input clock speed from user logic in Hz
-    bus_clk   : INTEGER := 400_000);   --speed the i2c bus (scl) will run at in Hz
-  PORT(
-    clk       : IN     STD_LOGIC;                    --system clock
-    reset_n   : IN     STD_LOGIC;                    --active low reset
-    ena       : IN     STD_LOGIC;                    --latch in command
-    addr      : IN     STD_LOGIC_VECTOR(6 DOWNTO 0); --address of target slave
-    rw        : IN     STD_LOGIC;                    --'0' is write, '1' is read
-    data_wr   : IN     STD_LOGIC_VECTOR(7 DOWNTO 0); --data to write to slave
-    busy      : OUT    STD_LOGIC;                    --indicates transaction in progress
-    data_rd   : OUT    STD_LOGIC_VECTOR(7 DOWNTO 0); --data read from slave
-    ack_error : BUFFER STD_LOGIC;                    --flag if improper acknowledge from slave
-    sda       : INOUT  STD_LOGIC;                    --serial data output of i2c bus
-    scl       : INOUT  STD_LOGIC);                   --serial clock output of i2c bus
-END COMPONENT;
-
-component SPISlave is
-port(
-    clk          : in  std_logic;
-    rst          : in  std_logic;
-    data_out     : out std_logic_vector(7 downto 0);
-    data_in      : in  std_logic_vector(7 downto 0);
-    rx_read      : in  std_logic;
-    rx_ena       : in  std_logic;
-    rx_present   : out std_logic;
-    rx_half_full : out std_logic;
-    rx_full      : out std_logic;
-    tx_write     : in  std_logic;
-    tx_present   : out std_logic;
-    tx_half_full : out std_logic;
-    tx_full      : out std_logic;
-    tx_wr_ack    : out std_logic;
-    rx_reset     : in  std_logic;
-    tx_reset     : in  std_logic;
-    cs           : in  std_logic;
-    sclk         : in  std_logic;
-    miso         : out std_logic;
-    mosi         : in  std_logic
-);
-end component;
-
 constant clkPeriod200M : time                         := 5 ns;
 constant clkPeriod100M : time                         := 10 ns;
 constant clkFreq       : real                         := 200.0e6;
@@ -211,6 +69,7 @@ signal acqBusy           : std_logic     := '0';
 signal error             : std_logic_vector(2 downto 0) := "000";
 signal rxRead            : std_logic                    := '0';
 signal rxPresent         : std_logic                    := '0';
+signal rxValid           : std_logic                    := '0';
 signal txWrite           : std_logic                    := '0';
 signal txWrAck           : std_logic                    := '0';
 signal flushRxFifo       : std_logic                    := '0';
@@ -312,141 +171,141 @@ begin
     testTxWrite <= '0';
     wait for clkPeriod200M*delay;
 
-    wait for 100 us;
+--    wait for 100 us;
 
-    testRxRead <= '1';
+--    testRxRead <= '1';
 
-    testDataIn <= x"76";
-    wait for clkPeriod200M*delay;
-    testTxWrite <= '1';
-    wait for clkPeriod200M;
-    testTxWrite <= '0';
-    wait for clkPeriod200M*delay;
-    testDataIn <= x"55";
-    wait for clkPeriod200M*delay;
-    testTxWrite <= '1';
-    wait for clkPeriod200M;
-    testTxWrite <= '0';
-    wait for clkPeriod200M*delay;
-    testDataIn <= x"00";
-    testTxWrite <= '1';
-    wait for clkPeriod200M;
-    testTxWrite <= '0';
-    wait for clkPeriod200M*delay;
-    testDataIn <= x"01";
-    testTxWrite <= '1';
-    wait for clkPeriod200M;
-    testTxWrite <= '0';
-    testDataIn <= x"00";
-    testTxWrite <= '1';
-    wait for clkPeriod200M;
-    testTxWrite <= '0';
-    testDataIn <= x"00";
-    testTxWrite <= '1';
-    wait for clkPeriod200M;
-    testTxWrite <= '0';
-    testDataIn <= x"00";
-    testTxWrite <= '1';
-    wait for clkPeriod200M;
-    testTxWrite <= '0';
-    testDataIn <= x"01";
-    testTxWrite <= '1';
-    wait for clkPeriod200M;
-    testTxWrite <= '0';
-    wait for clkPeriod200M*delay;
+--    testDataIn <= x"76";
+--    wait for clkPeriod200M*delay;
+--    testTxWrite <= '1';
+--    wait for clkPeriod200M;
+--    testTxWrite <= '0';
+--    wait for clkPeriod200M*delay;
+--    testDataIn <= x"55";
+--    wait for clkPeriod200M*delay;
+--    testTxWrite <= '1';
+--    wait for clkPeriod200M;
+--    testTxWrite <= '0';
+--    wait for clkPeriod200M*delay;
+--    testDataIn <= x"00";
+--    testTxWrite <= '1';
+--    wait for clkPeriod200M;
+--    testTxWrite <= '0';
+--    wait for clkPeriod200M*delay;
+--    testDataIn <= x"01";
+--    testTxWrite <= '1';
+--    wait for clkPeriod200M;
+--    testTxWrite <= '0';
+--    testDataIn <= x"00";
+--    testTxWrite <= '1';
+--    wait for clkPeriod200M;
+--    testTxWrite <= '0';
+--    testDataIn <= x"00";
+--    testTxWrite <= '1';
+--    wait for clkPeriod200M;
+--    testTxWrite <= '0';
+--    testDataIn <= x"00";
+--    testTxWrite <= '1';
+--    wait for clkPeriod200M;
+--    testTxWrite <= '0';
+--    testDataIn <= x"01";
+--    testTxWrite <= '1';
+--    wait for clkPeriod200M;
+--    testTxWrite <= '0';
+--    wait for clkPeriod200M*delay;
 
-    wait for 10 us;
+--    wait for 10 us;
 
-    NORT1 <= '0';
-    wait for clkPeriod200M;
-    NORT1 <= '1';
+--    NORT1 <= '0';
+--    wait for clkPeriod200M;
+--    NORT1 <= '1';
 
-    wait for 100 us;
+--    wait for 100 us;
 
-    testDataIn <= x"76";
-    wait for clkPeriod200M*delay;
-    testTxWrite <= '1';
-    wait for clkPeriod200M;
-    testTxWrite <= '0';
-    wait for clkPeriod200M*delay;
-    testDataIn <= x"b5";
-    wait for clkPeriod200M*delay;
-    testTxWrite <= '1';
-    wait for clkPeriod200M;
-    testTxWrite <= '0';
-    wait for clkPeriod200M*delay;
-    testDataIn <= x"00";
-    testTxWrite <= '1';
-    wait for clkPeriod200M;
-    testTxWrite <= '0';
-    wait for clkPeriod200M*delay;
-    testDataIn <= x"00";
-    testTxWrite <= '1';
-    wait for clkPeriod200M;
-    testTxWrite <= '0';
-    testDataIn <= x"00";
-    testTxWrite <= '1';
-    wait for clkPeriod200M;
-    testTxWrite <= '0';
-    testDataIn <= x"00";
-    testTxWrite <= '1';
-    wait for clkPeriod200M;
-    testTxWrite <= '0';
-    testDataIn <= x"01";
-    testTxWrite <= '1';
-    wait for clkPeriod200M;
-    testTxWrite <= '0';
-    testDataIn <= x"05";
-    testTxWrite <= '1';
-    wait for clkPeriod200M;
-    testTxWrite <= '0';
-    wait for clkPeriod200M*delay;
+--    testDataIn <= x"76";
+--    wait for clkPeriod200M*delay;
+--    testTxWrite <= '1';
+--    wait for clkPeriod200M;
+--    testTxWrite <= '0';
+--    wait for clkPeriod200M*delay;
+--    testDataIn <= x"b5";
+--    wait for clkPeriod200M*delay;
+--    testTxWrite <= '1';
+--    wait for clkPeriod200M;
+--    testTxWrite <= '0';
+--    wait for clkPeriod200M*delay;
+--    testDataIn <= x"00";
+--    testTxWrite <= '1';
+--    wait for clkPeriod200M;
+--    testTxWrite <= '0';
+--    wait for clkPeriod200M*delay;
+--    testDataIn <= x"00";
+--    testTxWrite <= '1';
+--    wait for clkPeriod200M;
+--    testTxWrite <= '0';
+--    testDataIn <= x"00";
+--    testTxWrite <= '1';
+--    wait for clkPeriod200M;
+--    testTxWrite <= '0';
+--    testDataIn <= x"00";
+--    testTxWrite <= '1';
+--    wait for clkPeriod200M;
+--    testTxWrite <= '0';
+--    testDataIn <= x"01";
+--    testTxWrite <= '1';
+--    wait for clkPeriod200M;
+--    testTxWrite <= '0';
+--    testDataIn <= x"05";
+--    testTxWrite <= '1';
+--    wait for clkPeriod200M;
+--    testTxWrite <= '0';
+--    wait for clkPeriod200M*delay;
 
-    wait for 600 us;
+--    wait for 600 us;
 
-    testDataIn <= x"76";
-    wait for clkPeriod200M*delay;
-    testTxWrite <= '1';
-    wait for clkPeriod200M;
-    testTxWrite <= '0';
-    wait for clkPeriod200M*delay;
-    testDataIn <= x"b5";
-    wait for clkPeriod200M*delay;
-    testTxWrite <= '1';
-    wait for clkPeriod200M;
-    testTxWrite <= '0';
-    wait for clkPeriod200M*delay;
-    testDataIn <= x"00";
-    testTxWrite <= '1';
-    wait for clkPeriod200M;
-    testTxWrite <= '0';
-    wait for clkPeriod200M*delay;
-    testDataIn <= x"00";
-    testTxWrite <= '1';
-    wait for clkPeriod200M;
-    testTxWrite <= '0';
-    testDataIn <= x"00";
-    testTxWrite <= '1';
-    wait for clkPeriod200M;
-    testTxWrite <= '0';
-    testDataIn <= x"00";
-    testTxWrite <= '1';
-    wait for clkPeriod200M;
-    testTxWrite <= '0';
-    testDataIn <= x"01";
-    testTxWrite <= '1';
-    wait for clkPeriod200M;
-    testTxWrite <= '0';
-    testDataIn <= x"00";
-    testTxWrite <= '1';
-    wait for clkPeriod200M;
-    testTxWrite <= '0';
-    wait for clkPeriod200M*delay;
+--    testDataIn <= x"76";
+--    wait for clkPeriod200M*delay;
+--    testTxWrite <= '1';
+--    wait for clkPeriod200M;
+--    testTxWrite <= '0';
+--    wait for clkPeriod200M*delay;
+--    testDataIn <= x"b5";
+--    wait for clkPeriod200M*delay;
+--    testTxWrite <= '1';
+--    wait for clkPeriod200M;
+--    testTxWrite <= '0';
+--    wait for clkPeriod200M*delay;
+--    testDataIn <= x"00";
+--    testTxWrite <= '1';
+--    wait for clkPeriod200M;
+--    testTxWrite <= '0';
+--    wait for clkPeriod200M*delay;
+--    testDataIn <= x"00";
+--    testTxWrite <= '1';
+--    wait for clkPeriod200M;
+--    testTxWrite <= '0';
+--    testDataIn <= x"00";
+--    testTxWrite <= '1';
+--    wait for clkPeriod200M;
+--    testTxWrite <= '0';
+--    testDataIn <= x"00";
+--    testTxWrite <= '1';
+--    wait for clkPeriod200M;
+--    testTxWrite <= '0';
+--    testDataIn <= x"01";
+--    testTxWrite <= '1';
+--    wait for clkPeriod200M;
+--    testTxWrite <= '0';
+--    testDataIn <= x"00";
+--    testTxWrite <= '1';
+--    wait for clkPeriod200M;
+--    testTxWrite <= '0';
+--    wait for clkPeriod200M*delay;
 
     wait;
 end process;
 
-dataAcqCtrlInst : dataAcqCtrl
+dataAcqCtrlInst: entity work.dataAcqCtrl
 port map(
     clk100M     => clk_200M,
     rst         => rst,
@@ -518,7 +377,7 @@ devReadyVec(acqSystem)  <= devReadyAcq;
 devBusyVec(acqSystem)   <= acqBusy;
 devBrstRst(acqSystem)   <= devBrstRstAcq;
 
-devInterfInst: deviceInterface
+devInterfInst: entity work.deviceInterface
 generic map(
     clkFreq      => clkFreq,
     timeout      => timeout,
@@ -538,6 +397,7 @@ port map(
     dataOut      => dataToMaster,
     rxRead       => rxRead,
     rxPresent    => rxPresent,
+    rxValid      => rxValid,
     txWrite      => txWrite,
     rxEna        => rxEna,
     txWrAck      => txWrAck,
@@ -570,6 +430,7 @@ port map(
     rx_read      => rxRead,
     rx_ena       => rxEna,
     rx_present   => rxPresent,
+    rx_valid     => rxValid,
     rx_half_full => open,
     rx_full      => open,
     tx_write     => txWrite,
@@ -585,7 +446,7 @@ port map(
     mosi         => mosi
 );
 
-spiInst: SPIMaster
+spiInst: entity work.SPIMaster
 generic map(
     clkFreq      => clkFreq,
     sclkFreq     => sclkFreq
