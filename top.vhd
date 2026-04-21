@@ -131,7 +131,7 @@ constant readCmd     : std_logic_vector(3 downto 0) := x"A";
 constant writeCmd    : std_logic_vector(3 downto 0) := x"5";
 constant burstRdCmd  : std_logic_vector(3 downto 0) := x"B";
 constant burstWrCmd  : std_logic_vector(3 downto 0) := x"3";
-constant maxBrstLen  : integer                      := 512;
+constant maxBrstLen  : integer                      := 2048;
 
 constant rstPORLen : integer := 10;
 
@@ -547,7 +547,7 @@ generic map(
 )
 port map(
     clk        => clk_200M,
-    rst        => pwrOnRst,
+    rst        => pwrOnRstSig, -- avoids warnings in drc for unroutable situations
     trgIn      => tEdge21,
     devExec    => devExec,
     devId      => devId,

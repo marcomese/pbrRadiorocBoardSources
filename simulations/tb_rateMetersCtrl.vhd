@@ -24,7 +24,7 @@ constant readCmd       : std_logic_vector(3 downto 0) := x"A";
 constant writeCmd      : std_logic_vector(3 downto 0) := x"5";
 constant burstWrCmd    : std_logic_vector(3 downto 0) := x"3";
 constant burstRdCmd    : std_logic_vector(3 downto 0) := x"B";
-constant maxBrstLen    : natural                      := 14000;
+constant maxBrstLen    : natural                      := 2048;
 constant delay         : natural                      := 1;--50000;
 constant trgNum        : natural                      := 64;
 
@@ -273,10 +273,10 @@ port map(
 
 clk_100M <= not clk_100M after clkPeriod100M/2;
 
-devDataInVec(acqSystem) <= dataFromRM;
-devReadyVec(acqSystem)  <= devReadyRM;
-devBusyVec(acqSystem)   <= rmBusy;
-devBrstRst(acqSystem)   <= devBrstRstRM;
+devDataInVec(rateMeters) <= dataFromRM;
+devReadyVec(rateMeters)  <= devReadyRM;
+devBusyVec(rateMeters)   <= rmBusy;
+devBrstRst(rateMeters)   <= devBrstRstRM;
 
 devInterfInst: entity work.deviceInterface
 generic map(

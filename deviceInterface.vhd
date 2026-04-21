@@ -100,6 +100,7 @@ signal   tOutRst,
          validId,
          rwSig,
          rxRdSig,
+         rxRdInhib,
          rstAddr,
          loadAddr,
          loadBrstBuff,
@@ -244,6 +245,7 @@ begin
             byteCnt       <= to_unsigned(devAddrBytes-1, byteCnt'length);
             paddCnt       <= (others => '0');
             rxRdSig       <= '0';
+            rxRdInhib     <= '0';
             txWSig        <= '0';
             rxEna         <= '1';
             flushRxFifo   <= '1';
@@ -285,16 +287,20 @@ begin
                     rstAddr     <= '1';
                     flushRxFifo <= '0';
                     flushTxFifo <= '0';
-                    rxRdSig     <= rxPresent and not rxValid;
+                    rxRdSig     <= '0';
 
                     state       <= idle;
 
-                    if rxPresent = '1' and validId = '1' then
-                        busy        <= '1';
-                        rstAddr     <= '0';
-                        rstDataOut  <= '0';
+                    if rxPresent = '1' and rxRdInhib = '0' then
+                        rxRdSig   <= '1';
+                        rxRdInhib <= '1';
+                    elsif validId = '1' then
+                        busy       <= '1';
+                        rstAddr    <= '0';
+                        rstDataOut <= '0';
+                        rxRdInhib  <= '0';
 
-                        state       <= getCmd;
+                        state      <= getCmd;
                     end if;
 
                 when getCmd =>
@@ -303,8 +309,12 @@ begin
 
                     state   <= getCmd;
 
-                    if rxPresent = '1' and validSig = '1' then
+                    if rxPresent = '1' and rxRdInhib = '0' then
+                        rxRdInhib <= '1';
+                        rxRdSig   <= '1';
+                    elsif validSig = '1' then
                         tOutRst       <= '1';
+                        rxRdInhib     <= '0';
                         devRwSig      <= rwSig;
                         devBrstSig    <= brstSig;
                         dataToFifoSel <= rwSig & brstSig;
@@ -316,7 +326,6 @@ begin
 
                 when getDev =>
                     tOutRst <= '0';
-                    rxRdSig <= '0';
 
                     state   <= getDev;
 
@@ -329,7 +338,6 @@ begin
                         state <= getDev;
                     elsif rxPresent = '1' and devBusy(devIdSig) = '0' then
                         tOutRst  <= '1';
-                        rxRdSig  <= '1';
                         loadAddr <= '1';
 
                         state    <= getAddr;
@@ -340,14 +348,18 @@ begin
                     end if;
 
                 when getAddr =>
-                    tOutRst <= '0';
-                    rxRdSig <= rxPresent and not rxValid;
+                    tOutRst   <= '0';
+                    rxRdSig   <= '0';
 
-                    state   <= getAddr;
+                    state     <= getAddr;
 
-                    if endCnt = '1' and devRwSig = devWrite then
+                    if rxValid = '1' then
+                        tOutRst  <= '1';
+                        byteCnt  <= byteCnt - 1;
+                    elsif rxPresent = '1' and rxRdSig = '0' and endCnt = '0' then
+                        rxRdSig <= '1';
+                    elsif endCnt = '1' and devRwSig = devWrite then
                         tOutRst    <= '1';
-                        rxRdSig    <= '0';
                         loadAddr   <= '0';
                         loadDataIn <= '1';
                         byteCnt    <= to_unsigned(devDataBytes-1, byteCnt'length);
@@ -355,7 +367,6 @@ begin
                         state    <= getData;
                     elsif endCnt = '1' and devRwSig = devRead then
                         tOutRst    <= '1';
-                        rxRdSig    <= '0';
                         loadAddr   <= '0';
                         loadDataIn <= '1';
                         byteCnt    <= to_unsigned(devDataBytes-1, byteCnt'length);
@@ -366,60 +377,54 @@ begin
                         if devBrstSig = '0' then
                             state <= readDev;
                         end if;
-                    elsif rxValid = '1' then
-                        tOutRst  <= '1';
-                        byteCnt  <= byteCnt - 1;
                     elsif tOutSig = '1' then
                         tOutRst <= '1';
-                        rxRdSig <= '0';
 
                         state   <= errFifo;
                     end if;
 
                 when getData =>
-                    tOutRst      <= '0';
-                    loadAddr     <= '0';
-                    rxRdSig      <= rxPresent and not rxValid;
+                    tOutRst   <= '0';
+                    loadAddr  <= '0';
+                    rxRdSig   <= '0';
 
-                    state        <= getData;
+                    state     <= getData;
 
-                    if endCnt = '1' and devBrstSig = '0' then
+                    if rxValid = '1' and brstCollect = '0' then
+                        tOutRst <= '1';
+                        byteCnt <= byteCnt - 1;
+                    elsif rxValid = '1' and brstCollect = '1' then
+                        tOutRst      <= '1';
+                        byteCnt      <= byteCnt - 1;
+                    elsif rxPresent = '1' and rxRdSig = '0' and endCnt = '0' then
+                        rxRdSig <= '1';
+                    elsif endCnt = '1' and devBrstSig = '0' then
                         tOutRst    <= '1';
-                        rxRdSig    <= '0';
                         loadDataIn <= '0';
 
                         state      <= done;
                     elsif endCnt = '1' and devBrstSig = '1' and brstCollect = '0' then
                         tOutRst    <= '1';
-                        rxRdSig    <= '0';
                         loadDataIn <= '0';
 
                         state      <= checkBrstPar;
                     elsif endCnt = '1' and devBrstSig = '1' and brstCollect = '1' then
                         tOutRst     <= '1';
-                        rxRdSig     <= '0';
                         brstCollect <= '0';
                         paddCollect <= '1';
                         loadDataIn  <= '0';
                         byteCnt     <= resize(brstByteNum, byteCnt'length);
 
                         state       <= addPadding;
-                    elsif rxValid = '1' and brstCollect = '0' then
-                        tOutRst <= '1';
-                        byteCnt <= byteCnt - 1;
-                    elsif rxValid = '1' and brstCollect = '1' then
-                        tOutRst      <= '1';
-                        byteCnt      <= byteCnt - 1;
                     elsif tOutSig = '1' then
                         tOutRst    <= '1';
-                        rxRdSig    <= '0';
                         loadDataIn <= '0';
 
                         state      <= errTOut;
                     end if;
 
                 when addPadding =>
-                    paddCnt <= paddCnt - 1;
+                    paddCnt   <= paddCnt - 1;
 
                     state   <= addPadding;
 
@@ -478,10 +483,8 @@ begin
 
                 when readDev =>
                     tOutRst  <= '0';
-                    loadAddr <= '0';
                     devExec  <= '0';
                     rxEna    <= '0';
-                    loadAddr <= '0';
                     wEnFifo  <= devReady(devIdSig) or wAckFifo;
                     byteCnt  <= byteCnt - stdLogicToInt(wAckFifo);
 
@@ -546,25 +549,25 @@ begin
                     end if;
 
                 when done =>
-                    devExec       <= '0';
-                    byteCnt       <= to_unsigned(devAddrBytes-1, byteCnt'length);
-                    txWSig        <= '0';
-                    readBrstBuff  <= '0';
-                    error         <= (others => '0');
+                    devExec      <= '0';
+                    byteCnt      <= to_unsigned(devAddrBytes-1, byteCnt'length);
+                    txWSig       <= '0';
+                    readBrstBuff <= '0';
+                    error        <= (others => '0');
 
-                    state         <= done;
+                    state        <= done;
 
                     if devBrstSig = '0' then
-                        devExec    <= not devRwSig;
-                        rxEna      <= '1';
-                        busy       <= '0';
+                        devExec <= not devRwSig;
+                        rxEna   <= '1';
+                        busy    <= '0';
 
-                        state      <= waitDevBusy;
+                        state   <= waitDevBusy;
                     elsif devBrstSig = '1' and devReady(devIdSig) = '1' then
-                        rxEna      <= '1';
-                        busy       <= '0';
+                        rxEna <= '1';
+                        busy  <= '0';
 
-                        state      <= waitDevBusy;
+                        state <= waitDevBusy;
                     end if;
 
                 when waitDevBusy =>
