@@ -112,6 +112,7 @@ signal   tOutRst,
          validSig,
          devRwSig,
          devBrstSig,
+         devBusyChk,
          brstCollect,
          paddCollect,
          lastBrst,
@@ -252,6 +253,7 @@ begin
             devBrstSig    <= '0';
             devBrstWrt    <= '0';
             devBrstSnd    <= '0';
+            devBusyChk    <= '0';
             rstAddr       <= '1';
             loadAddr      <= '0';
             devExec       <= '0';
@@ -572,8 +574,13 @@ begin
 
                     state <= waitDevBusy;
 
-                    if devBusy(devIdSig) = '0' then
+                    if devBusy(devIdSig) = '0' and devBusyChk = '0' then
+                        devBusyChk <= '1';
+
+                        state      <= waitDevBusy;
+                    elsif devBusy(devIdSig) = '0' and devBusyChk = '1' then
                         rstDataOut <= '1';
+                        devBusyChk <= '0';
 
                         state      <= waitRstFifo;
                     end if;
