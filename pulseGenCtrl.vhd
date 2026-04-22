@@ -124,7 +124,8 @@ signal   dacSend,
          endSettl,
          execSig,
          pGenEn,
-         start      : std_logic;
+         start,
+         locRst     : std_logic;
 signal   dacCmd     : std_logic_vector(3 downto 0);
 signal   dacValue   : std_logic_vector(11 downto 0);
 signal   periodSig,
@@ -137,13 +138,20 @@ dAddr    <= devAddrToInt(devAddr);
 endSettl <= settlCnt(settlCnt'left);
 start    <= devExec or execSig;
 
-pGenFSM: process(clk, rst, devExec, start)
+locRstProc: process(clk)
+begin
+    if rising_edge(clk) then
+        locRst <= rst;
+    end if;
+end process;
+
+pGenFSM: process(clk)
     variable ampl   : unsigned(31 downto 0)         := (others => '0');
     variable period : std_logic_vector(31 downto 0) := (others => '0');
     variable width  : std_logic_vector(31 downto 0) := (others => '0');
 begin
     if rising_edge(clk) then
-        if rst = '1' then
+        if locRst = '1' then
             devReady   <= '0';
             devDataOut <= (others => (others => '0'));
             rData      <= (others => (others => '0'));
@@ -411,7 +419,7 @@ end process;
 pGenFSMInst: entity work.pulseGenFSM
 port map(
     clk     => clk,
-    rst     => rst,
+    rst     => locRst,
     en      => pGenEn,
     period  => periodSig,
     width   => widthSig,
@@ -422,7 +430,7 @@ port map(
 dacSerInst: entity work.dacSerialInterface
 port map(
     clk      => clk,
-    rst      => rst,
+    rst      => locRst,
     send     => dacSend,
     dacCmd   => dacCmd,
     dacValue => dacValue,

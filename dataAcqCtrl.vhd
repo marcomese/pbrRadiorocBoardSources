@@ -107,7 +107,8 @@ signal swTrg,
        strtAcqSig,
        rdAcqSig,
        loadDataOut,
-       loadReg     : std_logic;
+       loadReg,
+       locRst      : std_logic;
 
 signal nbAcqSig    : std_logic_vector(7 downto 0);
 
@@ -119,10 +120,17 @@ resetAcq <= rstAcqSig;
 startAcq <= strtAcqSig;
 rdAcq    <= rdAcqSig and not devBrstSnd;
 
+locRstProc: process(clk100M)
+begin
+    if rising_edge(clk100M) then
+        locRst <= rst;
+    end if;
+end process;
+
 devDataOutCtrl: process(clk100M)
 begin
     if rising_edge(clk100M) then
-        if rst = '1' then
+        if locRst = '1' then
             devDataOut <= (others => (others => '0'));
         elsif loadDataOut = '1' and devBrst = '0' then
             devDataOut <= slvToDevData(rData(lastAddr));
@@ -135,7 +143,7 @@ end process;
 rDataCtrl: process(clk100M)
 begin
     if rising_edge(clk100M) then
-        if rst = '1' then
+        if locRst = '1' then
             rData <= (others => (others => '0'));
         elsif loadReg = '1' then
             rData(lastAddr) <= devDataToSlv(lastData);
@@ -150,7 +158,7 @@ end process;
 dataAcqCtrlFSM: process(clk100M)
 begin
     if rising_edge(clk100M) then
-        if rst = '1' then
+        if locRst = '1' then
             devReady    <= '0';
             busy        <= '0';
             loadDataOut <= '0';

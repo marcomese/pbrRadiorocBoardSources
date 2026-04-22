@@ -125,7 +125,8 @@ signal   tOutRst,
          wordWrt,
          wAckFifo,
          emptyFifo,
-         endCnt        : std_logic;
+         endCnt,
+         locRst        : std_logic;
 signal   devIdSig      : devices_t;
 signal   tOutCnt       : unsigned(bitsNum(tOut) downto 0);
 signal   byteCnt       : unsigned(bitsNum(bytesNum) downto 0);
@@ -154,6 +155,13 @@ brstFifoRstBusy <= brstWrRstBusy or brstRdRstBusy;
 loadBrstBuff    <= (rxValid and brstCollect) or paddCollect;
 lastBrst        <= not or_reduce(std_logic_vector(byteCnt(byteCnt'left downto 2)));
 idSig           <= idHeader & id;
+
+locRstProc: process(clk)
+begin
+    if rising_edge(clk) then
+        locRst <= rst;
+    end if;
+end process;
 
 devAddrCtrl: process(clk)
 begin
@@ -237,10 +245,10 @@ begin
     end case;
 end process;
 
-devFSM: process(clk, rst, rxPresent)
+devFSM: process(clk)
 begin
     if rising_edge(clk) then
-        if rst = '1' then
+        if locRst = '1' then
             tOutRst       <= '0';
             byteCnt       <= to_unsigned(devAddrBytes-1, byteCnt'length);
             paddCnt       <= (others => '0');
@@ -674,10 +682,10 @@ begin
     end if;
 end process;
 
-tOutCntInst: process(clk, rst, tOutRst, tOutSig)
+tOutCntInst: process(clk)
 begin
     if rising_edge(clk) then
-        if rst = '1' or tOutRst = '1' or tOutSig = '1' then
+        if locRst = '1' or tOutRst = '1' or tOutSig = '1' then
             tOutCnt <= to_unsigned(tOut-1, tOutCnt'length);
         else
             tOutCnt <= tOutCnt-1;

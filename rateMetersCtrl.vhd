@@ -94,7 +94,8 @@ signal cntTmr      : unsigned(cntTmrMax'length downto 0); -- MSB = overflow
 signal cntTmrSig,
        cntTmrSet,
        loadDataOut,
-       loadReg     : std_logic;
+       loadReg,
+       locRst      : std_logic;
 
 begin
 
@@ -102,10 +103,17 @@ dAddr     <= devAddrToInt(devAddr);
 
 cntTmrSig <= cntTmr(cntTmr'left);
 
+locRstProc: process(clk)
+begin
+    if rising_edge(clk) then
+        locRst <= rst;
+    end if;
+end process;
+
 devDataOutCtrl: process(clk)
 begin
     if rising_edge(clk) then
-        if rst = '1' then
+        if locRst = '1' then
             devDataOut <= (others => (others => '0'));
         elsif loadDataOut = '1' then
             devDataOut <= slvToDevData(rData(lastAddr));
@@ -116,7 +124,7 @@ end process;
 rDataCtrl: process(clk)
 begin
     if rising_edge(clk) then
-        if rst = '1' then
+        if locRst = '1' then
             rData <= (others => (others => '0'));
         elsif loadReg = '1' then
             rData(lastAddr) <= devDataToSlv(lastData);
@@ -131,7 +139,7 @@ end process;
 rateMetersCtrlFSM: process(clk)
 begin
     if rising_edge(clk) then
-        if rst = '1' then
+        if locRst = '1' then
             devReady    <= '0';
             busy        <= '0';
             loadDataOut <= '0';
@@ -217,7 +225,7 @@ begin
     trgICnt: process(clk)
     begin
         if rising_edge(clk) then
-            if rst = '1' then
+            if locRst = '1' then
                 trgMeters(i) <= (others => '0');
             elsif cntTmrSig = '1' then
                 trgMeters(i) <= (others => '0');
@@ -231,7 +239,7 @@ end generate;
 cntTmrGen: process(clk)
 begin
     if rising_edge(clk) then
-        if rst = '1' or cntTmrSig = '1' or cntTmrSet = '1' then
+        if locRst = '1' or cntTmrSig = '1' or cntTmrSet = '1' then
             cntTmr <= resize(cntTmrMax-2, cntTmr'length);
         else
             cntTmr <= cntTmr - 1;

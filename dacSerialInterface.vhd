@@ -42,16 +42,24 @@ constant frameLen   : integer := 24;
 signal   state      : state_t;
 signal   bitCounter : unsigned(bitsNum(frameLen) downto 0);
 signal   frame      : std_logic_vector(frameLen-1 downto 0);
-signal   endFrame   : std_logic;
+signal   endFrame,
+         locRst     : std_logic;
 
 begin
 
 endFrame <= bitCounter(bitCounter'left);
 
-dacSerialFSM: process(clk, rst, send, endFrame, dacCmd, dacValue)
+locRstProc: process(clk)
 begin
     if rising_edge(clk) then
-        if rst = '1' then
+        locRst <= rst;
+    end if;
+end process;
+
+dacSerialFSM: process(clk)
+begin
+    if rising_edge(clk) then
+        if locRst = '1' then
             frame      <= (others => '0');
             dacSDI     <= '0';
             dacSCLK    <= '0';

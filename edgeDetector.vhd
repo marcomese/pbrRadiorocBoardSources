@@ -16,7 +16,8 @@ end edgeDetector;
 
 architecture Behavioral of edgeDetector is
 
-signal ff1,
+signal locRst,
+       ff1,
        ff2 : std_logic;
 
 attribute ASYNC_REG : string;
@@ -24,6 +25,13 @@ attribute ASYNC_REG of ff1,
                        ff2   : signal is "true";
 
 begin
+
+locRstProc: process(clk)
+begin
+    if rising_edge(clk) then
+        locRst <= rst;
+    end if;
+end process;
 
 risingEdgeGen: if edge = "rising" generate
     signalOut <= ff1 and not ff2;
@@ -34,9 +42,9 @@ fallingEdgeGen: if edge = "falling" generate
 end generate;
 
 riseEdgeGen: if clockEdge = "rising" generate
-    edgeProc: process(clk,rst)
+    edgeProc: process(clk)
     begin
-        if rst = '1' then
+        if locRst = '1' then
             ff1 <= '0';
             ff2 <= '0';
         elsif rising_edge(clk) then
@@ -47,9 +55,9 @@ riseEdgeGen: if clockEdge = "rising" generate
 end generate;
 
 fallEdgeGen: if clockEdge = "falling" generate
-    edgeProc: process(clk,rst)
+    edgeProc: process(clk)
     begin
-        if rst = '1' then
+        if locRst = '1' then
             ff1 <= '0';
             ff2 <= '0';
         elsif falling_edge(clk) then

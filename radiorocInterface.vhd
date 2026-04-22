@@ -56,7 +56,8 @@ signal   dataReady,
          rw,
          brstOn,
          exec,
-         busyRad    : std_logic;
+         busyRad,
+         locRst     : std_logic;
 
 signal   dataOut    : devData_t;
 
@@ -64,10 +65,17 @@ begin
 
 devDataOut <= dataOut;
 
-radioFSM: process(clk, rst, devExec)
+locRstProc: process(clk)
 begin
     if rising_edge(clk) then
-        if rst = '1' then
+        locRst <= rst;
+    end if;
+end process;
+
+radioFSM: process(clk)
+begin
+    if rising_edge(clk) then
+        if locRst = '1' then
             exec       <= '0';
             rw         <= readCmd;
             devReady   <= '0';
@@ -134,7 +142,7 @@ generic map(
 )
 port map(
     clk          => clk,
-    rst          => rst,      
+    rst          => locRst,      
     exec         => exec,
     rw           => rw,
     brst         => devBrst,

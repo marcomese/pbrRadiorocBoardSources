@@ -92,7 +92,8 @@ signal sclkFF,
        loadRxFifo,
        rxEna,
        rxEmpty,
-       lastBit    : std_logic;
+       lastBit,
+       locRst     : std_logic;
 signal bitCount   : unsigned(3 downto 0);
 signal buffIn,
        buffOut,
@@ -110,10 +111,17 @@ loadTxFifo <= lastBit;
 
 rx_present <= not rxEmpty;
 
+locRstProc: process(clk)
+begin
+    if rising_edge(clk) then
+        locRst <= rst;
+    end if;
+end process;
+
 misoRegProc: process(clk)
 begin
     if rising_edge(clk) then
-        if rst = '1' then
+        if locRst = '1' then
             miso <= '0';
         else
             if cs = '0' then
@@ -128,7 +136,7 @@ end process;
 txPresInst: process(clk)
 begin
     if rising_edge(clk) then
-        if rst = '1' then
+        if locRst = '1' then
             tx_present <= '0';
         else
             tx_present <= txPres;
@@ -139,7 +147,7 @@ end process;
 sclkCsFFProc: process(clk)
 begin
     if rising_edge(clk) then
-        if rst = '1' then
+        if locRst = '1' then
             sclkFF <= '0';
             csFF   <= '1';
         else
@@ -155,10 +163,10 @@ sclkFall <= not sclk and sclkFF;
 
 csRise   <= cs and not csFF;
 
-rxEnaProc: process(clk, rst, csRise, rx_ena)
+rxEnaProc: process(clk)
 begin
     if rising_edge(clk) then
-        if rst = '1' or csRise = '1' then
+        if locRst = '1' or csRise = '1' then
             rxEna <= '1';
         elsif rx_ena = '0' then
             rxEna <= '0';
@@ -166,10 +174,10 @@ begin
     end if;
 end process;
 
-shiftRegInInst: process(clk, rst, sclkFall, cs)
+shiftRegInInst: process(clk)
 begin
     if rising_edge(clk) then
-        if rst = '1' then
+        if locRst = '1' then
             buffIn <= (others => '0');
         elsif cs = '0' and sclkFall = '1' then
             buffIn <= buffIn(6 downto 0) & mosi;
@@ -177,10 +185,10 @@ begin
     end if;
 end process;
 
-shiftRegOutInst: process(clk, rst, sclkRise, txPres, bitCount)
+shiftRegOutInst: process(clk)
 begin
     if rising_edge(clk) then
-        if rst = '1' then
+        if locRst = '1' then
             buffOut <= (others => '0');
         elsif loadBuff = '1' and txPres = '1' then
             buffOut <= txFifoDout;
@@ -190,10 +198,10 @@ begin
     end if;
 end process;
 
-bitCounterInst: process(clk, rst, sclkRise, cs)
+bitCounterInst: process(clk)
 begin
     if rising_edge(clk) then
-        if rst = '1' or lastBit = '1' or cs = '1' then
+        if locRst = '1' or lastBit = '1' or cs = '1' then
             bitCount <= to_unsigned(7, bitCount'length);
         elsif sclkFall = '1' then
             bitCount <= bitCount - 1;

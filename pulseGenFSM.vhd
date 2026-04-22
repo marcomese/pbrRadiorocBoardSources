@@ -38,7 +38,8 @@ type state_t is (idle,
 signal state     : state_t;
 signal endOnCnt,
        endOffCnt,
-       start     : std_logic;
+       start,
+       locRst    : std_logic;
 signal wBuff,
        tBuff     : unsigned(31 downto 0);
 signal onCnt,
@@ -49,10 +50,17 @@ begin
 endOnCnt  <= onCnt(32);
 endOffCnt <= offCnt(32);
 
-pGenFSM: process(clk, rst)
+locRstProc: process(clk)
 begin
     if rising_edge(clk) then
-        if rst = '1' then
+        locRst <= rst;
+    end if;
+end process;
+
+pGenFSM: process(clk)
+begin
+    if rising_edge(clk) then
+        if locRst = '1' then
             pulse   <= '0';
             pulsing <= '0';
             wBuff   <= (others => '0');

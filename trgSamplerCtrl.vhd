@@ -98,7 +98,8 @@ signal cntNSAftTrgSig,
        cntNSAftTrgSet,
        cntNSAftTrgEn,
        loadDataOut,
-       loadReg         : std_logic;
+       loadReg,
+       locRst          : std_logic;
 
 begin
 
@@ -106,10 +107,17 @@ dAddr          <= devAddrToInt(devAddr);
 
 cntNSAftTrgSig <= cntNSAfterTrg(cntNSAfterTrg'left);
 
+locRstProc: process(clk)
+begin
+    if rising_edge(clk) then
+        locRst <= rst;
+    end if;
+end process;
+
 devDataOutCtrl: process(clk)
 begin
     if rising_edge(clk) then
-        if rst = '1' then
+        if locRst = '1' then
             devDataOut <= (others => (others => '0'));
         elsif loadDataOut = '1' then
             devDataOut <= slvToDevData(rData(lastAddr));
@@ -120,7 +128,7 @@ end process;
 rDataCtrl: process(clk)
 begin
     if rising_edge(clk) then
-        if rst = '1' then
+        if locRst = '1' then
             rData <= (1 => initSlv(32, 15, 0, std_logic_vector(nSAfterTrgMax), '0'),
                       others => (others => '0'));
         elsif loadReg = '1' then
@@ -133,10 +141,10 @@ begin
     end if;
 end process;
 
-trgSamplerCtrlFSM: process(clk, rst, devExec)
+trgSamplerCtrlFSM: process(clk)
 begin
     if rising_edge(clk) then
-        if rst = '1' then
+        if locRst = '1' then
             devReady       <= '0';
             busy           <= '0';
             loadReg        <= '0';
@@ -217,10 +225,10 @@ end process;
 
 trgSmplGen: for i in 0 to trgNum-1 generate
 begin
-    trgICnt: process(clk, rst)
+    trgICnt: process(clk)
     begin
         if rising_edge(clk) then
-            if rst = '1' then
+            if locRst = '1' then
                 sampledTrg(i) <= (others => '0');
             else
                 sampledTrg(i) <= sampledTrg(i)(sampledTrg(i)'left-1 downto 0) & trgIn(i);
@@ -229,10 +237,10 @@ begin
     end process;
 end generate;
 
-nSAfterTrgProc: process(clk, rst)
+nSAfterTrgProc: process(clk)
 begin
     if rising_edge(clk) then
-        if rst = '1' then
+        if locRst = '1' then
             cntNSAfterTrg <= to_unsigned(nSAfterTrgDef-2, cntNSAfterTrg'length);
             cntNSAftTrgEn <= '0';
         elsif cntNSAftTrgSig = '1' or cntNSAftTrgSet = '1' then

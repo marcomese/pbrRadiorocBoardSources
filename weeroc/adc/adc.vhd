@@ -89,6 +89,8 @@ architecture Behavioral of adc is
     signal cd : std_logic_vector(10 downto 0);
     signal rdValidSig : std_logic;
 
+    signal locRst : std_logic;
+
 begin
 
 evtTrigger   <= trgEdge;
@@ -97,9 +99,16 @@ endAcq       <= end_acq;
 rdValid      <= rdValidSig;
 NORT_FPGA    <= and_reduce(t);
 
+locRstProc: process(clk_200M)
+begin
+    if rising_edge(clk_200M) then
+        locRst <= rst;
+    end if;
+end process;
+
 ma : entity xil_defaultlib.multi_acq
 Port map (
-    rst 	 => rst,
+    rst 	 => locRst,
     clk_200M => clk_200M,
     start	 => start,
     end_acq  => end_acq,
@@ -132,7 +141,7 @@ port map(
 	
 	ff : fifo_acq
 	port map (
-		rst    => rst,
+		rst    => locRst,
 		wr_clk => clk_200M,
 		rd_clk => clk_200M,
 		din    => din_l,
@@ -184,7 +193,7 @@ generic map(
 )
 port map(
     clk       => clk_200M,
-    rst       => rst,
+    rst       => locRst,
     signalIn  => trigger,
     signalOut => trgEdge
 );
@@ -196,14 +205,14 @@ generic map(
 )
 port map(
     clk       => clk_200M,
-    rst       => rst,
+    rst       => locRst,
     signalIn  => trigger_sft,
     signalOut => trgSftEdge
 );
 
-	process(rst, clk_200M)
+	process(locRst, clk_200M)
 	begin
-	if rst = '1' then
+	if locRst = '1' then
 		current_state <= idle;
 		cpt <= hold_delay;
 		ch <= 0;

@@ -73,7 +73,8 @@ signal   dAddr      : integer;
 signal   exec,
          dataReady,
          rw,
-         busyTmp    : std_logic;
+         busyTmp,
+         locRst     : std_logic;
 
 signal   rAddr      : std_logic_vector(7 downto 0);
 
@@ -88,10 +89,17 @@ dAddr     <= slvToInt(devAddr(0));
 
 dataOut32 <= x"00000" & dataOut(15 downto 4);
 
-hvTmpFSM: process(clk, rst, devExec)
+locRstProc: process(clk)
 begin
     if rising_edge(clk) then
-        if rst = '1' then
+        locRst <= rst;
+    end if;
+end process;
+
+hvTmpFSM: process(clk)
+begin
+    if rising_edge(clk) then
+        if locRst = '1' then
             exec       <= '0';
             rw         <= devRead;
             rAddr      <= (others => '0');
@@ -191,7 +199,7 @@ generic map(
 )
 port map(
     clk       => clk,
-    rst       => rst,
+    rst       => locRst,
     exec      => exec,
     rw        => rw,
     addr      => rAddr,

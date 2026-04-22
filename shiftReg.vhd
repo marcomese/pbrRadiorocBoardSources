@@ -43,18 +43,27 @@ signal   shiftCnt : unsigned(bitsNum(shiftNum) downto 0);
 
 signal   buffInt  : std_logic_vector(regLen-1 downto 0);
 
+signal   locRst   : std_logic;
+
 begin
 
 last  <= '1' when shiftCnt = 0 else '0';
+
+locRstProc: process(clk)
+begin
+    if rising_edge(clk) then
+        locRst <= rst;
+    end if;
+end process;
 
 leftShiftGen: if direction = "left" generate
 begin
     dataOut <= buffInt(buffInt'left downto buffInt'left-regLen+1);
 
-    buffIntInst: process(clk, rst)
+    buffIntInst: process(clk)
     begin
         if rising_edge(clk) then
-            if rst = '1' then
+            if locRst = '1' then
                 buffInt <= (others => '0');
             elsif load = '1' then
                 buffInt <= parDataIn;
@@ -70,10 +79,10 @@ rightShiftGen: if direction = "right" generate
 begin
     dataOut <= buffInt(regLen-1 downto 0);
 
-    buffIntInst: process(clk, rst)
+    buffIntInst: process(clk)
     begin
         if rising_edge(clk) then
-            if rst = '1' then
+            if locRst = '1' then
                 buffInt <= (others => '0');
             elsif load = '1' then
                 buffInt <= parDataIn;
@@ -85,10 +94,10 @@ begin
     end process;
 end generate;
 
-shiftCntInst: process(clk, rst)
+shiftCntInst: process(clk)
 begin
     if rising_edge(clk) then
-        if rst = '1' then
+        if locRst = '1' then
             full     <= '0';
             shiftCnt <= to_unsigned(shiftNum-1, shiftCnt'length);
         elsif load = '1' or shiftCnt(shiftCnt'left) = '1' then

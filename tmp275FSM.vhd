@@ -67,7 +67,8 @@ signal   rwSig,
          i2cBusyOld,
          i2cBusyRise,
          i2cBusyFall,
-         lastByte    : std_logic;
+         lastByte,
+         locRst      : std_logic;
 
 begin
 
@@ -79,11 +80,18 @@ i2cBusyFall <= i2cBusyOld and not i2cBusy;
 
 lastByte    <= bytesCnt(bytesCnt'left);
 
-tmpFSM: process(clk, rst, exec)
+locRstProc: process(clk)
+begin
+    if rising_edge(clk) then
+        locRst <= rst;
+    end if;
+end process;
+
+tmpFSM: process(clk)
     variable rI : integer range 0 to bytesNum-1 := 0;
 begin
     if rising_edge(clk) then
-        if rst = '1' then
+        if locRst = '1' then
             i2cEna        <= '0';
             i2cRw         <= '0';
             i2cDataWr     <= confAddr;

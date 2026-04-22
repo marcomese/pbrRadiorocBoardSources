@@ -73,7 +73,8 @@ signal   rwSig,
          lastByte,
          brstOld,
          brstRise,
-         brstFall     : std_logic;
+         brstFall,
+         locRst       : std_logic;
 signal   dataInVec    : std_logic_vector(devDataBytes*8-1 downto 0);
 signal   dataOutBuff  : std_logic_vector(dataInVec'left downto 0);
 signal   leftBCnt     : unsigned(2 downto 0);
@@ -96,10 +97,17 @@ brstFall    <= brstOld and not brst;
 
 brstRise    <= brst and not brstOld;
 
-radioFSM: process(clk, rst, exec)
+locRstProc: process(clk)
 begin
     if rising_edge(clk) then
-        if rst = '1' then
+        locRst <= rst;
+    end if;
+end process;
+
+radioFSM: process(clk)
+begin
+    if rising_edge(clk) then
+        if locRst = '1' then
             i2cEnaSig  <= '0';
             i2cAddr    <= (others => '0');
             i2cRw      <= '0';
