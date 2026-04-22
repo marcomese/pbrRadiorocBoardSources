@@ -138,46 +138,6 @@ signal   dataToFifo    : std_logic_vector(7 downto 0);
 signal   idSig         : std_logic_vector(7 downto 0);
 signal   dataBrstOut   : std_logic_vector(31 downto 0);
 
-attribute mark_debug : string;
-attribute mark_debug of state,
-                        validId,
-                        rwSig,
-                        brstSig,
-                        validSig,
-                        tOutRst,
-                        rxPresent,
-                        rxValid,
-                        byteCnt,
-                        paddCnt,
-                        rxRdSig,
-                        rxRdInhib,
-                        rxEna,
-                        devIdSig,
-                        devRwSig,
-                        devBrstSig,
-                        devBrstWrt,
-                        devBrstSnd,
-                        devBusyChk,
-                        rstAddr,
-                        loadAddr,
-                        devExec,
-                        busy,
-                        brstByteNum,
-                        brstCollect,
-                        paddCollect,
-                        readBrstBuff,
-                        rstDataOut,
-                        loadDataIn,
-                        loadLastBrst,
-                        wEnFifo,
-                        rEnFifo,
-                        txWSig,
-                        rstFifo,
-                        rstBrstBuff,
-                        dataToFifoSel,
-                        devDataOutSig,
-                        devAddrSig     : signal is "True";
-
 begin
 
 rxRead          <= rxRdSig;

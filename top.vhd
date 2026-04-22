@@ -547,7 +547,7 @@ generic map(
 )
 port map(
     clk        => clk_200M,
-    rst        => pwrOnRstSig, -- avoids warnings in drc for unroutable situations
+    rst        => pwrOnRst,
     trgIn      => tEdge21,
     devExec    => devExec,
     devId      => devId,

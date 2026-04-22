@@ -95,18 +95,21 @@ constant errAddrStatus      : std_logic_vector(31 downto 0) := initSlv(32, 13, 0
 constant errROnlyStatus     : std_logic_vector(31 downto 0) := initSlv(32, 13, 0, "11" & x"A00", '0');
 constant errFifoEmptyStatus : std_logic_vector(31 downto 0) := initSlv(32, 13, 0, "11" & x"B00", '0');
 
-signal state          : state_t;
+signal state       : state_t;
 
-signal dataIn         : devData_t;
+signal lastData    : devData_t;
 
-signal dAddr          : integer;
+signal dAddr,
+       lastAddr    : integer;
 
 signal swTrg,
        rstAcqSig,
        strtAcqSig,
-       rdAcqSig       : std_logic;
+       rdAcqSig,
+       loadDataOut,
+       loadReg     : std_logic;
 
-signal nbAcqSig       : std_logic_vector(7 downto 0);
+signal nbAcqSig    : std_logic_vector(7 downto 0);
 
 begin
 
@@ -116,49 +119,79 @@ resetAcq <= rstAcqSig;
 startAcq <= strtAcqSig;
 rdAcq    <= rdAcqSig and not devBrstSnd;
 
-dataAcqCtrlFSM: process(clk100M, rst, devExec)
-    variable i : integer := 0;
+devDataOutCtrl: process(clk100M)
 begin
     if rising_edge(clk100M) then
         if rst = '1' then
-            devReady   <= '0';
-            busy       <= '0';
-            rstAcqSig  <= '1';
-            strtAcqSig <= '0';
-            rdAcqSig   <= '0';
-            nbAcqSig   <= (others => '0');
             devDataOut <= (others => (others => '0'));
-            devBrstRst <= '0';
-            swTrg      <= '0';
-            rData      <= (others => (others => '0'));
+        elsif loadDataOut = '1' and devBrst = '0' then
+            devDataOut <= slvToDevData(rData(lastAddr));
+        elsif loadDataOut = '1' and devBrst = '1' then
+            devDataOut(0) <= doutAcq;
+        end if;
+    end if;
+end process;
+
+rDataCtrl: process(clk100M)
+begin
+    if rising_edge(clk100M) then
+        if rst = '1' then
+            rData <= (others => (others => '0'));
+        elsif loadReg = '1' then
+            rData(lastAddr) <= devDataToSlv(lastData);
+        elsif swTrg = '1' then
+            clearReg(reg, rData, addr'pos(regSwTrg));
+        else
+            rData(addr'pos(regFifoCnt)) <= std_logic_vector(resize(unsigned(rdDataCnt), regsLen));
+        end if;
+    end if;
+end process;
+
+dataAcqCtrlFSM: process(clk100M)
+begin
+    if rising_edge(clk100M) then
+        if rst = '1' then
+            devReady    <= '0';
+            busy        <= '0';
+            loadDataOut <= '0';
+            loadReg     <= '0';
+            rstAcqSig   <= '1';
+            strtAcqSig  <= '0';
+            rdAcqSig    <= '0';
+            nbAcqSig    <= (others => '0');
+            devBrstRst  <= '0';
+            swTrg       <= '0';
+            selAdc      <= (others => '0');
+            lastAddr    <= 0;
+            lastData    <= (others => (others => '0'));
 
             state      <= idle;
         else
-            writeReg(reg, rData, addr'pos(regFifoCnt), resize(unsigned(rdDataCnt), regsLen));
-
             selAdc <= readReg(reg, rData, addr'pos(regSelAdcMSB)) &
                       readReg(reg, rData, addr'pos(regSelAdcLSB)); 
 
             case state is
                 when idle =>
-                    devReady   <= '0';
-                    rstAcqSig  <= '0';
-                    strtAcqSig <= '0';
-                    swTrg      <= '0';
-                    busy       <= '0';
+                    devReady    <= '0';
+                    loadDataOut <= '0';
+                    loadReg     <= '0';
+                    rstAcqSig   <= '0';
+                    strtAcqSig  <= '0';
+                    swTrg       <= '0';
+                    busy        <= '0';
 
-                    state      <= idle;
+                    state       <= idle;
 
                     if devExec = '1' and devId = acqSystem then
                         if dAddr > addr'pos(addr'high) then
                             state    <= errAddr;
                         elsif devRw = devRead and devBrst = '0' then
-                            writeReg(reg, rData, addr'pos(regStatus), idleStatus);
-                            devReady   <= '1';
-                            devDataOut <= readReg(reg, rData, dAddr);
-                            busy       <= '1';
+                            lastAddr    <= dAddr;
+                            loadDataOut <= '1';
+                            devReady    <= '1';
+                            busy        <= '1';
 
-                            state      <= idle;
+                            state       <= idle;
                         elsif devRw = devRead and devBrst = '1' and emptyAcq = '0' then
                             rdAcqSig <= '1';
 
@@ -170,26 +203,28 @@ begin
                         elsif devRw = devWrite and reg(dAddr).rMode = ro then
                             state    <= errReadOnly;
                         elsif devRw = devWrite and reg(dAddr).rMode = rw then
-                            writeReg(reg, rData, addr'pos(regStatus), dAddr);
-                            writeReg(reg, rData, dAddr, devDataIn);
-                            busy  <= '1';
+                            lastAddr <= dAddr;
+                            lastData <= devDataIn;
+                            loadReg  <= '1';
+                            busy     <= '1';
 
-                            state <= execute;
+                            state    <= execute;
                         end if;
                     end if;
 
                 when execute =>
-                    state <= idle;
+                    loadReg <= '0';
+
+                    state   <= idle;
 
                     if isSet(reg, rData, addr'pos(regAcqEn)) then
                         rstAcqSig <= '1';
 
                         state     <= sendStartAcq;
                     elsif isSet(reg, rData, addr'pos(regSwTrg)) then
-                        clearReg(reg, rData, addr'pos(regSwTrg));
-                        swTrg <= '1';
-                    elsif readReg(reg, rData, addr'pos(regStatus)) = addrToSlv(addr'pos(regAcqNb)) then
-                        nbAcqSig <= readReg(reg, rData, addr'pos(regAcqNb))(7 downto 0);
+                        swTrg      <= '1';
+                    elsif lastAddr = addr'pos(regAcqNb) then
+                        nbAcqSig <= devDataToSlv(lastData)(nbAcqSig'range);
                     end if;
 
                 when sendStartAcq =>
@@ -199,7 +234,6 @@ begin
                     state      <= idle;
 
                 when readFifo =>
-                    devDataOut(0) <= doutAcq;
                     devReady      <= rdValid;
                     rdAcqSig      <= devBrstWrt;
 
@@ -240,21 +274,26 @@ begin
                     end if;
 
                 when errAddr =>
-                    writeReg(reg, rData, addr'pos(regStatus), errAddrStatus);
-                    busy  <= '0';
+                    lastAddr <= addr'pos(regStatus);
+                    lastData <= slvToDevData(errAddrStatus);
+                    loadReg  <= '1';
+                    busy     <= '0';
 
                     state <= idle;
 
                 when errReadOnly =>
-                    writeReg(reg, rData, addr'pos(regStatus), errROnlyStatus);
-                    busy  <= '0';
+                    lastAddr <= addr'pos(regStatus);
+                    lastData <= slvToDevData(errROnlyStatus);
+                    loadReg  <= '1';
+                    busy     <= '0';
 
                     state <= idle;
 
                 when errFifoEmpty =>
-                    writeReg(reg, rData, addr'pos(regStatus), errFifoEmptyStatus);
-                    devBrstRst <= '0';
-                    busy       <= '0';
+                    lastAddr <= addr'pos(regStatus);
+                    lastData <= slvToDevData(errFifoEmptyStatus);
+                    loadReg  <= '1';
+                    busy     <= '0';
 
                     state      <= idle;                    
 

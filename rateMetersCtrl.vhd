@@ -93,7 +93,6 @@ signal cntTmr      : unsigned(cntTmrMax'length downto 0); -- MSB = overflow
 
 signal cntTmrSig,
        cntTmrSet,
-       cntRst,
        loadDataOut,
        loadReg     : std_logic;
 
@@ -102,8 +101,6 @@ begin
 dAddr     <= devAddrToInt(devAddr);
 
 cntTmrSig <= cntTmr(cntTmr'left);
-
-cntRst    <= rst or cntTmrSig;
 
 devDataOutCtrl: process(clk)
 begin
