@@ -16,14 +16,14 @@
    </db_ref_list>
    <zoom_setting>
       <ZoomStartTime time="0.000000 us"></ZoomStartTime>
-      <ZoomEndTime time="1,001.000000 us"></ZoomEndTime>
-      <Cursor1Time time="351.690000 us"></Cursor1Time>
+      <ZoomEndTime time="501.000001 us"></ZoomEndTime>
+      <Cursor1Time time="52.020000 us"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
-      <NameColumnWidth column_width="219"></NameColumnWidth>
+      <NameColumnWidth column_width="207"></NameColumnWidth>
       <ValueColumnWidth column_width="58"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="71" />
+   <WVObjectSize size="80" />
    <wvobject fp_name="/tb_rateMetersCtrl/rst" type="logic">
       <obj_property name="ElementShortName">rst</obj_property>
       <obj_property name="ObjectShortName">rst</obj_property>
@@ -39,6 +39,14 @@
    <wvobject fp_name="/tb_rateMetersCtrl/t[0]" type="logic">
       <obj_property name="ElementShortName">[0]</obj_property>
       <obj_property name="ObjectShortName">[0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_rateMetersCtrl/testT" type="logic">
+      <obj_property name="ElementShortName">testT</obj_property>
+      <obj_property name="ObjectShortName">testT</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_rateMetersCtrl/testRst" type="logic">
+      <obj_property name="ElementShortName">testRst</obj_property>
+      <obj_property name="ObjectShortName">testRst</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_rateMetersCtrl/testMeter" type="array">
       <obj_property name="ElementShortName">testMeter[31:0]</obj_property>
@@ -77,10 +85,6 @@
    <wvobject fp_name="/tb_rateMetersCtrl/uut/cntTmrSig" type="logic">
       <obj_property name="ElementShortName">cntTmrSig</obj_property>
       <obj_property name="ObjectShortName">cntTmrSig</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_rateMetersCtrl/devReadyRm" type="logic">
-      <obj_property name="ElementShortName">devReadyRm</obj_property>
-      <obj_property name="ObjectShortName">devReadyRm</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_rateMetersCtrl/uut/cntTmrSet" type="logic">
       <obj_property name="ElementShortName">cntTmrSet</obj_property>
@@ -121,6 +125,38 @@
    <wvobject fp_name="/tb_rateMetersCtrl/devAddr" type="array">
       <obj_property name="ElementShortName">devAddr[1:0][7:0]</obj_property>
       <obj_property name="ObjectShortName">devAddr[1:0][7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_rateMetersCtrl/uut/devDataIn" type="array">
+      <obj_property name="ElementShortName">devDataIn[3:0][7:0]</obj_property>
+      <obj_property name="ObjectShortName">devDataIn[3:0][7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_rateMetersCtrl/uut/lastData" type="array">
+      <obj_property name="ElementShortName">lastData[3:0][7:0]</obj_property>
+      <obj_property name="ObjectShortName">lastData[3:0][7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_rateMetersCtrl/uut/rData" type="array">
+      <obj_property name="ElementShortName">rData[129:0][31:0]</obj_property>
+      <obj_property name="ObjectShortName">rData[129:0][31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_rateMetersCtrl/uut/rData[1]" type="array">
+      <obj_property name="ElementShortName">[1][31:0]</obj_property>
+      <obj_property name="ObjectShortName">[1][31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_rateMetersCtrl/uut/lastAddr" type="other">
+      <obj_property name="ElementShortName">lastAddr</obj_property>
+      <obj_property name="ObjectShortName">lastAddr</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_rateMetersCtrl/uut/loadDataOut" type="logic">
+      <obj_property name="ElementShortName">loadDataOut</obj_property>
+      <obj_property name="ObjectShortName">loadDataOut</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_rateMetersCtrl/uut/loadReg" type="logic">
+      <obj_property name="ElementShortName">loadReg</obj_property>
+      <obj_property name="ObjectShortName">loadReg</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_rateMetersCtrl/devReadyRm" type="logic">
+      <obj_property name="ElementShortName">devReadyRm</obj_property>
+      <obj_property name="ObjectShortName">devReadyRm</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_rateMetersCtrl/uut/state" type="other">
       <obj_property name="DisplayName">label</obj_property>

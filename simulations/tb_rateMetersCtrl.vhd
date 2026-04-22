@@ -121,31 +121,31 @@ begin
     testT <= '0';
 
 
-    wait for 1 us;
+--    wait for 1 us;
 
-    testDataIn <= x"76";
-    wait for clkPeriod100M*delay;
-    testTxWrite <= '1';
-    wait for clkPeriod100M;
-    testTxWrite <= '0';
-    wait for clkPeriod100M*delay;
-    testDataIn <= x"a6";
-    wait for clkPeriod100M*delay;
-    testTxWrite <= '1';
-    wait for clkPeriod100M;
-    testTxWrite <= '0';
-    wait for clkPeriod100M*delay;
-    testDataIn <= x"00";
-    testTxWrite <= '1';
-    wait for clkPeriod100M;
-    testTxWrite <= '0';
-    wait for clkPeriod100M*delay;
-    testDataIn <= x"76";
-    testTxWrite <= '1';
-    wait for clkPeriod100M;
-    testTxWrite <= '0';
+--    testDataIn <= x"76";
+--    wait for clkPeriod100M*delay;
+--    testTxWrite <= '1';
+--    wait for clkPeriod100M;
+--    testTxWrite <= '0';
+--    wait for clkPeriod100M*delay;
+--    testDataIn <= x"a6";
+--    wait for clkPeriod100M*delay;
+--    testTxWrite <= '1';
+--    wait for clkPeriod100M;
+--    testTxWrite <= '0';
+--    wait for clkPeriod100M*delay;
+--    testDataIn <= x"00";
+--    testTxWrite <= '1';
+--    wait for clkPeriod100M;
+--    testTxWrite <= '0';
+--    wait for clkPeriod100M*delay;
+--    testDataIn <= x"76";
+--    testTxWrite <= '1';
+--    wait for clkPeriod100M;
+--    testTxWrite <= '0';
     
-        wait for 350 us;
+--        wait for 350 us;
     
 --    wait for clkPeriod100M*delay;
 --    testDataIn <= x"76";
@@ -153,24 +153,24 @@ begin
 --    testTxWrite <= '1';
 --    wait for clkPeriod100M;
 --    testTxWrite <= '0';
-    wait for clkPeriod100M*delay;
-    testDataIn <= x"a6";
-    wait for clkPeriod100M*delay;
-    testTxWrite <= '1';
-    wait for clkPeriod100M;
-    testTxWrite <= '0';
-    wait for clkPeriod100M*delay;
-    testDataIn <= x"00";
-    testTxWrite <= '1';
-    wait for clkPeriod100M;
-    testTxWrite <= '0';
-    wait for clkPeriod100M*delay;
-    testDataIn <= x"71";
-    testTxWrite <= '1';
-    wait for clkPeriod100M;
-    testTxWrite <= '0';
+--    wait for clkPeriod100M*delay;
+--    testDataIn <= x"a6";
+--    wait for clkPeriod100M*delay;
+--    testTxWrite <= '1';
+--    wait for clkPeriod100M;
+--    testTxWrite <= '0';
+--    wait for clkPeriod100M*delay;
+--    testDataIn <= x"00";
+--    testTxWrite <= '1';
+--    wait for clkPeriod100M;
+--    testTxWrite <= '0';
+--    wait for clkPeriod100M*delay;
+--    testDataIn <= x"71";
+--    testTxWrite <= '1';
+--    wait for clkPeriod100M;
+--    testTxWrite <= '0';
 
-    wait for 350 ns;
+--    wait for 350 ns;
 
     testDataIn <= x"76";
     wait for clkPeriod100M*delay;

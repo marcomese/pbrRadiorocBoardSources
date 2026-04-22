@@ -68,32 +68,34 @@ signal   rData    : regsData_t(regsNum-1 downto 0);
 --------------------------------------------------------------------
 
 type state_t is (idle,
-                 readReady,
                  execute,
                  errAddr,
                  errReadOnly);
 
-type rateMeters_t is array(0 to trgNum-1) of std_logic_vector(31 downto 0);
+type rateMeters_t is array(0 to trgNum-1) of unsigned(31 downto 0);
 
 constant idleStatus     : std_logic_vector(31 downto 0) := initSlv(32, 13, 0, "00" & x"001", '0');
 constant errAddrStatus  : std_logic_vector(31 downto 0) := initSlv(32, 13, 0, "11" & x"500", '0');
 constant errROnlyStatus : std_logic_vector(31 downto 0) := initSlv(32, 13, 0, "11" & x"A00", '0');
 
-signal state     : state_t;
+signal state       : state_t;
 
-signal dataIn    : devData_t;
+signal lastData    : devData_t;
 
-signal dAddr     : integer;
+signal dAddr,
+       lastAddr    : integer range 0 to trgNum+addrNum-1;
 
-signal trgMeters : rateMeters_t;
+signal trgMeters   : rateMeters_t;
 
-signal cntTmrMax : unsigned(31 downto 0);
+signal cntTmrMax   : unsigned(31 downto 0);
 
-signal cntTmr    : unsigned(cntTmrMax'length downto 0); -- MSB = overflow
+signal cntTmr      : unsigned(cntTmrMax'length downto 0); -- MSB = overflow
 
 signal cntTmrSig,
        cntTmrSet,
-       cntRst    : std_logic;
+       cntRst,
+       loadDataOut,
+       loadReg     : std_logic;
 
 begin
 
@@ -103,80 +105,103 @@ cntTmrSig <= cntTmr(cntTmr'left);
 
 cntRst    <= rst or cntTmrSig;
 
-rateMetersCtrlFSM: process(clk, rst, devExec)
+devDataOutCtrl: process(clk)
 begin
     if rising_edge(clk) then
         if rst = '1' then
-            devReady   <= '0';
-            busy       <= '0';
             devDataOut <= (others => (others => '0'));
-            devBrstRst <= '0';
-            cntTmrMax  <= (others => '0');
-            cntTmrSet  <= '0';
-            rData      <= (others => (others => '0'));
+        elsif loadDataOut = '1' then
+            devDataOut <= readReg(reg, rData, dAddr);
+        end if;
+    end if;
+end process;
 
-            state      <= idle;
-        else
-
+rDataCtrl: process(clk)
+begin
+    if rising_edge(clk) then
+        if rst = '1' then
+            rData <= (others => (others => '0'));
+        elsif loadReg = '1' then
+            rData(lastAddr) <= devDataToSlv(lastData);
+        elsif cntTmrSig = '1' then
             trgMtrsToRDataLoop: for i in 0 to trgNum-1 loop
-                if cntTmrSig = '1' then
-                    rData(i+addrNum) <= trgMeters(i);
-                end if;
+                rData(i+addrNum) <= std_logic_vector(trgMeters(i));
             end loop;
+        end if;
+    end if;
+end process;
 
+rateMetersCtrlFSM: process(clk)
+begin
+    if rising_edge(clk) then
+        if rst = '1' then
+            devReady    <= '0';
+            busy        <= '0';
+            loadDataOut <= '0';
+            loadReg     <= '0';
+            devBrstRst  <= '0';
+            cntTmrMax   <= (others => '0');
+            cntTmrSet   <= '0';
+            lastAddr    <= 0;
+            lastData    <= (others => (others => '0'));
+
+            state       <= idle;
+        else
             case state is
                 when idle =>
-                    devReady   <= '0';
-                    busy       <= '0';
-                    cntTmrSet  <= '0';
+                    devReady    <= '0';
+                    busy        <= '0';
+                    loadDataOut <= '0';
+                    cntTmrSet   <= '0';
 
-                    state      <= idle;
+                    state       <= idle;
 
                     if devExec = '1' and devId = rateMeters then
                         if dAddr > trgNum+addrNum-1 then
                             state    <= errAddr;
                         elsif devRw = devRead and devBrst = '0' then
-                            writeReg(reg, rData, addr'pos(regStatus), idleStatus);
-                            busy  <= '1';
+                            busy        <= '1';
+                            loadDataOut <= '1';
+                            devReady    <= '1';
 
-                            state <= readReady;
+                            state       <= idle;
                         elsif devRw = devWrite and reg(dAddr).rMode = ro then
                             state    <= errReadOnly;
                         elsif devRw = devWrite and reg(dAddr).rMode = rw then
-                            writeReg(reg, rData, addr'pos(regStatus), dAddr);
-                            writeReg(reg, rData, dAddr, devDataIn);
-                            busy  <= '1';
+                            lastAddr <= dAddr;
+                            lastData <= devDataIn;
+                            loadReg  <= '1';
+                            busy     <= '1';
 
-                            state <= execute;
+                            state    <= execute;
                         end if;
                     end if;
 
-                when readReady =>
-                    devDataOut <= readReg(reg, rData, dAddr);
-                    devReady   <= '1';
-                    busy       <= '1';
-
-                    state      <= idle;
-
                 when execute =>
-                    state <= idle;
+                    loadReg <= '0';
 
-                    if readReg(reg, rData, addr'pos(regStatus)) = addrToSlv(addr'pos(regTmrBase)) then
-                        cntTmrMax <= readReg(reg, rData, addr'pos(regTmrBase));
+                    state   <= idle;
+
+                    if lastAddr = addr'pos(regTmrBase) then
+                        cntTmrMax <= resize(unsigned(devDataToSlv(lastData)), cntTmrMax'length);
                         cntTmrSet <= '1';
                     end if;
 
                 when errAddr =>
-                    writeReg(reg, rData, addr'pos(regStatus), errAddrStatus);
-                    busy  <= '0';
+                    lastAddr <= addr'pos(regStatus);
+                    lastData <= slvToDevData(errAddrStatus);
+                    loadReg  <= '1';
+                    busy     <= '0';
 
-                    state <= idle;
+                    state    <= idle;
 
                 when errReadOnly =>
-                    writeReg(reg, rData, addr'pos(regStatus), errROnlyStatus);
-                    busy  <= '0';
+                    lastAddr <= addr'pos(regStatus);
+                    lastData <= slvToDevData(errROnlyStatus);
+                    loadReg  <= '1';
+                    busy     <= '0';
 
-                    state <= idle;
+                    state    <= idle;
 
                 when others =>
                     devReady <= '0';
@@ -190,21 +215,18 @@ end process;
 
 trgCntGen: for i in 0 to trgNum-1 generate
 begin
-    trgICntInst: COUNTER_TC_MACRO
-    generic map(
-        COUNT_BY      => X"000000000001",
-        DEVICE        => "7SERIES",
-        DIRECTION     => "UP",
-        RESET_UPON_TC => "FALSE",
-        TC_VALUE      => X"000000000000",
-        WIDTH_DATA    => 32
-    )
-    port map(
-        CLK => clk,
-        RST => cntRst,
-        Q   => trgMeters(i),
-        CE  => trgIn(i)
-    );
+    trgICnt: process(clk)
+    begin
+        if rising_edge(clk) then
+            if rst = '1' then
+                trgMeters(i) <= (others => '0');
+            elsif cntTmrSig = '1' then
+                trgMeters(i) <= (others => '0');
+            elsif trgIn(i) = '1' then
+                trgMeters(i) <= trgMeters(i) + 1;
+            end if;
+        end if;
+    end process;
 end generate;
 
 cntTmrGen: process(clk, rst)
