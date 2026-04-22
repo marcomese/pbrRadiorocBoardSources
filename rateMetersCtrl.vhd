@@ -83,7 +83,7 @@ signal state       : state_t;
 signal lastData    : devData_t;
 
 signal dAddr,
-       lastAddr    : integer range 0 to trgNum+addrNum-1;
+       lastAddr    : integer;
 
 signal trgMeters   : rateMeters_t;
 
@@ -111,7 +111,7 @@ begin
         if rst = '1' then
             devDataOut <= (others => (others => '0'));
         elsif loadDataOut = '1' then
-            devDataOut <= readReg(reg, rData, dAddr);
+            devDataOut <= slvToDevData(rData(lastAddr));
         end if;
     end if;
 end process;
@@ -151,6 +151,7 @@ begin
                 when idle =>
                     devReady    <= '0';
                     busy        <= '0';
+                    loadReg     <= '0';
                     loadDataOut <= '0';
                     cntTmrSet   <= '0';
 
@@ -160,9 +161,10 @@ begin
                         if dAddr > trgNum+addrNum-1 then
                             state    <= errAddr;
                         elsif devRw = devRead and devBrst = '0' then
-                            busy        <= '1';
+                            lastAddr    <= dAddr;
                             loadDataOut <= '1';
                             devReady    <= '1';
+                            busy        <= '1';
 
                             state       <= idle;
                         elsif devRw = devWrite and reg(dAddr).rMode = ro then
@@ -229,7 +231,7 @@ begin
     end process;
 end generate;
 
-cntTmrGen: process(clk, rst)
+cntTmrGen: process(clk)
 begin
     if rising_edge(clk) then
         if rst = '1' or cntTmrSig = '1' or cntTmrSet = '1' then

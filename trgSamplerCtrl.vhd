@@ -81,9 +81,12 @@ constant errROnlyStatus : std_logic_vector(31 downto 0) := initSlv(32, 13, 0, "1
 
 signal state           : state_t;
 
+signal lastData        : devData_t;
+
 signal dataIn          : devData_t;
 
-signal dAddr           : integer;
+signal dAddr,
+       lastAddr        : integer range 0 to trgNum+addrNum-1;
 
 signal sampledTrg      : sampledTrg_t;
 
@@ -93,7 +96,9 @@ signal cntNSAfterTrg   : unsigned(nSAfterTrgMax'length downto 0); -- MSB = overf
 
 signal cntNSAftTrgSig,
        cntNSAftTrgSet,
-       cntNSAftTrgEn   : std_logic;
+       cntNSAftTrgEn,
+       loadDataOut,
+       loadReg         : std_logic;
 
 begin
 
@@ -101,37 +106,55 @@ dAddr          <= devAddrToInt(devAddr);
 
 cntNSAftTrgSig <= cntNSAfterTrg(cntNSAfterTrg'left);
 
+devDataOutCtrl: process(clk)
+begin
+    if rising_edge(clk) then
+        if rst = '1' then
+            devDataOut <= (others => (others => '0'));
+        elsif loadDataOut = '1' then
+            devDataOut <= slvToDevData(rData(lastAddr));
+        end if;
+    end if;
+end process;
+
+rDataCtrl: process(clk)
+begin
+    if rising_edge(clk) then
+        if rst = '1' then
+            rData <= (1 => initSlv(32, 15, 0, std_logic_vector(nSAfterTrgMax), '0'),
+                      others => (others => '0'));
+        elsif loadReg = '1' then
+            rData(lastAddr) <= devDataToSlv(lastData);
+        elsif cntNSAftTrgSig = '1' then
+            trgMtrsToRDataLoop: for i in 0 to trgNum-1 loop
+                rData(i+addrNum) <= sampledTrg(i);
+            end loop;
+        end if;
+    end if;
+end process;
+
 trgSamplerCtrlFSM: process(clk, rst, devExec)
 begin
     if rising_edge(clk) then
         if rst = '1' then
             devReady       <= '0';
             busy           <= '0';
-            devDataOut     <= (others => (others => '0'));
+            loadReg        <= '0';
+            loadDataOut    <= '0';
             devBrstRst     <= '0';
             nSAfterTrgMax  <= to_unsigned(nSAfterTrgDef-2, nSAfterTrgMax'length);
             cntNSAftTrgSet <= '0';
-            rData          <= (1 => initSlv(32, 15, 0, std_logic_vector(nSAfterTrgMax), '0'),
-                               others => (others => '0'));
+            lastAddr       <= 0;
+            lastData       <= (others => (others => '0'));
 
             state          <= init;
         else
-
-            trgMtrsToRDataLoop: for i in 0 to trgNum-1 loop
-                if cntNSAftTrgSig = '1' then
-                    writeReg(reg, rData, i+addrNum, sampledTrg(i));
-                end if;
-            end loop;
-
             case state is
-                when init =>
-                    writeReg(reg, rData, addr'pos(regStatus), idleStatus);
-                    writeReg(reg, rData, addr'pos(regSAfterTrg), nSAfterTrgDef);
-
-                    state <= idle;
                 when idle =>
                     devReady       <= '0';
                     busy           <= '0';
+                    loadReg        <= '0';
+                    loadDataOut    <= '0';
                     cntNSAftTrgSet <= '0';
 
                     state          <= idle;
@@ -140,42 +163,47 @@ begin
                         if dAddr > trgNum+addrNum-1 then
                             state    <= errAddr;
                         elsif devRw = devRead and devBrst = '0' then
-                            writeReg(reg, rData, addr'pos(regStatus), idleStatus);
-                            devReady   <= '1';
-                            devDataOut <= readReg(reg, rData, dAddr);
-                            busy       <= '1';
+                            lastAddr    <= dAddr;
+                            loadDataOut <= '1';
+                            devReady    <= '1';
+                            busy        <= '1';
 
-                            state      <= idle;
+                            state       <= idle;
                         elsif devRw = devWrite and reg(dAddr).rMode = ro then
                             state    <= errReadOnly;
                         elsif devRw = devWrite and reg(dAddr).rMode = rw then
-                            writeReg(reg, rData, addr'pos(regStatus), dAddr);
-                            writeReg(reg, rData, dAddr, devDataIn);
-                            busy  <= '1';
+                            lastAddr <= dAddr;
+                            lastData <= devDataIn;
+                            loadReg  <= '1';
+                            busy     <= '1';
 
-                            state <= execute;
+                            state    <= execute;
                         end if;
                     end if;
 
                 when execute =>
                     state <= idle;
 
-                    if readReg(reg, rData, addr'pos(regStatus)) = addrToSlv(addr'pos(regSAfterTrg)) then
-                        nSAfterTrgMax  <= resize(readReg(reg, rData, addr'pos(regSAfterTrg)), nsAfterTrgMax'length);
+                    if lastAddr = addr'pos(regSAfterTrg) then
+                        nSAfterTrgMax  <= resize(unsigned(devDataToSlv(lastData)), nsAfterTrgMax'length);
                         cntNSAftTrgSet <= '1';
                     end if;
 
                 when errAddr =>
-                    writeReg(reg, rData, addr'pos(regStatus), errAddrStatus);
-                    busy  <= '0';
+                    lastAddr <= addr'pos(regStatus);
+                    lastData <= slvToDevData(errAddrStatus);
+                    loadReg  <= '1';
+                    busy     <= '0';
 
-                    state <= idle;
+                    state    <= idle;
 
                 when errReadOnly =>
-                    writeReg(reg, rData, addr'pos(regStatus), errROnlyStatus);
-                    busy  <= '0';
+                    lastAddr <= addr'pos(regStatus);
+                    lastData <= slvToDevData(errROnlyStatus);
+                    loadReg  <= '1';
+                    busy     <= '0';
 
-                    state <= idle;
+                    state    <= idle;
 
                 when others =>
                     devReady <= '0';
