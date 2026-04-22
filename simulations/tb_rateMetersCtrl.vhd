@@ -26,11 +26,11 @@ constant burstWrCmd    : std_logic_vector(3 downto 0) := x"3";
 constant burstRdCmd    : std_logic_vector(3 downto 0) := x"B";
 constant maxBrstLen    : natural                      := 2048;
 constant delay         : natural                      := 1;--50000;
-constant trgNum        : natural                      := 64;
+constant trgNum        : natural                      := 128;
 
 signal rst               : std_logic := '0';
 signal clk_100M          : std_logic := '1';
-signal t           : std_logic_vector(63 downto 0) := (others => '0');
+signal t           : std_logic_vector(127 downto 0) := (others => '0');
 signal devId             : devices_t    := none;
 signal devReadyRm        : std_logic    := '0';
 signal devRw             : std_logic    := '0';
@@ -73,18 +73,102 @@ signal dataToMaster,
 signal rdDataCnt      : std_logic_vector(15 downto 0) := (others => '0');
 signal id             : std_logic_vector(3 downto 0) := (others => '0');
 signal testMeter, testMeterL      : std_logic_vector(31 downto 0) := (others => '0');
-signal testLoad : std_logic := '1';
+signal testT   : std_logic := '0';
+signal testRst : std_logic := '1';
 begin
 
 stimProc: process
 begin
     rst <= '1';
+    testRst <= '1';
     wait for clkPeriod100M*5;
     rst <= '0';
+    testRst <= '0';
     id  <= "0110";
 
-    wait for clkPeriod100M*5;
-    testLoad <= '0';
+    wait until rising_edge(clk_100M);
+    testT <= '1';
+    
+    wait until rising_edge(clk_100M);
+    testT <= '0';
+
+    wait until rising_edge(clk_100M);
+    testT <= '1';
+    
+    wait until rising_edge(clk_100M);
+    testT <= '0';
+
+    wait until rising_edge(clk_100M);
+    testT <= '1';
+    
+    wait until rising_edge(clk_100M);
+    testT <= '0';
+
+    testRst <= '1';
+    wait for clkPeriod100M;
+    testRst <= '0';
+
+    wait until rising_edge(clk_100M);
+    testT <= '1';
+    
+    wait until rising_edge(clk_100M);
+    testT <= '0';
+
+    wait until rising_edge(clk_100M);
+    testT <= '1';
+    
+    wait until rising_edge(clk_100M);
+    testT <= '0';
+
+
+    wait for 1 us;
+
+    testDataIn <= x"76";
+    wait for clkPeriod100M*delay;
+    testTxWrite <= '1';
+    wait for clkPeriod100M;
+    testTxWrite <= '0';
+    wait for clkPeriod100M*delay;
+    testDataIn <= x"a6";
+    wait for clkPeriod100M*delay;
+    testTxWrite <= '1';
+    wait for clkPeriod100M;
+    testTxWrite <= '0';
+    wait for clkPeriod100M*delay;
+    testDataIn <= x"00";
+    testTxWrite <= '1';
+    wait for clkPeriod100M;
+    testTxWrite <= '0';
+    wait for clkPeriod100M*delay;
+    testDataIn <= x"76";
+    testTxWrite <= '1';
+    wait for clkPeriod100M;
+    testTxWrite <= '0';
+    
+        wait for 350 us;
+    
+--    wait for clkPeriod100M*delay;
+--    testDataIn <= x"76";
+--    wait for clkPeriod100M*delay;
+--    testTxWrite <= '1';
+--    wait for clkPeriod100M;
+--    testTxWrite <= '0';
+    wait for clkPeriod100M*delay;
+    testDataIn <= x"a6";
+    wait for clkPeriod100M*delay;
+    testTxWrite <= '1';
+    wait for clkPeriod100M;
+    testTxWrite <= '0';
+    wait for clkPeriod100M*delay;
+    testDataIn <= x"00";
+    testTxWrite <= '1';
+    wait for clkPeriod100M;
+    testTxWrite <= '0';
+    wait for clkPeriod100M*delay;
+    testDataIn <= x"71";
+    testTxWrite <= '1';
+    wait for clkPeriod100M;
+    testTxWrite <= '0';
 
     wait for 350 ns;
 
@@ -217,36 +301,59 @@ begin
     wait for clkPeriod100M;
     testTxWrite <= '0';
     wait for clkPeriod100M*delay;
-    testDataIn <= x"FF";
+    testDataIn <= x"00";
     testTxWrite <= '1';
     wait for clkPeriod100M;
     testTxWrite <= '0';
     wait for clkPeriod100M*delay;
-    testDataIn <= x"FF";
+    testDataIn <= x"70";
     testTxWrite <= '1';
     wait for clkPeriod100M;
     testTxWrite <= '0';
 
     wait for 500 ns;
-    
+
+    testDataIn <= x"76";
+    wait for clkPeriod100M*delay;
+    testTxWrite <= '1';
+    wait for clkPeriod100M;
+    testTxWrite <= '0';
+    wait for clkPeriod100M*delay;
+    testDataIn <= x"a6";
+    wait for clkPeriod100M*delay;
+    testTxWrite <= '1';
+    wait for clkPeriod100M;
+    testTxWrite <= '0';
+    wait for clkPeriod100M*delay;
+    testDataIn <= x"00";
+    testTxWrite <= '1';
+    wait for clkPeriod100M;
+    testTxWrite <= '0';
+    wait for clkPeriod100M*delay;
+    testDataIn <= x"71";
+    testTxWrite <= '1';
+    wait for clkPeriod100M;
+    testTxWrite <= '0';
+
+    wait for 500 ns;
 
     wait;
 end process;
 
-testCntInst: COUNTER_LOAD_MACRO
-generic map (
-    COUNT_BY   => X"000000000001",
-    DEVICE     => "7SERIES",
-    WIDTH_DATA => 32
+testCntInst: COUNTER_TC_MACRO
+generic map(
+    COUNT_BY      => X"000000000001",
+    DEVICE        => "7SERIES",
+    DIRECTION     => "UP",
+    RESET_UPON_TC => "FALSE",
+    TC_VALUE      => X"000000000000",
+    WIDTH_DATA    => 32
 )
 port map(
-    CLK       => clk_100M,
-    RST       => rst,
-    Q         => testMeter,
-    CE        => t(0),
-    DIRECTION => '1',
-    LOAD      => testLoad,
-    LOAD_DATA => x"00000000" 
+    CLK => clk_100M,
+    RST => testRst,
+    Q   => testMeter,
+    CE  => testT
 );
 
 uut: entity work.rateMetersCtrl

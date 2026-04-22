@@ -68,6 +68,7 @@ signal   rData    : regsData_t(regsNum-1 downto 0);
 --------------------------------------------------------------------
 
 type state_t is (idle,
+                 readReady,
                  execute,
                  errAddr,
                  errReadOnly);
@@ -91,13 +92,16 @@ signal cntTmrMax : unsigned(31 downto 0);
 signal cntTmr    : unsigned(cntTmrMax'length downto 0); -- MSB = overflow
 
 signal cntTmrSig,
-       cntTmrSet : std_logic;
+       cntTmrSet,
+       cntRst    : std_logic;
 
 begin
 
 dAddr     <= devAddrToInt(devAddr);
 
 cntTmrSig <= cntTmr(cntTmr'left);
+
+cntRst    <= rst or cntTmrSig;
 
 rateMetersCtrlFSM: process(clk, rst, devExec)
 begin
@@ -133,11 +137,9 @@ begin
                             state    <= errAddr;
                         elsif devRw = devRead and devBrst = '0' then
                             writeReg(reg, rData, addr'pos(regStatus), idleStatus);
-                            devReady   <= '1';
-                            devDataOut <= readReg(reg, rData, dAddr);
-                            busy       <= '1';
+                            busy  <= '1';
 
-                            state      <= idle;
+                            state <= readReady;
                         elsif devRw = devWrite and reg(dAddr).rMode = ro then
                             state    <= errReadOnly;
                         elsif devRw = devWrite and reg(dAddr).rMode = rw then
@@ -148,6 +150,13 @@ begin
                             state <= execute;
                         end if;
                     end if;
+
+                when readReady =>
+                    devDataOut <= readReg(reg, rData, dAddr);
+                    devReady   <= '1';
+                    busy       <= '1';
+
+                    state      <= idle;
 
                 when execute =>
                     state <= idle;
@@ -181,20 +190,20 @@ end process;
 
 trgCntGen: for i in 0 to trgNum-1 generate
 begin
-   trgICntInst: COUNTER_LOAD_MACRO
-   generic map (
-        COUNT_BY   => X"000000000001",
-        DEVICE     => "7SERIES",
-        WIDTH_DATA => 32
+    trgICntInst: COUNTER_TC_MACRO
+    generic map(
+        COUNT_BY      => X"000000000001",
+        DEVICE        => "7SERIES",
+        DIRECTION     => "UP",
+        RESET_UPON_TC => "FALSE",
+        TC_VALUE      => X"000000000000",
+        WIDTH_DATA    => 32
     )
     port map(
-        CLK       => clk,
-        RST       => rst,
-        Q         => trgMeters(i),
-        CE        => trgIn(i),
-        DIRECTION => '1',
-        LOAD      => cntTmrSig,
-        LOAD_DATA => x"00000000" 
+        CLK => clk,
+        RST => cntRst,
+        Q   => trgMeters(i),
+        CE  => trgIn(i)
     );
 end generate;
 
