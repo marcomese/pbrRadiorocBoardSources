@@ -38,8 +38,7 @@ entity adc is
 		pulse : in std_logic;
 		extTrg : in std_logic;
 		endAcq : out std_logic;
-		rdValid : out std_logic;
-		test : out std_logic
+		rdValid : out std_logic
 	);
 end adc;
 
@@ -78,7 +77,7 @@ architecture Behavioral of adc is
 	signal din, din_l : std_logic_vector(31 downto 0);
 	
 	signal en_adc_sck, adc_sck_s, rstb_rd_s, rst_n : std_logic;
-	signal t0, trigger, trigger_sft,  holdext, trgEdge, trgSftEdge : std_logic;
+	signal t0, trigger, trgFF, trigger_sft, trgSftFF,  holdext, trgEdge, trgSftEdge : std_logic;
 	
 	signal adc_sck_vector :  std_logic_vector(1 downto 0);
 	
@@ -186,29 +185,31 @@ port map(
     trigger <= en_acq and hit;--(hit or extTrg or pulse);
     trigger_sft <= sel_adc(7);
 
-trgEdgeInst: entity work.edgeDetector
-generic map(
-    clockEdge => "falling",
-    edge      => "rising"
-)
-port map(
-    clk       => clk_200M,
-    rst       => locRst,
-    signalIn  => trigger,
-    signalOut => trgEdge
-);
+trgFFProc: process(clk_200M)
+begin
+    if rising_edge(clk_200M) then
+        if locRst = '1' then
+            trgFF <= '0';
+        else
+            trgFF <= trigger;
+        end if;
+    end if;
+end process;
 
-trgSftEdgeInst: entity work.edgeDetector
-generic map(
-    clockEdge => "falling",
-    edge      => "rising"
-)
-port map(
-    clk       => clk_200M,
-    rst       => locRst,
-    signalIn  => trigger_sft,
-    signalOut => trgSftEdge
-);
+trgEdge <= trigger and not trgFF;
+
+trgSftFFProc: process(clk_200M)
+begin
+    if rising_edge(clk_200M) then
+        if locRst = '1' then
+            trgSftFF <= '0';
+        else
+            trgSftFF <= trigger_sft;
+        end if;
+    end if;
+end process;
+
+trgSftEdge <= trigger_sft and not trgSftFF;
 
 	process(locRst, clk_200M)
 	begin
@@ -326,7 +327,6 @@ port map(
 	begin
 		case current_state is
 			when idle =>
-			     test<='1';
 				rstb_rd_s 	<= '1';
 				holdext    <= '0';
 				ck_read 	<= '0';
@@ -336,7 +336,6 @@ port map(
 				end_acq		<= '0';
 				en_trigext  <= '0';
 		    when wait_hold =>
-			     test<='0';
 		        rstb_rd_s 	<= '0';
 		        holdext    <= '0';
 				ck_read 	<= '0';
@@ -346,7 +345,6 @@ port map(
 				end_acq		<= '0';
 				en_trigext  <= '1';
 		    when rst_cpt =>
-			     test<='1';
 		        rstb_rd_s 	<= '1';
 		        holdext    <= '1';
 				ck_read 	<= '0';
@@ -356,7 +354,6 @@ port map(
 				end_acq		<= '0';
 				en_trigext  <= '1';
 		    when wait_conv =>
-			     test<='1';
 		        rstb_rd_s 	<= '1';
 		        holdext    <= '1';
 				ck_read 	<= '0';
@@ -366,7 +363,6 @@ port map(
 				end_acq		<= '0';  
 				en_trigext  <= '1';   
 			when asrt_rd_high =>
-			     test<='1';
 			    rstb_rd_s 	<= '1';
 		        holdext    <= '1';
 				ck_read 	<= '1';
@@ -376,7 +372,6 @@ port map(
 				end_acq		<= '0'; 
 				en_trigext  <= '0';
 			when asrt_rd_low =>
-			     test<='1';
 			    rstb_rd_s 	<= '1';
 		        holdext    <= '1';
 				ck_read 	<= '0';
@@ -449,7 +444,6 @@ port map(
 				end_acq		<= '0';
 				en_trigext  <= '0';	
 			when finish =>
-			     test<='0';
 				rstb_rd_s 	<= '1';
 				holdext    <= '0';
 				ck_read 	<= '0';

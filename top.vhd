@@ -90,7 +90,7 @@ architecture arch of radioroc_fw is
 	       tEdge1, tEdge2 : std_logic_vector(63 downto 0);
 	signal tEdge21, TBuf21 : std_logic_vector(127 downto 0);
 	-- Clock and reset
-	signal reset, resetn : std_logic;
+	signal reset, resetn, resetSig : std_logic;
 	signal clk_10M, clk_50M, clk_100M, clk_200M : std_logic;
 	signal sysClkDS : std_logic;
 	-- I2C
@@ -103,15 +103,6 @@ architecture arch of radioroc_fw is
 	signal nb_acq, dout_acq : std_logic_vector(7 downto 0);
 	signal rd_data_count_acq : std_logic_vector(15 downto 0);
 	signal sel_adc : std_logic_vector(63 downto 0);
-	-- Temperature
-	signal temp_cfg, temp_ctrl : std_logic_vector(7 downto 0);
-	signal temperature : std_logic_vector(15 downto 0);
-
-	signal cpt : natural range 0 to 255;
-	signal spy_tdc : std_logic_vector(7 downto 0);
-
-	signal test_daq : std_logic;
-	signal on_edge : std_logic;
 
 -- CONSTANTS for deviceInterface, tmpCtrl and PulseGentCtrl
 
@@ -288,7 +279,13 @@ generic map(
 port map(
     dest_clk  => clk_200M,
     src_arst  => areset,
-    dest_arst => reset
+    dest_arst => resetSig
+);
+
+resetBUFG: BUFG
+port map(
+    I => resetSig,
+    O => reset
 );
 
 syncIn: process(clk_200M)
@@ -495,8 +492,7 @@ port map(
     pulse => pulseSig,
     extTrg => extTrgSig,
     endAcq => endAcq,
-    rdValid => rdValid,
-    test => test_daq
+    rdValid => rdValid
 );
 
 trgSamplerInst: entity work.trgSamplerCtrl

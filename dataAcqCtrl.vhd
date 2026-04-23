@@ -40,7 +40,6 @@ port(
     resetAcq   : out std_logic;
     startAcq   : out std_logic;
     endAcq     : in  std_logic;
-    endMAcq    : out std_logic;
     rdValid    : in  std_logic;
     rdAcq      : out std_logic;
     rdDataCnt  : in  std_logic_vector(15 downto 0);
@@ -57,20 +56,18 @@ architecture Behavioral of dataAcqCtrl is
 
 type addr is (regStatus,
               regAcqEn,
-              regSwTrg,
               regFifoCnt,
               regAcqNb,
               regSelAdcMSB,
               regSelAdcLSB);
 
 constant reg : regsRec_t := (
-    addr'pos(regStatus)    => (rAddr => 0, rBegin => 31,  rEnd => 2,  rMode => ro),
-    addr'pos(regAcqEn)     => (rAddr => 0, rBegin => 1,   rEnd => 1,  rMode => rw),
-    addr'pos(regSwTrg)     => (rAddr => 0, rBegin => 0,   rEnd => 0,  rMode => rw),
-    addr'pos(regFifoCnt)   => (rAddr => 1, rBegin => 31,  rEnd => 16, rMode => ro),
-    addr'pos(regAcqNb)     => (rAddr => 1, rBegin => 7,   rEnd => 0,  rMode => rw),
-    addr'pos(regSelAdcMSB) => (rAddr => 2, rBegin => 31,  rEnd => 0,  rMode => rw),
-    addr'pos(regSelAdcLSB) => (rAddr => 3, rBegin => 31,  rEnd => 0,  rMode => rw)
+    addr'pos(regStatus)    => (rAddr => 0, rBegin => 31,  rEnd => 0,  rMode => ro),
+    addr'pos(regAcqEn)     => (rAddr => 1, rBegin => 31,  rEnd => 0,  rMode => rw),
+    addr'pos(regFifoCnt)   => (rAddr => 2, rBegin => 31,  rEnd => 0,  rMode => ro),
+    addr'pos(regAcqNb)     => (rAddr => 3, rBegin => 31,  rEnd => 0,  rMode => rw),
+    addr'pos(regSelAdcMSB) => (rAddr => 4, rBegin => 31,  rEnd => 0,  rMode => rw),
+    addr'pos(regSelAdcLSB) => (rAddr => 5, rBegin => 31,  rEnd => 0,  rMode => rw)
 );
 
 constant regsNum : integer := reg(reg'high).rAddr+1;
@@ -102,8 +99,7 @@ signal lastData    : devData_t;
 signal dAddr,
        lastAddr    : integer;
 
-signal swTrg,
-       rstAcqSig,
+signal rstAcqSig,
        strtAcqSig,
        rdAcqSig,
        loadDataOut,
@@ -147,10 +143,20 @@ begin
             rData <= (others => (others => '0'));
         elsif loadReg = '1' then
             rData(lastAddr) <= devDataToSlv(lastData);
-        elsif swTrg = '1' then
-            clearReg(reg, rData, addr'pos(regSwTrg));
         else
             rData(addr'pos(regFifoCnt)) <= std_logic_vector(resize(unsigned(rdDataCnt), regsLen));
+        end if;
+    end if;
+end process;
+
+selAdcProc: process(clk100M)
+begin
+    if rising_edge(clk100M) then
+        if locRst = '1' then
+            selAdc <= (others => '0');
+        else
+            selAdc <= rData(addr'pos(regSelAdcMSB)) &
+                      rData(addr'pos(regSelAdcLSB)); 
         end if;
     end if;
 end process;
@@ -168,16 +174,11 @@ begin
             rdAcqSig    <= '0';
             nbAcqSig    <= (others => '0');
             devBrstRst  <= '0';
-            swTrg       <= '0';
-            selAdc      <= (others => '0');
             lastAddr    <= 0;
             lastData    <= (others => (others => '0'));
 
             state      <= idle;
         else
-            selAdc <= readReg(reg, rData, addr'pos(regSelAdcMSB)) &
-                      readReg(reg, rData, addr'pos(regSelAdcLSB)); 
-
             case state is
                 when idle =>
                     devReady    <= '0';
@@ -185,7 +186,6 @@ begin
                     loadReg     <= '0';
                     rstAcqSig   <= '0';
                     strtAcqSig  <= '0';
-                    swTrg       <= '0';
                     busy        <= '0';
 
                     state       <= idle;
@@ -225,12 +225,10 @@ begin
 
                     state   <= idle;
 
-                    if isSet(reg, rData, addr'pos(regAcqEn)) then
+                    if rData(addr'pos(regAcqEn))(0) = '1' then
                         rstAcqSig <= '1';
 
                         state     <= sendStartAcq;
-                    elsif isSet(reg, rData, addr'pos(regSwTrg)) then
-                        swTrg      <= '1';
                     elsif lastAddr = addr'pos(regAcqNb) then
                         nbAcqSig <= devDataToSlv(lastData)(nbAcqSig'range);
                     end if;

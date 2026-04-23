@@ -42,7 +42,7 @@ fallingEdgeGen: if edge = "falling" generate
 end generate;
 
 riseEdgeGen: if clockEdge = "rising" generate
-    edgeProc: process(clk)
+    edgeProc: process(clk, locRst)
     begin
         if locRst = '1' then
             ff1 <= '0';
@@ -55,7 +55,7 @@ riseEdgeGen: if clockEdge = "rising" generate
 end generate;
 
 fallEdgeGen: if clockEdge = "falling" generate
-    edgeProc: process(clk)
+    edgeProc: process(clk, locRst)
     begin
         if locRst = '1' then
             ff1 <= '0';

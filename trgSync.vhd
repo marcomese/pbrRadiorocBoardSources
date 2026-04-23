@@ -28,21 +28,30 @@ end trgSync;
 
 architecture Behavioral of trgSync is
 
+signal locRst : std_logic;
+
+signal tFF    : std_logic_vector(trgNum-1 downto 0);
+
 begin
 
-trgEdgeGen: for i in 0 to trgNum-1 generate
+locRstProc: process(clk)
 begin
-    trgEdgeInst: entity work.edgeDetector
-    generic map(
-        clockEdge => "rising",
-        edge      => "falling"
-    )
-    port map(
-        clk       => clk,
-        rst       => rst,
-        signalIn  => tIn(i),
-        signalOut => tOut(i)
-    );
-end generate;
+    if rising_edge(clk) then
+        locRst <= rst;
+    end if;
+end process;
+
+trgFFProc: process(clk)
+begin
+    if rising_edge(clk) then
+        if locRst = '1' then
+            tFF <= (others => '1');
+        else
+            tFF <= tIn;
+        end if;
+    end if;
+end process;
+
+tOut <= tIn and not tFF;
 
 end Behavioral;
