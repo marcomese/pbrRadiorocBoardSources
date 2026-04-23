@@ -114,9 +114,13 @@ devDataOutCtrl: process(clk)
 begin
     if rising_edge(clk) then
         if locRst = '1' then
+            devReady   <= '0';
             devDataOut <= (others => (others => '0'));
         elsif loadDataOut = '1' then
+            devReady   <= '1';
             devDataOut <= slvToDevData(rData(lastAddr));
+        else
+            devReady <= '0';
         end if;
     end if;
 end process;
@@ -140,7 +144,6 @@ rateMetersCtrlFSM: process(clk)
 begin
     if rising_edge(clk) then
         if locRst = '1' then
-            devReady    <= '0';
             busy        <= '0';
             loadDataOut <= '0';
             loadReg     <= '0';
@@ -154,7 +157,6 @@ begin
         else
             case state is
                 when idle =>
-                    devReady    <= '0';
                     busy        <= '0';
                     loadReg     <= '0';
                     loadDataOut <= '0';
@@ -168,7 +170,6 @@ begin
                         elsif devRw = devRead and devBrst = '0' then
                             lastAddr    <= dAddr;
                             loadDataOut <= '1';
-                            devReady    <= '1';
                             busy        <= '1';
 
                             state       <= idle;
@@ -211,7 +212,6 @@ begin
                     state    <= idle;
 
                 when others =>
-                    devReady <= '0';
                     busy     <= '0';
 
                     state    <= idle;

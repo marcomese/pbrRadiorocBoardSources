@@ -181,7 +181,7 @@ port map(
     hold_delay <= to_integer(unsigned(hd));   
     cd <=   sel_adc(63 downto 56) & "000";  
     conv_delay <= to_integer(unsigned(cd));
-    
+
     trigger <= en_acq and hit;--(hit or extTrg or pulse);
     trigger_sft <= sel_adc(7);
 
@@ -215,7 +215,7 @@ trgSftEdge <= trigger_sft and not trgSftFF;
 	begin
 	if locRst = '1' then
 		current_state <= idle;
-		cpt <= hold_delay;
+		cpt <= 0;
 		ch <= 0;
 		cpt_adc_sck <= 0;
 		adc_sck_vector <= "11";

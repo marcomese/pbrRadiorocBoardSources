@@ -85,9 +85,13 @@ devDataOutCtrl: process(clk)
 begin
     if rising_edge(clk) then
         if locRst = '1' then
+            devReady   <= '0';
             devDataOut <= (others => (others => '0'));
         elsif loadDataOut = '1' then
+            devReady   <= '1';
             devDataOut <= slvToDevData(dataOut32);
+        else
+            devReady <= '0';
         end if;
     end if;
 end process;
@@ -115,7 +119,6 @@ hvTmpFSM: process(clk)
 begin
     if rising_edge(clk) then
         if locRst = '1' then
-            devReady    <= '0';
             loadDataOut <= '0';
             loadTmpFsm  <= '0';
             busy        <= '1';
@@ -133,7 +136,6 @@ begin
                     end if;
 
                 when idle =>
-                    devReady    <= '0';
                     loadDataOut <= '0';
                     loadTmpFsm  <= '0';
                     busy        <= '0';
@@ -155,14 +157,12 @@ begin
                     state       <= waitReady;
 
                     if dataReady = '1' then
-                        devReady    <= '1';
                         loadDataOut <= '1';
 
                         state       <= idle;
                     end if;
 
                 when others =>
-                    devReady    <= '0';
                     loadDataOut <= '0';
                     loadTmpFsm  <= '0';
 

@@ -159,6 +159,8 @@ begin
         elsif loadDataOut = '1' then
             devReady   <= '1';
             devDataOut <= slvToDevData(rData(lastAddr));
+        else
+            devReady <= '0';
         end if;
     end if;
 end process;
