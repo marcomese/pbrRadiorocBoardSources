@@ -225,7 +225,7 @@ begin
 
                     state   <= idle;
 
-                    if rData(addr'pos(regAcqEn))(0) = '1' then
+                    if lastAddr = addr'pos(regAcqEn) and lastData(0)(0) = '1' then
                         rstAcqSig <= '1';
 
                         state     <= sendStartAcq;

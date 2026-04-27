@@ -49,37 +49,6 @@ end SPISlave;
 
 architecture Behavioral of SPISlave is
 
-component rxFifo
-port(
-    clk       : in  std_logic;
-    srst      : in  std_logic;
-    din       : in  std_logic_vector(7 downto 0);
-    wr_en     : in  std_logic;
-    rd_en     : in  std_logic;
-    dout      : out std_logic_vector(7 downto 0);
-    full      : out std_logic;
-    empty     : out std_logic;
-    valid     : out std_logic;
-    prog_full : out std_logic
-);
-end component;
-
-component txFifo
-port(
-    clk       : in  std_logic;
-    srst      : in  std_logic;
-    din       : in  std_logic_vector(7 downto 0);
-    wr_en     : in  std_logic;
-    rd_en     : in  std_logic;
-    dout      : out std_logic_vector(7 downto 0);
-    full      : out std_logic;
-    wr_ack    : out std_logic;
-    empty     : out std_logic;
-    valid     : out std_logic;
-    prog_full : out std_logic
-);
-end component;
-
 signal sclkFF,
        sclkRise,
        sclkFall,
@@ -92,6 +61,7 @@ signal sclkFF,
        loadRxFifo,
        rxEna,
        rxEmpty,
+       txEmpty,
        lastBit,
        locRst     : std_logic;
 signal bitCount   : unsigned(3 downto 0);
@@ -110,6 +80,8 @@ loadRxFifo <= lastBit and rxEna;
 loadTxFifo <= lastBit;
 
 rx_present <= not rxEmpty;
+
+txPres <= not txEmpty;
 
 locRstProc: process(clk)
 begin
@@ -235,19 +207,30 @@ port map(
     injectsbiterr => '0'
 );
 
-txFifoInst: txFifo
+txFifoInst: xpm_fifo_sync
+generic map(
+    FIFO_WRITE_DEPTH => maxBrstLen,
+    READ_DATA_WIDTH  => 8,
+    WRITE_DATA_WIDTH => 8,
+    PROG_FULL_THRESH => 7,
+    READ_MODE        => "fwft",
+    USE_ADV_FEATURES => "0012",
+    FIFO_MEMORY_TYPE => "block"
+)
 port map(
-    clk       => clk,
-    srst      => tx_reset,
-    din       => data_in,
-    wr_en     => tx_write,
-    rd_en     => loadTxFifo,
-    dout      => txFifoDout,
-    full      => tx_full,
-    wr_ack    => tx_wr_ack,
-    empty     => open,
-    valid     => txPres,
-    prog_full => tx_half_full
+    wr_clk        => clk,
+    rst           => tx_reset,
+    din           => data_in,
+    wr_en         => tx_write,
+    dout          => txFifoDout,
+    rd_en         => loadTxFifo,
+    wr_ack        => tx_wr_ack,
+    empty         => txEmpty,
+    full          => tx_full,
+    prog_full     => tx_half_full,
+    sleep         => '0',
+    injectdbiterr => '0',
+    injectsbiterr => '0'
 );
 
 end Behavioral;

@@ -4,6 +4,8 @@ use ieee.numeric_std.all;
 use IEEE.STD_LOGIC_MISC.ALL;
 library UNISIM;
 use UNISIM.vcomponents.all;
+library xpm;
+use xpm.vcomponents.all;
 library xil_defaultlib;
 
 entity adc is
@@ -44,51 +46,55 @@ end adc;
 
 architecture Behavioral of adc is
 
-	component fifo_acq
-	Port (
-		rst : in std_logic;
-		wr_clk : in std_logic;
-		rd_clk : in std_logic;
-		din : in std_logic_vector(31 downto 0);
-		wr_en : in std_logic;
-		rd_en : in std_logic;
-		dout : out std_logic_vector(7 downto 0);
-		full : out std_logic;
-		empty : out std_logic;
-		valid : OUT STD_LOGIC;
-		rd_data_count : out std_logic_vector(15 downto 0)
-	);
-	end component;
+    COMPONENT fifo_acq
+      PORT (
+        clk : IN STD_LOGIC;
+        srst : IN STD_LOGIC;
+        din : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+        wr_en : IN STD_LOGIC;
+        rd_en : IN STD_LOGIC;
+        dout : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
+        full : OUT STD_LOGIC;
+        empty : OUT STD_LOGIC;
+        valid : OUT STD_LOGIC;
+        rd_data_count : OUT STD_LOGIC_VECTOR(15 DOWNTO 0)
+      );
+    END COMPONENT;
 
 	type state_t is (idle, wait_hold, rst_cpt, wait_conv, asrt_rd_high, asrt_rd_low, nxt, read_asic, start_conv, end_conv, read_adc, end_read_adc, write_fifo, finish);
 	signal current_state, next_state : state_t;
-	
+
 	signal cpt : natural range 0 to 4095;
 	signal cpt_adc_sck : natural range 0 to 31;
 	signal ch : natural range 0 to 80;
 	signal hold_delay : natural range 0 to 4095;
 	signal conv_delay : natural range 0 to 2047;
-	
+
 	signal hit0, hit, en_acq : std_logic;
 	signal end_acq : std_logic;
-	signal wr_en : std_logic;
-	
+	signal wr_en,wenFF,wenSync : std_logic;
+
 	signal sdo_hg_des, sdo_lg_des : std_logic_vector(15 downto 0);
+	signal sdo_hglg : std_logic_vector(31 downto 0);
 	signal din, din_l : std_logic_vector(31 downto 0);
-	
+
 	signal en_adc_sck, adc_sck_s, rstb_rd_s, rst_n : std_logic;
 	signal t0, trigger, trgFF, trigger_sft, trgSftFF,  holdext, trgEdge, trgSftEdge : std_logic;
-	
+
 	signal adc_sck_vector :  std_logic_vector(1 downto 0);
-	
+
 	signal NORT_FPGA : std_logic;
-	
+
 	signal  en_trigext : std_logic;
 	signal hd : std_logic_vector(11 downto 0);
     signal cd : std_logic_vector(10 downto 0);
     signal rdValidSig : std_logic;
 
     signal locRst : std_logic;
+
+attribute ASYNC_REG : string;
+attribute ASYNC_REG of wenFF,
+                       wenSync : signal is "True";
 
 begin
 
@@ -98,12 +104,12 @@ endAcq       <= end_acq;
 rdValid      <= rdValidSig;
 NORT_FPGA    <= and_reduce(t);
 
-locRstProc: process(clk_200M)
-begin
-    if rising_edge(clk_200M) then
+--locRstProc: process(clk_200M)
+--begin
+--    if rising_edge(clk_200M) then
         locRst <= rst;
-    end if;
-end process;
+--    end if;
+--end process;
 
 ma : entity xil_defaultlib.multi_acq
 Port map (
@@ -116,7 +122,7 @@ Port map (
     end_multi_acq => end_multi_acq,
     rst_n => rst_n
 );
-	
+
 adcSckBufInst: BUFGCE
 port map(
     O => adc_sck_s,
@@ -126,7 +132,7 @@ port map(
 
 	adc_sck <= adc_sck_s;
 	rstb_rd <= rstb_rd_s;
-	
+
     process(rstb_rd_s, adc_sck_s)
     begin
         if rising_edge(adc_sck_s) then
@@ -139,14 +145,15 @@ port map(
             end if;
         end if;
     end process;
-	
+
+	sdo_hglg <= sdo_hg_des & sdo_lg_des;
+
 	ff : fifo_acq
 	port map (
-		rst    => locRst,
-		wr_clk => clk_200M,
-		rd_clk => clk_200M,
+		srst    => locRst,
+		clk => clk_200M,
 		din    => din_l,
-		wr_en  => wr_en,
+		wr_en  => wenSync,
 		rd_en  => rd_en,
 		dout   => dout,
 		full   => open,
@@ -154,34 +161,55 @@ port map(
 		valid => rdValidSig,
 		rd_data_count => rd_data_count_acq
 	);
-	
-	process(clk_200M)
-	begin
-	if rising_edge(clk_200M) then
-	   din <= sdo_hg_des & sdo_lg_des;
-	   din_l <= din;
-	end if;
-	end process;
-	
+
+
+   wenSyncProc: process(clk_200M)
+   begin
+        if rising_edge(clk_200M) then
+            if locRst = '1' then
+                wenFF   <= '0';
+                wenSync <= '0';
+            else
+                wenFF   <= wr_en; 
+                wenSync <= wenFF;
+            end if;
+        end if;
+   end process;
+
+   sdo_hglgSync: xpm_cdc_array_single
+   generic map (
+      DEST_SYNC_FF   => 2,
+      INIT_SYNC_FF   => 0,
+      SIM_ASSERT_CHK => 0,
+      SRC_INPUT_REG  => 0,
+      WIDTH          => sdo_hglg'length
+   )
+   port map (
+      src_clk  => adc_sck_s,
+      dest_clk => clk_200M,
+      src_in   => sdo_hglg,
+      dest_out => din_l
+   );
+
 	hit0 <= t(to_integer(unsigned(sel_adc(5 downto 0))));
-	
-	with sel_adc(31 downto 29) select 
+
+	with sel_adc(31 downto 29) select
 		t0 <=  NORT1 when "000",
 			  NORT2 when "001",
 			  NORTQ when "010",
 			 hit0    when "011",
 			 NORT_FPGA when "100",
-			 '0'  when others;		
+			 '0'  when others;
 
     hit <= not t0;
                
     trig_ext <=      '0' when sel_adc(26) = '0' else (trigger or en_trigext);
-    hold_ext <=      sel_adc(27) and holdext; 
+    hold_ext <=      sel_adc(27) and holdext;
     reset_n <=       sel_adc(6) when sel_adc(28) = '0' else rst_n;
     
-    hd <= sel_adc(54 downto 51) & sel_adc(39 downto 32); 
-    hold_delay <= to_integer(unsigned(hd));   
-    cd <=   sel_adc(63 downto 56) & "000";  
+    hd <= sel_adc(54 downto 51) & sel_adc(39 downto 32);
+    hold_delay <= to_integer(unsigned(hd));
+    cd <=   sel_adc(63 downto 56) & "000";
     conv_delay <= to_integer(unsigned(cd));
 
     trigger <= en_acq and hit;--(hit or extTrg or pulse);
@@ -245,20 +273,20 @@ trgSftEdge <= trigger_sft and not trgSftFF;
 		end if;
 	end if;
 	end process;
-	
+
 	process(current_state, trgEdge, trgSftEdge, cpt, ch, cpt_adc_sck)
 	begin
-		case current_state is 
-			when idle => 
+		case current_state is
+			when idle =>
 				if trgEdge = '1' or trgSftEdge = '1' then
 					next_state <= wait_hold;
-				else 
+				else
 					next_state <= idle;
 				end if;
 		    when wait_hold =>
               if cpt = 0 then
                   next_state <= rst_cpt;
-              else 
+              else
                   next_state <= wait_hold;
               end if;
                 --next_state <= rst_cpt;
@@ -267,39 +295,39 @@ trgSftEdge <= trigger_sft and not trgSftFF;
             when wait_conv =>
                 if cpt = 40 then
                     next_state <= asrt_rd_high;
-                else 
+                else
                     next_state <= wait_conv;
                 end if;
             when asrt_rd_high =>
                 if cpt = 20 then
                     next_state <= asrt_rd_low;
-                else 
+                else
                     next_state <= asrt_rd_high;
                 end if;
             when asrt_rd_low =>
                 if cpt = 0 then
                     next_state <= nxt;
-                else 
+                else
                     next_state <= asrt_rd_low;
                 end if;
-			when nxt => 
+			when nxt =>
 				if ch >= 66 then
 					next_state <= finish;
 				elsif ch < 2 then
 				    next_state <= start_conv;
-				else 
+				else
 					next_state <= read_asic;
 				end if;
-			when read_asic => 
+			when read_asic =>
 				if cpt = 26 then
 					next_state <= start_conv;
-				else 
+				else
 					next_state <= read_asic;
 				end if;
-			when start_conv => 
+			when start_conv =>
 				if cpt = 0 then
 					next_state <= end_conv;
-				else 
+				else
 					next_state <= start_conv;
 				end if;
 			when end_conv =>
@@ -307,13 +335,13 @@ trgSftEdge <= trigger_sft and not trgSftFF;
 			when read_adc =>
 				if cpt_adc_sck >= 15 then
                     next_state <= end_read_adc;
-				else 
+				else
 					next_state <= read_adc;
 				end if;
 			when end_read_adc =>
                if ch < 3 then
                    next_state <= nxt;
-               else 
+               else
                    next_state <= write_fifo;
                 end if;
 			when write_fifo =>
@@ -324,7 +352,7 @@ trgSftEdge <= trigger_sft and not trgSftFF;
 				next_state <= idle;
 		end case;
 	end process;
-	
+
 	process(current_state)
 	begin
 		case current_state is
@@ -362,8 +390,8 @@ trgSftEdge <= trigger_sft and not trgSftFF;
 				n_cnv 		<= '0';
 				en_adc_sck 	<= '0';
 				wr_en		<= '0';
-				end_acq		<= '0';  
-				en_trigext  <= '1';   
+				end_acq		<= '0';
+				en_trigext  <= '1';
 			when asrt_rd_high =>
 			    rstb_rd_s 	<= '1';
 		        holdext    <= '1';
@@ -371,7 +399,7 @@ trgSftEdge <= trigger_sft and not trgSftFF;
 				n_cnv 		<= '0';
 				en_adc_sck 	<= '0';
 				wr_en		<= '0';
-				end_acq		<= '0'; 
+				end_acq		<= '0';
 				en_trigext  <= '0';
 			when asrt_rd_low =>
 			    rstb_rd_s 	<= '1';
@@ -380,17 +408,17 @@ trgSftEdge <= trigger_sft and not trgSftFF;
 				n_cnv 		<= '0';
 				en_adc_sck 	<= '0';
 				wr_en		<= '0';
-				end_acq		<= '0'; 
+				end_acq		<= '0';
 				en_trigext  <= '0';
 			when nxt =>
 				rstb_rd_s 	<= '1';
 				holdext    <= '1';
 				ck_read 	<= '0';
 				n_cnv 		<= '0';
-				en_adc_sck 	<= '0';	
+				en_adc_sck 	<= '0';
 				wr_en		<= '0';
-				end_acq		<= '0';	
-				en_trigext  <= '0';			
+				end_acq		<= '0';
+				en_trigext  <= '0';
 			when read_asic =>
 				rstb_rd_s 	<= '1';
 				holdext    <= '1';
@@ -423,19 +451,19 @@ trgSftEdge <= trigger_sft and not trgSftFF;
 				holdext    <= '1';
 				ck_read 	<= '0';
 				n_cnv 		<= '0';
-				en_adc_sck 	<= '1';	
+				en_adc_sck 	<= '1';
 				wr_en		<= '0';
 				end_acq		<= '0';
-				en_trigext  <= '0';	
+				en_trigext  <= '0';
 			when end_read_adc =>
 			 	rstb_rd_s 	<= '1';
 			 	holdext    <= '1';
 				ck_read 	<= '0';
 				n_cnv 		<= '0';
-				en_adc_sck 	<= '0';	
+				en_adc_sck 	<= '0';
 				wr_en		<= '0';
 				end_acq		<= '0';
-				en_trigext  <= '0';	
+				en_trigext  <= '0';
 			when write_fifo =>
 				rstb_rd_s 	<= '1';
 				holdext    <= '1';
@@ -444,7 +472,7 @@ trgSftEdge <= trigger_sft and not trgSftFF;
 				en_adc_sck 	<= '0';
 				wr_en		<= '1';
 				end_acq		<= '0';
-				en_trigext  <= '0';	
+				en_trigext  <= '0';
 			when finish =>
 				rstb_rd_s 	<= '1';
 				holdext    <= '0';
@@ -453,18 +481,18 @@ trgSftEdge <= trigger_sft and not trgSftFF;
 				en_adc_sck 	<= '0';
 				wr_en		<= '0';
 				end_acq		<= '1';
-				en_trigext  <= '0';	
+				en_trigext  <= '0';
 			when others =>
 				rstb_rd_s 	<= '1';
 				holdext    <= '0';
 				ck_read 	<= '0';
 				n_cnv 		<= '0';
-				en_adc_sck 	<= '0';	
+				en_adc_sck 	<= '0';
 				wr_en		<= '0';
-				end_acq		<= '0';	
-				en_trigext  <= '0';	
-		end case;			
-		
+				end_acq		<= '0';
+				en_trigext  <= '0';
+		end case;
+
 	end process;
-	
+
 end Behavioral;
