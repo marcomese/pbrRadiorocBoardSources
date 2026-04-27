@@ -95,7 +95,7 @@ architecture arch of radioroc_fw is
 	signal sysClkDS : std_logic;
 	-- I2C
 --	signal end_i2c, n_reset_i2c, rd55, wr_i2c, en_clki2c, sda_i, sda_o, sda_oen : std_logic;
-    signal end_i2c, n_reset_i2c, rd55, wr_i2c, en_clki2c : std_logic;
+    signal end_i2c, n_reset_i2c, rd55, wr_i2c, en_clki2c, enClkI2CSync : std_logic;
 	signal rstb_read_sft, reset_n_sft : std_logic;
 	signal i2c_in, i2c_set, q, start, end_rd, spy_i2c     : std_logic_vector(7 downto 0);
 	--ADC Acquisition
@@ -453,10 +453,25 @@ port map(
     scl       => sc_scl
 );
 
+enClkI2CSyncInst: xpm_cdc_single
+generic map(
+    DEST_SYNC_FF   => 4,
+    INIT_SYNC_FF   => 0,
+    SIM_ASSERT_CHK => 0,
+    SRC_INPUT_REG  => 1
+)
+port map(
+    src_clk  => clk_200M,
+    dest_clk => clk_10M,
+    src_in   => en_clki2c,
+    dest_out => enClkI2CSync
+);
+
+
 scClkSmBufInst: BUFGCE
 port map(
     O => sc_clk_sm,
-    CE => en_clki2c,
+    CE => enClkI2CSync,
     I => clk_10M
 );
 

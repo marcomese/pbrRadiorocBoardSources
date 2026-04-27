@@ -86,9 +86,13 @@ signal lastData        : devData_t;
 signal dataIn          : devData_t;
 
 signal dAddr,
-       lastAddr        : integer range 0 to trgNum+addrNum-1;
+       lastAddr,
+       pipeAddr        : integer;
 
-signal sampledTrg      : sampledTrg_t;
+signal sampledTrg,
+       sampledTrgSnap  : sampledTrg_t;
+
+signal pipeData        : std_logic_vector(31 downto 0);
 
 signal nSAfterTrgMax   : unsigned(15 downto 0);
 
@@ -99,7 +103,9 @@ signal cntNSAftTrgSig,
        cntNSAftTrgEn,
        loadDataOut,
        loadReg,
-       locRst          : std_logic;
+       locRst,
+       pipeEn,
+       snapEn          : std_logic;
 
 begin
 
@@ -129,17 +135,48 @@ begin
     end if;
 end process;
 
+regPipeProc: process(clk)
+begin
+    if rising_edge(clk) then
+        if locRst = '1' then
+            pipeEn   <= '0';
+            pipeAddr <= 0;
+            pipeData <= (others => '0');
+        else
+            pipeEn   <= loadReg;
+            pipeAddr <= lastAddr;
+            pipeData <= devDataToSlv(lastData);
+        end if;
+    end if;
+end process;
+
+snapProc: process(clk)
+begin
+    if rising_edge(clk) then
+        if locRst = '1' then
+            snapEn        <= '0';
+            sampledTrgSnap <= (others => (others => '0'));
+        else
+            snapEn <= cntNSAftTrgSig;
+
+            if cntNSAftTrgSig = '1' then
+                sampledTrgSnap <= sampledTrg;
+            end if;
+        end if;
+    end if;
+end process;
+
 rDataCtrl: process(clk)
 begin
     if rising_edge(clk) then
         if locRst = '1' then
             rData <= (1 => initSlv(32, 15, 0, std_logic_vector(nSAfterTrgMax), '0'),
                       others => (others => '0'));
-        elsif loadReg = '1' then
-            rData(lastAddr) <= devDataToSlv(lastData);
-        elsif cntNSAftTrgSig = '1' then
+        elsif pipeEn = '1' then
+            rData(pipeAddr) <= pipeData;
+        elsif snapEn = '1' then
             trgMtrsToRDataLoop: for i in 0 to trgNum-1 loop
-                rData(i+addrNum) <= sampledTrg(i);
+                rData(i+addrNum) <= std_logic_vector(sampledTrgSnap(i));
             end loop;
         end if;
     end if;

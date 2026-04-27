@@ -127,16 +127,18 @@ port map(
 	adc_sck <= adc_sck_s;
 	rstb_rd <= rstb_rd_s;
 	
-	process(rstb_rd_s, adc_sck_s)
-	begin
-		if rstb_rd_s = '0' then
-			sdo_hg_des <= (others => '0');
-			sdo_lg_des <= (others => '0');
-		elsif rising_edge(adc_sck_s) then
-			sdo_hg_des <= sdo_hg_des(14 downto 0) & sdo_hg;
-			sdo_lg_des <= sdo_lg_des(14 downto 0) & sdo_lg;
-		end if;
-	end process;
+    process(rstb_rd_s, adc_sck_s)
+    begin
+        if rising_edge(adc_sck_s) then
+            if rstb_rd_s = '0' then
+                sdo_hg_des <= (others => '0');
+                sdo_lg_des <= (others => '0');
+            else
+                sdo_hg_des <= sdo_hg_des(14 downto 0) & sdo_hg;
+                sdo_lg_des <= sdo_lg_des(14 downto 0) & sdo_lg;
+            end if;
+        end if;
+    end process;
 	
 	ff : fifo_acq
 	port map (

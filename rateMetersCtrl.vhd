@@ -83,19 +83,25 @@ signal state       : state_t;
 signal lastData    : devData_t;
 
 signal dAddr,
-       lastAddr    : integer;
+       lastAddr,
+       pipeAddr      : integer;
 
-signal trgMeters   : rateMeters_t;
+signal trgMeters,
+       trgMetersSnap : rateMeters_t;
 
-signal cntTmrMax   : unsigned(31 downto 0);
+signal pipeData      : std_logic_vector(31 downto 0);
 
-signal cntTmr      : unsigned(cntTmrMax'length downto 0); -- MSB = overflow
+signal cntTmrMax     : unsigned(31 downto 0);
+
+signal cntTmr        : unsigned(cntTmrMax'length downto 0); -- MSB = overflow
 
 signal cntTmrSig,
        cntTmrSet,
        loadDataOut,
        loadReg,
-       locRst      : std_logic;
+       locRst,
+       pipeEn,
+       snapEn        : std_logic;
 
 begin
 
@@ -125,16 +131,47 @@ begin
     end if;
 end process;
 
+regPipeProc: process(clk)
+begin
+    if rising_edge(clk) then
+        if locRst = '1' then
+            pipeEn   <= '0';
+            pipeAddr <= 0;
+            pipeData <= (others => '0');
+        else
+            pipeEn   <= loadReg;
+            pipeAddr <= lastAddr;
+            pipeData <= devDataToSlv(lastData);
+        end if;
+    end if;
+end process;
+
+snapProc: process(clk)
+begin
+    if rising_edge(clk) then
+        if locRst = '1' then
+            snapEn        <= '0';
+            trgMetersSnap <= (others => (others => '0'));
+        else
+            snapEn <= cntTmrSig;
+
+            if cntTmrSig = '1' then
+                trgMetersSnap <= trgMeters;
+            end if;
+        end if;
+    end if;
+end process;
+
 rDataCtrl: process(clk)
 begin
     if rising_edge(clk) then
         if locRst = '1' then
             rData <= (others => (others => '0'));
-        elsif loadReg = '1' then
-            rData(lastAddr) <= devDataToSlv(lastData);
-        elsif cntTmrSig = '1' then
-            trgMtrsToRDataLoop: for i in 0 to trgNum-1 loop
-                rData(i+addrNum) <= std_logic_vector(trgMeters(i));
+        elsif pipeEn = '1' then
+            rData(pipeAddr) <= pipeData;
+        elsif snapEn = '1' then
+            for i in 0 to trgNum-1 loop
+                rData(i+addrNum) <= std_logic_vector(trgMetersSnap(i));
             end loop;
         end if;
     end if;
