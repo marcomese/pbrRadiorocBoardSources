@@ -158,7 +158,7 @@ begin
             lastAddr       <= 0;
             lastData       <= (others => (others => '0'));
 
-            state          <= init;
+            state          <= idle;
         else
             case state is
                 when idle =>
