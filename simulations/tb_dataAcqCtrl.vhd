@@ -19,7 +19,7 @@ constant readCmd       : std_logic_vector(3 downto 0) := x"A";
 constant writeCmd      : std_logic_vector(3 downto 0) := x"5";
 constant burstWrCmd    : std_logic_vector(3 downto 0) := x"3";
 constant burstRdCmd    : std_logic_vector(3 downto 0) := x"B";
-constant maxBrstLen    : natural                      := 14000;
+constant maxBrstLen    : natural                      := 2048;
 constant delay         : natural                      := 1;--50000;
 
 signal rst               : std_logic := '0';
@@ -365,8 +365,7 @@ port map(
     pulsing           => pulsing,
     pulse             => pulse,
     endAcq            => endAcq,
-    rdValid           => rdValid,
-    test              => test
+    rdValid           => rdValid
 );
 
 clk_100M <= not clk_100M after clkPeriod100M/2;
