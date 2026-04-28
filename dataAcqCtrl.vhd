@@ -42,7 +42,7 @@ port(
     endAcq     : in  std_logic;
     rdValid    : in  std_logic;
     rdAcq      : out std_logic;
-    rdDataCnt  : in  std_logic_vector(15 downto 0);
+    rdDataCnt  : in  std_logic_vector(16 downto 0);
     emptyAcq   : in  std_logic;
     nbAcq      : out std_logic_vector(7 downto 0);
     selAdc     : out std_logic_vector(63 downto 0);
@@ -127,16 +127,11 @@ devDataOutCtrl: process(clk100M)
 begin
     if rising_edge(clk100M) then
         if locRst = '1' then
-            devReady   <= '0';
             devDataOut <= (others => (others => '0'));
         elsif loadDataOut = '1' and devBrst = '0' then
-            devReady   <= '1';
             devDataOut <= slvToDevData(rData(lastAddr));
         elsif loadDataOut = '1' and devBrst = '1' then
-            devReady      <= rdValid;
             devDataOut(0) <= doutAcq;
-        else
-            devReady <= '0';
         end if;
     end if;
 end process;
@@ -170,6 +165,7 @@ dataAcqCtrlFSM: process(clk100M)
 begin
     if rising_edge(clk100M) then
         if locRst = '1' then
+            devReady    <= '0';
             busy        <= '0';
             loadDataOut <= '0';
             loadReg     <= '0';
@@ -185,6 +181,7 @@ begin
         else
             case state is
                 when idle =>
+                    devReady    <= '0';
                     loadDataOut <= '0';
                     loadReg     <= '0';
                     rstAcqSig   <= '0';
@@ -198,6 +195,7 @@ begin
                             state    <= errAddr;
                         elsif devRw = devRead and devBrst = '0' then
                             lastAddr    <= dAddr;
+                            devReady    <= '1';
                             loadDataOut <= '1';
                             busy        <= '1';
 
@@ -243,6 +241,7 @@ begin
                     state      <= idle;
 
                 when readFifo =>
+                    devReady      <= rdValid;
                     rdAcqSig      <= devBrstWrt;
 
                     state         <= readFifo;
@@ -276,6 +275,7 @@ begin
                 when acqEnd =>
                     busy      <= '0';
                     rstAcqSig <= '0';
+                    devReady  <= '0';
 
                     state     <= idle;                    
 
@@ -284,6 +284,7 @@ begin
                     end if;
 
                 when errAddr =>
+                    devReady <= '0';
                     lastAddr <= addr'pos(regStatus);
                     lastData <= slvToDevData(errAddrStatus);
                     loadReg  <= '1';
@@ -292,6 +293,7 @@ begin
                     state <= idle;
 
                 when errReadOnly =>
+                    devReady <= '0';
                     lastAddr <= addr'pos(regStatus);
                     lastData <= slvToDevData(errROnlyStatus);
                     loadReg  <= '1';
@@ -300,6 +302,7 @@ begin
                     state <= idle;
 
                 when errFifoEmpty =>
+                    devReady   <= '0';
                     lastAddr   <= addr'pos(regStatus);
                     lastData   <= slvToDevData(errFifoEmptyStatus);
                     loadReg    <= '1';
@@ -309,6 +312,7 @@ begin
                     state      <= idle;                    
 
                 when others =>
+                    devReady <= '0';
                     busy     <= '0';
 
                     state    <= idle;

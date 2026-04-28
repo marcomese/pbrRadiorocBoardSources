@@ -31,7 +31,7 @@ entity adc is
 		adc_sck  : out std_logic;
 		empty_acq : out std_logic;
 		end_multi_acq : out std_logic;
-		rd_data_count_acq : out std_logic_vector(15 downto 0);
+		rd_data_count_acq : out std_logic_vector(16 downto 0);
 		hold_ext : out std_logic;
 		trig_ext : out std_logic;
 		trig_out : out std_logic;
@@ -57,7 +57,7 @@ architecture Behavioral of adc is
         full : OUT STD_LOGIC;
         empty : OUT STD_LOGIC;
         valid : OUT STD_LOGIC;
-        rd_data_count : OUT STD_LOGIC_VECTOR(15 DOWNTO 0)
+        rd_data_count : OUT STD_LOGIC_VECTOR(16 DOWNTO 0)
       );
     END COMPONENT;
 
@@ -92,22 +92,6 @@ architecture Behavioral of adc is
 
     signal locRst : std_logic;
 
-signal rd_data_count_acqSig : std_logic_vector(15 downto 0);
-signal empty_acqSig,
-       rd_enSig             : std_logic;
-signal doutSig              : std_logic_vector(7 downto 0);
-
-attribute MARK_DEBUG : string;
-attribute MARK_DEBUG of wr_en,
-                        adc_sck_s,
-                        adc_sck_vector,
-                        wenSync,
-                        sdo_hglg,
-                        din_l,
-                        doutSig,
-                        rd_enSig : signal is "True";
-
-
 begin
 
 evtTrigger   <= trgEdge;
@@ -115,11 +99,6 @@ trig_out     <= trigger_sft;
 endAcq       <= end_acq;
 rdValid      <= rdValidSig;
 NORT_FPGA    <= and_reduce(t);
-
-rd_data_count_acq <= rd_data_count_acqSig;
-empty_acq         <= empty_acqSig;
-dout              <= doutSig;
-rd_enSig          <= rd_en;
 
 --locRstProc: process(clk_200M)
 --begin
@@ -169,12 +148,12 @@ port map(
 		clk => clk_200M,
 		din    => din_l,
 		wr_en  => wenSync,
-		rd_en  => rd_enSig,
-		dout   => doutSig,
+		rd_en  => rd_en,
+		dout   => dout,
 		full   => open,
-		empty  => empty_acqSig,
+		empty  => empty_acq,
 		valid => rdValidSig,
-		rd_data_count => rd_data_count_acqSig
+		rd_data_count => rd_data_count_acq
 	);
 
 

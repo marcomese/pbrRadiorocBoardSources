@@ -101,7 +101,7 @@ architecture arch of radioroc_fw is
 	--ADC Acquisition
 	signal reset_acq, start_acq, rd_acq, adc_sck, end_acq, empty_acq, rstn_read_acq, reset_n_acq, trig_out : std_logic;
 	signal nb_acq, dout_acq : std_logic_vector(7 downto 0);
-	signal rd_data_count_acq : std_logic_vector(15 downto 0);
+	signal rd_data_count_acq : std_logic_vector(16 downto 0);
 	signal sel_adc : std_logic_vector(63 downto 0);
 
 -- CONSTANTS for deviceInterface, tmpCtrl and PulseGentCtrl
