@@ -142,20 +142,33 @@ port map(
 
 	sdo_hglg <= sdo_hg_des & sdo_lg_des;
 
-	ff : fifo_acq
-	port map (
-		srst    => locRst,
-		clk => clk_200M,
-		din    => din_l,
-		wr_en  => wenSync,
-		rd_en  => rd_en,
-		dout   => dout,
-		full   => open,
-		empty  => empty_acq,
-		valid => rdValidSig,
-		rd_data_count => rd_data_count_acq
-	);
-
+    adcFifo: xpm_fifo_sync
+    generic map(
+        FIFO_WRITE_DEPTH    => 16384,
+        READ_DATA_WIDTH     => 8,
+        WRITE_DATA_WIDTH    => 32,
+        RD_DATA_COUNT_WIDTH => 17,
+        READ_MODE           => "std",
+        USE_ADV_FEATURES    => "1400",
+        FIFO_MEMORY_TYPE    => "block"
+    )
+    port map(
+        wr_clk        => clk_200M,
+        rst           => locRst,
+        din           => din_l,
+        wr_en         => wenSync,
+        dout          => dout,
+        rd_en         => rd_en,
+        empty         => empty_acq,
+        data_valid    => rdValidSig,
+        rd_data_count => rd_data_count_acq,
+        full          => open,
+        wr_rst_busy   => open,
+        rd_rst_busy   => open,
+        sleep         => '0',
+        injectdbiterr => '0',
+        injectsbiterr => '0'
+    );
 
    wenSyncProc: process(clk_200M)
    begin
