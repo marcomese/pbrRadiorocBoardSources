@@ -127,11 +127,16 @@ devDataOutCtrl: process(clk100M)
 begin
     if rising_edge(clk100M) then
         if locRst = '1' then
+            devReady   <= '0';
             devDataOut <= (others => (others => '0'));
         elsif loadDataOut = '1' and devBrst = '0' then
+            devReady   <= '1';
             devDataOut <= slvToDevData(rData(lastAddr));
         elsif loadDataOut = '1' and devBrst = '1' then
+            devReady      <= rdValid;
             devDataOut(0) <= doutAcq;
+        else
+            devReady <= '0';
         end if;
     end if;
 end process;
@@ -165,7 +170,6 @@ dataAcqCtrlFSM: process(clk100M)
 begin
     if rising_edge(clk100M) then
         if locRst = '1' then
-            devReady    <= '0';
             busy        <= '0';
             loadDataOut <= '0';
             loadReg     <= '0';
@@ -181,7 +185,6 @@ begin
         else
             case state is
                 when idle =>
-                    devReady    <= '0';
                     loadDataOut <= '0';
                     loadReg     <= '0';
                     rstAcqSig   <= '0';
@@ -196,14 +199,14 @@ begin
                         elsif devRw = devRead and devBrst = '0' then
                             lastAddr    <= dAddr;
                             loadDataOut <= '1';
-                            devReady    <= '1';
                             busy        <= '1';
 
                             state       <= idle;
                         elsif devRw = devRead and devBrst = '1' and emptyAcq = '0' then
-                            rdAcqSig <= '1';
+                            rdAcqSig    <= '1';
+                            loadDataOut <= '1';
 
-                            state    <= readFifo;
+                            state       <= readFifo;
                         elsif devRw = devRead and devBrst = '1' and emptyAcq = '1' then
                             devBrstRst <= '1';
 
@@ -240,17 +243,18 @@ begin
                     state      <= idle;
 
                 when readFifo =>
-                    devReady      <= rdValid;
                     rdAcqSig      <= devBrstWrt;
 
                     state         <= readFifo;
 
                     if devBrstSnd = '1' then
-                        rdAcqSig <= '0';
+                        rdAcqSig    <= '0';
+                        loadDataOut <= '0';
 
                         state    <= waitBrstSent; 
                     elsif devBrst = '0' and devBrstWrt = '1' then
-                        rdAcqSig <= '0';
+                        rdAcqSig    <= '0';
+                        loadDataOut <= '0';
 
                         state    <= acqEnd;
                     end if;
@@ -259,9 +263,10 @@ begin
                     state <= waitBrstSent;
 
                     if devBrstSnd = '0' then
-                        rdAcqSig <= '1';
+                        rdAcqSig    <= '1';
+                        loadDataOut <= '1';
 
-                        state    <= readFifo;
+                        state       <= readFifo;
                     elsif emptyAcq = '1' then
                         devBrstRst <= '1';
 
@@ -271,7 +276,6 @@ begin
                 when acqEnd =>
                     busy      <= '0';
                     rstAcqSig <= '0';
-                    devReady  <= '0';
 
                     state     <= idle;                    
 
@@ -296,15 +300,15 @@ begin
                     state <= idle;
 
                 when errFifoEmpty =>
-                    lastAddr <= addr'pos(regStatus);
-                    lastData <= slvToDevData(errFifoEmptyStatus);
-                    loadReg  <= '1';
-                    busy     <= '0';
+                    lastAddr   <= addr'pos(regStatus);
+                    lastData   <= slvToDevData(errFifoEmptyStatus);
+                    loadReg    <= '1';
+                    devBrstRst <= '0';
+                    busy       <= '0';
 
                     state      <= idle;                    
 
                 when others =>
-                    devReady <= '0';
                     busy     <= '0';
 
                     state    <= idle;

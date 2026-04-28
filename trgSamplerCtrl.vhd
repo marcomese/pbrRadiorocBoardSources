@@ -111,8 +111,6 @@ begin
 
 dAddr          <= devAddrToInt(devAddr);
 
-cntNSAftTrgSig <= cntNSAfterTrg(cntNSAfterTrg'left);
-
 locRstProc: process(clk)
 begin
     if rising_edge(clk) then
@@ -274,13 +272,24 @@ begin
     end process;
 end generate;
 
+cntNSAftTrgProc: process(clk)
+begin
+    if rising_edge(clk) then
+        if locRst = '1' then
+            cntNSAftTrgSig <= '0';
+        else
+            cntNSAftTrgSig <= cntNSAfterTrg(cntNSAfterTrg'left);
+        end if;
+    end if;
+end process;
+
 nSAfterTrgProc: process(clk)
 begin
     if rising_edge(clk) then
         if locRst = '1' then
             cntNSAfterTrg <= to_unsigned(nSAfterTrgDef-2, cntNSAfterTrg'length);
             cntNSAftTrgEn <= '0';
-        elsif cntNSAftTrgSig = '1' or cntNSAftTrgSet = '1' then
+        elsif cntNSAfterTrg(cntNSAfterTrg'left) = '1' or cntNSAftTrgSet = '1' then
             cntNSAfterTrg <=  resize(nSAfterTrgMax-2, cntNSAfterTrg'length);
             cntNSAftTrgEn <= '0';
         elsif evtTrigger = '1' and cntNSAftTrgEn = '0' then

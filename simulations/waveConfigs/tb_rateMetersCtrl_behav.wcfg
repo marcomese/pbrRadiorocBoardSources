@@ -15,15 +15,19 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="0.000000 us"></ZoomStartTime>
-      <ZoomEndTime time="501.000001 us"></ZoomEndTime>
-      <Cursor1Time time="52.020000 us"></Cursor1Time>
+      <ZoomStartTime time="0.000 ns"></ZoomStartTime>
+      <ZoomEndTime time="6,655.001 ns"></ZoomEndTime>
+      <Cursor1Time time="20.000 ns"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
-      <NameColumnWidth column_width="207"></NameColumnWidth>
+      <NameColumnWidth column_width="199"></NameColumnWidth>
       <ValueColumnWidth column_width="58"></ValueColumnWidth>
    </column_width_setting>
    <WVObjectSize size="80" />
+   <wave_markers>
+      <marker time="4470000" label="" />
+      <marker time="499860000" label="" />
+   </wave_markers>
    <wvobject fp_name="/tb_rateMetersCtrl/rst" type="logic">
       <obj_property name="ElementShortName">rst</obj_property>
       <obj_property name="ObjectShortName">rst</obj_property>

@@ -61,7 +61,7 @@ architecture Behavioral of adc is
       );
     END COMPONENT;
 
-	type state_t is (idle, wait_hold, rst_cpt, wait_conv, asrt_rd_high, asrt_rd_low, nxt, read_asic, start_conv, end_conv, read_adc, end_read_adc, write_fifo, finish);
+	type state_t is (init, idle, wait_hold, rst_cpt, wait_conv, asrt_rd_high, asrt_rd_low, nxt, read_asic, start_conv, end_conv, read_adc, end_read_adc, write_fifo, finish);
 	signal current_state, next_state : state_t;
 
 	signal cpt : natural range 0 to 4095;
@@ -92,9 +92,21 @@ architecture Behavioral of adc is
 
     signal locRst : std_logic;
 
-attribute ASYNC_REG : string;
-attribute ASYNC_REG of wenFF,
-                       wenSync : signal is "True";
+signal rd_data_count_acqSig : std_logic_vector(15 downto 0);
+signal empty_acqSig,
+       rd_enSig             : std_logic;
+signal doutSig              : std_logic_vector(7 downto 0);
+
+attribute MARK_DEBUG : string;
+attribute MARK_DEBUG of wr_en,
+                        adc_sck_s,
+                        adc_sck_vector,
+                        wenSync,
+                        sdo_hglg,
+                        din_l,
+                        doutSig,
+                        rd_enSig : signal is "True";
+
 
 begin
 
@@ -103,6 +115,11 @@ trig_out     <= trigger_sft;
 endAcq       <= end_acq;
 rdValid      <= rdValidSig;
 NORT_FPGA    <= and_reduce(t);
+
+rd_data_count_acq <= rd_data_count_acqSig;
+empty_acq         <= empty_acqSig;
+dout              <= doutSig;
+rd_enSig          <= rd_en;
 
 --locRstProc: process(clk_200M)
 --begin
@@ -135,14 +152,12 @@ port map(
 
     process(rstb_rd_s, adc_sck_s)
     begin
-        if rising_edge(adc_sck_s) then
-            if rstb_rd_s = '0' then
-                sdo_hg_des <= (others => '0');
-                sdo_lg_des <= (others => '0');
-            else
-                sdo_hg_des <= sdo_hg_des(14 downto 0) & sdo_hg;
-                sdo_lg_des <= sdo_lg_des(14 downto 0) & sdo_lg;
-            end if;
+        if rstb_rd_s = '0' then
+            sdo_hg_des <= (others => '0');
+            sdo_lg_des <= (others => '0');
+        elsif rising_edge(adc_sck_s) then
+            sdo_hg_des <= sdo_hg_des(14 downto 0) & sdo_hg;
+            sdo_lg_des <= sdo_lg_des(14 downto 0) & sdo_lg;
         end if;
     end process;
 
@@ -154,12 +169,12 @@ port map(
 		clk => clk_200M,
 		din    => din_l,
 		wr_en  => wenSync,
-		rd_en  => rd_en,
-		dout   => dout,
+		rd_en  => rd_enSig,
+		dout   => doutSig,
 		full   => open,
-		empty  => empty_acq,
+		empty  => empty_acqSig,
 		valid => rdValidSig,
-		rd_data_count => rd_data_count_acq
+		rd_data_count => rd_data_count_acqSig
 	);
 
 
@@ -244,7 +259,7 @@ trgSftEdge <= trigger_sft and not trgSftFF;
 	process(locRst, clk_200M)
 	begin
 	if locRst = '1' then
-		current_state <= idle;
+		current_state <= init;
 		cpt <= 0;
 		ch <= 0;
 		cpt_adc_sck <= 0;
@@ -277,6 +292,8 @@ trgSftEdge <= trigger_sft and not trgSftFF;
 	process(current_state, trgEdge, trgSftEdge, cpt, ch, cpt_adc_sck)
 	begin
 		case current_state is
+		    when init =>
+		      next_state <= idle;
 			when idle =>
 				if trgEdge = '1' or trgSftEdge = '1' then
 					next_state <= wait_hold;
@@ -356,6 +373,15 @@ trgSftEdge <= trigger_sft and not trgSftFF;
 	process(current_state)
 	begin
 		case current_state is
+			when init =>
+				rstb_rd_s 	<= '0';
+				holdext    <= '0';
+				ck_read 	<= '0';
+				n_cnv 		<= '0';
+				en_adc_sck 	<= '0';
+				wr_en		<= '0';
+				end_acq		<= '0';
+				en_trigext  <= '0';
 			when idle =>
 				rstb_rd_s 	<= '1';
 				holdext    <= '0';

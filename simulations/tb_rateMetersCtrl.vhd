@@ -197,15 +197,15 @@ begin
     testTxWrite <= '1';
     wait for clkPeriod100M;
     testTxWrite <= '0';
-    testDataIn <= x"01";
+    testDataIn <= x"00";
     testTxWrite <= '1';
     wait for clkPeriod100M;
     testTxWrite <= '0';
-    testDataIn <= x"86";
+    testDataIn <= x"00";
     testTxWrite <= '1';
     wait for clkPeriod100M;
     testTxWrite <= '0';
-    testDataIn <= x"a0"; -- reset every 1e8*10ns = 1s
+    testDataIn <= x"09"; -- reset every 1e8*10ns = 1s
     testTxWrite <= '1';
     wait for clkPeriod100M;
     testTxWrite <= '0';

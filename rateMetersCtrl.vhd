@@ -107,8 +107,6 @@ begin
 
 dAddr     <= devAddrToInt(devAddr);
 
-cntTmrSig <= cntTmr(cntTmr'left);
-
 locRstProc: process(clk)
 begin
     if rising_edge(clk) then
@@ -273,10 +271,21 @@ begin
     end process;
 end generate;
 
+cntTmrSigProc: process(clk)
+begin
+    if rising_edge(clk) then
+        if locRst = '1' then
+            cntTmrSig <= '0';
+        else
+            cntTmrSig <= cntTmr(cntTmr'left);
+        end if;
+    end if;
+end process;
+
 cntTmrGen: process(clk)
 begin
     if rising_edge(clk) then
-        if locRst = '1' or cntTmrSig = '1' or cntTmrSet = '1' then
+        if locRst = '1' or cntTmr(cntTmr'left) = '1' or cntTmrSet = '1' then
             cntTmr <= resize(cntTmrMax-2, cntTmr'length);
         else
             cntTmr <= cntTmr - 1;

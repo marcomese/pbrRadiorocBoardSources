@@ -28,7 +28,7 @@ signal clk_100M          : std_logic := '1';
 signal start             : std_logic := '0';
 signal resetAcq          : std_logic    := '0';
 signal sdo_hg          : std_logic := '0';
-signal sdo_lg          : std_logic := '0';
+signal sdo_lg          : std_logic := '1';
 signal NORT1          : std_logic := '1';
 signal NORT2           : std_logic := '1';
 signal NORTQ             : std_logic := '1';
@@ -219,6 +219,14 @@ begin
     NORT1 <= '0';
     wait for clkPeriod200M;
     NORT1 <= '1';
+        wait for 100 us;
+    NORT1 <= '0';
+    wait for clkPeriod200M;
+    NORT1 <= '1';
+        wait for 100 us;
+    NORT1 <= '0';
+    wait for clkPeriod200M;
+    NORT1 <= '1';
 
     wait for 100 us;
 
@@ -304,6 +312,9 @@ begin
 
     wait;
 end process;
+
+sdo_hg <= not sdo_hg after clkPeriod100M;
+sdo_lg <= not sdo_lg after clkPeriod100M;
 
 dataAcqCtrlInst: entity work.dataAcqCtrl
 port map(

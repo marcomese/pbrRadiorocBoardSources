@@ -60,6 +60,7 @@ signal readRq,
        devIntBusy,
        devBrstRstTSmpl,
        rdValid,
+       trgFF,
        evtTrigger,
        trigger       : std_logic                    := '0';
 signal id             : std_logic_vector(3 downto 0) := (others => '0');
@@ -77,17 +78,18 @@ t21 <= t2 & t1;
 
 trigger <= not t1(0);
 
-trgEdge10nsInst: entity work.edgeDetector
-generic map(
-    clockEdge => "rising",
-    edge      => "rising"
-)
-port map(
-    clk       => clk_100M,
-    rst       => rst,
-    signalIn  => trigger,
-    signalOut => evtTrigger
-);
+trgEvtProc: process(clk_100M)
+begin
+    if rising_edge(clk_100M) then
+        if rst = '1' then
+            trgFF      <= '0';
+            evtTrigger <= '0';
+        else
+            trgFF      <= trigger;
+            evtTrigger <= trigger and not trgFF;
+        end if;
+    end if;
+end process;
 
 stimProc: process
 begin
