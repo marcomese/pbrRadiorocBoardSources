@@ -67,8 +67,7 @@ signal   rData      : regsData_t(regsNum-1 downto 0);
 
 --------------------------------------------------------------------
 
-type state_t is (init,
-                 idle,
+type state_t is (idle,
                  execute,
                  errAddr,
                  errReadOnly);
