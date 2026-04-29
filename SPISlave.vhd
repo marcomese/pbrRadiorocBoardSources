@@ -56,6 +56,7 @@ signal sclkFF,
        csRise,
        csFall,
        txPres,
+       txValid,
        loadBuff,
        loadTxFifo,
        loadRxFifo,
@@ -162,7 +163,7 @@ begin
     if rising_edge(clk) then
         if locRst = '1' then
             buffOut <= (others => '0');
-        elsif loadBuff = '1' and txPres = '1' then
+        elsif loadBuff = '1' and txValid = '1' then
             buffOut <= txFifoDout;
         elsif cs = '0' and sclkRise = '1' then
             buffOut <= buffOut(6 downto 0) & '0';
@@ -213,8 +214,8 @@ generic map(
     READ_DATA_WIDTH  => 8,
     WRITE_DATA_WIDTH => 8,
     PROG_FULL_THRESH => 7,
-    READ_MODE        => "fwft",
-    USE_ADV_FEATURES => "0012",
+    READ_MODE        => "std",
+    USE_ADV_FEATURES => "1012",
     FIFO_MEMORY_TYPE => "block"
 )
 port map(
@@ -224,6 +225,7 @@ port map(
     wr_en         => tx_write,
     dout          => txFifoDout,
     rd_en         => loadTxFifo,
+    data_valid    => txValid,
     wr_ack        => tx_wr_ack,
     empty         => txEmpty,
     full          => tx_full,
