@@ -85,12 +85,12 @@ endAcq       <= end_acq;
 rdValid      <= rdValidSig;
 NORT_FPGA    <= and_reduce(t);
 
-locRstProc: process(clk_200M)
-begin
-    if rising_edge(clk_200M) then
+--locRstProc: process(clk_200M) --locRst delay resets multi_acq fsm!
+--begin
+--    if rising_edge(clk_200M) then
         locRst <= rst;
-    end if;
-end process;
+--    end if;
+--end process;
 
 ma : entity xil_defaultlib.multi_acq
 Port map (
