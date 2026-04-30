@@ -57,11 +57,12 @@ architecture Behavioral of adc is
 
 	signal hit0, hit, en_acq : std_logic;
 	signal end_acq : std_logic;
-	signal wr_en,wenFF,wenSync : std_logic;
+	signal wr_en  : std_logic;
+	signal wrEnSync  : std_logic;
 
 	signal sdo_hg_des, sdo_lg_des : std_logic_vector(15 downto 0);
 	signal sdo_hglg : std_logic_vector(31 downto 0);
-	signal din, din_l : std_logic_vector(31 downto 0);
+	signal din : std_logic_vector(31 downto 0);
 
 	signal en_adc_sck, adc_sck_s, rstb_rd_s, rst_n : std_logic;
 	signal t0, trigger, trgFF, trigger_sft, trgSftFF,  holdext, trgEdge, trgSftEdge : std_logic;
@@ -127,8 +128,23 @@ port map(
 
 	sdo_hglg <= sdo_hg_des & sdo_lg_des;
 
-    adcFifo: xpm_fifo_sync
+    wrEnSyncInst: xpm_cdc_single
     generic map(
+        DEST_SYNC_FF   => 2,
+        INIT_SYNC_FF   => 0,
+        SIM_ASSERT_CHK => 0,
+        SRC_INPUT_REG  => 1
+    )
+    port map(
+        src_clk  => clk_200M,
+        dest_clk => clk_100M,
+        src_in   => wr_en,
+        dest_out => wrEnSync
+    );
+
+    adcFifo: xpm_fifo_async
+    generic map(
+        CDC_SYNC_STAGES     => 2,
         FIFO_WRITE_DEPTH    => 16384,
         READ_DATA_WIDTH     => 8,
         WRITE_DATA_WIDTH    => 32,
@@ -138,10 +154,11 @@ port map(
         FIFO_MEMORY_TYPE    => "block"
     )
     port map(
-        wr_clk        => clk_200M,
+        wr_clk        => clk_100M,
+        rd_clk        => clk_200M,
         rst           => locRst,
-        din           => din_l,
-        wr_en         => wenSync,
+        din           => sdo_hglg,
+        wr_en         => wrEnSync,
         dout          => dout,
         rd_en         => rd_en,
         empty         => empty_acq,
@@ -154,35 +171,6 @@ port map(
         injectdbiterr => '0',
         injectsbiterr => '0'
     );
-
-
-   wenSyncProc: process(clk_200M)
-   begin
-        if rising_edge(clk_200M) then
-            if locRst = '1' then
-                wenFF   <= '0';
-                wenSync <= '0';
-            else
-                wenFF   <= wr_en; 
-                wenSync <= wenFF;
-            end if;
-        end if;
-   end process;
-
-   sdo_hglgSync: xpm_cdc_array_single
-   generic map (
-      DEST_SYNC_FF   => 2,
-      INIT_SYNC_FF   => 0,
-      SIM_ASSERT_CHK => 0,
-      SRC_INPUT_REG  => 0,
-      WIDTH          => sdo_hglg'length
-   )
-   port map (
-      src_clk  => adc_sck_s,
-      dest_clk => clk_200M,
-      src_in   => sdo_hglg,
-      dest_out => din_l
-   );
 
 	hit0 <= t(to_integer(unsigned(sel_adc(5 downto 0))));
 

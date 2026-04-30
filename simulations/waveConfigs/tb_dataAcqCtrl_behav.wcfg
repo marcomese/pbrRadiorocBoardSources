@@ -15,15 +15,15 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="417,365.000 ns"></ZoomStartTime>
-      <ZoomEndTime time="422,535.001 ns"></ZoomEndTime>
-      <Cursor1Time time="422,615.000 ns"></Cursor1Time>
+      <ZoomStartTime time="268.854738 us"></ZoomStartTime>
+      <ZoomEndTime time="769.854738 us"></ZoomEndTime>
+      <Cursor1Time time="313.972201 us"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
-      <NameColumnWidth column_width="269"></NameColumnWidth>
+      <NameColumnWidth column_width="253"></NameColumnWidth>
       <ValueColumnWidth column_width="58"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="114" />
+   <WVObjectSize size="123" />
    <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/clk" type="logic">
       <obj_property name="ElementShortName">clk</obj_property>
       <obj_property name="ObjectShortName">clk</obj_property>
@@ -192,10 +192,6 @@
       <obj_property name="ElementShortName">data_valid</obj_property>
       <obj_property name="ObjectShortName">data_valid</obj_property>
    </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl/spiSlaveInst/txFifoInst/xpm_fifo_base_inst/\gen_sdpram.xpm_memory_base_inst /mem" type="array">
-      <obj_property name="ElementShortName">mem[0:2047][7:0]</obj_property>
-      <obj_property name="ObjectShortName">mem[0:2047][7:0]</obj_property>
-   </wvobject>
    <wvobject fp_name="/tb_dataAcqCtrl/cs" type="logic">
       <obj_property name="ElementShortName">cs</obj_property>
       <obj_property name="ObjectShortName">cs</obj_property>
@@ -280,25 +276,65 @@
       <obj_property name="ElementShortName">rstb_rd_s</obj_property>
       <obj_property name="ObjectShortName">rstb_rd_s</obj_property>
    </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl/adcInst/sdo_hglg" type="array">
-      <obj_property name="ElementShortName">sdo_hglg[31:0]</obj_property>
-      <obj_property name="ObjectShortName">sdo_hglg[31:0]</obj_property>
+   <wvobject fp_name="/tb_dataAcqCtrl/adcInst/en_adc_sck" type="logic">
+      <obj_property name="ElementShortName">en_adc_sck</obj_property>
+      <obj_property name="ObjectShortName">en_adc_sck</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl/adcInst/adc_sck_s" type="logic">
+      <obj_property name="ElementShortName">adc_sck_s</obj_property>
+      <obj_property name="ObjectShortName">adc_sck_s</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl/adcInst/adcFifo/rd_en" type="logic">
+      <obj_property name="ElementShortName">rd_en</obj_property>
+      <obj_property name="ObjectShortName">rd_en</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_dataAcqCtrl/adcInst/wr_en" type="logic">
       <obj_property name="ElementShortName">wr_en</obj_property>
       <obj_property name="ObjectShortName">wr_en</obj_property>
    </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl/adcInst/wenFF" type="logic">
-      <obj_property name="ElementShortName">wenFF</obj_property>
-      <obj_property name="ObjectShortName">wenFF</obj_property>
+   <wvobject fp_name="/tb_dataAcqCtrl/adcInst/wrEnSync" type="logic">
+      <obj_property name="ElementShortName">wrEnSync</obj_property>
+      <obj_property name="ObjectShortName">wrEnSync</obj_property>
    </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl/adcInst/wenSync" type="logic">
-      <obj_property name="ElementShortName">wenSync</obj_property>
-      <obj_property name="ObjectShortName">wenSync</obj_property>
+   <wvobject fp_name="/tb_dataAcqCtrl/adcInst/adcFifo/wr_en" type="logic">
+      <obj_property name="ElementShortName">wr_en</obj_property>
+      <obj_property name="ObjectShortName">wr_en</obj_property>
    </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl/adcInst/din_l" type="array">
-      <obj_property name="ElementShortName">din_l[31:0]</obj_property>
-      <obj_property name="ObjectShortName">din_l[31:0]</obj_property>
+   <wvobject fp_name="/tb_dataAcqCtrl/adcInst/adcFifo/dout" type="array">
+      <obj_property name="ElementShortName">dout[7:0]</obj_property>
+      <obj_property name="ObjectShortName">dout[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl/adcInst/sdo_hg_des" type="array">
+      <obj_property name="ElementShortName">sdo_hg_des[15:0]</obj_property>
+      <obj_property name="ObjectShortName">sdo_hg_des[15:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl/adcInst/sdo_lg_des" type="array">
+      <obj_property name="ElementShortName">sdo_lg_des[15:0]</obj_property>
+      <obj_property name="ObjectShortName">sdo_lg_des[15:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl/adcInst/sdo_hglg" type="array">
+      <obj_property name="ElementShortName">sdo_hglg[31:0]</obj_property>
+      <obj_property name="ObjectShortName">sdo_hglg[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl/adcInst/adcFifo/rd_en" type="logic">
+      <obj_property name="ElementShortName">rd_en</obj_property>
+      <obj_property name="ObjectShortName">rd_en</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl/adcInst/adcFifo/din" type="array">
+      <obj_property name="ElementShortName">din[31:0]</obj_property>
+      <obj_property name="ObjectShortName">din[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl/adcInst/adcFifo/rd_data_count" type="array">
+      <obj_property name="ElementShortName">rd_data_count[16:0]</obj_property>
+      <obj_property name="ObjectShortName">rd_data_count[16:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl/adcInst/wr_en" type="logic">
+      <obj_property name="ElementShortName">wr_en</obj_property>
+      <obj_property name="ObjectShortName">wr_en</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl/spiSlaveInst/txFifoInst/xpm_fifo_base_inst/\gen_sdpram.xpm_memory_base_inst /mem" type="array">
+      <obj_property name="ElementShortName">mem[0:2047][7:0]</obj_property>
+      <obj_property name="ObjectShortName">mem[0:2047][7:0]</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_dataAcqCtrl/adcInst/trigger" type="logic">
       <obj_property name="ElementShortName">trigger</obj_property>
