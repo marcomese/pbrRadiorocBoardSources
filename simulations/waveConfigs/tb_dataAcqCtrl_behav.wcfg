@@ -15,15 +15,15 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="268.854738 us"></ZoomStartTime>
-      <ZoomEndTime time="769.854738 us"></ZoomEndTime>
-      <Cursor1Time time="313.972201 us"></Cursor1Time>
+      <ZoomStartTime time="6,127.500 ns"></ZoomStartTime>
+      <ZoomEndTime time="12,532.501 ns"></ZoomEndTime>
+      <Cursor1Time time="7,195.000 ns"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
-      <NameColumnWidth column_width="253"></NameColumnWidth>
+      <NameColumnWidth column_width="249"></NameColumnWidth>
       <ValueColumnWidth column_width="58"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="123" />
+   <WVObjectSize size="124" />
    <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/clk" type="logic">
       <obj_property name="ElementShortName">clk</obj_property>
       <obj_property name="ObjectShortName">clk</obj_property>
@@ -211,6 +211,10 @@
    <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/brstBuffValid" type="logic">
       <obj_property name="ElementShortName">brstBuffValid</obj_property>
       <obj_property name="ObjectShortName">brstBuffValid</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl/readRq" type="logic">
+      <obj_property name="ElementShortName">readRq</obj_property>
+      <obj_property name="ObjectShortName">readRq</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_dataAcqCtrl/devInterfInst/dataBrstOut" type="array">
       <obj_property name="ElementShortName">dataBrstOut[31:0]</obj_property>
