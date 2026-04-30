@@ -142,7 +142,6 @@ port map(
         rst           => locRst,
         din           => din_l,
         wr_en         => wenSync,
-
         dout          => dout,
         rd_en         => rd_en,
         empty         => empty_acq,
