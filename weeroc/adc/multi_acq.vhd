@@ -43,7 +43,7 @@ begin
 	end if;
 	end process;
 	
-	process(current_state, start, end_acq, cpt_acq)
+	process(current_state, start, end_acq, cpt_acq, nb_acq_nat)
 	begin
 		case(current_state) is 
 			when idle => 

@@ -192,7 +192,7 @@ begin
     end if;
 end process;
 
-validIdMux: process(dataIn)
+validIdMux: process(dataIn, idSig)
 begin
     if dataIn = idSig then
         validId <= '1';
