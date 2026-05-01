@@ -95,7 +95,7 @@ architecture arch of radioroc_fw is
 
     signal n_reset_i2c, en_clki2c, enClkI2CSync : std_logic;
 	--ADC Acquisition
-	signal reset_acq, start_acq, rd_acq, adc_sck, end_acq, empty_acq, rstn_read_acq, reset_n_acq, trig_out : std_logic;
+	signal reset_acq, start_acq, rd_acq, adc_sck,empty_acq, rstn_read_acq, reset_n_acq, trig_out : std_logic;
 	signal nb_acq, dout_acq : std_logic_vector(7 downto 0);
 	signal rd_data_count_acq : std_logic_vector(16 downto 0);
 	signal sel_adc : std_logic_vector(63 downto 0);
@@ -201,7 +201,7 @@ signal readRq,
        sclkSync,
        mosiSync  : std_logic;
 
-signal endAcq, rdValid : std_logic;
+signal rdValid : std_logic;
 
 begin
 
@@ -223,7 +223,7 @@ pulse         <= pulseSig;
 
 nCMOS         <= '1';
 
-n_reset_i2c   <= en_clki2c and npwr_reset;
+n_reset_i2c   <= en_clki2c and resetn;
 
 tEdge21       <= tEdge2 & tEdge1;
 
@@ -484,7 +484,7 @@ generic map(
 )
 port map(
     clk       => clk_200M,
-    reset_n   => resetn,
+    reset_n   => n_reset_i2c,
     ena       => i2cEnaRad,
     addr      => i2cAddrRad,
     rw        => i2cRwRad,
@@ -512,6 +512,9 @@ port map(
 
 
 scClkSmBufInst: BUFGCE
+generic map(
+    SIM_DEVICE => "7SERIES"
+)
 port map(
     O => sc_clk_sm,
     CE => enClkI2CSync,
@@ -540,7 +543,7 @@ port map(
     n_cnv 	 => nCNV,
     adc_sck  => adc_sck,
     empty_acq => empty_acq,
-    end_multi_acq => end_acq,
+    end_multi_acq => open,
     rd_data_count_acq => rd_data_count_acq,
     hold_ext => sc_holdext,
     trig_ext => sc_trigext,
@@ -549,7 +552,6 @@ port map(
     pulsing => pulsingSig,
     pulse => pulseSig,
     extTrg => extTrgSig,
-    endAcq => endAcq,
     rdValid => rdValid
 );
 
@@ -617,7 +619,6 @@ port map(
     busy        => devBusyAcq,
     resetAcq    => reset_acq,
     startAcq    => start_acq,
-    endAcq      => endAcq,
     rdValid     => rdValid,
     rdAcq       => rd_acq,
     rdDataCnt   => rd_data_count_acq,

@@ -136,23 +136,23 @@ begin
     id  <= "0110";
     wait for clkPeriod200M*5;
 
-    wait for 350 ns;
+    wait for 1 us;
 
     --------------------------------------------------------------------
     -- 1st transaction: 0x76, 0x55, 0x00, 0x03, 0x00, 0x00, 0x00, 0x02
     --------------------------------------------------------------------
     startSpi;
     sendByte(x"76");
-    sendByte(x"55");
-    sendByte(x"00");
-    sendByte(x"03");
-    sendByte(x"00");
-    sendByte(x"00");
-    sendByte(x"00");
-    sendByte(x"02");
+--    sendByte(x"55");
+--    sendByte(x"00");
+--    sendByte(x"03");
+--    sendByte(x"00");
+--    sendByte(x"00");
+--    sendByte(x"00");
+--    sendByte(x"02");
     endSpi;
 
-    wait for 5 us;
+    wait for 5000 us;
 
     --------------------------------------------------------------------
     -- 2nd transaction: 0x76, 0xA5, 0x00, 0x05
@@ -251,7 +251,6 @@ port map(
     busy        => acqBusy,
     resetAcq    => resetAcq,
     startAcq    => start,
-    endAcq      => endAcq,
     rdValid     => rdValid,
     rdAcq       => rd_en,
     rdDataCnt   => rdDataCnt,

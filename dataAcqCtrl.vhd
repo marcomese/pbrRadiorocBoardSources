@@ -39,7 +39,6 @@ port(
     busy       : out std_logic;
     resetAcq   : out std_logic;
     startAcq   : out std_logic;
-    endAcq     : in  std_logic;
     rdValid    : in  std_logic;
     rdAcq      : out std_logic;
     rdDataCnt  : in  std_logic_vector(16 downto 0);

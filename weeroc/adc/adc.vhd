@@ -105,6 +105,9 @@ Port map (
 );
 
 adcSckBufInst: BUFGCE
+generic map(
+    SIM_DEVICE => "7SERIES"
+)
 port map(
     O => adc_sck_s,
     CE => en_adc_sck,
