@@ -215,16 +215,6 @@ set_property PACKAGE_PIN AB22 [get_ports SDA_275]
 
 create_clock -period 5.000 -name clk_200M [get_ports sysClk_p]
 
-#create_generated_clock -name clk_100M -source [get_ports sysClk_p] -divide_by 1 [get_pins bufr100MInst/O]
-
-#create_generated_clock -name clk_50M -source [get_ports sysClk_p] -divide_by 4 [get_pins bufr50Inst/O]
-
-#create_generated_clock -name clk_10M -source [get_pins bufr50Inst/O] -divide_by 5 [get_pins bufr10Inst/O]
-
-create_clock -period 50.000 -name sclk [get_ports sclk_p]
-
-set_clock_groups -asynchronous -group clk_200M -group sclk
-
 set_property CFGBVS VCCO [current_design]
 set_property CONFIG_VOLTAGE 3.3 [current_design]
 

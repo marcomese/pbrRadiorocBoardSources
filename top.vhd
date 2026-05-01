@@ -84,8 +84,6 @@ architecture arch of radioroc_fw is
     -- LVDS
 	signal ADC_SCKHG, ADC_SCKLG, ADC_HG, ADC_LG : std_logic;
 	signal T_1Buf, T_2Buf,
-	       T_1FF0, T_2FF0,
-	       T_1FF1, T_2FF1,
 	       T_1Sync, T_2Sync,
 	       tEdge1, tEdge2 : std_logic_vector(63 downto 0);
 	signal tEdge21, TBuf21 : std_logic_vector(127 downto 0);
@@ -94,10 +92,8 @@ architecture arch of radioroc_fw is
 	signal clk_10M, clk_50M, clk_100M, clk_200M : std_logic;
 	signal sysClkDS : std_logic;
 	-- I2C
---	signal end_i2c, n_reset_i2c, rd55, wr_i2c, en_clki2c, sda_i, sda_o, sda_oen : std_logic;
-    signal end_i2c, n_reset_i2c, rd55, wr_i2c, en_clki2c, enClkI2CSync : std_logic;
-	signal rstb_read_sft, reset_n_sft : std_logic;
-	signal i2c_in, i2c_set, q, start, end_rd, spy_i2c     : std_logic_vector(7 downto 0);
+
+    signal n_reset_i2c, en_clki2c, enClkI2CSync : std_logic;
 	--ADC Acquisition
 	signal reset_acq, start_acq, rd_acq, adc_sck, end_acq, empty_acq, rstn_read_acq, reset_n_acq, trig_out : std_logic;
 	signal nb_acq, dout_acq : std_logic_vector(7 downto 0);
@@ -106,7 +102,7 @@ architecture arch of radioroc_fw is
 
 -- CONSTANTS for deviceInterface, tmpCtrl and PulseGentCtrl
 
-constant clkFreq        : real      := 100.0e6;
+constant clkFreq        : real      := 200.0e6;
 constant timeout        : real      := 1.0;
 constant sleepOnPwrOn   : boolean   := True;
 constant pwrOnTime      : real      := 20.0e-6;
@@ -157,9 +153,6 @@ signal   devReadyPGen,
          devBusyAcq,
          devBusyRM,
          devBusyTSmpl,
-         devBrstRstPGen,
-         devBrstRstTmp,
-         devBrstRstRadioroc,
          devBrstRstAcq,
          devBrstRstRM,
          devBrstRstTSmpl,
@@ -171,8 +164,6 @@ signal   devAddr        : devAddr_t;
 
 -- SIGNALS FOR spiSlave --
 signal   error          : std_logic_vector(2 downto 0);
-signal   dataIn         : std_logic_vector(7 downto 0);
-signal   dataOut        : std_logic_vector(7 downto 0);
 signal   rxRead         : std_logic;
 signal   rxPresent      : std_logic;
 signal   rxValid        : std_logic;
@@ -192,41 +183,25 @@ signal   i2cDataWrRad   : std_logic_vector(7 downto 0);
 signal   i2cBusyRad     : std_logic;
 signal   i2cDataRdRad   : std_logic_vector(7 downto 0);
 signal   areset         : std_logic;
-signal   testTxWrite,
-         testRxRead,
-         testRxPresent  : std_logic;
 signal   dataToMaster,
          dataFromMaster : std_logic_vector(7 downto 0);
 
 signal extTrgFF, extTrgSig : std_logic;
 
-signal idFF, idSync : std_logic_vector(3 downto 0);
+signal idSync : std_logic_vector(2 downto 0);
+
+signal boardID : std_logic_vector(3 downto 0);
 
 signal readRq,
        cs,
        sclk,
        mosi,
        miso,
-       csFF,
-       sclkFF,
-       mosiFF,
        csSync,
        sclkSync,
        mosiSync  : std_logic;
 
 signal endAcq, rdValid : std_logic;
-
-attribute ASYNC_REG : string;
-attribute ASYNC_REG of csFF,
-                       sclkFF,
-                       mosiFF,
-                       csSync,
-                       sclkSync,
-                       mosiSync,
-                       T_1FF0,
-                       T_2FF0,
-                       T_1Sync,
-                       T_2Sync : signal is "true";
 
 begin
 
@@ -258,6 +233,8 @@ ADC_SCKHG     <= adc_sck;
 
 ADC_SCKLG     <= adc_sck;
 
+boardID       <= '0' & idSync;
+
 resetNSync: xpm_cdc_async_rst
 generic map(
   DEST_SYNC_FF    => 4,
@@ -288,26 +265,92 @@ port map(
     O => reset
 );
 
-syncIn: process(clk_200M)
-begin
-    if rising_edge(clk_200M) then
-        if reset = '1' then
-            idFF    <= (others => '0');
-            idSync  <= (others => '0');
-            T_1FF0  <= (others => '0');
-            T_2FF0  <= (others => '0');
-            T_1Sync <= (others => '0');
-            T_2Sync <= (others => '0');
-        else
-            idFF    <= '0' & id;
-            idSync  <= idFF;
-            T_1FF0  <= T_1Buf;
-            T_1Sync <= T_1FF0;
-            T_2FF0  <= T_2Buf;
-            T_2Sync <= T_2FF0;
-        end if;
-    end if;
-end process;
+T1SyncInst: xpm_cdc_array_single
+generic map(
+    DEST_SYNC_FF   => 2,
+    INIT_SYNC_FF   => 0,
+    SIM_ASSERT_CHK => 0,
+    SRC_INPUT_REG  => 0,
+    WIDTH          => T_1'length
+)
+port map(
+    src_clk  => '0',
+    dest_clk => clk_200M,
+    src_in   => T_1Buf,
+    dest_out => T_1Sync
+);
+
+T2SyncInst: xpm_cdc_array_single
+generic map(
+    DEST_SYNC_FF   => 2,
+    INIT_SYNC_FF   => 0,
+    SIM_ASSERT_CHK => 0,
+    SRC_INPUT_REG  => 0,
+    WIDTH          => T_2'length
+)
+port map(
+    src_clk  => '0',
+    dest_clk => clk_200M,
+    src_in   => T_2Buf,
+    dest_out => T_2Sync
+);
+
+idSyncInst: xpm_cdc_array_single
+generic map(
+    DEST_SYNC_FF   => 2,
+    INIT_SYNC_FF   => 0,
+    SIM_ASSERT_CHK => 0,
+    SRC_INPUT_REG  => 0,
+    WIDTH          => id'length
+)
+port map(
+    src_clk  => '0',
+    dest_clk => clk_200M,
+    src_in   => id,
+    dest_out => idSync
+);
+
+csSyncInst: xpm_cdc_single
+generic map(
+    DEST_SYNC_FF   => 2,
+    INIT_SYNC_FF   => 0,
+    SIM_ASSERT_CHK => 0,
+    SRC_INPUT_REG  => 0
+)
+port map(
+    src_clk  => '0',
+    dest_clk => clk_200M,
+    src_in   => cs,
+    dest_out => csSync
+);
+
+sclkSyncInst: xpm_cdc_single
+generic map(
+    DEST_SYNC_FF   => 2,
+    INIT_SYNC_FF   => 0,
+    SIM_ASSERT_CHK => 0,
+    SRC_INPUT_REG  => 0
+)
+port map(
+    src_clk  => '0',
+    dest_clk => clk_200M,
+    src_in   => sclk,
+    dest_out => sclkSync
+);
+
+mosiSyncInst: xpm_cdc_single
+generic map(
+    DEST_SYNC_FF   => 2,
+    INIT_SYNC_FF   => 0,
+    SIM_ASSERT_CHK => 0,
+    SRC_INPUT_REG  => 0
+)
+port map(
+    src_clk  => '0',
+    dest_clk => clk_200M,
+    src_in   => mosi,
+    dest_out => mosiSync
+);
 
 inTrg1Sync: entity work.trgSync
 generic map(
@@ -334,7 +377,7 @@ port map(
 extTrgFF  <= '0';
 extTrgSig <= '0';
 
-extTrg <= miso;
+extTrg <= '0';
 --extTrgSync: process(clk_200M)
 --begin
 --    if rising_edge(clk_200M) then
@@ -603,27 +646,6 @@ port map(
     scl       => SCL_275
 );
 
-spiSyncProc: process(clk_200M)
-begin
-    if rising_edge(clk_200M) then
-        if reset = '1' then
-            csFF     <= '1';
-            sclkFF   <= '0';
-            mosiFF   <= '0';
-            csSync   <= '1';
-            sclkSync <= '0';
-            mosiSync <= '0';
-        else
-            csFF     <= cs;
-            sclkFF   <= sclk;
-            mosiFF   <= mosi;
-            csSync   <= csFF;
-            sclkSync <= sclkFF;
-            mosiSync <= mosiFF;
-        end if;
-    end if;
-end process;
-
 spiSlaveInst: entity work.SPISlave
 generic map(
     maxBrstLen   => maxBrstLen
@@ -725,30 +747,38 @@ port map(
     i2cDataRd  => i2cDataRd
 );
 
+devDataInVec(none)      <= (others => (others => '0'));
 devDataInVec(pulseGen)  <= dataFromPGen;
 devDataInVec(tmp275)    <= dataFromTmp;
 devDataInVec(radioroc)  <= dataFromRadioroc;
+devDataInVec(dataReg)   <= (others => (others => '0'));
 devDataInVec(acqSystem) <= dataFromAcq;
 devDataInVec(rateMeters)<= dataFromRM;
 devDataInVec(trgSampler)<= dataFromTSmpl;
 
+devReadyVec(none)       <= '0';
 devReadyVec(pulseGen)   <= devReadyPGen;
 devReadyVec(tmp275)     <= devReadyTmp;
 devReadyVec(radioroc)   <= devReadyRadioroc;
+devReadyVec(dataReg)    <= '0';
 devReadyVec(acqSystem)  <= devReadyAcq;
 devReadyVec(rateMeters) <= devReadyRM;
 devReadyVec(trgSampler) <= devReadyTSmpl;
 
+devBusyVec(none)        <= '0';
 devBusyVec(pulseGen)    <= devBusyPGen;
 devBusyVec(tmp275)      <= devBusyTmp;
 devBusyVec(radioroc)    <= devBusyRadioroc;
+devBusyVec(dataReg)     <= '0'; 
 devBusyVec(acqSystem)   <= devBusyAcq;
 devBusyVec(rateMeters)  <= devBusyRM;
 devBusyVec(trgSampler)  <= devBusyTSmpl;
 
-devBrstRst(pulseGen)    <= devBrstRstPGen;
-devBrstRst(tmp275)      <= devBrstRstTmp;
-devBrstRst(radioroc)    <= devBrstRstRadioroc;
+devBrstRst(none)        <= '0';
+devBrstRst(pulseGen)    <= '0';
+devBrstRst(tmp275)      <= '0';
+devBrstRst(radioroc)    <= '0';
+devBrstRst(dataReg)     <= '0';
 devBrstRst(acqSystem)   <= devBrstRstAcq;
 devBrstRst(rateMeters)  <= devBrstRstRM;
 devBrstRst(trgSampler)  <= devBrstRstTSmpl;
@@ -768,7 +798,7 @@ generic map(
 port map(
     clk        => clk_200M,
     rst        => reset,
-    id         => idSync,
+    id         => boardID,
     dataIn     => dataFromMaster,
     dataOut    => dataToMaster,
     rxRead     => rxRead,

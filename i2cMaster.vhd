@@ -75,6 +75,9 @@ BEGIN
   BEGIN
     IF(reset_n = '0') THEN                --reset asserted
       stretch <= '0';
+      data_clk_prev <= '0';
+      scl_clk <= '0';
+      data_clk <= '0';
       count := 0;
     ELSIF(clk'EVENT AND clk = '1') THEN
       data_clk_prev <= data_clk;          --store previous value of data clock
@@ -111,6 +114,9 @@ BEGIN
     IF(reset_n = '0') THEN                 --reset asserted
       state <= ready;                      --return to initial state
       busy <= '1';                         --indicate not available
+      addr_rw <= (others => '0');
+      data_tx <= (others => '0');
+      data_rx <= (others => '0');
       scl_ena <= '0';                      --sets scl high impedance
       sda_int <= '1';                      --sets sda high impedance
       ack_error <= '0';                    --clear acknowledge error flag

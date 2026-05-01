@@ -62,7 +62,6 @@ architecture Behavioral of adc is
 
 	signal sdo_hg_des, sdo_lg_des : std_logic_vector(15 downto 0);
 	signal sdo_hglg : std_logic_vector(31 downto 0);
-	signal din : std_logic_vector(31 downto 0);
 
 	signal en_adc_sck, adc_sck_s, rstb_rd_s, rst_n : std_logic;
 	signal t0, trigger, trgFF, trigger_sft, trgSftFF,  holdext, trgEdge, trgSftEdge : std_logic;

@@ -54,30 +54,39 @@ signal sclkFF,
        sclkFall,
        csFF,
        csRise,
-       csFall,
        txPres,
        loadBuff,
        loadTxFifo,
        loadRxFifo,
+       rxRead,
+       txWrite,
        rxEna,
        rxEmpty,
        txEmpty,
        lastBit,
-       locRst     : std_logic;
-signal bitCount   : unsigned(3 downto 0);
+       rxRdRstBusy,
+       rxWrRstBusy,
+       txRdRstBusy,
+       txWrRstBusy,
+       locRst      : std_logic;
+signal bitCount    : unsigned(3 downto 0);
 signal buffIn,
        buffOut,
-       txFifoDout : std_logic_vector(7 downto 0);
+       txFifoDout  : std_logic_vector(7 downto 0);
 
 begin
+
+rxRead <= rx_read and not rxRdRstBusy;
+
+txWrite <= tx_write and not txWrRstBusy;
 
 lastBit    <= bitCount(bitCount'left);
 
 loadBuff   <= and_reduce(std_logic_vector(bitCount(2 downto 0)));
 
-loadRxFifo <= lastBit and rxEna;
+loadRxFifo <= lastBit and rxEna and not rxWrRstBusy;
 
-loadTxFifo <= lastBit;
+loadTxFifo <= lastBit and not txRdRstBusy;
 
 rx_present <= not rxEmpty;
 
@@ -197,11 +206,13 @@ port map(
     din           => buffIn,
     wr_en         => loadRxFifo,
     dout          => data_out,
-    rd_en         => rx_read,
+    rd_en         => rxRead,
     data_valid    => rx_valid,
     empty         => rxEmpty,
     full          => rx_full,
     prog_full     => rx_half_full,
+    rd_rst_busy   => rxRdRstBusy,
+    wr_rst_busy   => rxWrRstBusy,
     sleep         => '0',
     injectdbiterr => '0',
     injectsbiterr => '0'
@@ -221,13 +232,15 @@ port map(
     wr_clk        => clk,
     rst           => tx_reset,
     din           => data_in,
-    wr_en         => tx_write,
+    wr_en         => txWrite,
     dout          => txFifoDout,
     rd_en         => loadTxFifo,
     wr_ack        => tx_wr_ack,
     empty         => txEmpty,
     full          => tx_full,
     prog_full     => tx_half_full,
+    rd_rst_busy   => txRdRstBusy,
+    wr_rst_busy   => txWrRstBusy,
     sleep         => '0',
     injectdbiterr => '0',
     injectsbiterr => '0'
