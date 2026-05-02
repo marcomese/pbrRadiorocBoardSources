@@ -15,18 +15,15 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="50,337.500 ns"></ZoomStartTime>
-      <ZoomEndTime time="51,001.501 ns"></ZoomEndTime>
-      <Cursor1Time time="50,770.000 ns"></Cursor1Time>
+      <ZoomStartTime time="50,574.134 ns"></ZoomStartTime>
+      <ZoomEndTime time="50,729.335 ns"></ZoomEndTime>
+      <Cursor1Time time="50,600.000 ns"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="172"></NameColumnWidth>
-      <ValueColumnWidth column_width="112"></ValueColumnWidth>
+      <ValueColumnWidth column_width="104"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="22" />
-   <wave_markers>
-      <marker time="50570000" label="" />
-   </wave_markers>
+   <WVObjectSize size="25" />
    <wvobject fp_name="/tb_trgSampler/rst" type="logic">
       <obj_property name="ElementShortName">rst</obj_property>
       <obj_property name="ObjectShortName">rst</obj_property>
@@ -66,14 +63,27 @@
    <wvobject fp_name="/tb_trgSampler/uut/sampledTrg[0]" type="array">
       <obj_property name="ElementShortName">[0][31:0]</obj_property>
       <obj_property name="ObjectShortName">[0][31:0]</obj_property>
+      <obj_property name="Radix">BINARYRADIX</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_trgSampler/uut/cntNSAfterTrg" type="array">
       <obj_property name="ElementShortName">cntNSAfterTrg[16:0]</obj_property>
       <obj_property name="ObjectShortName">cntNSAfterTrg[16:0]</obj_property>
    </wvobject>
+   <wvobject fp_name="/tb_trgSampler/uut/sampledTrg[0]" type="array">
+      <obj_property name="ElementShortName">[0][31:0]</obj_property>
+      <obj_property name="ObjectShortName">[0][31:0]</obj_property>
+   </wvobject>
    <wvobject fp_name="/tb_trgSampler/uut/sampledTrg" type="array">
       <obj_property name="ElementShortName">sampledTrg[0:127][31:0]</obj_property>
       <obj_property name="ObjectShortName">sampledTrg[0:127][31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_trgSampler/uut/sampledTrgSnap[0]" type="array">
+      <obj_property name="ElementShortName">[0][31:0]</obj_property>
+      <obj_property name="ObjectShortName">[0][31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_trgSampler/uut/sampledTrgSnap" type="array">
+      <obj_property name="ElementShortName">sampledTrgSnap[0:127][31:0]</obj_property>
+      <obj_property name="ObjectShortName">sampledTrgSnap[0:127][31:0]</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_trgSampler/uut/cntNSAftTrgSig" type="logic">
       <obj_property name="ElementShortName">cntNSAftTrgSig</obj_property>

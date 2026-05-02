@@ -72,7 +72,7 @@ type state_t is (idle,
                  errAddr,
                  errReadOnly);
 
-type rateMeters_t is array(0 to trgNum-1) of unsigned(31 downto 0);
+type rateMeters_t is array(0 to trgNum-1) of std_logic_vector(31 downto 0);
 
 constant idleStatus     : std_logic_vector(31 downto 0) := initSlv(32, 13, 0, "00" & x"001", '0');
 constant errAddrStatus  : std_logic_vector(31 downto 0) := initSlv(32, 13, 0, "11" & x"500", '0');
@@ -169,7 +169,7 @@ begin
             rData(pipeAddr) <= pipeData;
         elsif snapEn = '1' then
             for i in 0 to trgNum-1 loop
-                rData(i+addrNum) <= std_logic_vector(trgMetersSnap(i));
+                rData(i+addrNum) <= trgMetersSnap(i);
             end loop;
         end if;
     end if;
@@ -257,18 +257,27 @@ end process;
 
 trgCntGen: for i in 0 to trgNum-1 generate
 begin
-    trgICnt: process(clk)
-    begin
-        if rising_edge(clk) then
-            if locRst = '1' then
-                trgMeters(i) <= (others => '0');
-            elsif cntTmrSig = '1' then
-                trgMeters(i) <= (others => '0');
-            elsif trgIn(i) = '1' then
-                trgMeters(i) <= trgMeters(i) + 1;
-            end if;
-        end if;
-    end process;
+    rateMeterDPSInst: entity work.rateMeterDSP
+    port map(
+        clk      => clk,
+        rst      => locRst,
+        trgIn    => trgIn(i),
+        clrIn    => cntTmrSig,
+        rateOut  => trgMeters(i),
+        overflow => open
+    );
+--    trgICnt: process(clk)
+--    begin
+--        if rising_edge(clk) then
+--            if locRst = '1' then
+--                trgMeters(i) <= (others => '0');
+--            elsif cntTmrSig = '1' then
+--                trgMeters(i) <= (others => '0');
+--            elsif trgIn(i) = '1' then
+--                trgMeters(i) <= trgMeters(i) + 1;
+--            end if;
+--        end if;
+--    end process;
 end generate;
 
 cntTmrSigProc: process(clk)

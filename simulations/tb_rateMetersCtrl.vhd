@@ -41,7 +41,7 @@ signal devBrstRst        : devStdLogic_t := (others => '0');
 signal devAddr           : devAddr_t    := (others => (others => '0'));
 signal devExec           : std_logic    := '0';
 signal dataToDev,
-       dataFromRM        : devData_t     := (others => (others => '0'));
+dataFromRM        : devData_t     := (others => (others => '0'));
 signal devDataInVec      : devDataVec_t  := (others => (others => (others => '0')));
 signal devReadyVec       : devStdLogic_t := (others => '0');
 signal devBusyVec        : devStdLogic_t := (others => '0');
@@ -54,71 +54,91 @@ signal txWrite           : std_logic                    := '0';
 signal txWrAck           : std_logic                    := '0';
 signal flushRxFifo       : std_logic                    := '0';
 signal rxEna             : std_logic                    := '1';
+signal overFlow          : std_logic                    := '1';
 signal readRq,
-       cs,
-       sclk,
-       miso,
-       mosi,
-       testTxWrite,
-       testRxRead,
-       testRxPresent,
-       devIntBusy,
-       devBrstRstRM,
-       rdValid        : std_logic                     := '0';
+cs,
+sclk,
+miso,
+mosi,
+testTxWrite,
+testRxRead,
+testRxPresent,
+devIntBusy,
+devBrstRstRM,
+rdValid        : std_logic                     := '0';
 signal dataToMaster,
-       testDataIn,
-       testDataOut,
-       testData,
-       dataFromMaster : std_logic_vector(7 downto 0)  := (others => '0');
+testDataIn,
+testDataOut,
+testData,
+dataFromMaster : std_logic_vector(7 downto 0)  := (others => '0');
 signal rdDataCnt      : std_logic_vector(15 downto 0) := (others => '0');
 signal id             : std_logic_vector(3 downto 0) := (others => '0');
-signal testMeter, testMeterL      : std_logic_vector(31 downto 0) := (others => '0');
+signal testMeter      : std_logic_vector(47 downto 0) := (others => '0');
 signal testT   : std_logic := '0';
 signal testRst : std_logic := '1';
+
+signal testMeterL : std_logic_vector(31 downto 0);
+
+signal testMeterM : std_logic_vector(47 downto 0) := (others => '0');
+
 begin
 
 stimProc: process
 begin
-    rst <= '1';
-    testRst <= '1';
-    wait for clkPeriod100M*5;
-    rst <= '0';
-    testRst <= '0';
-    id  <= "0110";
+rst <= '1';
+testRst <= '1';
+wait for clkPeriod100M*5;
+rst <= '0';
+testRst <= '0';
+id  <= "0110";
 
-    wait until rising_edge(clk_100M);
-    testT <= '1';
+
+wait until rising_edge(clk_100M);
+testT <= '1';
     
-    wait until rising_edge(clk_100M);
-    testT <= '0';
+wait until rising_edge(clk_100M);
+testT <= '0';
 
-    wait until rising_edge(clk_100M);
-    testT <= '1';
+wait until rising_edge(clk_100M);
+testT <= '1';
+
+wait until rising_edge(clk_100M);
+testT <= '0';
+
+wait until rising_edge(clk_100M);
+testRst <= '1';
+wait until rising_edge(clk_100M);
+testRst <= '0';
+
+wait until rising_edge(clk_100M);
+testT <= '1';
     
-    wait until rising_edge(clk_100M);
-    testT <= '0';
+wait until rising_edge(clk_100M);
+testT <= '0';
 
-    wait until rising_edge(clk_100M);
-    testT <= '1';
+wait for clkPeriod100M*4;
+testT <= '1';
+
+
+wait for clkPeriod100M*4;
+
+testT <= '0';
+
+wait until rising_edge(clk_100M);
+wait until rising_edge(clk_100M);
+wait until rising_edge(clk_100M);
+wait until rising_edge(clk_100M);
+wait until rising_edge(clk_100M);
+--testT <= '1';
     
-    wait until rising_edge(clk_100M);
-    testT <= '0';
+wait until rising_edge(clk_100M);
+testT <= '0';
 
-    testRst <= '1';
-    wait for clkPeriod100M;
-    testRst <= '0';
-
-    wait until rising_edge(clk_100M);
-    testT <= '1';
+wait until rising_edge(clk_100M);
+testT <= '1';
     
-    wait until rising_edge(clk_100M);
-    testT <= '0';
-
-    wait until rising_edge(clk_100M);
-    testT <= '1';
-    
-    wait until rising_edge(clk_100M);
-    testT <= '0';
+wait until rising_edge(clk_100M);
+testT <= '0';
 
 
 --    wait for 1 us;
@@ -172,210 +192,384 @@ begin
 
 --    wait for 350 ns;
 
-    testDataIn <= x"76";
-    wait for clkPeriod100M*delay;
-    testTxWrite <= '1';
-    wait for clkPeriod100M;
-    testTxWrite <= '0';
-    wait for clkPeriod100M*delay;
-    testDataIn <= x"56";
-    wait for clkPeriod100M*delay;
-    testTxWrite <= '1';
-    wait for clkPeriod100M;
-    testTxWrite <= '0';
-    wait for clkPeriod100M*delay;
-    testDataIn <= x"00";
-    testTxWrite <= '1';
-    wait for clkPeriod100M;
-    testTxWrite <= '0';
-    wait for clkPeriod100M*delay;
-    testDataIn <= x"01";
-    testTxWrite <= '1';
-    wait for clkPeriod100M;
-    testTxWrite <= '0';
-    testDataIn <= x"00";
-    testTxWrite <= '1';
-    wait for clkPeriod100M;
-    testTxWrite <= '0';
-    testDataIn <= x"00";
-    testTxWrite <= '1';
-    wait for clkPeriod100M;
-    testTxWrite <= '0';
-    testDataIn <= x"00";
-    testTxWrite <= '1';
-    wait for clkPeriod100M;
-    testTxWrite <= '0';
-    testDataIn <= x"09"; -- reset every 1e8*10ns = 1s
-    testTxWrite <= '1';
-    wait for clkPeriod100M;
-    testTxWrite <= '0';
-    wait for clkPeriod100M*delay;
+testDataIn <= x"76";
+wait for clkPeriod100M*delay;
+testTxWrite <= '1';
+wait for clkPeriod100M;
+testTxWrite <= '0';
+wait for clkPeriod100M*delay;
+testDataIn <= x"56";
+wait for clkPeriod100M*delay;
+testTxWrite <= '1';
+wait for clkPeriod100M;
+testTxWrite <= '0';
+wait for clkPeriod100M*delay;
+testDataIn <= x"00";
+testTxWrite <= '1';
+wait for clkPeriod100M;
+testTxWrite <= '0';
+wait for clkPeriod100M*delay;
+testDataIn <= x"01";
+testTxWrite <= '1';
+wait for clkPeriod100M;
+testTxWrite <= '0';
+testDataIn <= x"00";
+testTxWrite <= '1';
+wait for clkPeriod100M;
+testTxWrite <= '0';
+testDataIn <= x"00";
+testTxWrite <= '1';
+wait for clkPeriod100M;
+testTxWrite <= '0';
+testDataIn <= x"00";
+testTxWrite <= '1';
+wait for clkPeriod100M;
+testTxWrite <= '0';
+testDataIn <= x"09"; -- reset every 1e8*10ns = 1s
+testTxWrite <= '1';
+wait for clkPeriod100M;
+testTxWrite <= '0';
+wait for clkPeriod100M*delay;
 
-    wait for 50 us;
+wait for 50 us;
 
-    testDataIn <= x"76";
-    wait for clkPeriod100M*delay;
-    testTxWrite <= '1';
-    wait for clkPeriod100M;
-    testTxWrite <= '0';
-    wait for clkPeriod100M*delay;
-    testDataIn <= x"a6";
-    wait for clkPeriod100M*delay;
-    testTxWrite <= '1';
-    wait for clkPeriod100M;
-    testTxWrite <= '0';
-    wait for clkPeriod100M*delay;
-    testDataIn <= x"00";
-    testTxWrite <= '1';
-    wait for clkPeriod100M;
-    testTxWrite <= '0';
-    wait for clkPeriod100M*delay;
-    testDataIn <= x"01";
-    testTxWrite <= '1';
-    wait for clkPeriod100M;
-    testTxWrite <= '0';
+testDataIn <= x"76";
+wait for clkPeriod100M*delay;
+testTxWrite <= '1';
+wait for clkPeriod100M;
+testTxWrite <= '0';
+wait for clkPeriod100M*delay;
+testDataIn <= x"a6";
+wait for clkPeriod100M*delay;
+testTxWrite <= '1';
+wait for clkPeriod100M;
+testTxWrite <= '0';
+wait for clkPeriod100M*delay;
+testDataIn <= x"00";
+testTxWrite <= '1';
+wait for clkPeriod100M;
+testTxWrite <= '0';
+wait for clkPeriod100M*delay;
+testDataIn <= x"01";
+testTxWrite <= '1';
+wait for clkPeriod100M;
+testTxWrite <= '0';
 
-    wait for 500 ns;
+wait for 500 ns;
     
-    wait until rising_edge(clk_100M);
-    t(trgNum-1) <= '1';
-    t(0)        <= '1';
+wait until rising_edge(clk_100M);
+t(trgNum-1) <= '1';
+t(0)        <= '1';
     
-    wait until rising_edge(clk_100M);
-    t(trgNum-1) <= '0';
-    t(0)        <= '0';
+wait until rising_edge(clk_100M);
+t(trgNum-1) <= '0';
+t(0)        <= '0';
 
-    wait until rising_edge(clk_100M);
-    wait until rising_edge(clk_100M);
-    t(trgNum-1) <= '1';
-    t(0)        <= '1';
+wait until rising_edge(clk_100M);
+wait until rising_edge(clk_100M);
+t(trgNum-1) <= '1';
+t(0)        <= '1';
     
-    wait until rising_edge(clk_100M);
-    t(trgNum-1) <= '0';
-    t(0)        <= '0';
+wait until rising_edge(clk_100M);
+t(trgNum-1) <= '0';
+t(0)        <= '0';
 
-    wait until rising_edge(clk_100M);
-    wait until rising_edge(clk_100M);
-    t(trgNum-1) <= '1';
-    t(0)        <= '1';
+wait until rising_edge(clk_100M);
+wait until rising_edge(clk_100M);
+t(trgNum-1) <= '1';
+t(0)        <= '1';
     
-    wait until rising_edge(clk_100M);
-    t(trgNum-1) <= '0';
-    t(0)        <= '0';
+wait until rising_edge(clk_100M);
+t(trgNum-1) <= '0';
+t(0)        <= '0';
  
-    wait for clkPeriod100M;
+wait for clkPeriod100M;
 
-    testDataIn <= x"76";
-    wait for clkPeriod100M*delay;
-    testTxWrite <= '1';
-    wait for clkPeriod100M;
-    testTxWrite <= '0';
-    wait for clkPeriod100M*delay;
-    testDataIn <= x"a6";
-    wait for clkPeriod100M*delay;
-    testTxWrite <= '1';
-    wait for clkPeriod100M;
-    testTxWrite <= '0';
-    wait for clkPeriod100M*delay;
-    testDataIn <= x"00";
-    testTxWrite <= '1';
-    wait for clkPeriod100M;
-    testTxWrite <= '0';
-    wait for clkPeriod100M*delay;
-    testDataIn <= x"02";
-    testTxWrite <= '1';
-    wait for clkPeriod100M;
-    testTxWrite <= '0';
+testDataIn <= x"76";
+wait for clkPeriod100M*delay;
+testTxWrite <= '1';
+wait for clkPeriod100M;
+testTxWrite <= '0';
+wait for clkPeriod100M*delay;
+testDataIn <= x"a6";
+wait for clkPeriod100M*delay;
+testTxWrite <= '1';
+wait for clkPeriod100M;
+testTxWrite <= '0';
+wait for clkPeriod100M*delay;
+testDataIn <= x"00";
+testTxWrite <= '1';
+wait for clkPeriod100M;
+testTxWrite <= '0';
+wait for clkPeriod100M*delay;
+testDataIn <= x"02";
+testTxWrite <= '1';
+wait for clkPeriod100M;
+testTxWrite <= '0';
 
-    wait for 1 us;
+wait for 1 us;
 
-    testDataIn <= x"76";
-    wait for clkPeriod100M*delay;
-    testTxWrite <= '1';
-    wait for clkPeriod100M;
-    testTxWrite <= '0';
-    wait for clkPeriod100M*delay;
-    testDataIn <= x"a6";
-    wait for clkPeriod100M*delay;
-    testTxWrite <= '1';
-    wait for clkPeriod100M;
-    testTxWrite <= '0';
-    wait for clkPeriod100M*delay;
-    testDataIn <= x"00";
-    testTxWrite <= '1';
-    wait for clkPeriod100M;
-    testTxWrite <= '0';
-    wait for clkPeriod100M*delay;
-    testDataIn <= x"70";
-    testTxWrite <= '1';
-    wait for clkPeriod100M;
-    testTxWrite <= '0';
+testDataIn <= x"76";
+wait for clkPeriod100M*delay;
+testTxWrite <= '1';
+wait for clkPeriod100M;
+testTxWrite <= '0';
+wait for clkPeriod100M*delay;
+testDataIn <= x"a6";
+wait for clkPeriod100M*delay;
+testTxWrite <= '1';
+wait for clkPeriod100M;
+testTxWrite <= '0';
+wait for clkPeriod100M*delay;
+testDataIn <= x"00";
+testTxWrite <= '1';
+wait for clkPeriod100M;
+testTxWrite <= '0';
+wait for clkPeriod100M*delay;
+testDataIn <= x"70";
+testTxWrite <= '1';
+wait for clkPeriod100M;
+testTxWrite <= '0';
 
-    wait for 500 ns;
+wait for 500 ns;
 
-    testDataIn <= x"76";
-    wait for clkPeriod100M*delay;
-    testTxWrite <= '1';
-    wait for clkPeriod100M;
-    testTxWrite <= '0';
-    wait for clkPeriod100M*delay;
-    testDataIn <= x"a6";
-    wait for clkPeriod100M*delay;
-    testTxWrite <= '1';
-    wait for clkPeriod100M;
-    testTxWrite <= '0';
-    wait for clkPeriod100M*delay;
-    testDataIn <= x"00";
-    testTxWrite <= '1';
-    wait for clkPeriod100M;
-    testTxWrite <= '0';
-    wait for clkPeriod100M*delay;
-    testDataIn <= x"71";
-    testTxWrite <= '1';
-    wait for clkPeriod100M;
-    testTxWrite <= '0';
+testDataIn <= x"76";
+wait for clkPeriod100M*delay;
+testTxWrite <= '1';
+wait for clkPeriod100M;
+testTxWrite <= '0';
+wait for clkPeriod100M*delay;
+testDataIn <= x"a6";
+wait for clkPeriod100M*delay;
+testTxWrite <= '1';
+wait for clkPeriod100M;
+testTxWrite <= '0';
+wait for clkPeriod100M*delay;
+testDataIn <= x"00";
+testTxWrite <= '1';
+wait for clkPeriod100M;
+testTxWrite <= '0';
+wait for clkPeriod100M*delay;
+testDataIn <= x"71";
+testTxWrite <= '1';
+wait for clkPeriod100M;
+testTxWrite <= '0';
 
-    wait for 500 ns;
+wait for 500 ns;
 
-    wait;
+wait;
 end process;
 
-testCntInst: COUNTER_TC_MACRO
-generic map(
-    COUNT_BY      => X"000000000001",
-    DEVICE        => "7SERIES",
-    DIRECTION     => "UP",
-    RESET_UPON_TC => "FALSE",
-    TC_VALUE      => X"000000000000",
-    WIDTH_DATA    => 32
-)
+rateMeterDPSInst: entity work.rateMeterDSP
 port map(
-    CLK => clk_100M,
-    RST => testRst,
-    Q   => testMeter,
-    CE  => testT
+    clk      => clk_100M,
+    rst      => rst,
+    trgIn    => testT,
+    clrIn    => testRst,
+    rateOut  => testMeterL,
+    overflow => overFlow
+);
+
+DSP48E1_inst : DSP48E1
+generic map (
+    A_INPUT             => "DIRECT",
+    B_INPUT             => "DIRECT",
+    USE_DPORT           => FALSE,
+    USE_MULT            => "NONE",
+    USE_SIMD            => "ONE48",
+    AUTORESET_PATDET    => "NO_RESET",
+    MASK                => X"3fffffffffff",
+    PATTERN             => X"000000000000",
+    SEL_MASK            => "MASK",
+    SEL_PATTERN         => "PATTERN",
+    USE_PATTERN_DETECT  => "NO_PATDET",
+    ACASCREG            => 1,
+    ADREG               => 1,
+    ALUMODEREG          => 1,
+    AREG                => 1,
+    BCASCREG            => 1,
+    BREG                => 1,
+    CARRYINREG          => 0,
+    CARRYINSELREG       => 1,
+    CREG                => 1,
+    DREG                => 1,
+    INMODEREG           => 1,
+    MREG                => 0,
+    OPMODEREG           => 1,
+    PREG                => 1
+)
+port map (
+    ACOUT          => open,
+    BCOUT          => open,
+    CARRYCASCOUT   => open,
+    MULTSIGNOUT    => open,
+    PCOUT          => open,
+    OVERFLOW       => open,
+    PATTERNBDETECT => open,
+    PATTERNDETECT  => open,
+    UNDERFLOW      => open,
+    CARRYOUT       => open,
+
+    P              => testMeterM,
+
+    ACIN           => (others => '0'),
+    BCIN           => (others => '0'),
+    CARRYCASCIN    => '0',
+    MULTSIGNIN     => '0',
+    PCIN           => (others => '0'),
+
+    ALUMODE        => "0000",
+    CARRYINSEL     => "000",
+    CLK            => clk_100M,
+    INMODE         => "00000",
+    OPMODE         => "0100000",
+
+    A              => (others => '0'),
+    B              => (others => '0'),
+    C              => (others => '0'),
+    CARRYIN        => testT,
+    D              => (others => '0'),
+
+    CEA1           => '0',
+    CEA2           => '0',
+    CEAD           => '0',
+    CEALUMODE      => '1',
+    CEB1           => '0',
+    CEB2           => '0',
+    CEC            => '0',
+    CECARRYIN      => '1', 
+    CECTRL         => '1',
+    CED            => '0',
+    CEINMODE       => '1',
+    CEM            => '0',
+    CEP            => '1', 
+    RSTA           => '0',
+    RSTALLCARRYIN  => '0',
+    RSTALUMODE     => '0',
+    RSTB           => '0',
+    RSTC           => '0',
+    RSTCTRL        => '0',
+    RSTD           => '0',
+    RSTINMODE      => '0',
+    RSTM           => '0',
+    RSTP           => testRst
+);
+
+DSP48E1_inst2 : DSP48E1
+generic map (
+    -- Data path
+    A_INPUT             => "DIRECT",
+    B_INPUT             => "DIRECT",
+    USE_DPORT           => FALSE,
+    USE_MULT            => "NONE",
+    USE_SIMD            => "ONE48",
+    -- Pattern detector (non usato)
+    AUTORESET_PATDET    => "NO_RESET",
+    MASK                => X"3fffffffffff",
+    PATTERN             => X"000000000000",
+    SEL_MASK            => "MASK",
+    SEL_PATTERN         => "PATTERN",
+    USE_PATTERN_DETECT  => "NO_PATDET",
+    -- Pipeline registers
+    ACASCREG            => 1,
+    ADREG               => 1,
+    ALUMODEREG          => 1,
+    AREG                => 1,
+    BCASCREG            => 1,
+    BREG                => 1,
+    CARRYINREG          => 1,
+    CARRYINSELREG       => 1,
+    CREG                => 1,
+    DREG                => 1,
+    INMODEREG           => 1,
+    MREG                => 0,
+    OPMODEREG           => 1,
+    PREG                => 1
+)
+port map (
+    -- Cascade outputs (non usati)
+    ACOUT          => open,
+    BCOUT          => open,
+    CARRYCASCOUT   => open,
+    MULTSIGNOUT    => open,
+    PCOUT          => open,
+    OVERFLOW       => open,
+    PATTERNBDETECT => open,
+    PATTERNDETECT  => open,
+    UNDERFLOW      => open,
+    CARRYOUT       => open,
+
+    -- Output: somma
+    P              => testMeter,
+
+    -- Cascade inputs (non usati)
+    ACIN           => (others => '0'),
+    BCIN           => (others => '0'),
+    CARRYCASCIN    => '0',
+    MULTSIGNIN     => '0',
+    PCIN           => (others => '0'),
+
+    -- Control
+    ALUMODE        => "0000",
+    CARRYINSEL     => "000",
+    CLK            => clk_100M,
+    INMODE         => "00000",
+    OPMODE         => "0100000",
+
+    -- Data inputs (tutti zero, somma solo +1 via CARRYIN)
+    A              => (others => '0'),
+    B              => (others => '0'),
+    C              => (others => '0'),
+    CARRYIN        => '1',
+    D              => (others => '0'),
+
+    -- Clock enables
+    CEA1           => '0',
+    CEA2           => '0',
+    CEAD           => '0',
+    CEALUMODE      => '1',
+    CEB1           => '0',
+    CEB2           => '0',
+    CEC            => '0',
+    CECARRYIN      => '1',
+    CECTRL         => '1',
+    CED            => '0',
+    CEINMODE       => '1',
+    CEM            => '0',
+    CEP            => testT,
+    -- Resets
+    RSTA           => '0',
+    RSTALLCARRYIN  => '0',
+    RSTALUMODE     => '0',
+    RSTB           => '0',
+    RSTC           => '0',
+    RSTCTRL        => '0',
+    RSTD           => '0',
+    RSTINMODE      => '0',
+    RSTM           => '0',
+    RSTP           => testRst
 );
 
 uut: entity work.rateMetersCtrl
 generic map(
-    trgNum     => trgNum
+trgNum     => trgNum
 )
 port map(
-    clk        => clk_100M,
-    rst        => rst,
-    trgIn      => t,
-    devExec    => devExec,
-    devId      => devId,
-    devRw      => devRw,
-    devBrst    => devBrst,
-    devBrstWrt => devBrstWrt,
-    devBrstSnd => devBrstSnd,
-    devBrstRst => devBrstRstRM,
-    devAddr    => devAddr,
-    devDataIn  => dataToDev,
-    devDataOut => dataFromRM,
-    devReady   => devReadyRM,
-    busy       => rmBusy
+clk        => clk_100M,
+rst        => rst,
+trgIn      => t,
+devExec    => devExec,
+devId      => devId,
+devRw      => devRw,
+devBrst    => devBrst,
+devBrstWrt => devBrstWrt,
+devBrstSnd => devBrstSnd,
+devBrstRst => devBrstRstRM,
+devAddr    => devAddr,
+devDataIn  => dataToDev,
+devDataOut => dataFromRM,
+devReady   => devReadyRM,
+busy       => rmBusy
 );
 
 clk_100M <= not clk_100M after clkPeriod100M/2;
@@ -387,98 +581,98 @@ devBrstRst(rateMeters)   <= devBrstRstRM;
 
 devInterfInst: entity work.deviceInterface
 generic map(
-    clkFreq      => clkFreq,
-    timeout      => timeout,
-    idHeader     => idHeader,
-    broadcastId  => broadcastId,
-    readCmd      => readCmd,
-    writeCmd     => writeCmd,
-    burstWrCmd   => burstWrCmd,
-    burstRdCmd   => burstRdCmd,
-    maxBrstLen   => maxBrstLen
+clkFreq      => clkFreq,
+timeout      => timeout,
+idHeader     => idHeader,
+broadcastId  => broadcastId,
+readCmd      => readCmd,
+writeCmd     => writeCmd,
+burstWrCmd   => burstWrCmd,
+burstRdCmd   => burstRdCmd,
+maxBrstLen   => maxBrstLen
 )
 port map(
-    clk          => clk_100M,
-    rst          => rst,
-    id           => id,
-    dataIn       => dataFromMaster,
-    dataOut      => dataToMaster,
-    rxRead       => rxRead,
-    rxPresent    => rxPresent,
-    rxValid      => rxValid,
-    txWrite      => txWrite,
-    rxEna        => rxEna,
-    txWrAck      => txWrAck,
-    flushRxFifo  => flushRxFifo,
-    devId        => devId,
-    devReady     => devReadyVec,
-    devBusy      => devBusyVec,
-    devRw        => devRw,
-    devBrst      => devBrst,
-    devBrstWrt   => devBrstWrt,
-    devBrstSnd   => devBrstSnd,
-    devBrstRst   => devBrstRst,
-    devAddr      => devAddr,
-    devDataIn    => devDataInVec,
-    devDataOut   => dataToDev,
-    devExec      => devExec,
-    busy         => devIntBusy,
-    error        => error
+clk          => clk_100M,
+rst          => rst,
+id           => id,
+dataIn       => dataFromMaster,
+dataOut      => dataToMaster,
+rxRead       => rxRead,
+rxPresent    => rxPresent,
+rxValid      => rxValid,
+txWrite      => txWrite,
+rxEna        => rxEna,
+txWrAck      => txWrAck,
+flushRxFifo  => flushRxFifo,
+devId        => devId,
+devReady     => devReadyVec,
+devBusy      => devBusyVec,
+devRw        => devRw,
+devBrst      => devBrst,
+devBrstWrt   => devBrstWrt,
+devBrstSnd   => devBrstSnd,
+devBrstRst   => devBrstRst,
+devAddr      => devAddr,
+devDataIn    => devDataInVec,
+devDataOut   => dataToDev,
+devExec      => devExec,
+busy         => devIntBusy,
+error        => error
 );
 
 spiSlaveInst: entity work.SPISlave
 generic map(
-    maxBrstLen   => maxBrstLen
+maxBrstLen   => maxBrstLen
 )
 port map(
-    clk          => clk_100M,
-    rst          => rst,
-    data_out     => dataFromMaster,
-    data_in      => dataToMaster,
-    rx_read      => rxRead,
-    rx_ena       => rxEna,
-    rx_present   => rxPresent,
-    rx_valid     => rxValid,
-    rx_half_full => open,
-    rx_full      => open,
-    tx_write     => txWrite,
-    tx_present   => readRq,
-    tx_half_full => open,
-    tx_full      => open,
-    tx_wr_ack    => txWrAck,
-    rx_reset     => flushRxFifo,
-    tx_reset     => rst,
-    cs           => cs,
-    sclk         => sclk,
-    miso         => miso,
-    mosi         => mosi
+clk          => clk_100M,
+rst          => rst,
+data_out     => dataFromMaster,
+data_in      => dataToMaster,
+rx_read      => rxRead,
+rx_ena       => rxEna,
+rx_present   => rxPresent,
+rx_valid     => rxValid,
+rx_half_full => open,
+rx_full      => open,
+tx_write     => txWrite,
+tx_present   => readRq,
+tx_half_full => open,
+tx_full      => open,
+tx_wr_ack    => txWrAck,
+rx_reset     => flushRxFifo,
+tx_reset     => rst,
+cs           => cs,
+sclk         => sclk,
+miso         => miso,
+mosi         => mosi
 );
 
 spiInst: entity work.SPIMaster
 generic map(
-    clkFreq      => clkFreq,
-    sclkFreq     => sclkFreq
+clkFreq      => clkFreq,
+sclkFreq     => sclkFreq
 )
 port map(
-    clk          => clk_100M,
-    rst          => rst,
-    data_out     => testDataOut,
-    data_in      => testDataIn,
-    rx_read      => testRxRead,
-    rx_present   => testRxPresent,
-    rx_half_full => open,
-    rx_full      => open,
-    tx_write     => testTxWrite,
-    tx_present   => open,
-    tx_half_full => open,
-    tx_full      => open,
-    rx_reset     => rst,
-    tx_reset     => rst,
-    read_rq      => readRq,
-    cs           => cs,
-    sclk         => sclk,
-    miso         => miso,
-    mosi         => mosi
+clk          => clk_100M,
+rst          => rst,
+data_out     => testDataOut,
+data_in      => testDataIn,
+rx_read      => testRxRead,
+rx_present   => testRxPresent,
+rx_half_full => open,
+rx_full      => open,
+tx_write     => testTxWrite,
+tx_present   => open,
+tx_half_full => open,
+tx_full      => open,
+rx_reset     => rst,
+tx_reset     => rst,
+read_rq      => readRq,
+cs           => cs,
+sclk         => sclk,
+miso         => miso,
+mosi         => mosi
 );
 
 end Behavioral;

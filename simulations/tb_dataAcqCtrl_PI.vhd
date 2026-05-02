@@ -75,8 +75,7 @@ begin
 
     -- Differential clock generation (200 MHz)
     sysClk_p <= not sysClk_p after clkPeriod200M/2;
-    sysClk_n <= not sysClk_n after clkPeriod200M/2;
-    sysClk_n <= not sysClk_p;  -- ensure complementary
+    sysClk_n <= not sysClk_p;
 
     -- SPI single-ended to differential
     cs_p   <= cs_se;

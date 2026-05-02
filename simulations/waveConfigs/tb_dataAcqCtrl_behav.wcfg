@@ -3,269 +3,125 @@
    <wave_state>
    </wave_state>
    <db_ref_list>
-      <db_ref path="tb_dataAcqCtrl_PI_time_synth.wdb" id="1">
+      <db_ref path="tb_dataAcqCtrl_PI_time_impl.wdb" id="1">
          <top_modules>
-            <top_module name="devicespkg" />
             <top_module name="glbl" />
-            <top_module name="registerspkg" />
             <top_module name="tb_dataAcqCtrl_PI" />
-            <top_module name="utilspkg" />
-            <top_module name="vcomponents" />
          </top_modules>
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="0.000000 us"></ZoomStartTime>
-      <ZoomEndTime time="16.000001 us"></ZoomEndTime>
-      <Cursor1Time time="8.070000 us"></Cursor1Time>
+      <ZoomStartTime time="4.653613 us"></ZoomStartTime>
+      <ZoomEndTime time="13.263614 us"></ZoomEndTime>
+      <Cursor1Time time="9.750000 us"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
-      <NameColumnWidth column_width="119"></NameColumnWidth>
+      <NameColumnWidth column_width="107"></NameColumnWidth>
       <ValueColumnWidth column_width="58"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="61" />
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/spiSlaveInst/rst" type="logic">
-      <obj_property name="ElementShortName">rst</obj_property>
-      <obj_property name="ObjectShortName">rst</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/spiSlaveInst/clk" type="logic">
-      <obj_property name="ElementShortName">clk</obj_property>
-      <obj_property name="ObjectShortName">clk</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/spiSlaveInst/rxFifoInst/wr_clk" type="logic">
-      <obj_property name="ElementShortName">wr_clk</obj_property>
-      <obj_property name="ObjectShortName">wr_clk</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/spiSlaveInst/data_out" type="array">
-      <obj_property name="ElementShortName">data_out[7:0]</obj_property>
-      <obj_property name="ObjectShortName">data_out[7:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/spiSlaveInst/data_in" type="array">
-      <obj_property name="ElementShortName">data_in[7:0]</obj_property>
-      <obj_property name="ObjectShortName">data_in[7:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/spiSlaveInst/rx_read" type="logic">
-      <obj_property name="ElementShortName">rx_read</obj_property>
-      <obj_property name="ObjectShortName">rx_read</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/spiSlaveInst/rxFifoInst/empty" type="logic">
-      <obj_property name="ElementShortName">empty</obj_property>
-      <obj_property name="ObjectShortName">empty</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/spiSlaveInst/rx_ena" type="logic">
-      <obj_property name="ElementShortName">rx_ena</obj_property>
-      <obj_property name="ObjectShortName">rx_ena</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/spiSlaveInst/rx_present" type="logic">
-      <obj_property name="ElementShortName">rx_present</obj_property>
-      <obj_property name="ObjectShortName">rx_present</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/spiSlaveInst/rx_valid" type="logic">
-      <obj_property name="ElementShortName">rx_valid</obj_property>
-      <obj_property name="ObjectShortName">rx_valid</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/spiSlaveInst/tx_write" type="logic">
-      <obj_property name="ElementShortName">tx_write</obj_property>
-      <obj_property name="ObjectShortName">tx_write</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/spiSlaveInst/tx_present" type="logic">
-      <obj_property name="ElementShortName">tx_present</obj_property>
-      <obj_property name="ObjectShortName">tx_present</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/spiSlaveInst/tx_wr_ack" type="logic">
-      <obj_property name="ElementShortName">tx_wr_ack</obj_property>
-      <obj_property name="ObjectShortName">tx_wr_ack</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/spiSlaveInst/rx_reset" type="logic">
-      <obj_property name="ElementShortName">rx_reset</obj_property>
-      <obj_property name="ObjectShortName">rx_reset</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/spiSlaveInst/tx_reset" type="logic">
-      <obj_property name="ElementShortName">tx_reset</obj_property>
-      <obj_property name="ObjectShortName">tx_reset</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/spiSlaveInst/cs" type="logic">
-      <obj_property name="ElementShortName">cs</obj_property>
-      <obj_property name="ObjectShortName">cs</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/spiSlaveInst/sclk" type="logic">
-      <obj_property name="ElementShortName">sclk</obj_property>
-      <obj_property name="ObjectShortName">sclk</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/spiSlaveInst/miso" type="logic">
-      <obj_property name="ElementShortName">miso</obj_property>
-      <obj_property name="ObjectShortName">miso</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/spiSlaveInst/mosi" type="logic">
-      <obj_property name="ElementShortName">mosi</obj_property>
-      <obj_property name="ObjectShortName">mosi</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/spiSlaveInst/sclkFF" type="logic">
-      <obj_property name="ElementShortName">sclkFF</obj_property>
-      <obj_property name="ObjectShortName">sclkFF</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/spiSlaveInst/sclkRise" type="logic">
-      <obj_property name="ElementShortName">sclkRise</obj_property>
-      <obj_property name="ObjectShortName">sclkRise</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/spiSlaveInst/sclkFall" type="logic">
-      <obj_property name="ElementShortName">sclkFall</obj_property>
-      <obj_property name="ObjectShortName">sclkFall</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/spiSlaveInst/csFF" type="logic">
-      <obj_property name="ElementShortName">csFF</obj_property>
-      <obj_property name="ObjectShortName">csFF</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/spiSlaveInst/csRise" type="logic">
-      <obj_property name="ElementShortName">csRise</obj_property>
-      <obj_property name="ObjectShortName">csRise</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/spiSlaveInst/txPres" type="logic">
-      <obj_property name="ElementShortName">txPres</obj_property>
-      <obj_property name="ObjectShortName">txPres</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/spiSlaveInst/loadBuff" type="logic">
-      <obj_property name="ElementShortName">loadBuff</obj_property>
-      <obj_property name="ObjectShortName">loadBuff</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/spiSlaveInst/loadTxFifo" type="logic">
-      <obj_property name="ElementShortName">loadTxFifo</obj_property>
-      <obj_property name="ObjectShortName">loadTxFifo</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/spiSlaveInst/bitCount" type="array">
-      <obj_property name="ElementShortName">bitCount[3:0]</obj_property>
-      <obj_property name="ObjectShortName">bitCount[3:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/spiSlaveInst/loadRxFifo" type="logic">
-      <obj_property name="ElementShortName">loadRxFifo</obj_property>
-      <obj_property name="ObjectShortName">loadRxFifo</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/spiSlaveInst/rxEna" type="logic">
-      <obj_property name="ElementShortName">rxEna</obj_property>
-      <obj_property name="ObjectShortName">rxEna</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/spiSlaveInst/clk" type="logic">
-      <obj_property name="ElementShortName">clk</obj_property>
-      <obj_property name="ObjectShortName">clk</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/spiSlaveInst/rxFifoInst/wr_data_count" type="array">
-      <obj_property name="ElementShortName">wr_data_count[0:0]</obj_property>
-      <obj_property name="ObjectShortName">wr_data_count[0:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/spiSlaveInst/rxFifoInst/rd_data_count" type="array">
-      <obj_property name="ElementShortName">rd_data_count[0:0]</obj_property>
-      <obj_property name="ObjectShortName">rd_data_count[0:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/devInterfInst/rxPresent" type="logic">
-      <obj_property name="ElementShortName">rxPresent</obj_property>
-      <obj_property name="ObjectShortName">rxPresent</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/spiSlaveInst/rxEmpty" type="logic">
-      <obj_property name="ElementShortName">rxEmpty</obj_property>
-      <obj_property name="ObjectShortName">rxEmpty</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/spiSlaveInst/rxFifoInst/wr_clk" type="logic">
-      <obj_property name="ElementShortName">wr_clk</obj_property>
-      <obj_property name="ObjectShortName">wr_clk</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/spiSlaveInst/rxFifoInst/xpm_fifo_base_inst/rd_clk" type="logic">
-      <obj_property name="ElementShortName">rd_clk</obj_property>
-      <obj_property name="ObjectShortName">rd_clk</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/spiSlaveInst/rxFifoInst/data_valid" type="logic">
-      <obj_property name="ElementShortName">data_valid</obj_property>
-      <obj_property name="ObjectShortName">data_valid</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/spiSlaveInst/rxFifoInst/dout" type="array">
-      <obj_property name="ElementShortName">dout[7:0]</obj_property>
-      <obj_property name="ObjectShortName">dout[7:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/devInterfInst/state" type="other">
-      <obj_property name="ElementShortName">state</obj_property>
-      <obj_property name="ObjectShortName">state</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/spiSlaveInst/rxFifoInst/rd_en" type="logic">
-      <obj_property name="ElementShortName">rd_en</obj_property>
-      <obj_property name="ObjectShortName">rd_en</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/spiSlaveInst/rxFifoInst/wr_rst_busy" type="logic">
+   <WVObjectSize size="26" />
+   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/spiSlaveInst/rxFifoInst/wr_rst_busy" type="logic">
       <obj_property name="ElementShortName">wr_rst_busy</obj_property>
       <obj_property name="ObjectShortName">wr_rst_busy</obj_property>
    </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/spiSlaveInst/rxFifoInst/rd_rst_busy" type="logic">
-      <obj_property name="ElementShortName">rd_rst_busy</obj_property>
-      <obj_property name="ObjectShortName">rd_rst_busy</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/spiSlaveInst/rxRdRstBusy" type="logic">
-      <obj_property name="ElementShortName">rxRdRstBusy</obj_property>
-      <obj_property name="ObjectShortName">rxRdRstBusy</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/spiSlaveInst/rxWrRstBusy" type="logic">
-      <obj_property name="ElementShortName">rxWrRstBusy</obj_property>
-      <obj_property name="ObjectShortName">rxWrRstBusy</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/spiSlaveInst/txRdRstBusy" type="logic">
-      <obj_property name="ElementShortName">txRdRstBusy</obj_property>
-      <obj_property name="ObjectShortName">txRdRstBusy</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/spiSlaveInst/txWrRstBusy" type="logic">
-      <obj_property name="ElementShortName">txWrRstBusy</obj_property>
-      <obj_property name="ObjectShortName">txWrRstBusy</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/spiSlaveInst/rxFifoInst/data_valid" type="logic">
+   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/spiSlaveInst/rxFifoInst/data_valid" type="logic">
       <obj_property name="ElementShortName">data_valid</obj_property>
       <obj_property name="ObjectShortName">data_valid</obj_property>
    </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/spiSlaveInst/rxFifoInst/wr_en" type="logic">
-      <obj_property name="ElementShortName">wr_en</obj_property>
-      <obj_property name="ObjectShortName">wr_en</obj_property>
+   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/spiSlaveInst/rxFifoInst/din" type="array">
+      <obj_property name="ElementShortName">din[7:0]</obj_property>
+      <obj_property name="ObjectShortName">din[7:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/spiSlaveInst/rxFifoInst/dout" type="array">
+   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/spiSlaveInst/rxFifoInst/dout" type="array">
       <obj_property name="ElementShortName">dout[7:0]</obj_property>
       <obj_property name="ObjectShortName">dout[7:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/spiSlaveInst/txEmpty" type="logic">
-      <obj_property name="ElementShortName">txEmpty</obj_property>
-      <obj_property name="ObjectShortName">txEmpty</obj_property>
+   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/spiSlaveInst/rxFifoInst/empty" type="logic">
+      <obj_property name="ElementShortName">empty</obj_property>
+      <obj_property name="ObjectShortName">empty</obj_property>
    </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/spiSlaveInst/lastBit" type="logic">
-      <obj_property name="ElementShortName">lastBit</obj_property>
-      <obj_property name="ObjectShortName">lastBit</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/spiSlaveInst/rxFifoInst/wr_en" type="logic">
-      <obj_property name="ElementShortName">wr_en</obj_property>
-      <obj_property name="ObjectShortName">wr_en</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/spiSlaveInst/rxFifoInst/rd_en" type="logic">
+   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/spiSlaveInst/rxFifoInst/rd_en" type="logic">
       <obj_property name="ElementShortName">rd_en</obj_property>
       <obj_property name="ObjectShortName">rd_en</obj_property>
    </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/spiSlaveInst/rxFifoInst/wr_ack" type="logic">
-      <obj_property name="ElementShortName">wr_ack</obj_property>
-      <obj_property name="ObjectShortName">wr_ack</obj_property>
+   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/spiSlaveInst/rxFifoInst/rd_rst_busy" type="logic">
+      <obj_property name="ElementShortName">rd_rst_busy</obj_property>
+      <obj_property name="ObjectShortName">rd_rst_busy</obj_property>
    </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/spiSlaveInst/locRst" type="logic">
-      <obj_property name="ElementShortName">locRst</obj_property>
-      <obj_property name="ObjectShortName">locRst</obj_property>
+   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/spiSlaveInst/rxFifoInst/rst" type="logic">
+      <obj_property name="ElementShortName">rst</obj_property>
+      <obj_property name="ObjectShortName">rst</obj_property>
    </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/spiSlaveInst/bitCount" type="array">
-      <obj_property name="ElementShortName">bitCount[3:0]</obj_property>
-      <obj_property name="ObjectShortName">bitCount[3:0]</obj_property>
+   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/spiSlaveInst/rxFifoInst/wr_clk" type="logic">
+      <obj_property name="ElementShortName">wr_clk</obj_property>
+      <obj_property name="ObjectShortName">wr_clk</obj_property>
    </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/spiSlaveInst/buffIn" type="array">
-      <obj_property name="ElementShortName">buffIn[7:0]</obj_property>
-      <obj_property name="ObjectShortName">buffIn[7:0]</obj_property>
+   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/spiSlaveInst/rxFifoInst/wr_en" type="logic">
+      <obj_property name="ElementShortName">wr_en</obj_property>
+      <obj_property name="ObjectShortName">wr_en</obj_property>
    </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/spiSlaveInst/buffOut" type="array">
-      <obj_property name="ElementShortName">buffOut[7:0]</obj_property>
-      <obj_property name="ObjectShortName">buffOut[7:0]</obj_property>
+   <wvobject fp_name="/tb_dataAcqCtrl_PI/cs_se" type="logic">
+      <obj_property name="ElementShortName">cs_se</obj_property>
+      <obj_property name="ObjectShortName">cs_se</obj_property>
    </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/spiSlaveInst/txFifoDout" type="array">
-      <obj_property name="ElementShortName">txFifoDout[7:0]</obj_property>
-      <obj_property name="ObjectShortName">txFifoDout[7:0]</obj_property>
+   <wvobject fp_name="/tb_dataAcqCtrl_PI/sclk_se" type="logic">
+      <obj_property name="ElementShortName">sclk_se</obj_property>
+      <obj_property name="ObjectShortName">sclk_se</obj_property>
    </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/spiSlaveInst/maxBrstLen" type="other">
-      <obj_property name="ElementShortName">maxBrstLen</obj_property>
-      <obj_property name="ObjectShortName">maxBrstLen</obj_property>
+   <wvobject fp_name="/tb_dataAcqCtrl_PI/mosi_se" type="logic">
+      <obj_property name="ElementShortName">mosi_se</obj_property>
+      <obj_property name="ObjectShortName">mosi_se</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/miso" type="logic">
+      <obj_property name="ElementShortName">miso</obj_property>
+      <obj_property name="ObjectShortName">miso</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/devInterfInst/state" type="array">
+      <obj_property name="ElementShortName">state[1:0]</obj_property>
+      <obj_property name="ObjectShortName">state[1:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/spiSlaveInst/rxFifoInst/wr_rst_busy" type="logic">
+      <obj_property name="ElementShortName">wr_rst_busy</obj_property>
+      <obj_property name="ObjectShortName">wr_rst_busy</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/spiSlaveInst/rxFifoInst/data_valid" type="logic">
+      <obj_property name="ElementShortName">data_valid</obj_property>
+      <obj_property name="ObjectShortName">data_valid</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/spiSlaveInst/rxFifoInst/din" type="array">
+      <obj_property name="ElementShortName">din[7:0]</obj_property>
+      <obj_property name="ObjectShortName">din[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/spiSlaveInst/rxFifoInst/dout" type="array">
+      <obj_property name="ElementShortName">dout[7:0]</obj_property>
+      <obj_property name="ObjectShortName">dout[7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/spiSlaveInst/rxFifoInst/empty" type="logic">
+      <obj_property name="ElementShortName">empty</obj_property>
+      <obj_property name="ObjectShortName">empty</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/spiSlaveInst/rxFifoInst/lopt" type="logic">
+      <obj_property name="ElementShortName">lopt</obj_property>
+      <obj_property name="ObjectShortName">lopt</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/spiSlaveInst/rxFifoInst/rd_en" type="logic">
+      <obj_property name="ElementShortName">rd_en</obj_property>
+      <obj_property name="ObjectShortName">rd_en</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/spiSlaveInst/rxFifoInst/rd_rst_busy" type="logic">
+      <obj_property name="ElementShortName">rd_rst_busy</obj_property>
+      <obj_property name="ObjectShortName">rd_rst_busy</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/spiSlaveInst/rxFifoInst/rst" type="logic">
+      <obj_property name="ElementShortName">rst</obj_property>
+      <obj_property name="ObjectShortName">rst</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/spiSlaveInst/rxFifoInst/wr_clk" type="logic">
+      <obj_property name="ElementShortName">wr_clk</obj_property>
+      <obj_property name="ObjectShortName">wr_clk</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/spiSlaveInst/rxFifoInst/wr_en" type="logic">
+      <obj_property name="ElementShortName">wr_en</obj_property>
+      <obj_property name="ObjectShortName">wr_en</obj_property>
    </wvobject>
 </wave_config>

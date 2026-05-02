@@ -15,15 +15,15 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="0.000 ns"></ZoomStartTime>
-      <ZoomEndTime time="6,655.001 ns"></ZoomEndTime>
-      <Cursor1Time time="20.000 ns"></Cursor1Time>
+      <ZoomStartTime time="47.434 ns"></ZoomStartTime>
+      <ZoomEndTime time="152.335 ns"></ZoomEndTime>
+      <Cursor1Time time="70.100 ns"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
-      <NameColumnWidth column_width="199"></NameColumnWidth>
+      <NameColumnWidth column_width="183"></NameColumnWidth>
       <ValueColumnWidth column_width="58"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="80" />
+   <WVObjectSize size="81" />
    <wave_markers>
       <marker time="4470000" label="" />
       <marker time="499860000" label="" />
@@ -53,8 +53,16 @@
       <obj_property name="ObjectShortName">testRst</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_rateMetersCtrl/testMeter" type="array">
-      <obj_property name="ElementShortName">testMeter[31:0]</obj_property>
-      <obj_property name="ObjectShortName">testMeter[31:0]</obj_property>
+      <obj_property name="ElementShortName">testMeter[47:0]</obj_property>
+      <obj_property name="ObjectShortName">testMeter[47:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_rateMetersCtrl/testMeterM" type="array">
+      <obj_property name="ElementShortName">testMeterM[47:0]</obj_property>
+      <obj_property name="ObjectShortName">testMeterM[47:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_rateMetersCtrl/testMeterL" type="array">
+      <obj_property name="ElementShortName">testMeterL[31:0]</obj_property>
+      <obj_property name="ObjectShortName">testMeterL[31:0]</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_rateMetersCtrl/devId" type="other">
       <obj_property name="ElementShortName">devId</obj_property>
@@ -69,10 +77,6 @@
       <obj_property name="ElementShortName">[0][31:0]</obj_property>
       <obj_property name="ObjectShortName">[0][31:0]</obj_property>
       <obj_property name="label">trgMeters[0][31:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_rateMetersCtrl/testMeterL" type="array">
-      <obj_property name="ElementShortName">testMeterL[31:0]</obj_property>
-      <obj_property name="ObjectShortName">testMeterL[31:0]</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_rateMetersCtrl/uut/cntTmrMax" type="array">
       <obj_property name="ElementShortName">cntTmrMax[31:0]</obj_property>
