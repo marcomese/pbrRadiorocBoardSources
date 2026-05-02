@@ -20,7 +20,7 @@ use xpm.vcomponents.all;
 
 entity SPISlave is
 generic(
-    maxBrstLen   : natural
+    maxBrstLen   : integer
 );
 port(
     clk          : in  std_logic;

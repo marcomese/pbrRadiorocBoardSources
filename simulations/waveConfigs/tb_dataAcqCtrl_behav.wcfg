@@ -15,18 +15,26 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="1,666.400 ns"></ZoomStartTime>
-      <ZoomEndTime time="1,822.501 ns"></ZoomEndTime>
-      <Cursor1Time time="1,755.000 ns"></Cursor1Time>
+      <ZoomStartTime time="0.000000 us"></ZoomStartTime>
+      <ZoomEndTime time="16.000001 us"></ZoomEndTime>
+      <Cursor1Time time="8.070000 us"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
-      <NameColumnWidth column_width="209"></NameColumnWidth>
+      <NameColumnWidth column_width="119"></NameColumnWidth>
       <ValueColumnWidth column_width="58"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="57" />
+   <WVObjectSize size="61" />
    <wvobject fp_name="/tb_dataAcqCtrl_PI/spiSlaveInst/rst" type="logic">
       <obj_property name="ElementShortName">rst</obj_property>
       <obj_property name="ObjectShortName">rst</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl_PI/spiSlaveInst/clk" type="logic">
+      <obj_property name="ElementShortName">clk</obj_property>
+      <obj_property name="ObjectShortName">clk</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl_PI/spiSlaveInst/rxFifoInst/wr_clk" type="logic">
+      <obj_property name="ElementShortName">wr_clk</obj_property>
+      <obj_property name="ObjectShortName">wr_clk</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_dataAcqCtrl_PI/spiSlaveInst/data_out" type="array">
       <obj_property name="ElementShortName">data_out[7:0]</obj_property>
@@ -39,6 +47,10 @@
    <wvobject fp_name="/tb_dataAcqCtrl_PI/spiSlaveInst/rx_read" type="logic">
       <obj_property name="ElementShortName">rx_read</obj_property>
       <obj_property name="ObjectShortName">rx_read</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl_PI/spiSlaveInst/rxFifoInst/empty" type="logic">
+      <obj_property name="ElementShortName">empty</obj_property>
+      <obj_property name="ObjectShortName">empty</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_dataAcqCtrl_PI/spiSlaveInst/rx_ena" type="logic">
       <obj_property name="ElementShortName">rx_ena</obj_property>
@@ -120,6 +132,10 @@
       <obj_property name="ElementShortName">loadTxFifo</obj_property>
       <obj_property name="ObjectShortName">loadTxFifo</obj_property>
    </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl_PI/spiSlaveInst/bitCount" type="array">
+      <obj_property name="ElementShortName">bitCount[3:0]</obj_property>
+      <obj_property name="ObjectShortName">bitCount[3:0]</obj_property>
+   </wvobject>
    <wvobject fp_name="/tb_dataAcqCtrl_PI/spiSlaveInst/loadRxFifo" type="logic">
       <obj_property name="ElementShortName">loadRxFifo</obj_property>
       <obj_property name="ObjectShortName">loadRxFifo</obj_property>
@@ -140,10 +156,6 @@
       <obj_property name="ElementShortName">rd_data_count[0:0]</obj_property>
       <obj_property name="ObjectShortName">rd_data_count[0:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/spiSlaveInst/rxFifoInst/empty" type="logic">
-      <obj_property name="ElementShortName">empty</obj_property>
-      <obj_property name="ObjectShortName">empty</obj_property>
-   </wvobject>
    <wvobject fp_name="/tb_dataAcqCtrl_PI/devInterfInst/rxPresent" type="logic">
       <obj_property name="ElementShortName">rxPresent</obj_property>
       <obj_property name="ObjectShortName">rxPresent</obj_property>
@@ -163,6 +175,10 @@
    <wvobject fp_name="/tb_dataAcqCtrl_PI/spiSlaveInst/rxFifoInst/data_valid" type="logic">
       <obj_property name="ElementShortName">data_valid</obj_property>
       <obj_property name="ObjectShortName">data_valid</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl_PI/spiSlaveInst/rxFifoInst/dout" type="array">
+      <obj_property name="ElementShortName">dout[7:0]</obj_property>
+      <obj_property name="ObjectShortName">dout[7:0]</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_dataAcqCtrl_PI/devInterfInst/state" type="other">
       <obj_property name="ElementShortName">state</obj_property>

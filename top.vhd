@@ -498,7 +498,7 @@ port map(
 
 enClkI2CSyncInst: xpm_cdc_single
 generic map(
-    DEST_SYNC_FF   => 4,
+    DEST_SYNC_FF   => 2,
     INIT_SYNC_FF   => 0,
     SIM_ASSERT_CHK => 0,
     SRC_INPUT_REG  => 1

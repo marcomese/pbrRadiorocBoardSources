@@ -31,7 +31,7 @@ generic(
     writeCmd    : std_logic_vector(3 downto 0);
     burstWrCmd  : std_logic_vector(3 downto 0);
     burstRdCmd  : std_logic_vector(3 downto 0);
-    maxBrstLen  : natural -- maximum number of bytes to read/write in burst mode
+    maxBrstLen  : integer -- maximum number of bytes to read/write in burst mode
 );
 port(
     clk         : in  std_logic;
