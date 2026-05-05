@@ -54,7 +54,6 @@ signal sclkFF,
        sclkFall,
        csFF,
        csRise,
-       txPres,
        loadBuff,
        loadTxFifo,
        loadRxFifo,
@@ -76,26 +75,35 @@ signal buffIn,
 
 begin
 
-rxRead <= rx_read and not rxRdRstBusy;
-
-txWrite <= tx_write and not txWrRstBusy;
-
 lastBit    <= bitCount(bitCount'left);
 
 loadBuff   <= and_reduce(std_logic_vector(bitCount(2 downto 0)));
-
-loadRxFifo <= lastBit and rxEna and not rxWrRstBusy;
-
-loadTxFifo <= lastBit and not txRdRstBusy;
-
-rx_present <= not rxEmpty;
-
-txPres <= not txEmpty;
 
 locRstProc: process(clk)
 begin
     if rising_edge(clk) then
         locRst <= rst;
+    end if;
+end process;
+
+ctrlSigProc: process(clk)
+begin
+    if rising_edge(clk) then
+        if locRst = '1' then
+            loadRxFifo <= '0';
+            loadTxFifo <= '0';
+            rxRead     <= '0';
+            txWrite    <= '0';
+            rx_present <= '0';
+            tx_present <= '0';
+        else
+            loadRxFifo <= lastBit and rxEna and not rxWrRstBusy;
+            loadTxFifo <= lastBit and not txRdRstBusy;
+            rxRead     <= rx_read and not rxRdRstBusy;
+            txWrite    <= tx_write and not txWrRstBusy;
+            rx_present <= not rxEmpty;
+            tx_present <= not txEmpty;
+        end if;
     end if;
 end process;
 
@@ -110,17 +118,6 @@ begin
             else
                 miso <= '0';
             end if;
-        end if;
-    end if;
-end process;
-
-txPresInst: process(clk)
-begin
-    if rising_edge(clk) then
-        if locRst = '1' then
-            tx_present <= '0';
-        else
-            tx_present <= txPres;
         end if;
     end if;
 end process;
@@ -143,8 +140,6 @@ begin
         end if;
     end if;
 end process;
-
-
 
 rxEnaProc: process(clk)
 begin
@@ -173,7 +168,7 @@ begin
     if rising_edge(clk) then
         if locRst = '1' then
             buffOut <= (others => '0');
-        elsif loadBuff = '1' and txPres = '1' then
+        elsif loadBuff = '1' and txEmpty = '0' then
             buffOut <= txFifoDout;
         elsif cs = '0' and sclkRise = '1' then
             buffOut <= buffOut(6 downto 0) & '0';
