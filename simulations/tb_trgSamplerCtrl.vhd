@@ -24,7 +24,7 @@ constant trgNum        : natural                      := 64;
 
 signal rst               : std_logic := '0';
 signal clk_100M          : std_logic := '1';
-signal t1,t2             : std_logic_vector(63 downto 0) := (others => '1');
+signal t1,t2,t1Edge      : std_logic_vector(63 downto 0) := (others => '1');
 signal t21               : std_logic_vector(127 downto 0);
 signal devId             : devices_t    := none;
 signal devReadyTSmpl     : std_logic    := '0';
@@ -163,6 +163,17 @@ begin
 
     wait;
 end process;
+
+tSInst: entity work.trgSync
+generic map(
+    trgNum => 64
+)
+port map(
+    clk  => clk_100M,
+    rst  => rst,
+    tIn  => t1,
+    tOut => t1Edge
+);
 
 uut: entity work.trgSamplerCtrl
 generic map(

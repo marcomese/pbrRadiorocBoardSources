@@ -45,13 +45,13 @@ trgFFProc: process(clk)
 begin
     if rising_edge(clk) then
         if locRst = '1' then
-            tFF <= (others => '1');
+            tFF  <= (others => '1');
+            tOut <= (others => '0');
         else
-            tFF <= tIn;
+            tFF  <= tIn;
+            tOut <= not tIn and tFF;
         end if;
     end if;
 end process;
-
-tOut <= tIn and not tFF;
 
 end Behavioral;

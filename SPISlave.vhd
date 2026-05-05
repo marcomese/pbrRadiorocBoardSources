@@ -129,20 +129,22 @@ sclkCsFFProc: process(clk)
 begin
     if rising_edge(clk) then
         if locRst = '1' then
-            sclkFF <= '0';
-            csFF   <= '1';
+            sclkFF   <= '0';
+            csFF     <= '1';
+            sclkRise <= '0';
+            sclkFall <= '0';
+            csRise   <= '0';
         else
-            sclkFF <= sclk;
-            csFF   <= cs;
+            sclkFF   <= sclk;
+            csFF     <= cs;
+            sclkRise <= sclk and not sclkFF;
+            sclkFall <= not sclk and sclkFF;
+            csRise   <= cs and not csFF;
         end if;
     end if;
 end process;
 
-sclkRise <= sclk and not sclkFF;
 
-sclkFall <= not sclk and sclkFF;
-
-csRise   <= cs and not csFF;
 
 rxEnaProc: process(clk)
 begin

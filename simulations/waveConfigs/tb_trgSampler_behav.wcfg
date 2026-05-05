@@ -15,15 +15,15 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="50,574.134 ns"></ZoomStartTime>
-      <ZoomEndTime time="50,729.335 ns"></ZoomEndTime>
-      <Cursor1Time time="50,600.000 ns"></Cursor1Time>
+      <ZoomStartTime time="50,486.400 ns"></ZoomStartTime>
+      <ZoomEndTime time="50,798.401 ns"></ZoomEndTime>
+      <Cursor1Time time="50,660.000 ns"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="172"></NameColumnWidth>
-      <ValueColumnWidth column_width="104"></ValueColumnWidth>
+      <ValueColumnWidth column_width="96"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="25" />
+   <WVObjectSize size="28" />
    <wvobject fp_name="/tb_trgSampler/rst" type="logic">
       <obj_property name="ElementShortName">rst</obj_property>
       <obj_property name="ObjectShortName">rst</obj_property>
@@ -55,6 +55,14 @@
    <wvobject fp_name="/tb_trgSampler/uut/trgIn[0]" type="logic">
       <obj_property name="ElementShortName">[0]</obj_property>
       <obj_property name="ObjectShortName">[0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_trgSampler/t1Edge[0]" type="logic">
+      <obj_property name="ElementShortName">[0]</obj_property>
+      <obj_property name="ObjectShortName">[0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_trgSampler/t1Edge" type="array">
+      <obj_property name="ElementShortName">t1Edge[63:0]</obj_property>
+      <obj_property name="ObjectShortName">t1Edge[63:0]</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_trgSampler/uut/rData[2]" type="array">
       <obj_property name="ElementShortName">[2][31:0]</obj_property>
@@ -124,5 +132,9 @@
    <wvobject fp_name="/tb_trgSampler/devAddr" type="array">
       <obj_property name="ElementShortName">devAddr[1:0][7:0]</obj_property>
       <obj_property name="ObjectShortName">devAddr[1:0][7:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_trgSampler/uut/trgIn[0]" type="logic">
+      <obj_property name="ElementShortName">[0]</obj_property>
+      <obj_property name="ObjectShortName">[0]</obj_property>
    </wvobject>
 </wave_config>

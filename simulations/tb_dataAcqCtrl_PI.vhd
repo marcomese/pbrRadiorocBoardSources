@@ -191,9 +191,8 @@ begin
     begin
         -- Power-on reset (active low)
         npwr_reset <= '0';
-        wait for clkPeriod200M*1000;
-        npwr_reset <= '1';
         wait for clkPeriod200M*100;
+        npwr_reset <= '1';
 
         wait for 1 us;
 
