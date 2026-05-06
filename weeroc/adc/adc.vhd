@@ -46,21 +46,6 @@ end adc;
 
 architecture Behavioral of adc is
 
-    COMPONENT fifo_acq
-      PORT (
-        clk : IN STD_LOGIC;
-        srst : IN STD_LOGIC;
-        din : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
-        wr_en : IN STD_LOGIC;
-        rd_en : IN STD_LOGIC;
-        dout : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
-        full : OUT STD_LOGIC;
-        empty : OUT STD_LOGIC;
-        valid : OUT STD_LOGIC;
-        rd_data_count : OUT STD_LOGIC_VECTOR(16 DOWNTO 0)
-      );
-    END COMPONENT;
-
 	type state_t is (init, idle, wait_hold, rst_cpt, wait_conv, asrt_rd_high, asrt_rd_low, nxt, read_asic, start_conv, end_conv, read_adc, end_read_adc, write_fifo, finish);
 	signal current_state, next_state : state_t;
 
@@ -142,48 +127,61 @@ port map(
 
 	sdo_hglg <= sdo_hg_des & sdo_lg_des;
 
-	ff : fifo_acq
-    port map(
-		srst    => locRst,
-		clk => clk_200M,
-        din           => din_l,
-        wr_en         => wenSync,
-		rd_en  => rd_en,
-        dout          => dout,
-		full   => open,
-        empty         => empty_acq,
-		valid => rdValidSig,
-		rd_data_count => rd_data_count_acq
-    );
+sdo_hglgSync: xpm_cdc_array_single
+generic map(
+    DEST_SYNC_FF   => 2,
+    INIT_SYNC_FF   => 0,
+    SIM_ASSERT_CHK => 0,
+    SRC_INPUT_REG  => 0,
+    WIDTH          => sdo_hglg'length
+)
+port map(
+    src_clk  => adc_sck_s,
+    dest_clk => clk_200M,
+    src_in   => sdo_hglg,
+    dest_out => din_l
+);
 
-
-   wenSyncProc: process(clk_200M)
-   begin
-        if rising_edge(clk_200M) then
-            if locRst = '1' then
-                wenFF   <= '0';
-                wenSync <= '0';
-            else
-                wenFF   <= wr_en; 
-                wenSync <= wenFF;
-            end if;
+wenSyncProc: process(clk_200M)
+begin
+    if rising_edge(clk_200M) then
+        if locRst = '1' then
+            wenFF   <= '0';
+            wenSync <= '0';
+        else
+            wenFF   <= wr_en; 
+            wenSync <= wenFF;
         end if;
-   end process;
+    end if;
+end process;
 
-   sdo_hglgSync: xpm_cdc_array_single
-   generic map (
-      DEST_SYNC_FF   => 2,
-      INIT_SYNC_FF   => 0,
-      SIM_ASSERT_CHK => 0,
-      SRC_INPUT_REG  => 0,
-      WIDTH          => sdo_hglg'length
-   )
-   port map (
-      src_clk  => adc_sck_s,
-      dest_clk => clk_200M,
-      src_in   => sdo_hglg,
-      dest_out => din_l
-   );
+fifoAdc: xpm_fifo_sync
+generic map(
+    FIFO_WRITE_DEPTH    => 16384,
+    READ_DATA_WIDTH     => 8,
+    WRITE_DATA_WIDTH    => 32,
+    RD_DATA_COUNT_WIDTH => 17,
+    READ_MODE           => "std",
+    USE_ADV_FEATURES    => "1400",
+    FIFO_MEMORY_TYPE    => "block"
+)
+port map(
+    wr_clk        => clk_200M,
+    rst           => locRst,
+    din           => din_l,
+    wr_en         => wenSync,
+    dout          => dout,
+    rd_en         => rd_en,
+    rd_data_count => rd_data_count_acq,
+    data_valid    => rdValidSig,
+    empty         => empty_acq,
+    full          => open,
+    sleep         => '0',
+    injectdbiterr => '0',
+    injectsbiterr => '0'
+);
+
+
 
 	hit0 <= t(to_integer(unsigned(sel_adc(5 downto 0))));
 
