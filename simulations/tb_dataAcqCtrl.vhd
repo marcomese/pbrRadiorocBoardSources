@@ -44,7 +44,7 @@ signal n_cnv           : std_logic := '0';
 signal adc_sck           : std_logic := '0';
 signal empty_acq         : std_logic := '0';
 signal end_multi_acq     : std_logic := '0';
-signal rd_data_count_acq : std_logic_vector(15 downto 0) := (others => '0');
+signal rd_data_count_acq : std_logic_vector(16 downto 0) := (others => '0');
 signal hold_ext          : std_logic := '0';
 signal trig_ext          : std_logic := '0';
 signal trig_out          : std_logic := '0';
@@ -93,7 +93,7 @@ signal dataToMaster,
        testDataOut,
        testData,
        dataFromMaster : std_logic_vector(7 downto 0)  := (others => '0');
-signal rdDataCnt      : std_logic_vector(15 downto 0) := (others => '0');
+signal rdDataCnt      : std_logic_vector(16 downto 0) := (others => '0');
 signal id             : std_logic_vector(3 downto 0) := (others => '0');
 
 begin

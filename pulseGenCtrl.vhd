@@ -122,7 +122,6 @@ signal   dAddr,
 signal   settlCnt   : unsigned(bitsNum(max(settlingCount, pwrOnCount)) downto 0);
 signal   dacSend,
          dacBusySig,
-         endPwrOn,
          endSettl,
          execSig,
          pGenEn,
@@ -211,12 +210,15 @@ begin
             settlCnt    <= to_unsigned(settlingCount-2, settlCnt'length);
             execSig     <= '0';
             busy        <= '0';
+            loadDac     <= '0';
             loadDataOut <= '0';
             loadReg     <= '0';
             pGenEn      <= '0';
             settled     <= "00";
             lastAddr    <= 0;
             lastData    <= (others => (others => '0'));
+            periodSig   <= (others => '0');
+            widthSig    <= (others => '0');
 
             state       <= idle;
         else
@@ -224,6 +226,7 @@ begin
                 when idle =>
                     loadReg <= '0';
                     execSig <= '0';
+                    
 
                     state   <= idle;
 

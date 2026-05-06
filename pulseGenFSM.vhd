@@ -38,7 +38,6 @@ type state_t is (idle,
 signal state     : state_t;
 signal endOnCnt,
        endOffCnt,
-       start,
        locRst    : std_logic;
 signal wBuff,
        tBuff     : unsigned(31 downto 0);

@@ -62,7 +62,6 @@ architecture Behavioral of adc is
 
 	signal sdo_hg_des, sdo_lg_des : std_logic_vector(15 downto 0);
 	signal sdo_hglg : std_logic_vector(31 downto 0);
-	signal din : std_logic_vector(31 downto 0);
 
 	signal en_adc_sck, adc_sck_s, rstb_rd_s, rst_n : std_logic;
 	signal t0, trigger, trgFF, trigger_sft, trgSftFF,  holdext, trgEdge, trgSftEdge : std_logic;
@@ -200,27 +199,27 @@ trgFFProc: process(clk_200M)
 begin
     if rising_edge(clk_200M) then
         if locRst = '1' then
-            trgFF <= '0';
+            trgFF   <= '0';
+            trgEdge <= '0';
         else
-            trgFF <= trigger;
+            trgFF   <= trigger;
+            trgEdge <= trigger and not trgFF;
         end if;
     end if;
 end process;
-
-trgEdge <= trigger and not trgFF;
 
 trgSftFFProc: process(clk_200M)
 begin
     if rising_edge(clk_200M) then
         if locRst = '1' then
-            trgSftFF <= '0';
+            trgSftFF   <= '0';
+            trgSftEdge <= trigger_sft and not trgSftFF;
         else
-            trgSftFF <= trigger_sft;
+            trgSftFF   <= trigger_sft;
+            trgSftEdge <= trigger_sft and not trgSftFF;
         end if;
     end if;
 end process;
-
-trgSftEdge <= trigger_sft and not trgSftFF;
 
 	process(locRst, clk_200M)
 	begin
