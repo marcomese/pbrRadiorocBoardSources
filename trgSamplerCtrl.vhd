@@ -260,16 +260,23 @@ end process;
 
 trgSmplGen: for i in 0 to trgNum-1 generate
 begin
-    trgICnt: process(clk)
-    begin
-        if rising_edge(clk) then
-            if locRst = '1' then
-                sampledTrg(i) <= (others => '0');
-            else
-                sampledTrg(i) <= sampledTrg(i)(sampledTrg(i)'left-1 downto 0) & trgIn(i);
-            end if;
-        end if;
-    end process;
+    trgSmplInst: entity work.trgSamplerDSP
+    port map(
+        clk        => clk,
+        rst        => locRst,
+        trgIn      => trgIn(i),
+        trgSmplOut => sampledTrg(i)
+    );
+--    trgICnt: process(clk)
+--    begin
+--        if rising_edge(clk) then
+--            if locRst = '1' then
+--                sampledTrg(i) <= (others => '0');
+--            else
+--                sampledTrg(i) <= sampledTrg(i)(sampledTrg(i)'left-1 downto 0) & trgIn(i);
+--            end if;
+--        end if;
+--    end process;
 end generate;
 
 cntNSAftTrgProc: process(clk)
