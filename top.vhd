@@ -92,10 +92,8 @@ architecture arch of radioroc_fw is
 	signal clk_10M, clk_50M, clk_100M, clk_200M : std_logic;
 	signal sysClkDS : std_logic;
 	-- I2C
---	signal end_i2c, n_reset_i2c, rd55, wr_i2c, en_clki2c, sda_i, sda_o, sda_oen : std_logic;
-    signal end_i2c, n_reset_i2c, rd55, wr_i2c, en_clki2c, enClkI2CSync : std_logic;
-	signal rstb_read_sft, reset_n_sft : std_logic;
-	signal i2c_in, i2c_set, q, start, end_rd, spy_i2c     : std_logic_vector(7 downto 0);
+    signal en_clki2c, enClkI2CSync : std_logic;
+
 	--ADC Acquisition
 	signal reset_acq, start_acq, rd_acq, adc_sck, end_acq, empty_acq, rstn_read_acq, reset_n_acq, trig_out : std_logic;
 	signal nb_acq, dout_acq : std_logic_vector(7 downto 0);
@@ -155,9 +153,6 @@ signal   devReadyPGen,
          devBusyAcq,
          devBusyRM,
          devBusyTSmpl,
-         devBrstRstPGen,
-         devBrstRstTmp,
-         devBrstRstRadioroc,
          devBrstRstAcq,
          devBrstRstRM,
          devBrstRstTSmpl,
@@ -188,9 +183,6 @@ signal   i2cDataWrRad   : std_logic_vector(7 downto 0);
 signal   i2cBusyRad     : std_logic;
 signal   i2cDataRdRad   : std_logic_vector(7 downto 0);
 signal   areset         : std_logic;
-signal   testTxWrite,
-         testRxRead,
-         testRxPresent  : std_logic;
 signal   dataToMaster,
          dataFromMaster : std_logic_vector(7 downto 0);
 
@@ -221,7 +213,7 @@ sc_reset_n    <= reset_n_acq;
 
 sc_rstn_read  <= rstn_read_acq;
 
-sc_rstb_i2c   <= resetn;
+sc_rstb_i2c   <= en_clki2c and resetn;
 
 sc_rstb_sc    <= resetn;
 
@@ -230,8 +222,6 @@ sc_rstb_probe <= resetn;
 pulse         <= pulseSig;
 
 nCMOS         <= '1';
-
-n_reset_i2c   <= en_clki2c and npwr_reset;
 
 tEdge21       <= tEdge2 & tEdge1;
 

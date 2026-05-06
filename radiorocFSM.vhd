@@ -67,12 +67,10 @@ signal   rwSig,
          rstBuff,
          loadBuff,
          shiftBuff,
-         fullBuff,
          lastBuff,
          lastLeft,
          lastByte,
          brstOld,
-         brstRise,
          brstFall,
          locRst       : std_logic;
 signal   dataInVec    : std_logic_vector(devDataBytes*8-1 downto 0);
@@ -94,8 +92,6 @@ dataInVec   <= devDataToSlv(dataIn);
 lastLeft    <= leftBCnt(leftBCnt'left);
 
 brstFall    <= brstOld and not brst;
-
-brstRise    <= brst and not brstOld;
 
 locRstProc: process(clk)
 begin
@@ -291,7 +287,7 @@ port map(
     rst        => rstBuff,
     load       => loadBuff,
     shift      => shiftBuff,
-    full       => fullBuff,
+    full       => open,
     last       => lastBuff,
     parDataIn  => dataInVec,
     serDataIn  => i2cDataRd,
