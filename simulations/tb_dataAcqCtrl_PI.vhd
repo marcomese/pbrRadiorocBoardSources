@@ -71,6 +71,8 @@ architecture Behavioral of tb_dataAcqCtrl_PI is
     signal sclk_se : std_logic := '0';
     signal mosi_se : std_logic := '0';
 
+    constant del : integer := 10;
+    
 begin
 
     -- Differential clock generation (200 MHz)
@@ -160,18 +162,6 @@ begin
     --------------------------------------------------------------------
     stimProc: process
 
-        -- Send a single byte over SPI (mode 1: CPOL=0, CPHA=1, MSB first).
-        procedure sendByte(constant b : in std_logic_vector(7 downto 0)) is
-        begin
-            for i in 7 downto 0 loop
-                sclk_se <= '1';
-                mosi_se <= b(i);
-                wait for sclkPeriod/2;
-                sclk_se <= '0';
-                wait for sclkPeriod/2;
-            end loop;
-        end procedure;
-
         procedure startSpi is
         begin
             sclk_se <= '0';
@@ -188,6 +178,23 @@ begin
             wait for sclkPeriod;
         end procedure;
 
+        -- Send a single byte over SPI (mode 1: CPOL=0, CPHA=1, MSB first).
+        procedure sendByte(constant b : in std_logic_vector(7 downto 0); restart : boolean := False) is
+        begin
+            for i in 7 downto 0 loop
+                sclk_se <= '1';
+                mosi_se <= b(i);
+                wait for sclkPeriod/2;
+                sclk_se <= '0';
+                wait for sclkPeriod/2;
+            end loop;
+
+            if restart = True then
+                endSpi;
+                startSpi;
+            end if;
+        end procedure;
+
     begin
         -- Power-on reset (active low)
         npwr_reset <= '0';
@@ -200,14 +207,14 @@ begin
         -- 1st transaction: 0x76, 0x55, 0x00, 0x03, 0x00, 0x00, 0x00, 0x02
         --------------------------------------------------------------------
         startSpi;
-        sendByte(x"76");
-        sendByte(x"55");
-        sendByte(x"00");
-        sendByte(x"03");
-        sendByte(x"00");
-        sendByte(x"00");
-        sendByte(x"00");
-        sendByte(x"02");
+        sendByte(x"76", True);
+        sendByte(x"55", True);
+        sendByte(x"00", True);
+        sendByte(x"05", True);
+        sendByte(x"00", True);
+        sendByte(x"00", True);
+        sendByte(x"00", True);
+        sendByte(x"02", True);
         endSpi;
 
         wait for 5 us;
