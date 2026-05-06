@@ -46,6 +46,21 @@ end adc;
 
 architecture Behavioral of adc is
 
+    COMPONENT fifo_acq
+      PORT (
+        clk : IN STD_LOGIC;
+        srst : IN STD_LOGIC;
+        din : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
+        wr_en : IN STD_LOGIC;
+        rd_en : IN STD_LOGIC;
+        dout : OUT STD_LOGIC_VECTOR(7 DOWNTO 0);
+        full : OUT STD_LOGIC;
+        empty : OUT STD_LOGIC;
+        valid : OUT STD_LOGIC;
+        rd_data_count : OUT STD_LOGIC_VECTOR(16 DOWNTO 0)
+      );
+    END COMPONENT;
+
 	type state_t is (init, idle, wait_hold, rst_cpt, wait_conv, asrt_rd_high, asrt_rd_low, nxt, read_asic, start_conv, end_conv, read_adc, end_read_adc, write_fifo, finish);
 	signal current_state, next_state : state_t;
 
@@ -57,11 +72,11 @@ architecture Behavioral of adc is
 
 	signal hit0, hit, en_acq : std_logic;
 	signal end_acq : std_logic;
-	signal wr_en  : std_logic;
-	signal wrEnSync  : std_logic;
+	signal wr_en,wenFF,wenSync : std_logic;
 
 	signal sdo_hg_des, sdo_lg_des : std_logic_vector(15 downto 0);
 	signal sdo_hglg : std_logic_vector(31 downto 0);
+	signal din, din_l : std_logic_vector(31 downto 0);
 
 	signal en_adc_sck, adc_sck_s, rstb_rd_s, rst_n : std_logic;
 	signal t0, trigger, trgFF, trigger_sft, trgSftFF,  holdext, trgEdge, trgSftEdge : std_logic;
@@ -85,7 +100,7 @@ endAcq       <= end_acq;
 rdValid      <= rdValidSig;
 NORT_FPGA    <= and_reduce(t);
 
---locRstProc: process(clk_200M) --locRst delay resets multi_acq fsm!
+--locRstProc: process(clk_200M)
 --begin
 --    if rising_edge(clk_200M) then
         locRst <= rst;
@@ -127,49 +142,48 @@ port map(
 
 	sdo_hglg <= sdo_hg_des & sdo_lg_des;
 
-    wrEnSyncInst: xpm_cdc_single
-    generic map(
-        DEST_SYNC_FF   => 2,
-        INIT_SYNC_FF   => 0,
-        SIM_ASSERT_CHK => 0,
-        SRC_INPUT_REG  => 1
-    )
+	ff : fifo_acq
     port map(
-        src_clk  => clk_200M,
-        dest_clk => clk_100M,
-        src_in   => wr_en,
-        dest_out => wrEnSync
+		srst    => locRst,
+		clk => clk_200M,
+        din           => din_l,
+        wr_en         => wenSync,
+		rd_en  => rd_en,
+        dout          => dout,
+		full   => open,
+        empty         => empty_acq,
+		valid => rdValidSig,
+		rd_data_count => rd_data_count_acq
     );
 
-    adcFifo: xpm_fifo_async
-    generic map(
-        CDC_SYNC_STAGES     => 2,
-        FIFO_WRITE_DEPTH    => 16384,
-        READ_DATA_WIDTH     => 8,
-        WRITE_DATA_WIDTH    => 32,
-        RD_DATA_COUNT_WIDTH => 17,
-        READ_MODE           => "std",
-        USE_ADV_FEATURES    => "1400",
-        FIFO_MEMORY_TYPE    => "block"
-    )
-    port map(
-        wr_clk        => clk_100M,
-        rd_clk        => clk_200M,
-        rst           => locRst,
-        din           => sdo_hglg,
-        wr_en         => wrEnSync,
-        dout          => dout,
-        rd_en         => rd_en,
-        empty         => empty_acq,
-        data_valid    => rdValidSig,
-        rd_data_count => rd_data_count_acq,
-        full          => open,
-        wr_rst_busy   => open,
-        rd_rst_busy   => open,
-        sleep         => '0',
-        injectdbiterr => '0',
-        injectsbiterr => '0'
-    );
+
+   wenSyncProc: process(clk_200M)
+   begin
+        if rising_edge(clk_200M) then
+            if locRst = '1' then
+                wenFF   <= '0';
+                wenSync <= '0';
+            else
+                wenFF   <= wr_en; 
+                wenSync <= wenFF;
+            end if;
+        end if;
+   end process;
+
+   sdo_hglgSync: xpm_cdc_array_single
+   generic map (
+      DEST_SYNC_FF   => 2,
+      INIT_SYNC_FF   => 0,
+      SIM_ASSERT_CHK => 0,
+      SRC_INPUT_REG  => 0,
+      WIDTH          => sdo_hglg'length
+   )
+   port map (
+      src_clk  => adc_sck_s,
+      dest_clk => clk_200M,
+      src_in   => sdo_hglg,
+      dest_out => din_l
+   );
 
 	hit0 <= t(to_integer(unsigned(sel_adc(5 downto 0))));
 
@@ -199,27 +213,27 @@ trgFFProc: process(clk_200M)
 begin
     if rising_edge(clk_200M) then
         if locRst = '1' then
-            trgFF   <= '0';
-            trgEdge <= '0';
+            trgFF <= '0';
         else
-            trgFF   <= trigger;
-            trgEdge <= trigger and not trgFF;
+            trgFF <= trigger;
         end if;
     end if;
 end process;
+
+trgEdge <= trigger and not trgFF;
 
 trgSftFFProc: process(clk_200M)
 begin
     if rising_edge(clk_200M) then
         if locRst = '1' then
-            trgSftFF   <= '0';
-            trgSftEdge <= trigger_sft and not trgSftFF;
+            trgSftFF <= '0';
         else
-            trgSftFF   <= trigger_sft;
-            trgSftEdge <= trigger_sft and not trgSftFF;
+            trgSftFF <= trigger_sft;
         end if;
     end if;
 end process;
+
+trgSftEdge <= trigger_sft and not trgSftFF;
 
 	process(locRst, clk_200M)
 	begin
