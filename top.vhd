@@ -89,7 +89,7 @@ architecture arch of radioroc_fw is
 	signal tEdge21, TBuf21 : std_logic_vector(127 downto 0);
 	-- Clock and reset
 	signal reset, resetn, resetSig : std_logic;
-	signal clk_10M, clk_50M, clk_100M, clk_200M : std_logic;
+	signal clk_10M, clk_20M, clk_100M, clk_200M : std_logic;
 	signal sysClkDS : std_logic;
 	-- I2C
     signal en_clki2c, enClkI2CSync : std_logic;
@@ -202,6 +202,10 @@ signal readRq,
        mosiSync  : std_logic;
 
 signal endAcq, rdValid : std_logic;
+
+signal clkCnt : unsigned(4 downto 0); -- MSB = overflow
+
+signal clk10MT : std_logic;
 
 begin
 
@@ -442,36 +446,45 @@ port map(
     O => clk_200M
 );
 
-bufr100MInst: BUFR
-generic map(
-    BUFR_DIVIDE => "2"
-)
+clkDividerProc: process(clk_200M)
+begin
+    if rising_edge(clk_200M) then
+        if reset = '1' or clkCnt(clkCnt'left) = '1' then
+            clkCnt <= to_unsigned(8, clkCnt'length);
+        else
+            clkCnt <= clkCnt - 1;
+        end if;
+    end if;
+end process;
+
+burf100MInst: BUFGCE
 port map(
-    I   => clk_200M,
-    CE  => '1',
-    CLR => reset,
-    O   => clk_100M
+    I  => clk_200M,
+    CE => clkCnt(0),
+    O  => clk_100M
 );
 
-bufr50Inst: BUFR
-generic map(
-    BUFR_DIVIDE => "4"
-)
+burf20MInst: BUFGCE
 port map(
-    I => clk_200M,
-    CE => '1',
-    CLR => reset,
-    O => clk_50M
+    I  => clk_200M,
+    CE => clkCnt(clkCnt'left),
+    O  => clk_20M
 );
 
-bufr10Inst: BUFR
-generic map(
-    BUFR_DIVIDE => "5"
-)
+clk10MProc: process(clk_20M)
+begin
+    if rising_edge(clk_20M) then
+        if reset = '1' then
+            clk10MT <= '0';
+        else
+            clk10MT <= not clk10MT;
+        end if;
+    end if;
+end process;
+
+buf10MInst: BUFG
 port map(
-    I => clk_50M,
-    CE => '1',
-    CLR => reset,
+    I => clk10MT,
     O => clk_10M
 );
 

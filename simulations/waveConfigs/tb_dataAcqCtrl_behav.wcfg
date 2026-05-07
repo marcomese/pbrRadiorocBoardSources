@@ -15,62 +15,22 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="0.000000 us"></ZoomStartTime>
-      <ZoomEndTime time="160.000001 us"></ZoomEndTime>
-      <Cursor1Time time="160.000000 us"></Cursor1Time>
+      <ZoomStartTime time="910.084 ns"></ZoomStartTime>
+      <ZoomEndTime time="1,554.585 ns"></ZoomEndTime>
+      <Cursor1Time time="1,167.500 ns"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
-      <NameColumnWidth column_width="269"></NameColumnWidth>
+      <NameColumnWidth column_width="241"></NameColumnWidth>
       <ValueColumnWidth column_width="58"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="87" />
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/adc/rst" type="logic">
-      <obj_property name="ElementShortName">rst</obj_property>
-      <obj_property name="ObjectShortName">rst</obj_property>
-   </wvobject>
+   <WVObjectSize size="20" />
+   <wave_markers>
+      <marker time="867500" label="" />
+      <marker time="1067500" label="" />
+   </wave_markers>
    <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/adc/clk_100M" type="logic">
       <obj_property name="ElementShortName">clk_100M</obj_property>
       <obj_property name="ObjectShortName">clk_100M</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/adc/clk_200M" type="logic">
-      <obj_property name="ElementShortName">clk_200M</obj_property>
-      <obj_property name="ObjectShortName">clk_200M</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/adc/start" type="logic">
-      <obj_property name="ElementShortName">start</obj_property>
-      <obj_property name="ObjectShortName">start</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/adc/sdo_hg" type="logic">
-      <obj_property name="ElementShortName">sdo_hg</obj_property>
-      <obj_property name="ObjectShortName">sdo_hg</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/adc/sdo_lg" type="logic">
-      <obj_property name="ElementShortName">sdo_lg</obj_property>
-      <obj_property name="ObjectShortName">sdo_lg</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/adc/NORT1" type="logic">
-      <obj_property name="ElementShortName">NORT1</obj_property>
-      <obj_property name="ObjectShortName">NORT1</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/adc/NORT2" type="logic">
-      <obj_property name="ElementShortName">NORT2</obj_property>
-      <obj_property name="ObjectShortName">NORT2</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/adc/NORTQ" type="logic">
-      <obj_property name="ElementShortName">NORTQ</obj_property>
-      <obj_property name="ObjectShortName">NORTQ</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/adc/nb_acq" type="array">
-      <obj_property name="ElementShortName">nb_acq[7:0]</obj_property>
-      <obj_property name="ObjectShortName">nb_acq[7:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/adc/t" type="array">
-      <obj_property name="ElementShortName">t[63:0]</obj_property>
-      <obj_property name="ObjectShortName">t[63:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/adc/sel_adc" type="array">
-      <obj_property name="ElementShortName">sel_adc[63:0]</obj_property>
-      <obj_property name="ObjectShortName">sel_adc[63:0]</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/adc/rd_en" type="logic">
       <obj_property name="ElementShortName">rd_en</obj_property>
@@ -79,82 +39,6 @@
    <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/adc/dout" type="array">
       <obj_property name="ElementShortName">dout[7:0]</obj_property>
       <obj_property name="ObjectShortName">dout[7:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/adc/reset_n" type="logic">
-      <obj_property name="ElementShortName">reset_n</obj_property>
-      <obj_property name="ObjectShortName">reset_n</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/adc/rstb_rd" type="logic">
-      <obj_property name="ElementShortName">rstb_rd</obj_property>
-      <obj_property name="ObjectShortName">rstb_rd</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/adc/ck_read" type="logic">
-      <obj_property name="ElementShortName">ck_read</obj_property>
-      <obj_property name="ObjectShortName">ck_read</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/adc/n_cnv" type="logic">
-      <obj_property name="ElementShortName">n_cnv</obj_property>
-      <obj_property name="ObjectShortName">n_cnv</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/adc/adc_sck" type="logic">
-      <obj_property name="ElementShortName">adc_sck</obj_property>
-      <obj_property name="ObjectShortName">adc_sck</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/adc/empty_acq" type="logic">
-      <obj_property name="ElementShortName">empty_acq</obj_property>
-      <obj_property name="ObjectShortName">empty_acq</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/adc/end_multi_acq" type="logic">
-      <obj_property name="ElementShortName">end_multi_acq</obj_property>
-      <obj_property name="ObjectShortName">end_multi_acq</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/adc/rd_data_count_acq" type="array">
-      <obj_property name="ElementShortName">rd_data_count_acq[16:0]</obj_property>
-      <obj_property name="ObjectShortName">rd_data_count_acq[16:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/adc/hold_ext" type="logic">
-      <obj_property name="ElementShortName">hold_ext</obj_property>
-      <obj_property name="ObjectShortName">hold_ext</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/adc/trig_ext" type="logic">
-      <obj_property name="ElementShortName">trig_ext</obj_property>
-      <obj_property name="ObjectShortName">trig_ext</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/adc/trig_out" type="logic">
-      <obj_property name="ElementShortName">trig_out</obj_property>
-      <obj_property name="ObjectShortName">trig_out</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/adc/evtTrigger" type="logic">
-      <obj_property name="ElementShortName">evtTrigger</obj_property>
-      <obj_property name="ObjectShortName">evtTrigger</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/adc/pulsing" type="logic">
-      <obj_property name="ElementShortName">pulsing</obj_property>
-      <obj_property name="ObjectShortName">pulsing</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/adc/pulse" type="logic">
-      <obj_property name="ElementShortName">pulse</obj_property>
-      <obj_property name="ObjectShortName">pulse</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/adc/extTrg" type="logic">
-      <obj_property name="ElementShortName">extTrg</obj_property>
-      <obj_property name="ObjectShortName">extTrg</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/adc/endAcq" type="logic">
-      <obj_property name="ElementShortName">endAcq</obj_property>
-      <obj_property name="ObjectShortName">endAcq</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/adc/rdValid" type="logic">
-      <obj_property name="ElementShortName">rdValid</obj_property>
-      <obj_property name="ObjectShortName">rdValid</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/adc/current_state" type="other">
-      <obj_property name="ElementShortName">current_state</obj_property>
-      <obj_property name="ObjectShortName">current_state</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/adc/next_state" type="other">
-      <obj_property name="ElementShortName">next_state</obj_property>
-      <obj_property name="ObjectShortName">next_state</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/adc/cpt" type="other">
       <obj_property name="ElementShortName">cpt</obj_property>
@@ -168,73 +52,9 @@
       <obj_property name="ElementShortName">ch</obj_property>
       <obj_property name="ObjectShortName">ch</obj_property>
    </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/adc/hold_delay" type="other">
-      <obj_property name="ElementShortName">hold_delay</obj_property>
-      <obj_property name="ObjectShortName">hold_delay</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/adc/conv_delay" type="other">
-      <obj_property name="ElementShortName">conv_delay</obj_property>
-      <obj_property name="ObjectShortName">conv_delay</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/adc/hit0" type="logic">
-      <obj_property name="ElementShortName">hit0</obj_property>
-      <obj_property name="ObjectShortName">hit0</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/adc/hit" type="logic">
-      <obj_property name="ElementShortName">hit</obj_property>
-      <obj_property name="ObjectShortName">hit</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/adc/en_acq" type="logic">
-      <obj_property name="ElementShortName">en_acq</obj_property>
-      <obj_property name="ObjectShortName">en_acq</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/adc/end_acq" type="logic">
-      <obj_property name="ElementShortName">end_acq</obj_property>
-      <obj_property name="ObjectShortName">end_acq</obj_property>
-   </wvobject>
    <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/adc/wr_en" type="logic">
       <obj_property name="ElementShortName">wr_en</obj_property>
       <obj_property name="ObjectShortName">wr_en</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/adc/wrEnSync" type="logic">
-      <obj_property name="ElementShortName">wrEnSync</obj_property>
-      <obj_property name="ObjectShortName">wrEnSync</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/adc/sdo_hg_des" type="array">
-      <obj_property name="ElementShortName">sdo_hg_des[15:0]</obj_property>
-      <obj_property name="ObjectShortName">sdo_hg_des[15:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/adc/sdo_lg_des" type="array">
-      <obj_property name="ElementShortName">sdo_lg_des[15:0]</obj_property>
-      <obj_property name="ObjectShortName">sdo_lg_des[15:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/adc/sdo_hglg" type="array">
-      <obj_property name="ElementShortName">sdo_hglg[31:0]</obj_property>
-      <obj_property name="ObjectShortName">sdo_hglg[31:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/adc/din" type="array">
-      <obj_property name="ElementShortName">din[31:0]</obj_property>
-      <obj_property name="ObjectShortName">din[31:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/adc/en_adc_sck" type="logic">
-      <obj_property name="ElementShortName">en_adc_sck</obj_property>
-      <obj_property name="ObjectShortName">en_adc_sck</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/adc/adc_sck_s" type="logic">
-      <obj_property name="ElementShortName">adc_sck_s</obj_property>
-      <obj_property name="ObjectShortName">adc_sck_s</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/adc/rstb_rd_s" type="logic">
-      <obj_property name="ElementShortName">rstb_rd_s</obj_property>
-      <obj_property name="ObjectShortName">rstb_rd_s</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/adc/rst_n" type="logic">
-      <obj_property name="ElementShortName">rst_n</obj_property>
-      <obj_property name="ObjectShortName">rst_n</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/adc/t0" type="logic">
-      <obj_property name="ElementShortName">t0</obj_property>
-      <obj_property name="ObjectShortName">t0</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/adc/trigger" type="logic">
       <obj_property name="ElementShortName">trigger</obj_property>
@@ -244,41 +64,13 @@
       <obj_property name="ElementShortName">trgFF</obj_property>
       <obj_property name="ObjectShortName">trgFF</obj_property>
    </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/adc/trigger_sft" type="logic">
-      <obj_property name="ElementShortName">trigger_sft</obj_property>
-      <obj_property name="ObjectShortName">trigger_sft</obj_property>
-   </wvobject>
    <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/adc/trgSftFF" type="logic">
       <obj_property name="ElementShortName">trgSftFF</obj_property>
       <obj_property name="ObjectShortName">trgSftFF</obj_property>
    </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/adc/holdext" type="logic">
-      <obj_property name="ElementShortName">holdext</obj_property>
-      <obj_property name="ObjectShortName">holdext</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/adc/trgEdge" type="logic">
-      <obj_property name="ElementShortName">trgEdge</obj_property>
-      <obj_property name="ObjectShortName">trgEdge</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/adc/trgSftEdge" type="logic">
-      <obj_property name="ElementShortName">trgSftEdge</obj_property>
-      <obj_property name="ObjectShortName">trgSftEdge</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/dataAcqCtrlInst/clk100M" type="logic">
-      <obj_property name="ElementShortName">clk100M</obj_property>
-      <obj_property name="ObjectShortName">clk100M</obj_property>
-   </wvobject>
    <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/dataAcqCtrlInst/rst" type="logic">
       <obj_property name="ElementShortName">rst</obj_property>
       <obj_property name="ObjectShortName">rst</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/dataAcqCtrlInst/devExec" type="logic">
-      <obj_property name="ElementShortName">devExec</obj_property>
-      <obj_property name="ObjectShortName">devExec</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/dataAcqCtrlInst/devId" type="other">
-      <obj_property name="ElementShortName">devId</obj_property>
-      <obj_property name="ObjectShortName">devId</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/dataAcqCtrlInst/devRw" type="logic">
       <obj_property name="ElementShortName">devRw</obj_property>
@@ -288,88 +80,32 @@
       <obj_property name="ElementShortName">devBrst</obj_property>
       <obj_property name="ObjectShortName">devBrst</obj_property>
    </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/dataAcqCtrlInst/devBrstWrt" type="logic">
-      <obj_property name="ElementShortName">devBrstWrt</obj_property>
-      <obj_property name="ObjectShortName">devBrstWrt</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/dataAcqCtrlInst/devBrstSnd" type="logic">
-      <obj_property name="ElementShortName">devBrstSnd</obj_property>
-      <obj_property name="ObjectShortName">devBrstSnd</obj_property>
-   </wvobject>
    <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/dataAcqCtrlInst/devBrstRst" type="logic">
       <obj_property name="ElementShortName">devBrstRst</obj_property>
       <obj_property name="ObjectShortName">devBrstRst</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/dataAcqCtrlInst/devAddr" type="array">
-      <obj_property name="ElementShortName">devAddr[1:0][7:0]</obj_property>
-      <obj_property name="ObjectShortName">devAddr[1:0][7:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/dataAcqCtrlInst/devDataIn" type="array">
-      <obj_property name="ElementShortName">devDataIn[3:0][7:0]</obj_property>
-      <obj_property name="ObjectShortName">devDataIn[3:0][7:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/dataAcqCtrlInst/devDataOut" type="array">
-      <obj_property name="ElementShortName">devDataOut[3:0][7:0]</obj_property>
-      <obj_property name="ObjectShortName">devDataOut[3:0][7:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/dataAcqCtrlInst/devReady" type="logic">
-      <obj_property name="ElementShortName">devReady</obj_property>
-      <obj_property name="ObjectShortName">devReady</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/dataAcqCtrlInst/busy" type="logic">
-      <obj_property name="ElementShortName">busy</obj_property>
-      <obj_property name="ObjectShortName">busy</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/dataAcqCtrlInst/resetAcq" type="logic">
-      <obj_property name="ElementShortName">resetAcq</obj_property>
-      <obj_property name="ObjectShortName">resetAcq</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/dataAcqCtrlInst/startAcq" type="logic">
-      <obj_property name="ElementShortName">startAcq</obj_property>
-      <obj_property name="ObjectShortName">startAcq</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/dataAcqCtrlInst/endAcq" type="logic">
-      <obj_property name="ElementShortName">endAcq</obj_property>
-      <obj_property name="ObjectShortName">endAcq</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/dataAcqCtrlInst/rdValid" type="logic">
-      <obj_property name="ElementShortName">rdValid</obj_property>
-      <obj_property name="ObjectShortName">rdValid</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/dataAcqCtrlInst/rdAcq" type="logic">
-      <obj_property name="ElementShortName">rdAcq</obj_property>
-      <obj_property name="ObjectShortName">rdAcq</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/dataAcqCtrlInst/rdDataCnt" type="array">
-      <obj_property name="ElementShortName">rdDataCnt[16:0]</obj_property>
-      <obj_property name="ObjectShortName">rdDataCnt[16:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/dataAcqCtrlInst/emptyAcq" type="logic">
-      <obj_property name="ElementShortName">emptyAcq</obj_property>
-      <obj_property name="ObjectShortName">emptyAcq</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/dataAcqCtrlInst/nbAcq" type="array">
-      <obj_property name="ElementShortName">nbAcq[7:0]</obj_property>
-      <obj_property name="ObjectShortName">nbAcq[7:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/dataAcqCtrlInst/selAdc" type="array">
-      <obj_property name="ElementShortName">selAdc[63:0]</obj_property>
-      <obj_property name="ObjectShortName">selAdc[63:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/dataAcqCtrlInst/doutAcq" type="array">
-      <obj_property name="ElementShortName">doutAcq[7:0]</obj_property>
-      <obj_property name="ObjectShortName">doutAcq[7:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/dataAcqCtrlInst/rData" type="array">
-      <obj_property name="ElementShortName">rData[5:0][31:0]</obj_property>
-      <obj_property name="ObjectShortName">rData[5:0][31:0]</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/dataAcqCtrlInst/state" type="other">
       <obj_property name="ElementShortName">state</obj_property>
       <obj_property name="ObjectShortName">state</obj_property>
    </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/dataAcqCtrlInst/lastData" type="array">
-      <obj_property name="ElementShortName">lastData[3:0][7:0]</obj_property>
-      <obj_property name="ObjectShortName">lastData[3:0][7:0]</obj_property>
+   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/clk_100M" type="logic">
+      <obj_property name="ElementShortName">clk_100M</obj_property>
+      <obj_property name="ObjectShortName">clk_100M</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/clk_20M" type="logic">
+      <obj_property name="ElementShortName">clk_20M</obj_property>
+      <obj_property name="ObjectShortName">clk_20M</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/clk10MT" type="logic">
+      <obj_property name="ElementShortName">clk10MT</obj_property>
+      <obj_property name="ObjectShortName">clk10MT</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/clk_10M" type="logic">
+      <obj_property name="ElementShortName">clk_10M</obj_property>
+      <obj_property name="ObjectShortName">clk_10M</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/sysClkDS" type="logic">
+      <obj_property name="ElementShortName">sysClkDS</obj_property>
+      <obj_property name="ObjectShortName">sysClkDS</obj_property>
    </wvobject>
 </wave_config>
