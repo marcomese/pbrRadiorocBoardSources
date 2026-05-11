@@ -15,15 +15,18 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="113,033.100 ns"></ZoomStartTime>
-      <ZoomEndTime time="113,086.601 ns"></ZoomEndTime>
-      <Cursor1Time time="113,057.500 ns"></Cursor1Time>
+      <ZoomStartTime time="123,540.900 ns"></ZoomStartTime>
+      <ZoomEndTime time="123,671.001 ns"></ZoomEndTime>
+      <Cursor1Time time="123,577.500 ns"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
-      <NameColumnWidth column_width="233"></NameColumnWidth>
+      <NameColumnWidth column_width="229"></NameColumnWidth>
       <ValueColumnWidth column_width="58"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="57" />
+   <WVObjectSize size="64" />
+   <wave_markers>
+      <marker time="123322500" label="" />
+   </wave_markers>
    <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/adc/rd_en" type="logic">
       <obj_property name="ElementShortName">rd_en</obj_property>
       <obj_property name="ObjectShortName">rd_en</obj_property>
@@ -35,10 +38,39 @@
    <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/adc/cpt" type="array">
       <obj_property name="ElementShortName">cpt[12:0]</obj_property>
       <obj_property name="ObjectShortName">cpt[12:0]</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/adc/ch" type="other">
       <obj_property name="ElementShortName">ch</obj_property>
       <obj_property name="ObjectShortName">ch</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/adc/n_cnv" type="logic">
+      <obj_property name="ElementShortName">n_cnv</obj_property>
+      <obj_property name="ObjectShortName">n_cnv</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/adc/adc_sck" type="logic">
+      <obj_property name="ElementShortName">adc_sck</obj_property>
+      <obj_property name="ObjectShortName">adc_sck</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/adc/shift_en" type="logic">
+      <obj_property name="ElementShortName">shift_en</obj_property>
+      <obj_property name="ObjectShortName">shift_en</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/adc/sdo_hg_des" type="array">
+      <obj_property name="ElementShortName">sdo_hg_des[15:0]</obj_property>
+      <obj_property name="ObjectShortName">sdo_hg_des[15:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/adc/sdo_lg_des" type="array">
+      <obj_property name="ElementShortName">sdo_lg_des[15:0]</obj_property>
+      <obj_property name="ObjectShortName">sdo_lg_des[15:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/adc/sdo_hglg" type="array">
+      <obj_property name="ElementShortName">sdo_hglg[31:0]</obj_property>
+      <obj_property name="ObjectShortName">sdo_hglg[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/adc/en_adc_sck" type="logic">
+      <obj_property name="ElementShortName">en_adc_sck</obj_property>
+      <obj_property name="ObjectShortName">en_adc_sck</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/adc/wr_en" type="logic">
       <obj_property name="ElementShortName">wr_en</obj_property>
