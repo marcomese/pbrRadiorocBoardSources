@@ -222,12 +222,12 @@ begin
         --------------------------------------------------------------------
         -- 2nd transaction: 0x76, 0xA5, 0x00, 0x05
         --------------------------------------------------------------------
-        startSpi;
-        sendByte(x"76");
-        sendByte(x"A5");
-        sendByte(x"00");
-        sendByte(x"05");
-        endSpi;
+--        startSpi;
+--        sendByte(x"76");
+--        sendByte(x"A5");
+--        sendByte(x"00");
+--        sendByte(x"03");
+--        endSpi;
 
         wait for 100 us;
 

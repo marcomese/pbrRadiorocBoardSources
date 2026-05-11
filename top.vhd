@@ -89,7 +89,7 @@ architecture arch of radioroc_fw is
 	signal tEdge21, TBuf21 : std_logic_vector(127 downto 0);
 	-- Clock and reset
 	signal reset, resetn, resetSig : std_logic;
-	signal clk_10M, clk_20M, clk_100M, clk_200M : std_logic;
+	signal clk_10M, clk_20M, clk_200M : std_logic;
 	signal sysClkDS : std_logic;
 	-- I2C
     signal en_clki2c, enClkI2CSync : std_logic;
@@ -457,13 +457,6 @@ begin
     end if;
 end process;
 
-burf100MInst: BUFGCE
-port map(
-    I  => clk_200M,
-    CE => clkCnt(0),
-    O  => clk_100M
-);
-
 burf20MInst: BUFGCE
 port map(
     I  => clk_200M,
@@ -531,7 +524,6 @@ port map(
 adc: entity xil_defaultlib.adc
 port map(
     rst 	 => reset_acq,
-    clk_100M => clk_100M,
     clk_200M => clk_200M,
     start    => start_acq,
     sdo_hg	 => ADC_HG,
