@@ -15,18 +15,15 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="123,540.900 ns"></ZoomStartTime>
-      <ZoomEndTime time="123,671.001 ns"></ZoomEndTime>
-      <Cursor1Time time="123,577.500 ns"></Cursor1Time>
+      <ZoomStartTime time="123,955.800 ns"></ZoomStartTime>
+      <ZoomEndTime time="124,086.301 ns"></ZoomEndTime>
+      <Cursor1Time time="123,982.500 ns"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
-      <NameColumnWidth column_width="229"></NameColumnWidth>
+      <NameColumnWidth column_width="225"></NameColumnWidth>
       <ValueColumnWidth column_width="58"></ValueColumnWidth>
    </column_width_setting>
    <WVObjectSize size="64" />
-   <wave_markers>
-      <marker time="123322500" label="" />
-   </wave_markers>
    <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/adc/rd_en" type="logic">
       <obj_property name="ElementShortName">rd_en</obj_property>
       <obj_property name="ObjectShortName">rd_en</obj_property>
