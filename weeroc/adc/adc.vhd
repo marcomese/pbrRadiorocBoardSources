@@ -46,6 +46,7 @@ entity adc is
         NORT2             : in  std_logic;
         NORTQ             : in  std_logic;
         nb_acq            : in  std_logic_vector(7 downto 0);
+        tStamp            : in  std_logic_vector(63 downto 0);
         t                 : in  std_logic_vector(63 downto 0);
         sel_adc           : in  std_logic_vector(63 downto 0);
         rd_en             : in  std_logic;
@@ -72,25 +73,14 @@ end adc;
 
 architecture Behavioral of adc is
 
---    component fifo_acq
---        port (
---            clk           : in  std_logic;
---            srst          : in  std_logic;
---            din           : in  std_logic_vector(31 downto 0);
---            wr_en         : in  std_logic;
---            rd_en         : in  std_logic;
---            dout          : out std_logic_vector(7 downto 0);
---            full          : out std_logic;
---            empty         : out std_logic;
---            valid         : out std_logic;
---            rd_data_count : out std_logic_vector(16 downto 0)
---        );
---    end component;
-
-    type state_t is (init, idle, wait_hold, rst_cpt, wait_conv,
+    type state_t is (init, idle, wrTSCoarse, wrTSFine, wait_hold, rst_cpt, wait_conv,
                      asrt_rd_high, asrt_rd_low, nxt, read_asic,
                      start_conv, end_conv, read_adc, end_read_adc,
                      write_fifo, finish);
+
+    constant ACQDATA  : std_logic_vector(1 downto 0) := "00";
+    constant TSCOARSE : std_logic_vector(1 downto 0) := "01";
+    constant TSFINE   : std_logic_vector(1 downto 0) := "10";
 
     signal current_state, next_state : state_t;
 
@@ -100,13 +90,15 @@ architecture Behavioral of adc is
     signal ch         : natural range 0 to 80;
     signal hold_delay : natural range 0 to 4095;
     signal conv_delay : natural range 0 to 2047;
+    
+    signal dinSel : std_logic_vector(1 downto 0);
 
     signal hit0, hit, en_acq      : std_logic;
     signal end_acq                : std_logic;
     signal wr_en                  : std_logic;
 
     signal sdo_hg_des, sdo_lg_des : std_logic_vector(15 downto 0);
-    signal sdo_hglg               : std_logic_vector(31 downto 0);
+    signal dinFifo                : std_logic_vector(31 downto 0);
 
     signal en_adc_sck             : std_logic;
     signal adc_sck_int            : std_logic;
@@ -212,10 +204,19 @@ begin
         end if;
     end process;
 
-    -- xpm_fifo_sync have different packaging compared to ip fifo generator
-    sdo_hglg <= sdo_hg_des(7 downto 0) & sdo_hg_des(15 downto 8) &
-                sdo_lg_des(7 downto 0) & sdo_lg_des(15 downto 8);
-
+    dinMux: process(dinSel, sdo_hg_des, sdo_lg_des, tStamp)
+    begin
+        -- xpm_fifo_sync have different packaging compared to ip fifo generator
+        case(dinSel) is
+            when TSCOARSE =>
+                dinFifo <= tStamp(47 downto 32) & tStamp(63 downto 48);
+            when TSFINE =>
+                dinFifo <= tStamp(15 downto 0) & tStamp(31 downto 16);
+            when others =>
+                dinFifo <= sdo_hg_des(7 downto 0) & sdo_hg_des(15 downto 8) &
+                           sdo_lg_des(7 downto 0) & sdo_lg_des(15 downto 8);
+        end case;
+    end process;
     ----------------------------------------------------------------
     -- SCK rising-edge counter (replaces adc_sck_vector / cpt_adc_sck)
     --   Reset to 0 on entry to end_conv (the cycle before read_adc)
@@ -249,7 +250,7 @@ begin
     port map(
         wr_clk        => clk_200M,
         rst           => locRst,
-        din           => sdo_hglg,
+        din           => dinFifo,
         wr_en         => wr_en,
         dout          => dout,
         rd_en         => rd_en,
@@ -261,20 +262,6 @@ begin
         injectdbiterr => '0',
         injectsbiterr => '0'
     );
-
---    ff : fifo_acq
---        port map (
---            srst          => locRst,
---            clk           => clk_200M,
---            din           => sdo_hglg,
---            wr_en         => wr_en,
---            rd_en         => rd_en,
---            dout          => dout,
---            full          => open,
---            empty         => empty_acq,
---            valid         => rdValidSig,
---            rd_data_count => rd_data_count_acq
---        );
 
     ----------------------------------------------------------------
     -- Trigger source mux + edge detection
@@ -366,10 +353,17 @@ begin
                 next_state <= idle;
             when idle =>
                 if trgEdge = '1' or trgSftEdge = '1' then
-                    next_state <= wait_hold;
+                    --next_state <= wait_hold;
+                    next_state <= wrTSCoarse;
                 else
                     next_state <= idle;
                 end if;
+            when wrTSCoarse =>
+                next_state <= wrTSFine;
+
+            when wrTSFine =>
+                next_state <= wait_hold;
+
             when wait_hold =>
                 if cpt = 0 then
                     next_state <= rst_cpt;
@@ -451,6 +445,7 @@ begin
         n_cnv      <= '0';
         en_adc_sck <= '0';
         wr_en      <= '0';
+        dinSel     <= ACQDATA;
         end_acq    <= '0';
         en_trigext <= '0';
 
@@ -460,6 +455,12 @@ begin
                 holdext   <= '0';
             when idle =>
                 holdext <= '0';
+            when wrTSCoarse =>
+                wr_en  <= '1';
+                dinSel <= TSCOARSE;
+            when wrTSFine =>
+                wr_en <= '1';
+                dinSel <= TSFINE;
             when wait_hold =>
                 rstb_rd_s  <= '0';
                 holdext    <= '0';

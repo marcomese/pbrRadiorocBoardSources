@@ -102,11 +102,12 @@ architecture arch of radioroc_fw is
 
 -- CONSTANTS for deviceInterface, tmpCtrl and PulseGentCtrl
 
-constant clkFreq        : real      := 100.0e6;
+constant clkFreq        : real      := 200.0e6;
 constant timeout        : real      := 1.0;
 constant sleepOnPwrOn   : boolean   := True;
 constant pwrOnTime      : real      := 20.0e-6;
 constant settlingTime   : real      := 5.0e-6;
+constant coarseBase     : real      := 1.0;
 
 constant tmpAddr        : std_logic_vector(6 downto 0) := "1001000";
 constant sipmHvAddr     : std_logic_vector(6 downto 0) := "1110011";
@@ -185,6 +186,8 @@ signal   i2cDataRdRad   : std_logic_vector(7 downto 0);
 signal   areset         : std_logic;
 signal   dataToMaster,
          dataFromMaster : std_logic_vector(7 downto 0);
+
+signal   tStamp         : std_logic_vector(63 downto 0);
 
 signal extTrgFF, extTrgSig : std_logic;
 
@@ -538,6 +541,7 @@ port map(
     NORT2 	 => sc_NORT2,
     NORTQ    => sc_NORTQ,
     nb_acq   => nb_acq,
+    tStamp   => tStamp,
     t		 => T_1Sync,
     sel_adc => sel_adc,
     rd_en 	 => rd_acq,
@@ -605,6 +609,20 @@ port map(
     devDataOut => dataFromRM,
     devReady   => devReadyRM,
     busy       => devBusyRM
+);
+
+timeStampInst: entity work.timeStamp
+generic map(
+    clkFreq    => clkFreq,
+    coarseBase => coarseBase
+)
+port map(
+    clk     => clk_200M,
+    rst     => reset,
+    freeze  => evtTrigger,
+    tFine   => open,
+    tCoarse => open,
+    tStamp  => tStamp
 );
 
 dataAcqCtrlInst : entity work.dataAcqCtrl
