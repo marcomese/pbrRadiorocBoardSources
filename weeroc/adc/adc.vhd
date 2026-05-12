@@ -72,20 +72,20 @@ end adc;
 
 architecture Behavioral of adc is
 
-    component fifo_acq
-        port (
-            clk           : in  std_logic;
-            srst          : in  std_logic;
-            din           : in  std_logic_vector(31 downto 0);
-            wr_en         : in  std_logic;
-            rd_en         : in  std_logic;
-            dout          : out std_logic_vector(7 downto 0);
-            full          : out std_logic;
-            empty         : out std_logic;
-            valid         : out std_logic;
-            rd_data_count : out std_logic_vector(16 downto 0)
-        );
-    end component;
+--    component fifo_acq
+--        port (
+--            clk           : in  std_logic;
+--            srst          : in  std_logic;
+--            din           : in  std_logic_vector(31 downto 0);
+--            wr_en         : in  std_logic;
+--            rd_en         : in  std_logic;
+--            dout          : out std_logic_vector(7 downto 0);
+--            full          : out std_logic;
+--            empty         : out std_logic;
+--            valid         : out std_logic;
+--            rd_data_count : out std_logic_vector(16 downto 0)
+--        );
+--    end component;
 
     type state_t is (init, idle, wait_hold, rst_cpt, wait_conv,
                      asrt_rd_high, asrt_rd_low, nxt, read_asic,
@@ -233,19 +233,46 @@ begin
     ----------------------------------------------------------------
     -- Acquisition FIFO (single domain: clk_200M only)
     ----------------------------------------------------------------
-    ff : fifo_acq
-        port map (
-            srst          => locRst,
-            clk           => clk_200M,
-            din           => sdo_hglg,
-            wr_en         => wr_en,
-            rd_en         => rd_en,
-            dout          => dout,
-            full          => open,
-            empty         => empty_acq,
-            valid         => rdValidSig,
-            rd_data_count => rd_data_count_acq
-        );
+
+    dataFifo: xpm_fifo_sync
+    generic map(
+        FIFO_WRITE_DEPTH => 16384,
+        READ_DATA_WIDTH  => 8,
+        WRITE_DATA_WIDTH => 32,
+        PROG_FULL_THRESH => 7,
+        READ_MODE        => "std",
+        USE_ADV_FEATURES => "1400",
+        FIFO_MEMORY_TYPE => "block"
+    )
+    port map(
+        wr_clk        => clk_200M,
+        rst           => locRst,
+        din           => sdo_hglg,
+        wr_en         => wr_en,
+        dout          => dout,
+        rd_en         => rd_en,
+        data_valid    => rdValidSig,
+        empty         => empty_acq,
+        full          => open,
+        rd_data_count => rd_data_count_acq,
+        sleep         => '0',
+        injectdbiterr => '0',
+        injectsbiterr => '0'
+    );
+
+--    ff : fifo_acq
+--        port map (
+--            srst          => locRst,
+--            clk           => clk_200M,
+--            din           => sdo_hglg,
+--            wr_en         => wr_en,
+--            rd_en         => rd_en,
+--            dout          => dout,
+--            full          => open,
+--            empty         => empty_acq,
+--            valid         => rdValidSig,
+--            rd_data_count => rd_data_count_acq
+--        );
 
     ----------------------------------------------------------------
     -- Trigger source mux + edge detection
