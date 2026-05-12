@@ -212,7 +212,9 @@ begin
         end if;
     end process;
 
-    sdo_hglg <= sdo_hg_des & sdo_lg_des;
+    -- xpm_fifo_sync have different packaging compared to ip fifo generator
+    sdo_hglg <= sdo_hg_des(7 downto 0) & sdo_hg_des(15 downto 8) &
+                sdo_lg_des(7 downto 0) & sdo_lg_des(15 downto 8);
 
     ----------------------------------------------------------------
     -- SCK rising-edge counter (replaces adc_sck_vector / cpt_adc_sck)
@@ -236,12 +238,13 @@ begin
 
     dataFifo: xpm_fifo_sync
     generic map(
-        FIFO_WRITE_DEPTH => 16384,
-        READ_DATA_WIDTH  => 8,
-        WRITE_DATA_WIDTH => 32,
-        READ_MODE        => "std",
-        USE_ADV_FEATURES => "1400",
-        FIFO_MEMORY_TYPE => "block"
+        FIFO_WRITE_DEPTH    => 16384,
+        READ_DATA_WIDTH     => 8,
+        WRITE_DATA_WIDTH    => 32,
+        RD_DATA_COUNT_WIDTH => 17,
+        READ_MODE           => "std",
+        USE_ADV_FEATURES    => "1400",
+        FIFO_MEMORY_TYPE    => "block"
     )
     port map(
         wr_clk        => clk_200M,
