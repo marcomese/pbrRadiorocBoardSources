@@ -458,6 +458,9 @@ begin
 end process;
 
 burf20MInst: BUFGCE
+generic map(
+    SIM_DEVICE => "7SERIES"
+)
 port map(
     I  => clk_200M,
     CE => clkCnt(clkCnt'left),
@@ -515,6 +518,9 @@ port map(
 );
 
 scClkSmBufInst: BUFGCE
+generic map(
+    SIM_DEVICE => "7SERIES"
+)
 port map(
     O => sc_clk_sm,
     CE => enClkI2CSync,
