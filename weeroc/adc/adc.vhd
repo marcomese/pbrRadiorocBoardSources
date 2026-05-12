@@ -239,7 +239,6 @@ begin
         FIFO_WRITE_DEPTH => 16384,
         READ_DATA_WIDTH  => 8,
         WRITE_DATA_WIDTH => 32,
-        PROG_FULL_THRESH => 7,
         READ_MODE        => "std",
         USE_ADV_FEATURES => "1400",
         FIFO_MEMORY_TYPE => "block"
