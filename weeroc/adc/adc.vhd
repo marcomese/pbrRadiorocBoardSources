@@ -110,8 +110,8 @@ architecture Behavioral of adc is
 
     signal en_adc_sck             : std_logic;
     signal adc_sck_int            : std_logic;
-    signal shift_en,
-           firstEn                : std_logic;
+    signal shift_en               : std_logic;
+    signal sck_cnt_en             : std_logic;
     signal rstb_rd_s, rst_n       : std_logic;
 
     signal t0                     : std_logic;
@@ -168,35 +168,36 @@ begin
     begin
         if rising_edge(clk_200M) then
             if locRst = '1' or en_adc_sck = '0' or sck_cnt = 16 then
-                adc_sck_int <= '0';
+                adc_sck_int <= '1';
+                sck_cnt_en  <= '0';
             else
                 adc_sck_int <= not adc_sck_int;
+                sck_cnt_en  <= en_adc_sck and adc_sck_int;
             end if;
         end if;
     end process;
 
     -- shift_en is high for exactly one clk_200M cycle per generated
     -- SCK period, in the rising-edge cycle of adc_sck_int.
-    shift_en <= en_adc_sck and adc_sck_int;
 
     adc_sck <= adc_sck_int;
     rstb_rd <= rstb_rd_s;
+
+    shiftEnProc: process(clk_200M)
+    begin
+        if rising_edge(clk_200M) then
+            if locRst = '1' then
+                shift_en <= '0';
+            elsif sck_cnt < 15 then
+                shift_en <= en_adc_sck and adc_sck_int;
+            end if;
+        end if;
+    end process;
 
     ----------------------------------------------------------------
     -- Deserializer (16-bit shift register for HG and LG)
     --   Sync reset, sampled in clk_200M domain on shift_en.
     ----------------------------------------------------------------
-    
-    firstEnProc: process(clk_200M)
-    begin
-        if rising_edge(clk_200M) then
-            if locRst = '1' then
-                firstEn <= '0';
-            else
-                firstEn <= shift_en;
-            end if;
-        end if;
-    end process;
     
     deserProc : process(clk_200M)
     begin
@@ -204,7 +205,7 @@ begin
             if locRst = '1' or rstb_rd_s = '0' then
                 sdo_hg_des <= (others => '0');
                 sdo_lg_des <= (others => '0');
-            elsif firstEn = '1' then
+            elsif shift_en = '1' then
                 sdo_hg_des <= sdo_hg_des(14 downto 0) & sdo_hg;
                 sdo_lg_des <= sdo_lg_des(14 downto 0) & sdo_lg;
             end if;
@@ -223,7 +224,7 @@ begin
         if rising_edge(clk_200M) then
             if locRst = '1' or current_state = end_conv then
                 sck_cnt <= (others => '0');
-            elsif shift_en = '1' then
+            elsif sck_cnt_en = '1' then
                 sck_cnt <= sck_cnt + 1;
             end if;
         end if;
@@ -443,7 +444,7 @@ begin
             when asrt_rd_low =>
                 null;
             when nxt =>
-                null;
+                rstb_rd_s  <= '0';
             when read_asic =>
                 ck_read <= '1';
             when start_conv =>
