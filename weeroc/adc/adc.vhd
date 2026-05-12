@@ -110,7 +110,8 @@ architecture Behavioral of adc is
 
     signal en_adc_sck             : std_logic;
     signal adc_sck_int            : std_logic;
-    signal shift_en               : std_logic;
+    signal shift_en,
+           firstEn                : std_logic;
     signal rstb_rd_s, rst_n       : std_logic;
 
     signal t0                     : std_logic;
@@ -185,13 +186,25 @@ begin
     -- Deserializer (16-bit shift register for HG and LG)
     --   Sync reset, sampled in clk_200M domain on shift_en.
     ----------------------------------------------------------------
+    
+    firstEnProc: process(clk_200M)
+    begin
+        if rising_edge(clk_200M) then
+            if locRst = '1' then
+                firstEn <= '0';
+            else
+                firstEn <= shift_en;
+            end if;
+        end if;
+    end process;
+    
     deserProc : process(clk_200M)
     begin
         if rising_edge(clk_200M) then
             if locRst = '1' or rstb_rd_s = '0' then
                 sdo_hg_des <= (others => '0');
                 sdo_lg_des <= (others => '0');
-            elsif shift_en = '1' then
+            elsif firstEn = '1' then
                 sdo_hg_des <= sdo_hg_des(14 downto 0) & sdo_hg;
                 sdo_lg_des <= sdo_lg_des(14 downto 0) & sdo_lg;
             end if;

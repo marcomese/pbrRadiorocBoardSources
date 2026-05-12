@@ -15,15 +15,15 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="123,955.800 ns"></ZoomStartTime>
-      <ZoomEndTime time="124,086.301 ns"></ZoomEndTime>
-      <Cursor1Time time="123,982.500 ns"></Cursor1Time>
+      <ZoomStartTime time="0.000000 us"></ZoomStartTime>
+      <ZoomEndTime time="140.519481 us"></ZoomEndTime>
+      <Cursor1Time time="124.142500 us"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
-      <NameColumnWidth column_width="225"></NameColumnWidth>
+      <NameColumnWidth column_width="221"></NameColumnWidth>
       <ValueColumnWidth column_width="58"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="64" />
+   <WVObjectSize size="67" />
    <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/adc/rd_en" type="logic">
       <obj_property name="ElementShortName">rd_en</obj_property>
       <obj_property name="ObjectShortName">rd_en</obj_property>
@@ -45,6 +45,18 @@
       <obj_property name="ElementShortName">n_cnv</obj_property>
       <obj_property name="ObjectShortName">n_cnv</obj_property>
    </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/adc/ma/clk_200M" type="logic">
+      <obj_property name="ElementShortName">clk_200M</obj_property>
+      <obj_property name="ObjectShortName">clk_200M</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/adc/en_adc_sck" type="logic">
+      <obj_property name="ElementShortName">en_adc_sck</obj_property>
+      <obj_property name="ObjectShortName">en_adc_sck</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/adc/adc_sck_int" type="logic">
+      <obj_property name="ElementShortName">adc_sck_int</obj_property>
+      <obj_property name="ObjectShortName">adc_sck_int</obj_property>
+   </wvobject>
    <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/adc/adc_sck" type="logic">
       <obj_property name="ElementShortName">adc_sck</obj_property>
       <obj_property name="ObjectShortName">adc_sck</obj_property>
@@ -52,6 +64,10 @@
    <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/adc/shift_en" type="logic">
       <obj_property name="ElementShortName">shift_en</obj_property>
       <obj_property name="ObjectShortName">shift_en</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/adc/firstEn" type="logic">
+      <obj_property name="ElementShortName">firstEn</obj_property>
+      <obj_property name="ObjectShortName">firstEn</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/adc/sdo_hg_des" type="array">
       <obj_property name="ElementShortName">sdo_hg_des[15:0]</obj_property>
@@ -136,10 +152,6 @@
    <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/adc/ma/rst" type="logic">
       <obj_property name="ElementShortName">rst</obj_property>
       <obj_property name="ObjectShortName">rst</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/adc/ma/clk_200M" type="logic">
-      <obj_property name="ElementShortName">clk_200M</obj_property>
-      <obj_property name="ObjectShortName">clk_200M</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/adc/ma/start" type="logic">
       <obj_property name="ElementShortName">start</obj_property>
