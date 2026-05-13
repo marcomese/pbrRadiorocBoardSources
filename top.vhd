@@ -187,7 +187,9 @@ signal   areset         : std_logic;
 signal   dataToMaster,
          dataFromMaster : std_logic_vector(7 downto 0);
 
-signal   tStamp         : std_logic_vector(63 downto 0);
+signal   tFine   : std_logic_vector(31 downto 0);
+signal   tCoarse : std_logic_vector(31 downto 0);
+signal   tStamp  : std_logic_vector(63 downto 0);
 
 signal extTrgFF, extTrgSig : std_logic;
 
@@ -620,8 +622,8 @@ port map(
     clk     => clk_200M,
     rst     => reset,
     freeze  => evtTrigger,
-    tFine   => open,
-    tCoarse => open,
+    tFine   => tFine,
+    tCoarse => tCoarse,
     tStamp  => tStamp
 );
 

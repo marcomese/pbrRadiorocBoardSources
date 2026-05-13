@@ -119,6 +119,14 @@ architecture Behavioral of adc is
     signal rdValidSig             : std_logic;
     signal locRst                 : std_logic;
 
+attribute MARK_DEBUG : string;
+attribute MARK_DEBUG of trigger,
+                        wr_en,
+                        sdo_hg_des,
+                        sdo_lg_des,
+                        tStamp,
+                        dinFifo    : signal is "True";
+
 begin
 
     evtTrigger <= trgEdge;
@@ -206,12 +214,14 @@ begin
 
     dinMux: process(dinSel, sdo_hg_des, sdo_lg_des, tStamp)
     begin
-        -- xpm_fifo_sync have different packaging compared to ip fifo generator
+        -- xpm_fifo_sync have different packaging compared to ip fifo generator:
+        -- it reads B2, B3, B0, B1
+        -- writing B2,B3,B0,B1 to have B3,B2,B1,B0 in the file 
         case(dinSel) is
             when TSCOARSE =>
-                dinFifo <= tStamp(47 downto 32) & tStamp(63 downto 48);
+                dinFifo <= tStamp(55 downto 48) & tStamp(63 downto 56) & tStamp(39 downto 32) & tStamp(47 downto 40);
             when TSFINE =>
-                dinFifo <= tStamp(15 downto 0) & tStamp(31 downto 16);
+                dinFifo <= tStamp(23 downto 16) & tStamp(31 downto 24) & tStamp(7 downto 0) & tStamp(15 downto 8);
             when others =>
                 dinFifo <= sdo_hg_des(7 downto 0) & sdo_hg_des(15 downto 8) &
                            sdo_lg_des(7 downto 0) & sdo_lg_des(15 downto 8);

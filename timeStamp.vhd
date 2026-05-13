@@ -33,7 +33,7 @@ end timeStamp;
 
 architecture Behavioral of timeStamp is
 
-constant cntMax     : integer := integer(coarseBase/clkFreq);
+constant cntMax     : integer := integer(coarseBase*clkFreq);
 
 signal   locRst,
          coarseEn   : std_logic;
