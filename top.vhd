@@ -113,13 +113,15 @@ constant tmpAddr        : std_logic_vector(6 downto 0) := "1001000";
 constant sipmHvAddr     : std_logic_vector(6 downto 0) := "1110011";
 constant chipID         : std_logic_vector(3 downto 0) := "0000";
 
-constant idHeader    : std_logic_vector(3 downto 0) := x"7";
-constant broadcastId : std_logic_vector(3 downto 0) := x"F";
-constant readCmd     : std_logic_vector(3 downto 0) := x"A";
-constant writeCmd    : std_logic_vector(3 downto 0) := x"5";
-constant burstRdCmd  : std_logic_vector(3 downto 0) := x"B";
-constant burstWrCmd  : std_logic_vector(3 downto 0) := x"3";
-constant maxBrstLen  : integer                      := 2048;
+constant idHeader    : std_logic_vector(3 downto 0)  := x"7";
+constant broadcastId : std_logic_vector(3 downto 0)  := x"F";
+constant readCmd     : std_logic_vector(3 downto 0)  := x"A";
+constant writeCmd    : std_logic_vector(3 downto 0)  := x"5";
+constant burstRdCmd  : std_logic_vector(3 downto 0)  := x"B";
+constant burstWrCmd  : std_logic_vector(3 downto 0)  := x"3";
+constant maxBrstLen  : integer                       := 2048;
+constant dataHeader  : std_logic_vector(31 downto 0) := x"52_42_30_30";
+constant dataFooter  : std_logic_vector(31 downto 0) := x"5F_45_4F_50";
 
 constant rstPORLen : integer := 10;
 
@@ -533,6 +535,10 @@ port map(
 );
 
 adc: entity xil_defaultlib.adc
+generic map(
+    dataHeader => dataHeader,
+    dataFooter => dataFooter
+)
 port map(
     rst 	 => reset_acq,
     clk_200M => clk_200M,
@@ -543,6 +549,7 @@ port map(
     NORT2 	 => sc_NORT2,
     NORTQ    => sc_NORTQ,
     nb_acq   => nb_acq,
+    id       => boardID,
     tStamp   => tStamp,
     t		 => T_1Sync,
     sel_adc => sel_adc,

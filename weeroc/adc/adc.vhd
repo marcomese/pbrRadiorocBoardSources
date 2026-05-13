@@ -36,51 +36,58 @@ use xpm.vcomponents.all;
 library xil_defaultlib;
 
 entity adc is
-    port (
-        rst               : in  std_logic;
-        clk_200M          : in  std_logic;
-        start             : in  std_logic;
-        sdo_hg            : in  std_logic;
-        sdo_lg            : in  std_logic;
-        NORT1             : in  std_logic;
-        NORT2             : in  std_logic;
-        NORTQ             : in  std_logic;
-        nb_acq            : in  std_logic_vector(7 downto 0);
-        tStamp            : in  std_logic_vector(63 downto 0);
-        t                 : in  std_logic_vector(63 downto 0);
-        sel_adc           : in  std_logic_vector(63 downto 0);
-        rd_en             : in  std_logic;
-        dout              : out std_logic_vector(7 downto 0);
-        reset_n           : out std_logic;
-        rstb_rd           : out std_logic;
-        ck_read           : out std_logic;
-        n_cnv             : out std_logic;
-        adc_sck           : out std_logic;
-        empty_acq         : out std_logic;
-        end_multi_acq     : out std_logic;
-        rd_data_count_acq : out std_logic_vector(16 downto 0);
-        hold_ext          : out std_logic;
-        trig_ext          : out std_logic;
-        trig_out          : out std_logic;
-        evtTrigger        : out std_logic;
-        pulsing           : in  std_logic;
-        pulse             : in  std_logic;
-        extTrg            : in  std_logic;
-        endAcq            : out std_logic;
-        rdValid           : out std_logic
-    );
+generic(
+    dataHeader        : std_logic_vector(31 downto 0);
+    dataFooter        : std_logic_vector(31 downto 0)
+);
+port(
+    rst               : in  std_logic;
+    clk_200M          : in  std_logic;
+    start             : in  std_logic;
+    sdo_hg            : in  std_logic;
+    sdo_lg            : in  std_logic;
+    NORT1             : in  std_logic;
+    NORT2             : in  std_logic;
+    NORTQ             : in  std_logic;
+    nb_acq            : in  std_logic_vector(7 downto 0);
+    id                : in  std_logic_vector(3 downto 0);
+    tStamp            : in  std_logic_vector(63 downto 0);
+    t                 : in  std_logic_vector(63 downto 0);
+    sel_adc           : in  std_logic_vector(63 downto 0);
+    rd_en             : in  std_logic;
+    dout              : out std_logic_vector(7 downto 0);
+    reset_n           : out std_logic;
+    rstb_rd           : out std_logic;
+    ck_read           : out std_logic;
+    n_cnv             : out std_logic;
+    adc_sck           : out std_logic;
+    empty_acq         : out std_logic;
+    end_multi_acq     : out std_logic;
+    rd_data_count_acq : out std_logic_vector(16 downto 0);
+    hold_ext          : out std_logic;
+    trig_ext          : out std_logic;
+    trig_out          : out std_logic;
+    evtTrigger        : out std_logic;
+    pulsing           : in  std_logic;
+    pulse             : in  std_logic;
+    extTrg            : in  std_logic;
+    endAcq            : out std_logic;
+    rdValid           : out std_logic
+);
 end adc;
 
 architecture Behavioral of adc is
 
-    type state_t is (init, idle, wrTSCoarse, wrTSFine, wait_hold, rst_cpt, wait_conv,
+    type state_t is (init, idle, wrHeader, wrTSCoarse, wrTSFine, wait_hold, rst_cpt, wait_conv,
                      asrt_rd_high, asrt_rd_low, nxt, read_asic,
                      start_conv, end_conv, read_adc, end_read_adc,
-                     write_fifo, finish);
+                     write_fifo, wrFooter, finish);
 
-    constant ACQDATA  : std_logic_vector(1 downto 0) := "00";
-    constant TSCOARSE : std_logic_vector(1 downto 0) := "01";
-    constant TSFINE   : std_logic_vector(1 downto 0) := "10";
+    constant HEADER   : std_logic_vector(2 downto 0) := "000";
+    constant TSCOARSE : std_logic_vector(2 downto 0) := "001";
+    constant TSFINE   : std_logic_vector(2 downto 0) := "010";
+    constant ACQDATA  : std_logic_vector(2 downto 0) := "011";
+    constant FOOTER   : std_logic_vector(2 downto 0) := "100";
 
     signal current_state, next_state : state_t;
 
@@ -91,7 +98,7 @@ architecture Behavioral of adc is
     signal hold_delay : natural range 0 to 4095;
     signal conv_delay : natural range 0 to 2047;
     
-    signal dinSel : std_logic_vector(1 downto 0);
+    signal dinSel : std_logic_vector(2 downto 0);
 
     signal hit0, hit, en_acq      : std_logic;
     signal end_acq                : std_logic;
@@ -119,13 +126,7 @@ architecture Behavioral of adc is
     signal rdValidSig             : std_logic;
     signal locRst                 : std_logic;
 
-attribute MARK_DEBUG : string;
-attribute MARK_DEBUG of trigger,
-                        wr_en,
-                        sdo_hg_des,
-                        sdo_lg_des,
-                        tStamp,
-                        dinFifo    : signal is "True";
+    signal dHeader                : std_logic_vector(31 downto 0);
 
 begin
 
@@ -135,16 +136,10 @@ begin
     rdValid    <= rdValidSig;
     NORT_FPGA  <= and_reduce(t);
 
---    locRstProc : process(clk_200M) 
---    begin
---        if rising_edge(clk_200M) then
-            locRst <= rst;
---        end if;
---    end process;
+    dHeader    <= dataHeader(31 downto 4) & id;
 
-    ----------------------------------------------------------------
-    -- multi_acq instance (unchanged)
-    ----------------------------------------------------------------
+    locRst <= rst;
+
     ma : entity xil_defaultlib.multi_acq
         port map (
             rst           => locRst,
@@ -157,13 +152,6 @@ begin
             rst_n         => rst_n
         );
 
-    ----------------------------------------------------------------
-    -- adc_sck generation: toggle FF in clk_200M domain.
-    --   While en_adc_sck = '1' and sck_cnt < 16, adc_sck_int toggles
-    --   each clk_200M cycle, producing a 100 MHz square wave with
-    --   exactly 16 rising edges per read_adc burst.
-    --   Otherwise it is held at '0'.
-    ----------------------------------------------------------------
     sckGen : process(clk_200M)
     begin
         if rising_edge(clk_200M) then
@@ -176,9 +164,6 @@ begin
             end if;
         end if;
     end process;
-
-    -- shift_en is high for exactly one clk_200M cycle per generated
-    -- SCK period, in the rising-edge cycle of adc_sck_int.
 
     adc_sck <= adc_sck_int;
     rstb_rd <= rstb_rd_s;
@@ -194,11 +179,6 @@ begin
         end if;
     end process;
 
-    ----------------------------------------------------------------
-    -- Deserializer (16-bit shift register for HG and LG)
-    --   Sync reset, sampled in clk_200M domain on shift_en.
-    ----------------------------------------------------------------
-    
     deserProc : process(clk_200M)
     begin
         if rising_edge(clk_200M) then
@@ -218,20 +198,20 @@ begin
         -- it reads B2, B3, B0, B1
         -- writing B2,B3,B0,B1 to have B3,B2,B1,B0 in the file 
         case(dinSel) is
+            when HEADER =>
+                dinFifo <= dHeader(23 downto 16) & dHeader(31 downto 24) & dHeader(7 downto 0) & dHeader(15 downto 8);
             when TSCOARSE =>
                 dinFifo <= tStamp(55 downto 48) & tStamp(63 downto 56) & tStamp(39 downto 32) & tStamp(47 downto 40);
             when TSFINE =>
                 dinFifo <= tStamp(23 downto 16) & tStamp(31 downto 24) & tStamp(7 downto 0) & tStamp(15 downto 8);
+            when FOOTER =>
+                dinFifo <= dataFooter(23 downto 16) & dataFooter(31 downto 24) & dataFooter(7 downto 0) & dataFooter(15 downto 8);
             when others =>
                 dinFifo <= sdo_hg_des(7 downto 0) & sdo_hg_des(15 downto 8) &
                            sdo_lg_des(7 downto 0) & sdo_lg_des(15 downto 8);
         end case;
     end process;
-    ----------------------------------------------------------------
-    -- SCK rising-edge counter (replaces adc_sck_vector / cpt_adc_sck)
-    --   Reset to 0 on entry to end_conv (the cycle before read_adc)
-    --   so the deserializer always starts a fresh 16-bit window.
-    ----------------------------------------------------------------
+    
     sckCntProc : process(clk_200M)
     begin
         if rising_edge(clk_200M) then
@@ -242,10 +222,6 @@ begin
             end if;
         end if;
     end process;
-
-    ----------------------------------------------------------------
-    -- Acquisition FIFO (single domain: clk_200M only)
-    ----------------------------------------------------------------
 
     dataFifo: xpm_fifo_sync
     generic map(
@@ -273,9 +249,6 @@ begin
         injectsbiterr => '0'
     );
 
-    ----------------------------------------------------------------
-    -- Trigger source mux + edge detection
-    ----------------------------------------------------------------
     hit0 <= t(to_integer(unsigned(sel_adc(5 downto 0))));
 
     with sel_adc(31 downto 29) select
@@ -316,9 +289,6 @@ begin
     trgEdge    <= trigger     and not trgFF;
     trgSftEdge <= trigger_sft and not trgSftFF;
 
-    ----------------------------------------------------------------
-    -- FSM: state register + delay counter + channel counter
-    ----------------------------------------------------------------
     fsmSeq : process(clk_200M)
     begin
         if rising_edge(clk_200M) then
@@ -329,8 +299,6 @@ begin
             else
                 current_state <= next_state;
 
-                -- cpt: load on entry to the corresponding state, otherwise
-                -- decrement but saturate at -1 to avoid wrap-around.
                 case current_state is
                     when idle =>
                         cpt <= to_signed(hold_delay, cpt'length);
@@ -353,9 +321,6 @@ begin
         end if;
     end process;
 
-    ----------------------------------------------------------------
-    -- FSM: next-state logic
-    ----------------------------------------------------------------
     fsmComb : process(current_state, trgEdge, trgSftEdge, cpt, ch, sck_cnt)
     begin
         case current_state is
@@ -363,11 +328,12 @@ begin
                 next_state <= idle;
             when idle =>
                 if trgEdge = '1' or trgSftEdge = '1' then
-                    --next_state <= wait_hold;
-                    next_state <= wrTSCoarse;
+                    next_state <= wrHeader;
                 else
                     next_state <= idle;
                 end if;
+            when wrHeader =>
+                next_state <= wrTSCoarse;
             when wrTSCoarse =>
                 next_state <= wrTSFine;
 
@@ -437,18 +403,16 @@ begin
             when write_fifo =>
                 next_state <= nxt;
             when finish =>
+                next_state <= wrFooter;
+            when wrFooter =>
                 next_state <= idle;
             when others =>
                 next_state <= idle;
         end case;
     end process;
 
-    ----------------------------------------------------------------
-    -- FSM: combinational outputs (defaults + per-state overrides)
-    ----------------------------------------------------------------
     fsmOut : process(current_state)
     begin
-        -- defaults: applied to every state, individual states override below
         rstb_rd_s  <= '1';
         holdext    <= '1';
         ck_read    <= '0';
@@ -465,6 +429,9 @@ begin
                 holdext   <= '0';
             when idle =>
                 holdext <= '0';
+            when wrHeader =>
+                wr_en  <= '1';
+                dinSel <= HEADER;
             when wrTSCoarse =>
                 wr_en  <= '1';
                 dinSel <= TSCOARSE;
@@ -500,6 +467,9 @@ begin
             when finish =>
                 holdext <= '0';
                 end_acq <= '1';
+            when wrFooter =>
+                wr_en  <= '1';
+                dinSel <= FOOTER;
             when others =>
                 holdext <= '0';
         end case;
