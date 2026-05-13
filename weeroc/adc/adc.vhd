@@ -103,6 +103,7 @@ architecture Behavioral of adc is
     signal hit0, hit, en_acq      : std_logic;
     signal end_acq                : std_logic;
     signal wr_en                  : std_logic;
+    signal wenSig                 : std_logic;
 
     signal sdo_hg_des, sdo_lg_des : std_logic_vector(15 downto 0);
     signal dinFifo                : std_logic_vector(31 downto 0);
@@ -192,24 +193,33 @@ begin
         end if;
     end process;
 
-    dinMux: process(dinSel, sdo_hg_des, sdo_lg_des, tStamp)
+    dinMux: process(clk_200M)
     begin
         -- xpm_fifo_sync have different packaging compared to ip fifo generator:
         -- it reads B2, B3, B0, B1
-        -- writing B2,B3,B0,B1 to have B3,B2,B1,B0 in the file 
-        case(dinSel) is
-            when HEADER =>
-                dinFifo <= dHeader(23 downto 16) & dHeader(31 downto 24) & dHeader(7 downto 0) & dHeader(15 downto 8);
-            when TSCOARSE =>
-                dinFifo <= tStamp(55 downto 48) & tStamp(63 downto 56) & tStamp(39 downto 32) & tStamp(47 downto 40);
-            when TSFINE =>
-                dinFifo <= tStamp(23 downto 16) & tStamp(31 downto 24) & tStamp(7 downto 0) & tStamp(15 downto 8);
-            when FOOTER =>
-                dinFifo <= dataFooter(23 downto 16) & dataFooter(31 downto 24) & dataFooter(7 downto 0) & dataFooter(15 downto 8);
-            when others =>
-                dinFifo <= sdo_hg_des(7 downto 0) & sdo_hg_des(15 downto 8) &
-                           sdo_lg_des(7 downto 0) & sdo_lg_des(15 downto 8);
-        end case;
+        -- writing B2,B3,B0,B1 to have B3,B2,B1,B0 in the file
+        if rising_edge(clk_200M) then
+            if locRst = '1' then
+                wenSig  <= '0';
+                dinFifo <= (others => '0');
+            else
+                wenSig <= wr_en;
+
+                case(dinSel) is
+                    when HEADER =>
+                        dinFifo <= dHeader(23 downto 16) & dHeader(31 downto 24) & dHeader(7 downto 0) & dHeader(15 downto 8);
+                    when TSCOARSE =>
+                        dinFifo <= tStamp(55 downto 48) & tStamp(63 downto 56) & tStamp(39 downto 32) & tStamp(47 downto 40);
+                    when TSFINE =>
+                        dinFifo <= tStamp(23 downto 16) & tStamp(31 downto 24) & tStamp(7 downto 0) & tStamp(15 downto 8);
+                    when FOOTER =>
+                        dinFifo <= dataFooter(23 downto 16) & dataFooter(31 downto 24) & dataFooter(7 downto 0) & dataFooter(15 downto 8);
+                    when others =>
+                        dinFifo <= sdo_hg_des(7 downto 0) & sdo_hg_des(15 downto 8) &
+                                   sdo_lg_des(7 downto 0) & sdo_lg_des(15 downto 8);
+                end case;
+            end if;
+        end if;
     end process;
     
     sckCntProc : process(clk_200M)
@@ -237,7 +247,7 @@ begin
         wr_clk        => clk_200M,
         rst           => locRst,
         din           => dinFifo,
-        wr_en         => wr_en,
+        wr_en         => wenSig,
         dout          => dout,
         rd_en         => rd_en,
         data_valid    => rdValidSig,
