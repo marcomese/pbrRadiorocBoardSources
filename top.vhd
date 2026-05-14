@@ -89,10 +89,10 @@ architecture arch of radioroc_fw is
 	signal tEdge21, TBuf21 : std_logic_vector(127 downto 0);
 	-- Clock and reset
 	signal reset, resetn, resetSig : std_logic;
-	signal clk_10M, clk_200M : std_logic;
+	signal clk_200M : std_logic;
 	signal sysClkDS : std_logic;
 	-- I2C
-    signal en_clki2c, enClkI2CSync : std_logic;
+    signal en_clki2c : std_logic;
 
 	--ADC Acquisition
 	signal reset_acq, start_acq, rd_acq, adc_sck, end_acq, empty_acq, rstn_read_acq, reset_n_acq, trig_out : std_logic;
@@ -475,12 +475,6 @@ begin
     end if;
 end process;
 
-buf10MInst: BUFG
-port map(
-    I => clk10MT,
-    O => clk_10M
-);
-
 i2cRadModule: entity work.i2cMaster
 generic map(
     input_clk => 200000000,
@@ -500,28 +494,14 @@ port map(
     scl       => sc_scl
 );
 
-enClkI2CSyncInst: xpm_cdc_single
-generic map(
-    DEST_SYNC_FF   => 2,
-    INIT_SYNC_FF   => 0,
-    SIM_ASSERT_CHK => 0,
-    SRC_INPUT_REG  => 1
-)
-port map(
-    src_clk  => clk_200M,
-    dest_clk => clk_10M,
-    src_in   => en_clki2c,
-    dest_out => enClkI2CSync
-);
-
 scClkSmBufInst: BUFGCE
 generic map(
     SIM_DEVICE => "7SERIES"
 )
 port map(
-    O => sc_clk_sm,
-    CE => enClkI2CSync,
-    I => clk_10M
+    O  => sc_clk_sm,
+    CE => en_clki2c,
+    I  => clk10MT
 );
 
 adc: entity xil_defaultlib.adc
