@@ -129,6 +129,17 @@ architecture Behavioral of adc is
 
     signal dHeader                : std_logic_vector(31 downto 0);
 
+attribute MARK_DEBUG : string;
+attribute MARK_DEBUG of rdValidSig,
+                        end_multi_acq,
+                        sdo_hg_des,
+                        sdo_lg_des,
+                        dinFifo,
+                        dinSel,
+                        wr_en,
+                        wenSig,
+                        rd_data_count_acq : signal is "True";
+
 begin
 
     evtTrigger <= trgEdge;
@@ -196,8 +207,8 @@ begin
     dinMux: process(clk_200M)
     begin
         -- xpm_fifo_sync have different packaging compared to ip fifo generator:
-        -- it reads B2, B3, B0, B1
-        -- writing B2,B3,B0,B1 to have B3,B2,B1,B0 in the file
+        -- it gives B0, B1, B2, B3
+        -- I'm writing B0,B1,B2,B3 to have B3,B2,B1,B0 in the file
         if rising_edge(clk_200M) then
             if locRst = '1' then
                 wenSig  <= '0';
@@ -207,16 +218,15 @@ begin
 
                 case(dinSel) is
                     when HEADER =>
-                        dinFifo <= dHeader(23 downto 16) & dHeader(31 downto 24) & dHeader(7 downto 0) & dHeader(15 downto 8);
+                        dinFifo <= dHeader(7 downto 0) & dHeader(15 downto 8) & dHeader(23 downto 16) & dHeader(31 downto 24);
                     when TSCOARSE =>
-                        dinFifo <= tStamp(55 downto 48) & tStamp(63 downto 56) & tStamp(39 downto 32) & tStamp(47 downto 40);
+                        dinFifo <= tStamp(39 downto 32) & tStamp(47 downto 40) & tStamp(55 downto 48) & tStamp(63 downto 56);
                     when TSFINE =>
-                        dinFifo <= tStamp(23 downto 16) & tStamp(31 downto 24) & tStamp(7 downto 0) & tStamp(15 downto 8);
+                        dinFifo <= tStamp(7 downto 0) & tStamp(15 downto 8) & tStamp(23 downto 16) & tStamp(31 downto 24);
                     when FOOTER =>
-                        dinFifo <= dataFooter(23 downto 16) & dataFooter(31 downto 24) & dataFooter(7 downto 0) & dataFooter(15 downto 8);
+                        dinFifo <= dataFooter(7 downto 0) & dataFooter(15 downto 8) & dataFooter(23 downto 16) & dataFooter(31 downto 24);
                     when others =>
-                        dinFifo <= sdo_hg_des(7 downto 0) & sdo_hg_des(15 downto 8) &
-                                   sdo_lg_des(7 downto 0) & sdo_lg_des(15 downto 8);
+                        dinFifo <= sdo_lg_des(7 downto 0) & sdo_lg_des(15 downto 8) & sdo_hg_des(7 downto 0) & sdo_hg_des(15 downto 8);
                 end case;
             end if;
         end if;
@@ -378,7 +388,7 @@ begin
                 end if;
             when nxt =>
                 if ch >= 66 then
-                    next_state <= finish;
+                    next_state <= wrFooter;--finish;
                 elsif ch < 2 then
                     next_state <= start_conv;
                 else
@@ -412,9 +422,9 @@ begin
                 end if;
             when write_fifo =>
                 next_state <= nxt;
-            when finish =>
-                next_state <= wrFooter;
             when wrFooter =>
+                next_state <= finish;
+            when finish =>
                 next_state <= idle;
             when others =>
                 next_state <= idle;
@@ -478,8 +488,8 @@ begin
                 holdext <= '0';
                 end_acq <= '1';
             when wrFooter =>
-                wr_en  <= '1';
                 dinSel <= FOOTER;
+                wr_en  <= '1';
             when others =>
                 holdext <= '0';
         end case;

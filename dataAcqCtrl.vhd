@@ -104,9 +104,19 @@ signal rstAcqSig,
        rdAcqSig,
        loadDataOut,
        loadReg,
+       devBrstSig,
        locRst      : std_logic;
 
 signal nbAcqSig    : std_logic_vector(7 downto 0);
+
+attribute MARK_DEBUG : string;
+attribute MARK_DEBUG of devReady,
+                        devBrst,
+                        devBrstSnd,
+                        rdAcqSig,
+                        loadDataOut,
+                        devDataOut,
+                        doutAcq : signal is "True";
 
 begin
 
@@ -128,9 +138,9 @@ begin
     if rising_edge(clk100M) then
         if locRst = '1' then
             devDataOut <= (others => (others => '0'));
-        elsif loadDataOut = '1' and devBrst = '0' then
+        elsif loadDataOut = '1' and devBrstSig = '0' then
             devDataOut <= slvToDevData(rData(lastAddr));
-        elsif loadDataOut = '1' and devBrst = '1' then
+        elsif loadDataOut = '1' and devBrstSig = '1' then
             devDataOut(0) <= doutAcq;
         end if;
     end if;
@@ -174,6 +184,7 @@ begin
             rdAcqSig    <= '0';
             nbAcqSig    <= (others => '0');
             devBrstRst  <= '0';
+            devBrstSig  <= '0';
             lastAddr    <= 0;
             lastData    <= (others => (others => '0'));
 
@@ -186,6 +197,7 @@ begin
                     loadReg     <= '0';
                     rstAcqSig   <= '0';
                     strtAcqSig  <= '0';
+                    devBrstSig  <= devBrst;
                     busy        <= '0';
 
                     state       <= idle;

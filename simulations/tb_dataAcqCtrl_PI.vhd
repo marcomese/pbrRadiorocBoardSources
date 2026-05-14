@@ -219,6 +219,32 @@ begin
 
         wait for 5 us;
 
+        startSpi;
+        sendByte(x"76");
+        sendByte(x"55");
+        sendByte(x"00");
+        sendByte(x"04");
+        sendByte(x"00");
+        sendByte(x"00");
+        sendByte(x"02");
+        sendByte(x"12");
+        endSpi;
+
+        wait for 5 us;
+
+        startSpi;
+        sendByte(x"76");
+        sendByte(x"55");
+        sendByte(x"00");
+        sendByte(x"05");
+        sendByte(x"00");
+        sendByte(x"01");
+        sendByte(x"00");
+        sendByte(x"00");
+        endSpi;
+
+        wait for 5 us;
+
         --------------------------------------------------------------------
         -- 2nd transaction: 0x76, 0xA5, 0x00, 0x05
         --------------------------------------------------------------------
@@ -229,7 +255,7 @@ begin
 --        sendByte(x"03");
 --        endSpi;
 
-        wait for 100 us;
+        wait for 50 us;
 
         --------------------------------------------------------------------
         -- 3rd transaction: 0x76, 0x55, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01
@@ -272,8 +298,8 @@ begin
         sendByte(x"00");
         sendByte(x"00");
         sendByte(x"00");
-        sendByte(x"01");
-        sendByte(x"05");
+        sendByte(x"02");
+        sendByte(x"20");
         endSpi;
 
         wait for 600 us;
