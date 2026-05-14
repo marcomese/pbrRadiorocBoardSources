@@ -129,17 +129,6 @@ architecture Behavioral of adc is
 
     signal dHeader                : std_logic_vector(31 downto 0);
 
-attribute MARK_DEBUG : string;
-attribute MARK_DEBUG of rdValidSig,
-                        end_multi_acq,
-                        sdo_hg_des,
-                        sdo_lg_des,
-                        dinFifo,
-                        dinSel,
-                        wr_en,
-                        wenSig,
-                        rd_data_count_acq : signal is "True";
-
 begin
 
     evtTrigger <= trgEdge;

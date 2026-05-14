@@ -109,15 +109,6 @@ signal rstAcqSig,
 
 signal nbAcqSig    : std_logic_vector(7 downto 0);
 
-attribute MARK_DEBUG : string;
-attribute MARK_DEBUG of devReady,
-                        devBrst,
-                        devBrstSnd,
-                        rdAcqSig,
-                        loadDataOut,
-                        devDataOut,
-                        doutAcq : signal is "True";
-
 begin
 
 dAddr    <= devAddrToInt(devAddr);
