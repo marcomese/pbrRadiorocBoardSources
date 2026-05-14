@@ -228,3 +228,94 @@ set_property CONFIG_VOLTAGE 3.3 [current_design]
 
 set_property BITSTREAM.CONFIG.CONFIGRATE 50 [current_design]
 set_property BITSTREAM.GENERAL.COMPRESS TRUE [current_design]
+
+create_debug_core u_ila_0 ila
+set_property ALL_PROBE_SAME_MU true [get_debug_cores u_ila_0]
+set_property ALL_PROBE_SAME_MU_CNT 1 [get_debug_cores u_ila_0]
+set_property C_ADV_TRIGGER false [get_debug_cores u_ila_0]
+set_property C_DATA_DEPTH 65536 [get_debug_cores u_ila_0]
+set_property C_EN_STRG_QUAL false [get_debug_cores u_ila_0]
+set_property C_INPUT_PIPE_STAGES 0 [get_debug_cores u_ila_0]
+set_property C_TRIGIN_EN false [get_debug_cores u_ila_0]
+set_property C_TRIGOUT_EN false [get_debug_cores u_ila_0]
+set_property port_width 1 [get_debug_ports u_ila_0/clk]
+connect_debug_port u_ila_0/clk [get_nets [list dest_clk]]
+set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe0]
+set_property port_width 8 [get_debug_ports u_ila_0/probe0]
+connect_debug_port u_ila_0/probe0 [get_nets [list {dataAcqCtrlInst/devDataOut[3][0]} {dataAcqCtrlInst/devDataOut[3][1]} {dataAcqCtrlInst/devDataOut[3][2]} {dataAcqCtrlInst/devDataOut[3][3]} {dataAcqCtrlInst/devDataOut[3][4]} {dataAcqCtrlInst/devDataOut[3][5]} {dataAcqCtrlInst/devDataOut[3][6]} {dataAcqCtrlInst/devDataOut[3][7]}]]
+create_debug_port u_ila_0 probe
+set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe1]
+set_property port_width 17 [get_debug_ports u_ila_0/probe1]
+connect_debug_port u_ila_0/probe1 [get_nets [list {adc/rd_data_count_acq[0]} {adc/rd_data_count_acq[1]} {adc/rd_data_count_acq[2]} {adc/rd_data_count_acq[3]} {adc/rd_data_count_acq[4]} {adc/rd_data_count_acq[5]} {adc/rd_data_count_acq[6]} {adc/rd_data_count_acq[7]} {adc/rd_data_count_acq[8]} {adc/rd_data_count_acq[9]} {adc/rd_data_count_acq[10]} {adc/rd_data_count_acq[11]} {adc/rd_data_count_acq[12]} {adc/rd_data_count_acq[13]} {adc/rd_data_count_acq[14]} {adc/rd_data_count_acq[15]} {adc/rd_data_count_acq[16]}]]
+create_debug_port u_ila_0 probe
+set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe2]
+set_property port_width 16 [get_debug_ports u_ila_0/probe2]
+connect_debug_port u_ila_0/probe2 [get_nets [list {adc/sdo_hg_des[0]} {adc/sdo_hg_des[1]} {adc/sdo_hg_des[2]} {adc/sdo_hg_des[3]} {adc/sdo_hg_des[4]} {adc/sdo_hg_des[5]} {adc/sdo_hg_des[6]} {adc/sdo_hg_des[7]} {adc/sdo_hg_des[8]} {adc/sdo_hg_des[9]} {adc/sdo_hg_des[10]} {adc/sdo_hg_des[11]} {adc/sdo_hg_des[12]} {adc/sdo_hg_des[13]} {adc/sdo_hg_des[14]} {adc/sdo_hg_des[15]}]]
+create_debug_port u_ila_0 probe
+set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe3]
+set_property port_width 16 [get_debug_ports u_ila_0/probe3]
+connect_debug_port u_ila_0/probe3 [get_nets [list {adc/sdo_lg_des[0]} {adc/sdo_lg_des[1]} {adc/sdo_lg_des[2]} {adc/sdo_lg_des[3]} {adc/sdo_lg_des[4]} {adc/sdo_lg_des[5]} {adc/sdo_lg_des[6]} {adc/sdo_lg_des[7]} {adc/sdo_lg_des[8]} {adc/sdo_lg_des[9]} {adc/sdo_lg_des[10]} {adc/sdo_lg_des[11]} {adc/sdo_lg_des[12]} {adc/sdo_lg_des[13]} {adc/sdo_lg_des[14]} {adc/sdo_lg_des[15]}]]
+create_debug_port u_ila_0 probe
+set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe4]
+set_property port_width 8 [get_debug_ports u_ila_0/probe4]
+connect_debug_port u_ila_0/probe4 [get_nets [list {dataAcqCtrlInst/devDataOut[1][0]} {dataAcqCtrlInst/devDataOut[1][1]} {dataAcqCtrlInst/devDataOut[1][2]} {dataAcqCtrlInst/devDataOut[1][3]} {dataAcqCtrlInst/devDataOut[1][4]} {dataAcqCtrlInst/devDataOut[1][5]} {dataAcqCtrlInst/devDataOut[1][6]} {dataAcqCtrlInst/devDataOut[1][7]}]]
+create_debug_port u_ila_0 probe
+set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe5]
+set_property port_width 8 [get_debug_ports u_ila_0/probe5]
+connect_debug_port u_ila_0/probe5 [get_nets [list {dataAcqCtrlInst/devDataOut[0][0]} {dataAcqCtrlInst/devDataOut[0][1]} {dataAcqCtrlInst/devDataOut[0][2]} {dataAcqCtrlInst/devDataOut[0][3]} {dataAcqCtrlInst/devDataOut[0][4]} {dataAcqCtrlInst/devDataOut[0][5]} {dataAcqCtrlInst/devDataOut[0][6]} {dataAcqCtrlInst/devDataOut[0][7]}]]
+create_debug_port u_ila_0 probe
+set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe6]
+set_property port_width 8 [get_debug_ports u_ila_0/probe6]
+connect_debug_port u_ila_0/probe6 [get_nets [list {dataAcqCtrlInst/devDataOut[2][0]} {dataAcqCtrlInst/devDataOut[2][1]} {dataAcqCtrlInst/devDataOut[2][2]} {dataAcqCtrlInst/devDataOut[2][3]} {dataAcqCtrlInst/devDataOut[2][4]} {dataAcqCtrlInst/devDataOut[2][5]} {dataAcqCtrlInst/devDataOut[2][6]} {dataAcqCtrlInst/devDataOut[2][7]}]]
+create_debug_port u_ila_0 probe
+set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe7]
+set_property port_width 32 [get_debug_ports u_ila_0/probe7]
+connect_debug_port u_ila_0/probe7 [get_nets [list {adc/dinFifo[0]} {adc/dinFifo[1]} {adc/dinFifo[2]} {adc/dinFifo[3]} {adc/dinFifo[4]} {adc/dinFifo[5]} {adc/dinFifo[6]} {adc/dinFifo[7]} {adc/dinFifo[8]} {adc/dinFifo[9]} {adc/dinFifo[10]} {adc/dinFifo[11]} {adc/dinFifo[12]} {adc/dinFifo[13]} {adc/dinFifo[14]} {adc/dinFifo[15]} {adc/dinFifo[16]} {adc/dinFifo[17]} {adc/dinFifo[18]} {adc/dinFifo[19]} {adc/dinFifo[20]} {adc/dinFifo[21]} {adc/dinFifo[22]} {adc/dinFifo[23]} {adc/dinFifo[24]} {adc/dinFifo[25]} {adc/dinFifo[26]} {adc/dinFifo[27]} {adc/dinFifo[28]} {adc/dinFifo[29]} {adc/dinFifo[30]} {adc/dinFifo[31]}]]
+create_debug_port u_ila_0 probe
+set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe8]
+set_property port_width 3 [get_debug_ports u_ila_0/probe8]
+connect_debug_port u_ila_0/probe8 [get_nets [list {adc/dinSel[0]} {adc/dinSel[1]} {adc/dinSel[2]}]]
+create_debug_port u_ila_0 probe
+set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe9]
+set_property port_width 8 [get_debug_ports u_ila_0/probe9]
+connect_debug_port u_ila_0/probe9 [get_nets [list {dataAcqCtrlInst/doutAcq[0]} {dataAcqCtrlInst/doutAcq[1]} {dataAcqCtrlInst/doutAcq[2]} {dataAcqCtrlInst/doutAcq[3]} {dataAcqCtrlInst/doutAcq[4]} {dataAcqCtrlInst/doutAcq[5]} {dataAcqCtrlInst/doutAcq[6]} {dataAcqCtrlInst/doutAcq[7]}]]
+create_debug_port u_ila_0 probe
+set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe10]
+set_property port_width 1 [get_debug_ports u_ila_0/probe10]
+connect_debug_port u_ila_0/probe10 [get_nets [list dataAcqCtrlInst/devBrst]]
+create_debug_port u_ila_0 probe
+set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe11]
+set_property port_width 1 [get_debug_ports u_ila_0/probe11]
+connect_debug_port u_ila_0/probe11 [get_nets [list dataAcqCtrlInst/devBrstSnd]]
+create_debug_port u_ila_0 probe
+set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe12]
+set_property port_width 1 [get_debug_ports u_ila_0/probe12]
+connect_debug_port u_ila_0/probe12 [get_nets [list dataAcqCtrlInst/devReady]]
+create_debug_port u_ila_0 probe
+set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe13]
+set_property port_width 1 [get_debug_ports u_ila_0/probe13]
+connect_debug_port u_ila_0/probe13 [get_nets [list adc/end_multi_acq]]
+create_debug_port u_ila_0 probe
+set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe14]
+set_property port_width 1 [get_debug_ports u_ila_0/probe14]
+connect_debug_port u_ila_0/probe14 [get_nets [list dataAcqCtrlInst/loadDataOut]]
+create_debug_port u_ila_0 probe
+set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe15]
+set_property port_width 1 [get_debug_ports u_ila_0/probe15]
+connect_debug_port u_ila_0/probe15 [get_nets [list dataAcqCtrlInst/rdAcqSig]]
+create_debug_port u_ila_0 probe
+set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe16]
+set_property port_width 1 [get_debug_ports u_ila_0/probe16]
+connect_debug_port u_ila_0/probe16 [get_nets [list adc/rdValidSig]]
+create_debug_port u_ila_0 probe
+set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe17]
+set_property port_width 1 [get_debug_ports u_ila_0/probe17]
+connect_debug_port u_ila_0/probe17 [get_nets [list adc/wenSig]]
+create_debug_port u_ila_0 probe
+set_property PROBE_TYPE DATA_AND_TRIGGER [get_debug_ports u_ila_0/probe18]
+set_property port_width 1 [get_debug_ports u_ila_0/probe18]
+connect_debug_port u_ila_0/probe18 [get_nets [list adc/wr_en]]
+set_property C_CLK_INPUT_FREQ_HZ 300000000 [get_debug_cores dbg_hub]
+set_property C_ENABLE_CLK_DIVIDER false [get_debug_cores dbg_hub]
+set_property C_USER_SCAN_CHAIN 1 [get_debug_cores dbg_hub]
+connect_debug_port dbg_hub/clk [get_nets dest_clk]
