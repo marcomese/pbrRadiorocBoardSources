@@ -26,6 +26,7 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 use ieee.std_logic_misc.all;
+use work.ucrc_pkg.all;
 
 library UNISIM;
 use UNISIM.vcomponents.all;
@@ -81,13 +82,18 @@ architecture Behavioral of adc is
     type state_t is (init, idle, wrHeader, wrTSCoarse, wrTSFine, wait_hold, rst_cpt, wait_conv,
                      asrt_rd_high, asrt_rd_low, nxt, read_asic,
                      start_conv, end_conv, read_adc, end_read_adc,
-                     write_fifo, wrFooter, finish);
+                     write_fifo, wrFooter, wrCRC32, finish);
 
-    constant HEADER   : std_logic_vector(2 downto 0) := "000";
-    constant TSCOARSE : std_logic_vector(2 downto 0) := "001";
-    constant TSFINE   : std_logic_vector(2 downto 0) := "010";
-    constant ACQDATA  : std_logic_vector(2 downto 0) := "011";
-    constant FOOTER   : std_logic_vector(2 downto 0) := "100";
+    type dinSel_t is (HEADER,
+                      TSCOARSE,
+                      TSFINE,
+                      ACQDATA,
+                      CRC32,
+                      FOOTER);
+
+    constant POLYNOMIAL : std_logic_vector(31 downto 0) := x"04C11DB7";
+    constant INIT_VALUE : std_logic_vector(31 downto 0) := x"FFFFFFFF";
+    constant DATA_WIDTH : integer                       := 32;
 
     signal current_state, next_state : state_t;
 
@@ -98,12 +104,14 @@ architecture Behavioral of adc is
     signal hold_delay : natural range 0 to 4095;
     signal conv_delay : natural range 0 to 2047;
     
-    signal dinSel : std_logic_vector(2 downto 0);
+    signal dinSel     : dinSel_t;
 
     signal hit0, hit, en_acq      : std_logic;
     signal end_acq                : std_logic;
     signal wr_en                  : std_logic;
     signal wenSig                 : std_logic;
+    signal crcEn                  : std_logic;
+    signal crcClkEn               : std_logic;
 
     signal sdo_hg_des, sdo_lg_des : std_logic_vector(15 downto 0);
     signal dinFifo                : std_logic_vector(31 downto 0);
@@ -126,8 +134,11 @@ architecture Behavioral of adc is
     signal cd                     : std_logic_vector(10 downto 0);
     signal rdValidSig             : std_logic;
     signal locRst                 : std_logic;
+    signal crcRst                 : std_logic;
 
-    signal dHeader                : std_logic_vector(31 downto 0);
+    signal dHeader,
+           crcVal,
+           crcXor                 : std_logic_vector(31 downto 0);
 
 begin
 
@@ -200,10 +211,12 @@ begin
         -- I'm writing B0,B1,B2,B3 to have B3,B2,B1,B0 in the file
         if rising_edge(clk_200M) then
             if locRst = '1' then
-                wenSig  <= '0';
-                dinFifo <= (others => '0');
+                wenSig   <= '0';
+                crcClkEn <= '0';
+                dinFifo  <= (others => '0');
             else
-                wenSig <= wr_en;
+                wenSig   <= wr_en;
+                crcClkEn <= wr_en and crcEn;
 
                 case(dinSel) is
                     when HEADER =>
@@ -214,6 +227,8 @@ begin
                         dinFifo <= tStamp(7 downto 0) & tStamp(15 downto 8) & tStamp(23 downto 16) & tStamp(31 downto 24);
                     when FOOTER =>
                         dinFifo <= dataFooter(7 downto 0) & dataFooter(15 downto 8) & dataFooter(23 downto 16) & dataFooter(31 downto 24);
+                    when CRC32 =>
+                        dinFifo <= crcXor;
                     when others =>
                         dinFifo <= sdo_lg_des(7 downto 0) & sdo_lg_des(15 downto 8) & sdo_hg_des(7 downto 0) & sdo_hg_des(15 downto 8);
                 end case;
@@ -256,6 +271,24 @@ begin
         sleep         => '0',
         injectdbiterr => '0',
         injectsbiterr => '0'
+    );
+
+    crcXor <= crcVal xor x"FFFFFFFF";
+
+    ucrcInst: ucrc_par
+    generic map(
+        POLYNOMIAL => POLYNOMIAL,
+        INIT_VALUE => INIT_VALUE,
+        DATA_WIDTH => DATA_WIDTH,
+        SYNC_RESET => 1
+    )
+    port map(
+        clk_i   => clk_200M,
+        rst_i   => crcRst,
+        clken_i => crcClkEn,
+        data_i  => dinFifo,
+        match_o => open,
+        crc_o   => crcVal
     );
 
     hit0 <= t(to_integer(unsigned(sel_adc(5 downto 0))));
@@ -377,7 +410,7 @@ begin
                 end if;
             when nxt =>
                 if ch >= 66 then
-                    next_state <= wrFooter;--finish;
+                    next_state <= wrCRC32;--finish;
                 elsif ch < 2 then
                     next_state <= start_conv;
                 else
@@ -411,6 +444,8 @@ begin
                 end if;
             when write_fifo =>
                 next_state <= nxt;
+            when wrCRC32 =>
+                next_state <= wrFooter;
             when wrFooter =>
                 next_state <= finish;
             when finish =>
@@ -428,12 +463,15 @@ begin
         n_cnv      <= '0';
         en_adc_sck <= '0';
         wr_en      <= '0';
+        crcEn      <= '1';
+        crcRst     <= '0';
         dinSel     <= ACQDATA;
         end_acq    <= '0';
         en_trigext <= '0';
 
         case current_state is
             when init =>
+                crcRst    <= '1';
                 rstb_rd_s <= '0';
                 holdext   <= '0';
             when idle =>
@@ -474,9 +512,15 @@ begin
             when write_fifo =>
                 wr_en <= '1';
             when finish =>
+                crcRst  <= '1';
                 holdext <= '0';
                 end_acq <= '1';
+            when wrCRC32 =>
+                crcEn  <= '0';
+                dinSel <= CRC32;
+                wr_en  <= '1';
             when wrFooter =>
+                crcEn  <= '0';
                 dinSel <= FOOTER;
                 wr_en  <= '1';
             when others =>
