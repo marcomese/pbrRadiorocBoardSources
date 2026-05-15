@@ -203,6 +203,21 @@ begin
 
         wait for 1 us;
 
+        startSpi;
+        sendByte(x"76");
+        sendByte(x"52");
+        sendByte(x"00");
+        sendByte(x"03");
+        sendByte(x"00");
+        sendByte(x"00");
+        sendByte(x"00");
+        sendByte(x"02");
+        endSpi;
+        
+        wait for 10 us;
+
+        wait for 1 us;
+
         --------------------------------------------------------------------
         -- 1st transaction: 0x76, 0x55, 0x00, 0x03, 0x00, 0x00, 0x00, 0x02
         --------------------------------------------------------------------

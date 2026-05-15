@@ -89,7 +89,7 @@ architecture arch of radioroc_fw is
 	signal tEdge21, TBuf21 : std_logic_vector(127 downto 0);
 	-- Clock and reset
 	signal reset, resetn, resetSig : std_logic;
-	signal clk_200M : std_logic;
+	signal clk_200M, clk10MSig : std_logic;
 	signal sysClkDS : std_logic;
 	-- I2C
     signal en_clki2c : std_logic;
@@ -212,8 +212,6 @@ signal endAcq, rdValid : std_logic;
 
 signal clkCnt : unsigned(4 downto 0); -- MSB = overflow
 
-signal clk10MT : std_logic;
-
 begin
 
 areset        <= not npwr_reset;
@@ -243,6 +241,63 @@ ADC_SCKHG     <= adc_sck;
 ADC_SCKLG     <= adc_sck;
 
 boardID       <= '0' & idSync;
+
+
+sysClkIBUFDS: IBUFDS
+generic map(
+    DIFF_TERM    => TRUE,
+    IBUF_LOW_PWR => FALSE,
+    IOSTANDARD   => "LVDS_25"
+)
+port map(
+    I  => sysClk_p,
+    IB => sysClk_n,
+    O  => sysClkDS
+);
+
+sysClkBUFG: BUFG
+port map(
+    I => sysClkDS,
+    O => clk_200M
+);
+
+clkDividerProc: process(clk_200M)
+begin
+    if rising_edge(clk_200M) then
+        if reset = '1' or clkCnt(clkCnt'left) = '1' or en_clki2c = '0' then
+            clkCnt <= to_unsigned(8, clkCnt'length);
+        else
+            clkCnt <= clkCnt - 1;
+        end if;
+    end if;
+end process;
+
+clk10MProc: process(clk_200M)
+begin
+    if rising_edge(clk_200M) then
+        if reset = '1' or en_clki2c = '0' then
+            clk10MSig <= '0';
+        elsif clkCnt(clkCnt'left) = '1' then
+            clk10MSig <= not clk10MSig;
+        end if;
+    end if;
+end process;
+
+scClkSmBufInst: ODDR
+generic map(
+    DDR_CLK_EDGE => "SAME_EDGE", 
+    INIT         => '0',
+    SRTYPE       => "SYNC"
+)
+port map(
+    Q  => sc_clk_sm,
+    C  => clk_200M,
+    CE => '1',
+    D1 => clk10MSig,
+    D2 => clk10MSig,
+    R  => reset,
+    S  => '0'
+);
 
 resetNSync: xpm_cdc_async_rst
 generic map(
@@ -435,46 +490,6 @@ port map(
     miso_n   => miso_n
 );
 
-sysClkIBUFDS: IBUFDS
-generic map(
-    DIFF_TERM    => TRUE,
-    IBUF_LOW_PWR => FALSE,
-    IOSTANDARD   => "LVDS_25"
-)
-port map(
-    I  => sysClk_p,
-    IB => sysClk_n,
-    O  => sysClkDS
-);
-
-sysClkBUFG: BUFG
-port map(
-    I => sysClkDS,
-    O => clk_200M
-);
-
-clkDividerProc: process(clk_200M)
-begin
-    if rising_edge(clk_200M) then
-        if reset = '1' or clkCnt(clkCnt'left) = '1' then
-            clkCnt <= to_unsigned(8, clkCnt'length);
-        else
-            clkCnt <= clkCnt - 1;
-        end if;
-    end if;
-end process;
-
-clk10MProc: process(clk_200M)
-begin
-    if rising_edge(clk_200M) then
-        if reset = '1' then
-            clk10MT <= '0';
-        elsif clkCnt(clkCnt'left) = '1' then
-            clk10MT <= not clk10MT;
-        end if;
-    end if;
-end process;
-
 i2cRadModule: entity work.i2cMaster
 generic map(
     input_clk => 200000000,
@@ -492,16 +507,6 @@ port map(
     ack_error => open,
     sda       => sc_sda,
     scl       => sc_scl
-);
-
-scClkSmBufInst: BUFGCE
-generic map(
-    SIM_DEVICE => "7SERIES"
-)
-port map(
-    O  => sc_clk_sm,
-    CE => en_clki2c,
-    I  => clk10MT
 );
 
 adc: entity xil_defaultlib.adc
