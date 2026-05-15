@@ -8,16 +8,19 @@ end tb_crc;
 architecture behav of tb_crc is
 
 constant clkPeriod    : time := 5 ns;
-constant POLYNOMIAL   : std_logic_vector(31 downto 0) := x"814141AB";
-constant INIT_VALUE   : std_logic_vector(31 downto 0) := x"00000000";
-constant DATA_WIDTH   : integer                       := 8;
+constant POLYNOMIAL   : std_logic_vector(31 downto 0) := x"04C11DB7";
+constant INIT_VALUE   : std_logic_vector(31 downto 0) := x"FFFFFFFF";
+constant DATA_WIDTH   : integer          := 32;
 signal   clk, rst     : std_logic := '1';
 signal   clken        : std_logic := '0';
 signal   match_p      : std_logic;
 signal   par_in       : std_logic_vector(DATA_WIDTH - 1 downto 0);
 signal   crc_p        : std_logic_vector(POLYNOMIAL'length - 1 downto 0);
+signal   crcXor       : std_logic_vector(POLYNOMIAL'length - 1 downto 0);
 
 begin
+
+crcXor <= crc_p xor x"FFFFFFFF";
 
 MAIN : process
 begin
@@ -26,31 +29,7 @@ begin
     rst <= '0';
     wait for clkPeriod*5;
 
-    par_in <= x"ab";
-    wait for clkPeriod;
-    clken <= '1';
-    wait for clkPeriod;
-    clken <= '0';
-    
-    wait for clkPeriod*5;
-
-    par_in <= x"cd";
-    wait for clkPeriod;
-    clken <= '1';
-    wait for clkPeriod;
-    clken <= '0';
-    
-    wait for clkPeriod*5;
-
-    par_in <= x"ef";
-    wait for clkPeriod;
-    clken <= '1';
-    wait for clkPeriod;
-    clken <= '0';
-    
-    wait for clkPeriod*5;
-
-    par_in <= x"12";
+    par_in <= x"abcdef12";
     wait for clkPeriod;
     clken <= '1';
     wait for clkPeriod;

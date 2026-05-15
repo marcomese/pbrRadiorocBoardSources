@@ -27,6 +27,7 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 use ieee.std_logic_misc.all;
 use work.ucrc_pkg.all;
+use work.utilsPkg.all;
 
 library UNISIM;
 use UNISIM.vcomponents.all;
@@ -138,7 +139,7 @@ architecture Behavioral of adc is
 
     signal dHeader,
            crcVal,
-           crcXor                 : std_logic_vector(31 downto 0);
+           crcXorRev              : std_logic_vector(31 downto 0);
 
 begin
 
@@ -225,10 +226,10 @@ begin
                         dinFifo <= tStamp(39 downto 32) & tStamp(47 downto 40) & tStamp(55 downto 48) & tStamp(63 downto 56);
                     when TSFINE =>
                         dinFifo <= tStamp(7 downto 0) & tStamp(15 downto 8) & tStamp(23 downto 16) & tStamp(31 downto 24);
+                    when CRC32 =>
+                        dinFifo <= crcXorRev(7 downto 0) & crcXorRev(15 downto 8) & crcXorRev(23 downto 16) & crcXorRev(31 downto 24);
                     when FOOTER =>
                         dinFifo <= dataFooter(7 downto 0) & dataFooter(15 downto 8) & dataFooter(23 downto 16) & dataFooter(31 downto 24);
-                    when CRC32 =>
-                        dinFifo <= crcXor;
                     when others =>
                         dinFifo <= sdo_lg_des(7 downto 0) & sdo_lg_des(15 downto 8) & sdo_hg_des(7 downto 0) & sdo_hg_des(15 downto 8);
                 end case;
@@ -273,7 +274,7 @@ begin
         injectsbiterr => '0'
     );
 
-    crcXor <= crcVal xor x"FFFFFFFF";
+    crcXorRev <= reverse(crcVal xor x"FFFFFFFF");
 
     ucrcInst: ucrc_par
     generic map(

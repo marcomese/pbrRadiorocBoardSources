@@ -18,6 +18,8 @@ package utilsPkg is
 
     function bitsNum(val: integer) return integer;
 
+    function reverse(v: std_logic_vector) return std_logic_vector;
+
     function max(a,b: integer) return integer;
 
     function ones(size: integer) return std_logic_vector;
@@ -78,6 +80,17 @@ package body utilsPkg is
     begin
         return integer(ceil(log2(real(val + 1))));
     end bitsNum;
+
+    function reverse(v: std_logic_vector) return std_logic_vector is
+        variable result : std_logic_vector(v'range);
+        alias    rv     : std_logic_vector(v'reverse_range) is v;
+    begin
+        for i in rv'range loop
+            result(i) := rv(i);
+        end loop;
+
+        return result;
+    end reverse;
 
     function max(a,b: integer) return integer is
     begin
