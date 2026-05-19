@@ -9,6 +9,7 @@
             <top_module name="glbl" />
             <top_module name="registerspkg" />
             <top_module name="tb_dataAcqCtrl_PI" />
+            <top_module name="ucrc_pkg" />
             <top_module name="utilspkg" />
             <top_module name="vcomponents" />
          </top_modules>
@@ -16,14 +17,17 @@
    </db_ref_list>
    <zoom_setting>
       <ZoomStartTime time="0.000000 us"></ZoomStartTime>
-      <ZoomEndTime time="601.000001 us"></ZoomEndTime>
-      <Cursor1Time time="232.113417 us"></Cursor1Time>
+      <ZoomEndTime time="27.140001 us"></ZoomEndTime>
+      <Cursor1Time time="9.502600 us"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
-      <NameColumnWidth column_width="181"></NameColumnWidth>
+      <NameColumnWidth column_width="173"></NameColumnWidth>
       <ValueColumnWidth column_width="58"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="18" />
+   <WVObjectSize size="26" />
+   <wave_markers>
+      <marker time="7517500" label="" />
+   </wave_markers>
    <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/adc/rd_en" type="logic">
       <obj_property name="ElementShortName">rd_en</obj_property>
       <obj_property name="ObjectShortName">rd_en</obj_property>
@@ -87,6 +91,18 @@
       <obj_property name="ObjectShortName">state</obj_property>
       <obj_property name="label">devInterfState</obj_property>
    </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/radInterfInst/state" type="other">
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="ElementShortName">state</obj_property>
+      <obj_property name="ObjectShortName">state</obj_property>
+      <obj_property name="label">radInterfState</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/radInterfInst/radioFSMInst/state" type="other">
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="ElementShortName">state</obj_property>
+      <obj_property name="ObjectShortName">state</obj_property>
+      <obj_property name="label">radFSMState</obj_property>
+   </wvobject>
    <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/clk_200M" type="logic">
       <obj_property name="ElementShortName">clk_200M</obj_property>
       <obj_property name="ObjectShortName">clk_200M</obj_property>
@@ -94,6 +110,30 @@
    <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/clk10MSig" type="logic">
       <obj_property name="ElementShortName">clk10MSig</obj_property>
       <obj_property name="ObjectShortName">clk10MSig</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/i2cEna" type="logic">
+      <obj_property name="ElementShortName">i2cEna</obj_property>
+      <obj_property name="ObjectShortName">i2cEna</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/i2cRadModule/sda" type="logic">
+      <obj_property name="ElementShortName">sda</obj_property>
+      <obj_property name="ObjectShortName">sda</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/i2cRadModule/scl" type="logic">
+      <obj_property name="ElementShortName">scl</obj_property>
+      <obj_property name="ObjectShortName">scl</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/i2cRadModule/state" type="other">
+      <obj_property name="ElementShortName">state</obj_property>
+      <obj_property name="ObjectShortName">state</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/i2cRadModule/scl_clk" type="logic">
+      <obj_property name="ElementShortName">scl_clk</obj_property>
+      <obj_property name="ObjectShortName">scl_clk</obj_property>
+   </wvobject>
+   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/i2cRadModule/scl_ena" type="logic">
+      <obj_property name="ElementShortName">scl_ena</obj_property>
+      <obj_property name="ObjectShortName">scl_ena</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/en_clki2c" type="logic">
       <obj_property name="ElementShortName">en_clki2c</obj_property>

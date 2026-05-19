@@ -283,21 +283,31 @@ begin
     end if;
 end process;
 
-scClkSmBufInst: ODDR
+scClkSmBufInst: BUFGCE
 generic map(
-    DDR_CLK_EDGE => "SAME_EDGE", 
-    INIT         => '0',
-    SRTYPE       => "SYNC"
+    SIM_DEVICE => "7SERIES"
 )
 port map(
-    Q  => sc_clk_sm,
-    C  => clk_200M,
-    CE => '1',
-    D1 => clk10MSig,
-    D2 => clk10MSig,
-    R  => reset,
-    S  => '0'
+    O  => sc_clk_sm,
+    CE => en_clki2c,
+    I  => clk10MSig
 );
+
+--scClkSmBufInst: ODDR
+--generic map(
+--    DDR_CLK_EDGE => "SAME_EDGE", 
+--    INIT         => '0',
+--    SRTYPE       => "SYNC"
+--)
+--port map(
+--    Q  => sc_clk_sm,
+--    C  => clk_200M,
+--    CE => '1',
+--    D1 => clk10MSig,
+--    D2 => clk10MSig,
+--    R  => reset,
+--    S  => '0'
+--);
 
 resetNSync: xpm_cdc_async_rst
 generic map(
