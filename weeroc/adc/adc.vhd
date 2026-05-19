@@ -39,8 +39,12 @@ library xil_defaultlib;
 
 entity adc is
 generic(
-    dataHeader        : std_logic_vector(31 downto 0);
-    dataFooter        : std_logic_vector(31 downto 0)
+    FIFO_WRITE_DEPTH    : integer;
+    READ_DATA_WIDTH     : integer;
+    WRITE_DATA_WIDTH    : integer;
+    RD_DATA_COUNT_WIDTH : integer;
+    dataHeader          : std_logic_vector(31 downto 0);
+    dataFooter          : std_logic_vector(31 downto 0)
 );
 port(
     rst               : in  std_logic;
@@ -51,11 +55,18 @@ port(
     NORT1             : in  std_logic;
     NORT2             : in  std_logic;
     NORTQ             : in  std_logic;
-    nb_acq            : in  std_logic_vector(7 downto 0);
+    nb_acq            : in  std_logic_vector(31 downto 0);
+    holdDelay         : in  std_logic_vector(15 downto 0);
+    convDelay         : in  std_logic_vector(15 downto 0);
+    rstSel            : in  std_logic;
+    holdSel           : in  std_logic;
+    trgSel            : in  std_logic_vector(3 downto 0);
+    trgExtSel         : in  std_logic;
+    swTrg             : in  std_logic;
+    swRst             : in  std_logic;
     id                : in  std_logic_vector(3 downto 0);
     tStamp            : in  std_logic_vector(63 downto 0);
     t                 : in  std_logic_vector(63 downto 0);
-    sel_adc           : in  std_logic_vector(63 downto 0);
     rd_en             : in  std_logic;
     dout              : out std_logic_vector(7 downto 0);
     reset_n           : out std_logic;
@@ -65,7 +76,7 @@ port(
     adc_sck           : out std_logic;
     empty_acq         : out std_logic;
     end_multi_acq     : out std_logic;
-    rd_data_count_acq : out std_logic_vector(16 downto 0);
+    rd_data_count_acq : out std_logic_vector(RD_DATA_COUNT_WIDTH-1 downto 0);
     hold_ext          : out std_logic;
     trig_ext          : out std_logic;
     trig_out          : out std_logic;
@@ -131,13 +142,21 @@ architecture Behavioral of adc is
 
     signal NORT_FPGA              : std_logic;
     signal en_trigext             : std_logic;
-    signal hd                     : std_logic_vector(11 downto 0);
-    signal cd                     : std_logic_vector(10 downto 0);
     signal rdValidSig             : std_logic;
     signal locRst                 : std_logic;
     signal crcRst                 : std_logic;
 
-    signal dHeader,
+    signal trgSelSig     : std_logic_vector(3 downto 0);
+    signal holdDelaySig,
+           convDelaySig  : std_logic_vector(15 downto 0);
+    signal rstSelSig,
+           holdSelSig,
+           trgExtSelSig,
+           swTrgSig,
+           swRstSig     : std_logic;
+
+    signal nbAcq,
+           dHeader,
            crcVal,
            crcXorRev              : std_logic_vector(31 downto 0);
 
@@ -159,7 +178,7 @@ begin
             clk_200M      => clk_200M,
             start         => start,
             end_acq       => end_acq,
-            nb_acq        => nb_acq,
+            nb_acq        => nbAcq,
             en_acq        => en_acq,
             end_multi_acq => end_multi_acq,
             rst_n         => rst_n
@@ -250,10 +269,10 @@ begin
 
     dataFifo: xpm_fifo_sync
     generic map(
-        FIFO_WRITE_DEPTH    => 16384,
-        READ_DATA_WIDTH     => 8,
-        WRITE_DATA_WIDTH    => 32,
-        RD_DATA_COUNT_WIDTH => 17,
+        FIFO_WRITE_DEPTH    => FIFO_WRITE_DEPTH,
+        READ_DATA_WIDTH     => READ_DATA_WIDTH,
+        WRITE_DATA_WIDTH    => WRITE_DATA_WIDTH,
+        RD_DATA_COUNT_WIDTH => RD_DATA_COUNT_WIDTH,
         READ_MODE           => "std",
         USE_ADV_FEATURES    => "1400",
         FIFO_MEMORY_TYPE    => "block"
@@ -292,6 +311,33 @@ begin
         crc_o   => crcVal
     );
 
+    sigInProc: process(clk_200M)
+    begin
+        if rising_edge(clk_200M) then
+            if locRst = '1' then
+                holdDelaySig <= (others => '0');
+                convDelaySig <= (others => '0');
+                rstSelSig    <= '0';
+                holdSelSig   <= '0';
+                trgSelSig    <= (others => '0');
+                trgExtSelSig <= '0';
+                swTrgSig     <= '0';
+                swRstSig     <= '0';
+                nbAcq        <= (others => '0');
+            else
+                holdDelaySig <= holdDelay;
+                convDelaySig <= convDelay;
+                rstSelSig    <= rstSel;
+                holdSelSig   <= holdSel;
+                trgSelSig    <= trgSel;
+                trgExtSelSig <= trgExtSel;
+                swTrgSig     <= swTrg;
+                swRstSig     <= swRst;
+                nbAcq        <= nb_acq;
+            end if;
+        end if;
+    end process;
+
     hit0 <= t(to_integer(unsigned(sel_adc(5 downto 0))));
 
     with sel_adc(31 downto 29) select
@@ -304,17 +350,15 @@ begin
 
     hit <= not t0;
 
-    trig_ext <= '0' when sel_adc(26) = '0' else (trigger or en_trigext);
-    hold_ext <= sel_adc(27) and holdext;
-    reset_n  <= sel_adc(6) when sel_adc(28) = '0' else rst_n;
+    trig_ext <= '0' when trgExtSel = '0' else (trigger or en_trigext);
+    hold_ext <= holdSel and holdext;
+    reset_n  <= swRst when rstSel = '0' else rst_n;
 
-    hd         <= sel_adc(54 downto 51) & sel_adc(39 downto 32);
-    hold_delay <= to_integer(unsigned(hd));
-    cd         <= sel_adc(63 downto 56) & "000";
-    conv_delay <= to_integer(unsigned(cd));
+    hold_delay <= to_integer(unsigned(holdDelay));
+    conv_delay <= to_integer(unsigned(convDelay)); -- should be multiplied by 8
 
     trigger     <= en_acq and hit;
-    trigger_sft <= sel_adc(7);
+    trigger_sft <= swTrg;
 
     trgFFProc : process(clk_200M)
     begin
@@ -411,7 +455,7 @@ begin
                 end if;
             when nxt =>
                 if ch >= 66 then
-                    next_state <= wrCRC32;--finish;
+                    next_state <= wrCRC32;
                 elsif ch < 2 then
                     next_state <= start_conv;
                 else

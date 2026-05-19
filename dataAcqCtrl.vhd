@@ -22,8 +22,11 @@ library xpm;
 use xpm.vcomponents.all;
 
 entity dataAcqCtrl is
+generic(
+    rdDataCntWidth : integer
+);
 port(
-    clk100M    : in  std_logic;
+    clk        : in  std_logic;
     rst        : in  std_logic;
     devExec    : in  std_logic;
     devId      : in  devices_t;
@@ -42,10 +45,17 @@ port(
     endAcq     : in  std_logic;
     rdValid    : in  std_logic;
     rdAcq      : out std_logic;
-    rdDataCnt  : in  std_logic_vector(16 downto 0);
+    rdDataCnt  : in  std_logic_vector(rdDataCntWidth-1 downto 0);
     emptyAcq   : in  std_logic;
-    nbAcq      : out std_logic_vector(7 downto 0);
-    selAdc     : out std_logic_vector(63 downto 0);
+    nbAcq      : out std_logic_vector(31 downto 0);
+    holdDelay  : out std_logic_vector(15 downto 0);
+    convDelay  : out std_logic_vector(15 downto 0);
+    trgSel     : out std_logic_vector(3 downto 0);
+    trgExtSel  : out std_logic;
+    rstSel     : out std_logic;
+    holdSel    : out std_logic;
+    swTrg      : out std_logic;
+    swRst      : out std_logic;
     doutAcq    : in  std_logic_vector(7 downto 0)
 );
 end dataAcqCtrl;
@@ -58,16 +68,28 @@ type addr is (regStatus,
               regAcqEn,
               regFifoCnt,
               regAcqNb,
-              regSelAdcMSB,
-              regSelAdcLSB);
+              regHoldDel,
+              regConvDel,
+              regTrgSel,
+              regTrgExtSel,
+              regRstSel,
+              regHoldSel,
+              regSwTrg,
+              regSwRst);
 
 constant reg : regsRec_t := (
-    addr'pos(regStatus)    => (rAddr => 0, rBegin => 31,  rEnd => 0,  rMode => ro),
-    addr'pos(regAcqEn)     => (rAddr => 1, rBegin => 31,  rEnd => 0,  rMode => rw),
-    addr'pos(regFifoCnt)   => (rAddr => 2, rBegin => 31,  rEnd => 0,  rMode => ro),
-    addr'pos(regAcqNb)     => (rAddr => 3, rBegin => 31,  rEnd => 0,  rMode => rw),
-    addr'pos(regSelAdcMSB) => (rAddr => 4, rBegin => 31,  rEnd => 0,  rMode => rw),
-    addr'pos(regSelAdcLSB) => (rAddr => 5, rBegin => 31,  rEnd => 0,  rMode => rw)
+    addr'pos(regStatus)    => (rAddr => 0,  rBegin => 31,  rEnd => 0,  rMode => ro),
+    addr'pos(regAcqEn)     => (rAddr => 1,  rBegin => 31,  rEnd => 0,  rMode => rw),
+    addr'pos(regFifoCnt)   => (rAddr => 2,  rBegin => 31,  rEnd => 0,  rMode => ro),
+    addr'pos(regAcqNb)     => (rAddr => 3,  rBegin => 31,  rEnd => 0,  rMode => rw),
+    addr'pos(regHoldDel)   => (rAddr => 4,  rBegin => 31,  rEnd => 0,  rMode => rw),
+    addr'pos(regConvDel)   => (rAddr => 5,  rBegin => 31,  rEnd => 0,  rMode => rw),
+    addr'pos(regTrgSel)    => (rAddr => 6,  rBegin => 31,  rEnd => 0,  rMode => rw),
+    addr'pos(regTrgExtSel) => (rAddr => 7,  rBegin => 31,  rEnd => 0,  rMode => rw),
+    addr'pos(regRstSel)    => (rAddr => 8,  rBegin => 31,  rEnd => 0,  rMode => rw),
+    addr'pos(regHoldSel)   => (rAddr => 9,  rBegin => 31,  rEnd => 0,  rMode => rw),
+    addr'pos(regSwTrg)     => (rAddr => 10, rBegin => 31,  rEnd => 0,  rMode => rw),
+    addr'pos(regSwRst)     => (rAddr => 11, rBegin => 31,  rEnd => 0,  rMode => rw)
 );
 
 constant regsNum : integer := reg(reg'high).rAddr+1;
@@ -92,6 +114,9 @@ constant errAddrStatus      : std_logic_vector(31 downto 0) := initSlv(32, 13, 0
 constant errROnlyStatus     : std_logic_vector(31 downto 0) := initSlv(32, 13, 0, "11" & x"A00", '0');
 constant errFifoEmptyStatus : std_logic_vector(31 downto 0) := initSlv(32, 13, 0, "11" & x"B00", '0');
 
+constant INT_ON             : std_logic_vector(31 downto 0) := (others => '1');
+constant EXT_OFF            : std_logic_vector(31 downto 0) := (others => '0');
+
 signal state       : state_t;
 
 signal lastData    : devData_t;
@@ -107,26 +132,42 @@ signal rstAcqSig,
        devBrstSig,
        locRst      : std_logic;
 
-signal nbAcqSig    : std_logic_vector(7 downto 0);
+signal nbAcqSig     : std_logic_vector(31 downto 0);
+signal holdDelaySig : std_logic_vector(15 downto 0);
+signal convDelaySig : std_logic_vector(15 downto 0);
+signal trgSelSig    : std_logic_vector(3 downto 0);
+signal trgExtSelSig : std_logic;
+signal rstSelSig    : std_logic;
+signal holdSelSig   : std_logic;
+signal swTrgSig     : std_logic;
+signal swRstSig     : std_logic;
 
 begin
 
-dAddr    <= devAddrToInt(devAddr);
-nbAcq    <= nbAcqSig;
-resetAcq <= rstAcqSig;
-startAcq <= strtAcqSig;
-rdAcq    <= rdAcqSig and not devBrstSnd;
+dAddr     <= devAddrToInt(devAddr);
+nbAcq     <= nbAcqSig;
+holdDelay <= holdDelaySig;
+convDelay <= convDelaySig;
+trgSel    <= trgSelSig;
+trgExtSel <= trgExtSelSig;
+rstSel    <= rstSelSig;
+holdSel   <= holdSelSig;
+swTrg     <= swTrgSig;
+swRst     <= swRstSig;
+resetAcq  <= rstAcqSig;
+startAcq  <= strtAcqSig;
+rdAcq     <= rdAcqSig and not devBrstSnd;
 
-locRstProc: process(clk100M)
+locRstProc: process(clk)
 begin
-    if rising_edge(clk100M) then
+    if rising_edge(clk) then
         locRst <= rst;
     end if;
 end process;
 
-devDataOutCtrl: process(clk100M)
+devDataOutCtrl: process(clk)
 begin
-    if rising_edge(clk100M) then
+    if rising_edge(clk) then
         if locRst = '1' then
             devDataOut <= (others => (others => '0'));
         elsif loadDataOut = '1' and devBrstSig = '0' then
@@ -137,34 +178,66 @@ begin
     end if;
 end process;
 
-rDataCtrl: process(clk100M)
+rDataCtrl: process(clk)
 begin
-    if rising_edge(clk100M) then
+    if rising_edge(clk) then
         if locRst = '1' then
-            rData <= (others => (others => '0'));
+            rData        <= (others => (others => '0'));
+            nbAcqSig     <= (others => '0');
+            holdDelaySig <= (others => '0');
+            convDelaySig <= (others => '0');
+            trgSelSig    <= (others => '0');
+            trgExtSelSig <= '0';
+            rstSelSig    <= '0';
+            holdSelSig   <= '0';
+            swTrgSig     <= '0';
+            swRstSig     <= '0';
         elsif loadReg = '1' then
             rData(lastAddr) <= devDataToSlv(lastData);
         else
             rData(addr'pos(regFifoCnt)) <= std_logic_vector(resize(unsigned(rdDataCnt), regsLen));
+            rData(addr'pos(regSwTrg))   <= EXT_OFF;
+            rData(addr'pos(regSwRst))   <= EXT_OFF;
+
+            nbAcqSig     <= rData(addr'pos(regAcqNb));
+            holdDelaySig <= rData(addr'pos(regHoldDel))(holdDelaySig'range);
+            convDelaySig <= rData(addr'pos(regConvDel))(convDelaySig'range);
+            trgSelSig    <= rData(addr'pos(regTrgSel))(trgSelSig'range);
+            swTrgSig     <= '0';
+            swRstSig     <= '0';
+
+            if rData(addr'pos(regSwTrg)) = INT_ON then
+                swTrgSig <= '1';
+            end if;
+
+            if rData(addr'pos(regSwRst)) = INT_ON then
+                swRstSig <= '1';
+            end if;
+
+            if rData(addr'pos(regTrgExtSel)) = INT_ON then
+                trgExtSelSig <= '1';
+            elsif rData(addr'pos(regTrgExtSel)) = EXT_OFF then
+                trgExtSelSig <= '0';
+            end if;
+
+            if rData(addr'pos(regRstSel)) = INT_ON then
+                rstSelSig <= '1';
+            elsif rData(addr'pos(regRstSel)) = EXT_OFF then
+                rstSelSig <= '0';
+            end if;
+
+            if rData(addr'pos(regHoldSel)) = INT_ON then
+                holdSelSig <= '1';
+            elsif rData(addr'pos(regHoldSel)) = EXT_OFF then
+                holdSelSig <= '0';
+            end if;
         end if;
     end if;
 end process;
 
-selAdcProc: process(clk100M)
+dataAcqCtrlFSM: process(clk)
 begin
-    if rising_edge(clk100M) then
-        if locRst = '1' then
-            selAdc <= (others => '0');
-        else
-            selAdc <= rData(addr'pos(regSelAdcMSB)) &
-                      rData(addr'pos(regSelAdcLSB)); 
-        end if;
-    end if;
-end process;
-
-dataAcqCtrlFSM: process(clk100M)
-begin
-    if rising_edge(clk100M) then
+    if rising_edge(clk) then
         if locRst = '1' then
             devReady    <= '0';
             busy        <= '0';
@@ -173,7 +246,6 @@ begin
             rstAcqSig   <= '1';
             strtAcqSig  <= '0';
             rdAcqSig    <= '0';
-            nbAcqSig    <= (others => '0');
             devBrstRst  <= '0';
             devBrstSig  <= '0';
             lastAddr    <= 0;
@@ -188,6 +260,7 @@ begin
                     loadReg     <= '0';
                     rstAcqSig   <= '0';
                     strtAcqSig  <= '0';
+                    devBrstRst  <= '0';
                     devBrstSig  <= devBrst;
                     busy        <= '0';
 
@@ -229,12 +302,10 @@ begin
 
                     state   <= idle;
 
-                    if lastAddr = addr'pos(regAcqEn) and lastData(0)(0) = '1' then
+                    if lastAddr = addr'pos(regAcqEn) and devDataToSlv(lastData) = INTERNAL_ON then
                         rstAcqSig <= '1';
 
                         state     <= sendStartAcq;
-                    elsif lastAddr = addr'pos(regAcqNb) then
-                        nbAcqSig <= devDataToSlv(lastData)(nbAcqSig'range);
                     end if;
 
                 when sendStartAcq =>

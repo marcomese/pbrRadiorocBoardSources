@@ -2,6 +2,7 @@ library ieee;
 use ieee.std_logic_1164.all;
 use ieee.std_logic_unsigned.all;
 use IEEE.numeric_std.all;
+use ieee.math_real.all;
 use IEEE.STD_LOGIC_MISC.ALL;
 
 library UNISIM;
@@ -80,28 +81,6 @@ entity radioroc_fw is
 end entity;
 
 architecture arch of radioroc_fw is
-
-    -- LVDS
-	signal ADC_SCKHG, ADC_SCKLG, ADC_HG, ADC_LG : std_logic;
-	signal T_1Buf, T_2Buf,
-	       T_1Sync, T_2Sync,
-	       tEdge1, tEdge2 : std_logic_vector(63 downto 0);
-	signal tEdge21, TBuf21 : std_logic_vector(127 downto 0);
-	-- Clock and reset
-	signal reset, resetn, resetSig : std_logic;
-	signal clk_200M, clk10MSig : std_logic;
-	signal sysClkDS : std_logic;
-	-- I2C
-    signal en_clki2c : std_logic;
-
-	--ADC Acquisition
-	signal reset_acq, start_acq, rd_acq, adc_sck, end_acq, empty_acq, rstn_read_acq, reset_n_acq, trig_out : std_logic;
-	signal nb_acq, dout_acq : std_logic_vector(7 downto 0);
-	signal rd_data_count_acq : std_logic_vector(16 downto 0);
-	signal sel_adc : std_logic_vector(63 downto 0);
-
--- CONSTANTS for deviceInterface, tmpCtrl and PulseGentCtrl
-
 constant clkFreq        : real      := 200.0e6;
 constant timeout        : real      := 1.0;
 constant sleepOnPwrOn   : boolean   := True;
@@ -122,8 +101,37 @@ constant burstWrCmd  : std_logic_vector(3 downto 0)  := x"3";
 constant maxBrstLen  : integer                       := 2048;
 constant dataHeader  : std_logic_vector(31 downto 0) := x"52_42_30_30";
 constant dataFooter  : std_logic_vector(31 downto 0) := x"5F_45_4F_50";
+constant FIFO_WRITE_DEPTH    : integer := 16384;                                                                                      
+constant READ_DATA_WIDTH     : integer := 8;                                                                                           
+constant WRITE_DATA_WIDTH    : integer := 32;                                                                                          
+constant RD_DATA_COUNT_WIDTH : integer := integer(ceil(log2(real(FIFO_WRITE_DEPTH)*real(WRITE_DATA_WIDTH)/real(READ_DATA_WIDTH))))+1;    
 
-constant rstPORLen : integer := 10;
+signal ADC_SCKHG, ADC_SCKLG, ADC_HG, ADC_LG : std_logic;
+signal T_1Buf, T_2Buf,
+       T_1Sync, T_2Sync,
+       tEdge1, tEdge2 : std_logic_vector(63 downto 0);
+signal tEdge21, TBuf21 : std_logic_vector(127 downto 0);
+-- Clock and reset
+signal reset, resetn, resetSig : std_logic;
+signal clk_200M, clk10MSig : std_logic;
+signal sysClkDS : std_logic;
+-- I2C
+signal en_clki2c : std_logic;
+
+--ADC Acquisition
+signal reset_acq, start_acq, rd_acq, adc_sck, end_acq, empty_acq, rstn_read_acq, reset_n_acq, trig_out : std_logic;
+signal nb_acq    : std_logic_vector(31 downto 0);
+signal holdDelay : std_logic_vector(15 downto 0);
+signal convDelay : std_logic_vector(15 downto 0);
+signal rstSel    : std_logic;
+signal holdSel   : std_logic;
+signal trgSel    : std_logic_vector(3 downto 0);
+signal trgExtSel : std_logic;
+signal swTrg     : std_logic;
+signal swRst     : std_logic;
+signal dout_acq  : std_logic_vector(7 downto 0);
+signal rd_data_count_acq : std_logic_vector(RD_DATA_COUNT_WIDTH-1 downto 0);
+signal sel_adc : std_logic_vector(63 downto 0);
 
 signal   dataToDev,
          dataFromPGen,
@@ -511,6 +519,10 @@ port map(
 
 adc: entity xil_defaultlib.adc
 generic map(
+    FIFO_WRITE_DEPTH    => FIFO_WRITE_DEPTH,
+    READ_DATA_WIDTH     => READ_DATA_WIDTH,
+    WRITE_DATA_WIDTH    => WRITE_DATA_WIDTH,
+    RD_DATA_COUNT_WIDTH => RD_DATA_COUNT_WIDTH,
     dataHeader => dataHeader,
     dataFooter => dataFooter
 )
@@ -527,7 +539,14 @@ port map(
     id       => boardID,
     tStamp   => tStamp,
     t		 => T_1Sync,
-    sel_adc => sel_adc,
+    holdDelay => holdDelay,
+    convDelay => convDelay,
+    rstSel    => rstSel,
+    holdSel   => holdSel,
+    trgSel    => trgSel,
+    trgExtSel => trgExtSel,
+    swTrg     => swTrg,
+    swRst     => swRst,
     rd_en 	 => rd_acq,
     dout 	 => dout_acq,
     reset_n    => reset_n_acq,
@@ -610,31 +629,41 @@ port map(
 );
 
 dataAcqCtrlInst : entity work.dataAcqCtrl
+generic map(
+    rdDataCntWidth => RD_DATA_COUNT_WIDTH
+)
 port map(
-    clk100M     => clk_200M,
-    rst         => reset,
-    devExec     => devExec,
-    devId       => devId,
-    devRw       => devRw,
-    devBrst     => devBrst,
-    devBrstWrt  => devBrstWrt,
-    devBrstSnd  => devBrstSnd,
-    devBrstRst  => devBrstRstAcq,
-    devAddr     => devAddr,
-    devDataIn   => dataToDev,
-    devDataOut  => dataFromAcq,
-    devReady    => devReadyAcq,
-    busy        => devBusyAcq,
-    resetAcq    => reset_acq,
-    startAcq    => start_acq,
-    endAcq      => endAcq,
-    rdValid     => rdValid,
-    rdAcq       => rd_acq,
-    rdDataCnt   => rd_data_count_acq,
-    emptyAcq    => empty_acq,
-    nbAcq       => nb_acq,
-    selAdc      => sel_adc,
-    doutAcq     => dout_acq
+    clk        => clk_200M,
+    rst        => reset,
+    devExec    => devExec,
+    devId      => devId,
+    devRw      => devRw,
+    devBrst    => devBrst,
+    devBrstWrt => devBrstWrt,
+    devBrstSnd => devBrstSnd,
+    devBrstRst => devBrstRstAcq,
+    devAddr    => devAddr,
+    devDataIn  => dataToDev,
+    devDataOut => dataFromAcq,
+    devReady   => devReadyAcq,
+    busy       => devBusyAcq,
+    resetAcq   => reset_acq,
+    startAcq   => start_acq,
+    endAcq     => endAcq,
+    rdValid    => rdValid,
+    rdAcq      => rd_acq,
+    rdDataCnt  => rd_data_count_acq,
+    emptyAcq   => empty_acq,
+    nbAcq      => nb_acq,
+    holdDelay  => holdDelay,
+    convDelay  => convDelay,
+    rstSel     => rstSel,
+    holdSel    => holdSel,
+    trgSel     => trgSel,
+    trgExtSel  => trgExtSel,
+    swTrg      => swTrg,
+    swRst      => swRst,
+    doutAcq    => dout_acq
 );
 
 i2cTmpModule: entity work.i2cMaster
