@@ -89,7 +89,7 @@ architecture arch of radioroc_fw is
 	signal tEdge21, TBuf21 : std_logic_vector(127 downto 0);
 	-- Clock and reset
 	signal reset, resetn, resetSig : std_logic;
-	signal clk_200M, clk10MSig : std_logic;
+	signal clk_200M, clk10MSig, clk10MBuf : std_logic;
 	signal sysClkDS : std_logic;
 	-- I2C
     signal en_clki2c : std_logic;
@@ -283,31 +283,27 @@ begin
     end if;
 end process;
 
-scClkSmBufInst: BUFGCE
-generic map(
-    SIM_DEVICE => "7SERIES"
-)
+clk10MBufInst: BUFG
 port map(
-    O  => sc_clk_sm,
-    CE => en_clki2c,
+    O  => clk10MBuf,
     I  => clk10MSig
 );
 
---scClkSmBufInst: ODDR
---generic map(
---    DDR_CLK_EDGE => "SAME_EDGE", 
---    INIT         => '0',
---    SRTYPE       => "SYNC"
---)
---port map(
---    Q  => sc_clk_sm,
---    C  => clk_200M,
---    CE => '1',
---    D1 => clk10MSig,
---    D2 => clk10MSig,
---    R  => reset,
---    S  => '0'
---);
+scClkSmBufInst: ODDR
+generic map(
+    DDR_CLK_EDGE => "OPPOSITE_EDGE", 
+    INIT         => '0',
+    SRTYPE       => "SYNC"
+)
+port map(
+    Q  => sc_clk_sm,
+    C  => clk10MBuf,
+    CE => '1',
+    D1 => '1',
+    D2 => '0',
+    R  => '0',
+    S  => '0'
+);
 
 resetNSync: xpm_cdc_async_rst
 generic map(
