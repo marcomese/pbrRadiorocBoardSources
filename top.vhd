@@ -89,13 +89,13 @@ architecture arch of radioroc_fw is
 	signal tEdge21, TBuf21 : std_logic_vector(127 downto 0);
 	-- Clock and reset
 	signal reset, resetn, resetSig : std_logic;
-	signal clk_200M, clk10MSig, clk10MBuf : std_logic;
+	signal clk_200M, clk10MSig : std_logic;
 	signal sysClkDS : std_logic;
 	-- I2C
     signal en_clki2c : std_logic;
 
 	--ADC Acquisition
-	signal reset_acq, start_acq, rd_acq, adc_sck, end_acq, empty_acq, rstn_read_acq, reset_n_acq, trig_out : std_logic;
+	signal reset_acq, start_acq, rd_acq, adc_sck, adcSckBuf, end_acq, empty_acq, rstn_read_acq, reset_n_acq, trig_out : std_logic;
 	signal nb_acq, dout_acq : std_logic_vector(7 downto 0);
 	signal rd_data_count_acq : std_logic_vector(16 downto 0);
 	signal sel_adc : std_logic_vector(63 downto 0);
@@ -236,10 +236,6 @@ tEdge21       <= tEdge2 & tEdge1;
 
 TBuf21        <= T_2Buf & T_1Buf;
 
-ADC_SCKHG     <= adc_sck;
-
-ADC_SCKLG     <= adc_sck;
-
 boardID       <= '0' & idSync;
 
 
@@ -285,19 +281,57 @@ end process;
 
 clk10MBufInst: BUFG
 port map(
-    O  => clk10MBuf,
+    O  => sc_clk_sm,
     I  => clk10MSig
 );
 
-scClkSmBufInst: ODDR
+--scClkSmBufInst: ODDR
+--generic map(
+--    DDR_CLK_EDGE => "OPPOSITE_EDGE", 
+--    INIT         => '0',
+--    SRTYPE       => "SYNC"
+--)
+--port map(
+--    Q  => sc_clk_sm,
+--    C  => clk10MBuf,
+--    CE => '1',
+--    D1 => '1',
+--    D2 => '0',
+--    R  => '0',
+--    S  => '0'
+--);
+
+adcSckBufInst: BUFG
+port map(
+    O  => adcSckBuf,
+    I  => adc_sck
+);
+
+adcSckHGBufInst: ODDR
 generic map(
     DDR_CLK_EDGE => "OPPOSITE_EDGE", 
-    INIT         => '0',
+    INIT         => '1',
     SRTYPE       => "SYNC"
 )
 port map(
-    Q  => sc_clk_sm,
-    C  => clk10MBuf,
+    Q  => ADC_SCKHG,
+    C  => adcSckBuf,
+    CE => '1',
+    D1 => '1',
+    D2 => '0',
+    R  => '0',
+    S  => '0'
+);
+
+adcSckLGBufInst: ODDR
+generic map(
+    DDR_CLK_EDGE => "OPPOSITE_EDGE", 
+    INIT         => '1',
+    SRTYPE       => "SYNC"
+)
+port map(
+    Q  => ADC_SCKLG,
+    C  => adcSckBuf,
     CE => '1',
     D1 => '1',
     D2 => '0',
