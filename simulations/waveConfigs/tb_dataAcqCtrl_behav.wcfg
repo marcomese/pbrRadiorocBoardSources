@@ -16,15 +16,15 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="4,127.600 ns"></ZoomStartTime>
-      <ZoomEndTime time="10,932.601 ns"></ZoomEndTime>
-      <Cursor1Time time="5,517.500 ns"></Cursor1Time>
+      <ZoomStartTime time="0.000000 us"></ZoomStartTime>
+      <ZoomEndTime time="101.000000 us"></ZoomEndTime>
+      <Cursor1Time time="75.542500 us"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
-      <NameColumnWidth column_width="169"></NameColumnWidth>
+      <NameColumnWidth column_width="165"></NameColumnWidth>
       <ValueColumnWidth column_width="58"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="26" />
+   <WVObjectSize size="25" />
    <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/adc/rd_en" type="logic">
       <obj_property name="ElementShortName">rd_en</obj_property>
       <obj_property name="ObjectShortName">rd_en</obj_property>
@@ -103,10 +103,6 @@
    <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/clk_200M" type="logic">
       <obj_property name="ElementShortName">clk_200M</obj_property>
       <obj_property name="ObjectShortName">clk_200M</obj_property>
-   </wvobject>
-   <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/clk10MSig" type="logic">
-      <obj_property name="ElementShortName">clk10MSig</obj_property>
-      <obj_property name="ObjectShortName">clk10MSig</obj_property>
    </wvobject>
    <wvobject fp_name="/tb_dataAcqCtrl_PI/DUT/i2cEna" type="logic">
       <obj_property name="ElementShortName">i2cEna</obj_property>

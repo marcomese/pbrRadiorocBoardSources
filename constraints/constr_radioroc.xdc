@@ -215,7 +215,7 @@ set_property PACKAGE_PIN AB22 [get_ports SDA_275]
 
 create_clock -period 5.000 -name clk_200M [get_ports sysClk_p]
 
-create_generated_clock -name sc_clk_sm -source [get_ports sysClk_p] -divide_by 20 [get_pins clk10MBufInst/O]
+create_generated_clock -name clk_2M -source [get_ports sysClk_p] -divide_by 100 [get_pins clk2MBufInst/O]
 
 create_generated_clock -name adcSck -source [get_ports sysClk_p] -divide_by 2 [get_pins adcSckBufInst/O]
 

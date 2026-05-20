@@ -89,7 +89,7 @@ architecture arch of radioroc_fw is
 	signal tEdge21, TBuf21 : std_logic_vector(127 downto 0);
 	-- Clock and reset
 	signal reset, resetn, resetSig : std_logic;
-	signal clk_200M, clk10MSig : std_logic;
+	signal clk_200M, clk2MSig, clk2MBuf : std_logic;
 	signal sysClkDS : std_logic;
 	-- I2C
     signal en_clki2c : std_logic;
@@ -210,7 +210,7 @@ signal readRq,
 
 signal endAcq, rdValid : std_logic;
 
-signal clkCnt : unsigned(4 downto 0); -- MSB = overflow
+signal clkCnt : unsigned(7 downto 0); -- MSB = overflow
 
 begin
 
@@ -261,45 +261,45 @@ clkDividerProc: process(clk_200M)
 begin
     if rising_edge(clk_200M) then
         if reset = '1' or clkCnt(clkCnt'left) = '1' or en_clki2c = '0' then
-            clkCnt <= to_unsigned(8, clkCnt'length);
+            clkCnt <= to_unsigned(48, clkCnt'length);
         else
             clkCnt <= clkCnt - 1;
         end if;
     end if;
 end process;
 
-clk10MProc: process(clk_200M)
+clk2MProc: process(clk_200M)
 begin
     if rising_edge(clk_200M) then
         if reset = '1' or en_clki2c = '0' then
-            clk10MSig <= '0';
+            clk2MSig <= '0';
         elsif clkCnt(clkCnt'left) = '1' then
-            clk10MSig <= not clk10MSig;
+            clk2MSig <= not clk2MSig;
         end if;
     end if;
 end process;
 
-clk10MBufInst: BUFG
+clk2MBufInst: BUFG
 port map(
-    O  => sc_clk_sm,
-    I  => clk10MSig
+    O  => clk2MBuf,
+    I  => clk2MSig
 );
 
---scClkSmBufInst: ODDR
---generic map(
---    DDR_CLK_EDGE => "OPPOSITE_EDGE", 
---    INIT         => '0',
---    SRTYPE       => "SYNC"
---)
---port map(
---    Q  => sc_clk_sm,
---    C  => clk10MBuf,
---    CE => '1',
---    D1 => '1',
---    D2 => '0',
---    R  => '0',
---    S  => '0'
---);
+scClkSmBufInst: ODDR
+generic map(
+    DDR_CLK_EDGE => "OPPOSITE_EDGE", 
+    INIT         => '0',
+    SRTYPE       => "SYNC"
+)
+port map(
+    Q  => sc_clk_sm,
+    C  => clk2MBuf,
+    CE => '1',
+    D1 => '1',
+    D2 => '0',
+    R  => '0',
+    S  => '0'
+);
 
 adcSckBufInst: BUFG
 port map(
@@ -533,7 +533,7 @@ port map(
 i2cRadModule: entity work.i2cMaster
 generic map(
     input_clk => 200000000,
-    bus_clk   => 500000
+    bus_clk   => 100000
 )
 port map(
     clk       => clk_200M,
