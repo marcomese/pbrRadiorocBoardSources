@@ -82,7 +82,8 @@ end entity;
 architecture arch of radioroc_fw is
 
     -- LVDS
-	signal ADC_SCKHG, ADC_SCKLG, ADC_HG, ADC_LG : std_logic;
+	signal ADC_SCKHG, ADC_SCKLG, ADC_HG, ADC_LG, 
+	       sc_NORT1Sync, sc_NORT2Sync, sc_NORTQSync : std_logic;
 	signal T_1Buf, T_2Buf,
 	       T_1Sync, T_2Sync,
 	       tEdge1, tEdge2 : std_logic_vector(63 downto 0);
@@ -399,6 +400,48 @@ port map(
     dest_out => T_2Sync
 );
 
+NORT1SyncInst: xpm_cdc_single
+generic map(
+    DEST_SYNC_FF   => 2,
+    INIT_SYNC_FF   => 0,
+    SIM_ASSERT_CHK => 0,
+    SRC_INPUT_REG  => 0
+)
+port map(
+    src_clk  => '0',
+    dest_clk => clk_200M,
+    src_in   => sc_NORT1,
+    dest_out => sc_NORT1Sync
+);
+
+NORT2SyncInst: xpm_cdc_single
+generic map(
+    DEST_SYNC_FF   => 2,
+    INIT_SYNC_FF   => 0,
+    SIM_ASSERT_CHK => 0,
+    SRC_INPUT_REG  => 0
+)
+port map(
+    src_clk  => '0',
+    dest_clk => clk_200M,
+    src_in   => sc_NORT2,
+    dest_out => sc_NORT2Sync
+);
+
+NORTQSyncInst: xpm_cdc_single
+generic map(
+    DEST_SYNC_FF   => 2,
+    INIT_SYNC_FF   => 0,
+    SIM_ASSERT_CHK => 0,
+    SRC_INPUT_REG  => 0
+)
+port map(
+    src_clk  => '0',
+    dest_clk => clk_200M,
+    src_in   => sc_NORTQ,
+    dest_out => sc_NORTQSync
+);
+
 idSyncInst: xpm_cdc_array_single
 generic map(
     DEST_SYNC_FF   => 2,
@@ -560,9 +603,9 @@ port map(
     start    => start_acq,
     sdo_hg	 => ADC_HG,
     sdo_lg	 => ADC_LG,
-    NORT1	 => sc_NORT1,
-    NORT2 	 => sc_NORT2,
-    NORTQ    => sc_NORTQ,
+    NORT1	 => sc_NORT1Sync,
+    NORT2 	 => sc_NORT2Sync,
+    NORTQ    => sc_NORTQSync,
     nb_acq   => nb_acq,
     id       => boardID,
     tStamp   => tStamp,
