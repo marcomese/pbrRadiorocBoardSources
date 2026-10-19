@@ -9,6 +9,12 @@
 --
 -- Revision:
 -- Revision 0.01 - File Created
+-- Revision 0.02 - devBusy/devReady/devBrstRst/devDataIn of the selected device
+--                 are registered (one clock of latency, new selDev state)
+--                 to take the devIdSig mux out of the FSM critical path;
+--                 timeout added to getCmd, readDev, sendBrst, done and
+--                 waitDevBusy; rxRdInhib released on every received byte
+--                 (stray/invalid bytes no longer lock the interface)
 ----------------------------------------------------------------------------------
 
 library IEEE;
@@ -68,6 +74,7 @@ architecture Behavioral of deviceInterface is
 
 type state_t is (idle,
                  getCmd,
+                 selDev,
                  getDev,
                  getAddr,
                  getData,
@@ -113,7 +120,9 @@ signal   tOutRst,
          validSig,
          devRwSig,
          devBrstSig,
-         devBusyChk,
+         devBusySel,
+         devReadySel,
+         devBrstRstSel,
          brstCollect,
          paddCollect,
          lastBrst,
@@ -128,6 +137,8 @@ signal   tOutRst,
          endCnt,
          locRst        : std_logic;
 signal   devIdSig      : devices_t;
+signal   devBusyChk    : unsigned(1 downto 0);
+signal   devDataSel    : devData_t;
 signal   tOutCnt       : unsigned(bitsNum(tOut) downto 0);
 signal   byteCnt       : unsigned(bitsNum(bytesNum) downto 0);
 signal   brstByteNum   : unsigned(bitsNum(bytesNum)-1 downto 0);
@@ -138,6 +149,10 @@ signal   dataToFifoSel : std_logic_vector(1 downto 0);
 signal   dataToFifo    : std_logic_vector(7 downto 0);
 signal   idSig         : std_logic_vector(7 downto 0);
 signal   dataBrstOut   : std_logic_vector(31 downto 0);
+
+attribute max_fanout : integer;
+
+attribute max_fanout of devIdSig : signal is 16;
 
 begin
 
@@ -192,6 +207,18 @@ begin
     end if;
 end process;
 
+-- signals of the selected device, registered: devIdSig is stable for the
+-- whole transaction (it changes only in getCmd and in the error states)
+devSelProc: process(clk)
+begin
+    if rising_edge(clk) then
+        devBusySel    <= devBusy(devIdSig);
+        devReadySel   <= devReady(devIdSig);
+        devBrstRstSel <= devBrstRst(devIdSig);
+        devDataSel    <= devDataIn(devIdSig);
+    end if;
+end process;
+
 validIdMux: process(dataIn, idSig)
 begin
     if dataIn = idSig then
@@ -229,7 +256,7 @@ begin
     end case;
 end process;
 
-dataToFifoMux: process(dataToFifoSel, devDataIn, byteCnt, devIdSig)
+dataToFifoMux: process(dataToFifoSel, devDataSel, byteCnt)
 begin
     case dataToFifoSel is
         when "00" =>
@@ -237,9 +264,9 @@ begin
         when "01" =>
             dataToFifo <= (others => '0');
         when "10" =>
-            dataToFifo <= devDataIn(devIdSig)(to_integer(byteCnt(1 downto 0)));
+            dataToFifo <= devDataSel(to_integer(byteCnt(1 downto 0)));
         when "11" =>
-            dataToFifo <= devDataIn(devIdSig)(0);
+            dataToFifo <= devDataSel(0);
         when others =>
             dataToFifo <= (others => '0');
     end case;
@@ -263,7 +290,7 @@ begin
             devBrstSig    <= '0';
             devBrstWrt    <= '0';
             devBrstSnd    <= '0';
-            devBusyChk    <= '0';
+            devBusyChk    <= (others => '0');
             rstAddr       <= '1';
             loadAddr      <= '0';
             devExec       <= '0';
@@ -309,6 +336,8 @@ begin
                         rxRdInhib  <= '0';
 
                         state      <= getCmd;
+                    elsif rxValid = '1' then
+                        rxRdInhib <= '0'; -- not for this board: discard the byte
                     end if;
 
                 when getCmd =>
@@ -329,8 +358,23 @@ begin
                         devIdSig      <= slvToDev(dataIn(3 downto 0));
                         error         <= (others => '0');
 
-                        state         <= getDev;
+                        state         <= selDev;
+                    elsif rxValid = '1' then
+                        tOutRst   <= '1';
+                        rxRdInhib <= '0'; -- invalid command byte
+
+                        state     <= errFifo;
+                    elsif tOutSig = '1' then
+                        tOutRst <= '1';
+
+                        state   <= errFifo;
                     end if;
+
+                -- one clock to load the registered signals of the new device
+                when selDev =>
+                    tOutRst <= '0';
+
+                    state   <= getDev;
 
                 when getDev =>
                     tOutRst <= '0';
@@ -342,17 +386,17 @@ begin
                         busy    <= '0';
 
                         state   <= idle;
-                    elsif rxPresent = '1' and devBusy(devIdSig) = '1' then
+                    elsif tOutSig = '1' then
+                        tOutRst <= '1';
+
+                        state   <= errFifo;
+                    elsif rxPresent = '1' and devBusySel = '1' then
                         state <= getDev;
-                    elsif rxPresent = '1' and devBusy(devIdSig) = '0' then
+                    elsif rxPresent = '1' and devBusySel = '0' then
                         tOutRst  <= '1';
                         loadAddr <= '1';
 
                         state    <= getAddr;
-                    elsif tOutSig = '1'  then
-                        tOutRst <= '1';
-
-                        state   <= errFifo;
                     end if;
 
                 when getAddr =>
@@ -466,34 +510,41 @@ begin
                     end if;
 
                 when sendBrst =>
+                    tOutRst       <= '0';
                     devExec       <= '0';
                     readBrstBuff  <= '0';
                     loadLastBrst  <= '0';
 
                     state         <= sendBrst;
 
-                    if devReady(devIdSig) = '1' and lastBrst = '0' then
+                    if devReadySel = '1' and lastBrst = '0' then
+                        tOutRst      <= '1';
                         devExec      <= '1';
                         readBrstBuff <= '1';
                         byteCnt      <= byteCnt - devDataBytes;
-                    elsif devReady(devIdSig) = '1' and lastBrst = '1' and devBrstSig = '1' then
+                    elsif devReadySel = '1' and lastBrst = '1' and devBrstSig = '1' then
+                        tOutRst       <= '1';
                         devBrstSig    <= '0';
                         loadLastBrst  <= '1';
                     elsif lastBrst = '1' and devBrstSig = '0' then
                         readBrstBuff  <= '1';
 
                         state         <= done;
-                    elsif devBrstRst(devIdSig) = '1' then
+                    elsif devBrstRstSel = '1' then
                         devBrstSig    <= '0';
 
                         state         <= done;
+                    elsif tOutSig = '1' then
+                        tOutRst <= '1';
+
+                        state   <= errTOut;
                     end if;
 
                 when readDev =>
                     tOutRst  <= '0';
                     devExec  <= '0';
                     rxEna    <= '0';
-                    wEnFifo  <= devReady(devIdSig) or wAckFifo;
+                    wEnFifo  <= devReadySel or wAckFifo;
                     byteCnt  <= byteCnt - stdLogicToInt(wAckFifo);
 
                     state    <= readDev;
@@ -503,6 +554,10 @@ begin
                         byteCnt <= byteCnt - 1;
 
                         state   <= sendDevData;
+                    elsif tOutSig = '1' then
+                        tOutRst <= '1';
+
+                        state   <= errTOut;
                     end if;
 
                 when readBrst =>
@@ -511,7 +566,7 @@ begin
                     rxEna       <= '0';
                     devBrstWrt  <= '0';
                     devBrstSnd  <= '0';
-                    wEnFifo     <= devReady(devIdSig);
+                    wEnFifo     <= devReadySel;
 
                     state       <= readBrst;
 
@@ -526,7 +581,7 @@ begin
                         devBrstSnd <= '1';
 
                         state      <= sendDevData;
-                    elsif devBrstRst(devIdSig) = '1' then
+                    elsif devBrstRstSel = '1' then
                         devBrstSig <= '0';
 
                         state      <= done;
@@ -550,13 +605,14 @@ begin
                         state       <= readBrst;
                     elsif emptyFifo = '1' and endCnt = '1' then
                         state <= done;
-                    elsif devBrstRst(devIdSig) = '1' then
+                    elsif devBrstRstSel = '1' then
                         devBrstSig <= '0';
 
                         state      <= done;
                     end if;
 
                 when done =>
+                    tOutRst      <= '0';
                     devExec      <= '0';
                     byteCnt      <= to_unsigned(devAddrBytes-1, byteCnt'length);
                     txWSig       <= '0';
@@ -571,29 +627,41 @@ begin
                         busy    <= '0';
 
                         state   <= waitDevBusy;
-                    elsif devBrstSig = '1' and devReady(devIdSig) = '1' then
+                    elsif devBrstSig = '1' and devReadySel = '1' then
                         rxEna <= '1';
                         busy  <= '0';
 
                         state <= waitDevBusy;
+                    elsif tOutSig = '1' then
+                        tOutRst <= '1';
+
+                        state   <= errTOut;
                     end if;
 
+                -- devBusySel is one clock late: wait for it to be low on the
+                -- third check (the original logic used the second one)
                 when waitDevBusy =>
+                    tOutRst     <= '0';
                     devExec     <= '0';
                     rstFifo     <= '1';
                     rstBrstBuff <= '1';
 
                     state <= waitDevBusy;
 
-                    if devBusy(devIdSig) = '0' and devBusyChk = '0' then
-                        devBusyChk <= '1';
+                    if devBusySel = '0' and devBusyChk /= 2 then
+                        devBusyChk <= devBusyChk + 1;
 
                         state      <= waitDevBusy;
-                    elsif devBusy(devIdSig) = '0' and devBusyChk = '1' then
+                    elsif devBusySel = '0' and devBusyChk = 2 then
                         rstDataOut <= '1';
-                        devBusyChk <= '0';
+                        devBusyChk <= (others => '0');
 
                         state      <= waitRstFifo;
+                    elsif tOutSig = '1' then
+                        tOutRst    <= '1';
+                        devBusyChk <= (others => '0');
+
+                        state      <= errTOut;
                     end if;
 
                 when waitRstFifo =>
@@ -620,6 +688,19 @@ begin
                     rstDataOut    <= '1';
                     rstFifo       <= '1';
                     rstBrstBuff   <= '1';
+                    rxRdInhib     <= '0';
+                    devExec       <= '0';
+                    loadAddr      <= '0';
+                    loadDataIn    <= '0';
+                    brstCollect   <= '0';
+                    paddCollect   <= '0';
+                    readBrstBuff  <= '0';
+                    loadLastBrst  <= '0';
+                    wEnFifo       <= '0';
+                    rEnFifo       <= '0';
+                    devBrstWrt    <= '0';
+                    devBrstSnd    <= '0';
+                    devBusyChk    <= (others => '0');
                     error         <= "001";
 
                     state         <= idle;
@@ -638,6 +719,19 @@ begin
                     rstDataOut    <= '1';
                     rstFifo       <= '1';
                     rstBrstBuff   <= '1';
+                    rxRdInhib     <= '0';
+                    devExec       <= '0';
+                    loadAddr      <= '0';
+                    loadDataIn    <= '0';
+                    brstCollect   <= '0';
+                    paddCollect   <= '0';
+                    readBrstBuff  <= '0';
+                    loadLastBrst  <= '0';
+                    wEnFifo       <= '0';
+                    rEnFifo       <= '0';
+                    devBrstWrt    <= '0';
+                    devBrstSnd    <= '0';
+                    devBusyChk    <= (others => '0');
                     error         <= "010";
 
                     state         <= idle;
@@ -656,6 +750,19 @@ begin
                     rstDataOut    <= '1';
                     rstFifo       <= '1';
                     rstBrstBuff   <= '1';
+                    rxRdInhib     <= '0';
+                    devExec       <= '0';
+                    loadAddr      <= '0';
+                    loadDataIn    <= '0';
+                    brstCollect   <= '0';
+                    paddCollect   <= '0';
+                    readBrstBuff  <= '0';
+                    loadLastBrst  <= '0';
+                    wEnFifo       <= '0';
+                    rEnFifo       <= '0';
+                    devBrstWrt    <= '0';
+                    devBrstSnd    <= '0';
+                    devBusyChk    <= (others => '0');
                     error         <= "011";
 
                     state         <= idle;
@@ -674,6 +781,19 @@ begin
                     rstDataOut    <= '1';
                     rstFifo       <= '1';
                     rstBrstBuff   <= '1';
+                    rxRdInhib     <= '0';
+                    devExec       <= '0';
+                    loadAddr      <= '0';
+                    loadDataIn    <= '0';
+                    brstCollect   <= '0';
+                    paddCollect   <= '0';
+                    readBrstBuff  <= '0';
+                    loadLastBrst  <= '0';
+                    wEnFifo       <= '0';
+                    rEnFifo       <= '0';
+                    devBrstWrt    <= '0';
+                    devBrstSnd    <= '0';
+                    devBusyChk    <= (others => '0');
                     error         <= "111";
 
                     state         <= idle;

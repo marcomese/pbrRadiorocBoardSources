@@ -9,6 +9,10 @@
 --
 -- Revision:
 -- Revision 0.01 - File Created
+-- Revision 0.02 - rData holds only the config/status registers; counters are
+--                 read directly from trgMetersSnap through a 2-stage
+--                 registered mux (devReady one clock later than before);
+--                 no reset on the snapshot array; cntTmrSig fanout limited
 ----------------------------------------------------------------------------------
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
@@ -63,7 +67,11 @@ constant reg      : regsRec_t := initRegs(regModes);
 
 constant regsNum  : integer := reg(reg'high).rAddr+1;
 
-signal   rData    : regsData_t(regsNum-1 downto 0);
+signal   rData    : regsData_t(addrNum-1 downto 0); -- config/status only
+
+constant grpSize  : natural := 16;                         -- first mux stage width
+constant grpNum   : natural := (trgNum+grpSize-1)/grpSize; -- second mux stage width
+constant idxBits  : natural := bitsNum(grpNum*grpSize-1);
 
 --------------------------------------------------------------------
 
@@ -74,6 +82,8 @@ type state_t is (idle,
 
 type rateMeters_t is array(0 to trgNum-1) of std_logic_vector(31 downto 0);
 
+type grpData_t is array(0 to grpNum-1) of std_logic_vector(31 downto 0);
+
 constant idleStatus     : std_logic_vector(31 downto 0) := initSlv(32, 13, 0, "00" & x"001", '0');
 constant errAddrStatus  : std_logic_vector(31 downto 0) := initSlv(32, 13, 0, "11" & x"500", '0');
 constant errROnlyStatus : std_logic_vector(31 downto 0) := initSlv(32, 13, 0, "11" & x"A00", '0');
@@ -82,12 +92,27 @@ signal state       : state_t;
 
 signal lastData    : devData_t;
 
-signal dAddr,
-       lastAddr,
-       pipeAddr      : integer;
+signal dAddr         : integer;
 
-signal trgMeters,
-       trgMetersSnap : rateMeters_t;
+signal lastAddr      : integer range 0 to trgNum+addrNum-1;
+
+signal pipeAddr      : integer range 0 to addrNum-1;
+
+signal trgMeters     : rateMeters_t;
+
+signal trgMetersSnap : rateMeters_t := (others => (others => '0'));
+
+signal rdIdx         : unsigned(idxBits-1 downto 0);
+
+signal rdHiSel       : integer range 0 to grpNum-1;
+
+signal rdGrpData     : grpData_t;
+
+signal rdCfgData     : std_logic_vector(31 downto 0);
+
+signal rdIsCfg,
+       rdIsCfgPipe,
+       rdPipeEn      : std_logic;
 
 signal pipeData      : std_logic_vector(31 downto 0);
 
@@ -100,8 +125,11 @@ signal cntTmrSig,
        loadDataOut,
        loadReg,
        locRst,
-       pipeEn,
-       snapEn        : std_logic;
+       pipeEn        : std_logic;
+
+attribute max_fanout : integer;
+
+attribute max_fanout of cntTmrSig : signal is 64;
 
 begin
 
@@ -120,14 +148,58 @@ begin
         if locRst = '1' then
             devReady   <= '0';
             devDataOut <= (others => (others => '0'));
-        elsif loadDataOut = '1' then
-            devReady   <= '1';
-            devDataOut <= slvToDevData(rData(lastAddr));
+        elsif rdPipeEn = '1' then
+            devReady <= '1';
+
+            if rdIsCfgPipe = '1' then
+                devDataOut <= slvToDevData(rdCfgData);
+            else
+                devDataOut <= slvToDevData(rdGrpData(rdHiSel));
+            end if;
         else
             devReady <= '0';
         end if;
     end if;
 end process;
+
+-- first read stage: 16:1 mux inside each group of counters (the snapshot is
+-- stable for the whole gate, so the extra clock does not affect coherency)
+rdStage1Proc: process(clk)
+begin
+    if rising_edge(clk) then
+        if locRst = '1' then
+            rdPipeEn    <= '0';
+            rdIsCfgPipe <= '0';
+            rdHiSel     <= 0;
+            rdCfgData   <= (others => '0');
+        else
+            rdPipeEn    <= loadDataOut;
+            rdIsCfgPipe <= rdIsCfg;
+            rdHiSel     <= to_integer(rdIdx(idxBits-1 downto 4));
+
+            if lastAddr < addrNum then
+                rdCfgData <= rData(lastAddr);
+            end if;
+        end if;
+    end if;
+end process;
+
+rdGrpGen: for g in 0 to grpNum-1 generate
+begin
+    rdGrpProc: process(clk)
+        variable cIdx : integer;
+    begin
+        if rising_edge(clk) then
+            cIdx := g*grpSize + to_integer(rdIdx(3 downto 0));
+
+            if cIdx < trgNum then
+                rdGrpData(g) <= trgMetersSnap(cIdx);
+            else
+                rdGrpData(g) <= (others => '0');
+            end if;
+        end if;
+    end process;
+end generate;
 
 regPipeProc: process(clk)
 begin
@@ -138,8 +210,11 @@ begin
             pipeData <= (others => '0');
         else
             pipeEn   <= loadReg;
-            pipeAddr <= lastAddr;
             pipeData <= devDataToSlv(lastData);
+
+            if loadReg = '1' then
+                pipeAddr <= lastAddr; -- only status/config addresses get here
+            end if;
         end if;
     end if;
 end process;
@@ -147,15 +222,8 @@ end process;
 snapProc: process(clk)
 begin
     if rising_edge(clk) then
-        if locRst = '1' then
-            snapEn        <= '0';
-            trgMetersSnap <= (others => (others => '0'));
-        else
-            snapEn <= cntTmrSig;
-
-            if cntTmrSig = '1' then
-                trgMetersSnap <= trgMeters;
-            end if;
+        if cntTmrSig = '1' then
+            trgMetersSnap <= trgMeters;
         end if;
     end if;
 end process;
@@ -167,10 +235,6 @@ begin
             rData <= (others => (others => '0'));
         elsif pipeEn = '1' then
             rData(pipeAddr) <= pipeData;
-        elsif snapEn = '1' then
-            for i in 0 to trgNum-1 loop
-                rData(i+addrNum) <= trgMetersSnap(i);
-            end loop;
         end if;
     end if;
 end process;
@@ -186,6 +250,8 @@ begin
             cntTmrMax   <= (others => '0');
             cntTmrSet   <= '0';
             lastAddr    <= 0;
+            rdIdx       <= (others => '0');
+            rdIsCfg     <= '1';
             lastData    <= (others => (others => '0'));
 
             state       <= idle;
@@ -206,6 +272,14 @@ begin
                             lastAddr    <= dAddr;
                             loadDataOut <= '1';
                             busy        <= '1';
+
+                            if dAddr < addrNum then
+                                rdIsCfg <= '1';
+                                rdIdx   <= (others => '0');
+                            else
+                                rdIsCfg <= '0';
+                                rdIdx   <= to_unsigned(dAddr-addrNum, idxBits);
+                            end if;
 
                             state       <= idle;
                         elsif devRw = devWrite and reg(dAddr).rMode = ro then
