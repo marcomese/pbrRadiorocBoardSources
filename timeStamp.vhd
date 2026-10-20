@@ -9,6 +9,10 @@
 --
 -- Revision:
 -- Revision 0.01 - File Created
+-- Revision 0.02 - freeze and the counter value are registered before the
+--                 capture: the stored timestamp is the same, tStamp is
+--                 updated one clock later (freeze no longer drives the CE
+--                 of the 64 tStamp FFs directly)
 ----------------------------------------------------------------------------------
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
@@ -36,7 +40,10 @@ architecture Behavioral of timeStamp is
 constant cntMax     : integer := integer(coarseBase*clkFreq);
 
 signal   locRst,
-         coarseEn   : std_logic;
+         coarseEn,
+         freezeD    : std_logic;
+
+signal   tNowD      : std_logic_vector(63 downto 0);
 
 signal   tFineSig   : unsigned(bitsNum(cntMax)-1 downto 0);
 
@@ -55,14 +62,28 @@ begin
     end if;
 end process;
 
+-- time at the freeze clock, registered together with freeze
+tNowProc: process(clk)
+begin
+    if rising_edge(clk) then
+        if locRst = '1' then
+            freezeD <= '0';
+        else
+            freezeD <= freeze;
+        end if;
+
+        tNowD <= std_logic_vector(tCoarseSig) &
+                 std_logic_vector(resize(tFineSig,tFine'length));
+    end if;
+end process;
+
 tStampProc: process(clk)
 begin
     if rising_edge(clk) then
         if locRst = '1' then
             tStamp <= (others => '0');
-        elsif freeze = '1' then
-            tStamp <= std_logic_vector(tCoarseSig) &
-                      std_logic_vector(resize(tFineSig,tFine'length));
+        elsif freezeD = '1' then
+            tStamp <= tNowD;
         end if;
     end if;
 end process;

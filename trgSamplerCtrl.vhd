@@ -13,6 +13,9 @@
 --                 read directly from sampledTrgSnap through a 2-stage
 --                 registered mux (devReady one clock later than before);
 --                 no reset on the snapshot array; cntNSAftTrgSig fanout limited
+-- Revision 0.03 - extra read stage: rdIdx copied in one register per group
+--                 (placed close to the group's snapshot), devReady one
+--                 more clock later
 ----------------------------------------------------------------------------------
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
@@ -84,6 +87,8 @@ type sampledTrg_t is array(0 to trgNum-1) of std_logic_vector(31 downto 0);
 
 type grpData_t is array(0 to grpNum-1) of std_logic_vector(31 downto 0);
 
+type grpIdx_t is array(0 to grpNum-1) of unsigned(3 downto 0);
+
 constant idleStatus     : std_logic_vector(31 downto 0) := initSlv(32, 13, 0, "00" & x"001", '0');
 constant errAddrStatus  : std_logic_vector(31 downto 0) := initSlv(32, 13, 0, "11" & x"500", '0');
 constant errROnlyStatus : std_logic_vector(31 downto 0) := initSlv(32, 13, 0, "11" & x"A00", '0');
@@ -113,8 +118,14 @@ signal rdGrpData       : grpData_t;
 signal rdCfgData       : std_logic_vector(31 downto 0);
 
 signal rdIsCfg,
+       rdIsCfg0,
        rdIsCfgPipe,
+       rdPipeEn0,
        rdPipeEn        : std_logic;
+
+signal rdIdxGrp        : grpIdx_t;
+
+signal rdHiSel0        : integer range 0 to grpNum-1;
 
 signal pipeData        : std_logic_vector(31 downto 0);
 
@@ -131,6 +142,10 @@ signal cntNSAftTrgSig,
        pipeEn          : std_logic;
 
 attribute max_fanout : integer;
+
+attribute keep : string;
+
+attribute keep of rdIdxGrp : signal is "true"; -- one copy per group, do not merge
 
 attribute max_fanout of cntNSAftTrgSig : signal is 64;
 
@@ -165,20 +180,22 @@ begin
     end if;
 end process;
 
--- first read stage: 16:1 mux inside each group of channels (the snapshot is
--- stable until the next event, so the extra clock does not affect coherency)
-rdStage1Proc: process(clk)
+-- stage 0: copy of the read index for every group (short routes to the
+-- group muxes); config registers selected here
+rdStage0Proc: process(clk)
 begin
     if rising_edge(clk) then
         if locRst = '1' then
-            rdPipeEn    <= '0';
-            rdIsCfgPipe <= '0';
-            rdHiSel     <= 0;
-            rdCfgData   <= (others => '0');
+            rdPipeEn0 <= '0';
+            rdIsCfg0  <= '0';
+            rdHiSel0  <= 0;
+            rdIdxGrp  <= (others => (others => '0'));
+            rdCfgData <= (others => '0');
         else
-            rdPipeEn    <= loadDataOut;
-            rdIsCfgPipe <= rdIsCfg;
-            rdHiSel     <= to_integer(rdIdx(idxBits-1 downto 4));
+            rdPipeEn0 <= loadDataOut;
+            rdIsCfg0  <= rdIsCfg;
+            rdHiSel0  <= to_integer(rdIdx(idxBits-1 downto 4));
+            rdIdxGrp  <= (others => rdIdx(3 downto 0));
 
             if lastAddr < addrNum then
                 rdCfgData <= rData(lastAddr);
@@ -187,13 +204,30 @@ begin
     end if;
 end process;
 
+rdStage1Proc: process(clk)
+begin
+    if rising_edge(clk) then
+        if locRst = '1' then
+            rdPipeEn    <= '0';
+            rdIsCfgPipe <= '0';
+            rdHiSel     <= 0;
+        else
+            rdPipeEn    <= rdPipeEn0;
+            rdIsCfgPipe <= rdIsCfg0;
+            rdHiSel     <= rdHiSel0;
+        end if;
+    end if;
+end process;
+
+-- first read stage: 16:1 mux inside each group of channels (the snapshot is
+-- stable until the next event, so the extra clock does not affect coherency)
 rdGrpGen: for g in 0 to grpNum-1 generate
 begin
     rdGrpProc: process(clk)
         variable cIdx : integer;
     begin
         if rising_edge(clk) then
-            cIdx := g*grpSize + to_integer(rdIdx(3 downto 0));
+            cIdx := g*grpSize + to_integer(rdIdxGrp(g));
 
             if cIdx < trgNum then
                 rdGrpData(g) <= sampledTrgSnap(cIdx);

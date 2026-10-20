@@ -10,6 +10,13 @@
 -- Revision:
 -- Revision 0.01 - File Created
 -- Revision 0.02 - Modified for using with deviceInterface.vhd
+-- Revision 0.03 - period/width/amplitude check precomputed in a register
+--                 (vwtOk) and new preCheckVWT state, to take the 32-bit
+--                 comparisons out of the checkVWT critical path
+-- Revision 0.04 - busy/loadDataOut cleared in idle (after a read they stayed
+--                 at '1' until the next write); new waitReg state so that
+--                 execute sees the register just written (first outEn = 1
+--                 did not start the pulses)
 --
 --  TODO:
 --
@@ -104,12 +111,14 @@ constant errVWTStatus   : std_logic_vector(31 downto 0) := initSlv(32, 13, 0, "1
 constant errOthStatus   : std_logic_vector(31 downto 0) := initSlv(32, 13, 0, "11" & x"F00", '0');
 
 type state_t is (idle,
+                 waitReg,
                  execute,
                  waitPwrOnTime,
                  waitSettlingTime,
                  setVDac,
                  setRef,
                  pwrSave,
+                 preCheckVWT,
                  checkVWT,
                  errAddr,
                  errReadOnly,
@@ -129,6 +138,7 @@ signal   dacSend,
          loadDataOut,
          loadReg,
          loadDac,
+         vwtOk,
          locRst     : std_logic;
 signal   dacCmd     : std_logic_vector(3 downto 0);
 signal   dacValue   : std_logic_vector(11 downto 0);
@@ -200,10 +210,27 @@ begin
     end if;
 end process;
 
+-- period > width > 0 and amplitude > 0, evaluated every clock on the
+-- registers: valid one clock after any rData update (see preCheckVWT)
+vwtOkProc: process(clk)
+    variable ampl   : unsigned(31 downto 0);
+    variable period : unsigned(31 downto 0);
+    variable width  : unsigned(31 downto 0);
+begin
+    if rising_edge(clk) then
+        ampl   := unsigned(rData(addr'pos(regVSet)));
+        period := unsigned(rData(addr'pos(regTSet)));
+        width  := unsigned(rData(addr'pos(regWSet)));
+
+        if period > width and width > 0 and ampl > 0 then
+            vwtOk <= '1';
+        else
+            vwtOk <= '0';
+        end if;
+    end if;
+end process;
+
 pGenFSM: process(clk)
-    variable ampl   : std_logic_vector(31 downto 0) := (others => '0');
-    variable period : std_logic_vector(31 downto 0) := (others => '0');
-    variable width  : std_logic_vector(31 downto 0) := (others => '0');
 begin
     if rising_edge(clk) then
         if locRst = '1' then
@@ -224,11 +251,12 @@ begin
         else
             case state is
                 when idle =>
-                    loadReg <= '0';
-                    execSig <= '0';
-                    
+                    loadReg     <= '0';
+                    execSig     <= '0';
+                    loadDataOut <= '0';
+                    busy        <= '0';
 
-                    state   <= idle;
+                    state       <= idle;
 
                     if start = '1' and devID = pulseGen then
                         if dAddr > addr'pos(addr'high) then
@@ -247,9 +275,16 @@ begin
                             loadReg  <= '1';
                             busy     <= '1';
 
-                            state    <= execute;
+                            state    <= waitReg;
                         end if;
                     end if;
+
+                -- rData is written at the end of this clock: execute must
+                -- see the new value
+                when waitReg =>
+                    loadReg <= '0';
+
+                    state   <= execute;
 
                 when execute =>
                     loadReg <= '0';
@@ -269,13 +304,13 @@ begin
                             loadDac <= '1';
 
                             state   <= pwrSave;
-                        elsif rData(addr'pos(regOutEn))(0) = '0' then ---- rData not updated yet!
+                        elsif rData(addr'pos(regOutEn))(0) = '0' then
                             pGenEn <= '0';
                             busy   <= '0';
 
                             state  <= idle;
                         elsif rData(addr'pos(regOutEn))(0) = '1' and rData(addr'pos(regPwrSave))(0) = '0' then
-                            state    <= checkVWT;
+                            state    <= preCheckVWT;
                         elsif rData(addr'pos(regOutEn))(0) = '1' and rData(addr'pos(regPwrSave))(0) = '1' then
                             state    <= waitSettlingTime;
                         else
@@ -362,7 +397,7 @@ begin
                         settlCnt <= to_unsigned(settlingCount-2, settlCnt'length);
                         settled  <= "00";
 
-                        state    <= checkVWT;
+                        state    <= preCheckVWT;
                     elsif endSettl = '1' and not rData(addr'pos(regOutEn))(0) = '0' then
                         settlCnt <= to_unsigned(settlingCount-2, settlCnt'length);
                         busy     <= '0';
@@ -391,7 +426,7 @@ begin
                         settlCnt <= to_unsigned(settlingCount-2, settlCnt'length);
                         settled  <= "00";
 
-                        state    <= checkVWT;
+                        state    <= preCheckVWT;
                     elsif endSettl = '1' and rData(addr'pos(regOutEn))(0) = '0' then
                         loadReg  <= '1';        
                         lastAddr <= addr'pos(regPwrSave);
@@ -409,23 +444,25 @@ begin
                         state    <= idle;
                     end if;
 
-                when checkVWT =>
-                    ampl   := rData(addr'pos(regVSet));
-                    period := rData(addr'pos(regTSet));
-                    width  := rData(addr'pos(regWSet));
+                -- one clock for vwtOk to see the last rData update
+                when preCheckVWT =>
+                    loadReg <= '0';
 
+                    state   <= checkVWT;
+
+                when checkVWT =>
                     state  <= errVWT;
 
                     if settled = "01" then
                         state <= waitSettlingTime;
                     elsif settled = "10" then
                         state <= waitPwrOnTime;
-                    elsif unsigned(period) > unsigned(width) and unsigned(width) > 0 and unsigned(ampl) > 0 then
+                    elsif vwtOk = '1' then
                         loadReg   <= '1';
                         lastAddr  <= addr'pos(regStatus);
                         lastData  <= slvToDevData(pOnStatus);
-                        periodSig <= period;
-                        widthSig  <= width;
+                        periodSig <= rData(addr'pos(regTSet));
+                        widthSig  <= rData(addr'pos(regWSet));
                         pGenEn    <= '1';
 
                         state     <= idle;
