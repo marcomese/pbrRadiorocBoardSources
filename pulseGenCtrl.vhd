@@ -17,6 +17,10 @@
 --                 at '1' until the next write); new waitReg state so that
 --                 execute sees the register just written (first outEn = 1
 --                 did not start the pulses)
+-- Revision 0.05 - waitSettlingTime: "not outEn = '0'" was parsed as
+--                 "(not outEn) = '0'": with outEn = 0 and pwrSave = 0 the FSM
+--                 stayed in waitSettlingTime with busy = '1' (deadlock with
+--                 deviceInterface after an amplitude write)
 --
 --  TODO:
 --
@@ -398,7 +402,7 @@ begin
                         settled  <= "00";
 
                         state    <= preCheckVWT;
-                    elsif endSettl = '1' and not rData(addr'pos(regOutEn))(0) = '0' then
+                    elsif endSettl = '1' and rData(addr'pos(regOutEn))(0) = '0' then
                         settlCnt <= to_unsigned(settlingCount-2, settlCnt'length);
                         busy     <= '0';
                         execSig  <= '0';

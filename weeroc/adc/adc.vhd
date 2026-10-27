@@ -20,6 +20,12 @@
 --   * cpt is signed and saturates at -1 in states where it is not reloaded, so
 --     it can never wrap to 4095 by accident (latent bug in the original).
 --   * fsmOut process uses default assignments + per-state overrides.
+--   * desClr clears the deserializer before every channel; rstb_rd (the
+--     RADIOROC read register reset) is low only in init and wait_hold, as in
+--     the original design: resetting it in nxt restarted the channel scan at
+--     every channel (all 64 reads returned the first channel).
+--   * trgEdge is the rising edge of hit, gated by en_acq: a discriminator
+--     output still high when en_acq returns high no longer retriggers.
 ----------------------------------------------------------------------------------
 
 library ieee;
@@ -120,11 +126,12 @@ architecture Behavioral of adc is
     signal en_adc_sck             : std_logic;
     signal adc_sck_int            : std_logic;
     signal shift_en               : std_logic;
+    signal desClr                 : std_logic;
     signal sck_cnt_en             : std_logic;
     signal rstb_rd_s, rst_n       : std_logic;
 
     signal t0                     : std_logic;
-    signal trigger, trgFF         : std_logic;
+    signal trigger, hitFF         : std_logic;
     signal trigger_sft, trgSftFF  : std_logic;
     signal trgEdge, trgSftEdge    : std_logic;
     signal holdext                : std_logic;
@@ -195,7 +202,7 @@ begin
     deserProc : process(clk_200M)
     begin
         if rising_edge(clk_200M) then
-            if locRst = '1' or rstb_rd_s = '0' then
+            if locRst = '1' or rstb_rd_s = '0' or desClr = '1' then
                 sdo_hg_des <= (others => '0');
                 sdo_lg_des <= (others => '0');
             elsif shift_en = '1' then
@@ -320,16 +327,18 @@ begin
     begin
         if rising_edge(clk_200M) then
             if locRst = '1' then
-                trgFF    <= '0';
+                hitFF    <= '0';
                 trgSftFF <= '0';
             else
-                trgFF    <= trigger;
+                hitFF    <= hit;
                 trgSftFF <= trigger_sft;
             end if;
         end if;
     end process;
 
-    trgEdge    <= trigger     and not trgFF;
+    -- edge of the discriminator output itself: no new trigger when en_acq
+    -- goes high again while hit is still high
+    trgEdge    <= en_acq and hit and not hitFF;
     trgSftEdge <= trigger_sft and not trgSftFF;
 
     fsmSeq : process(clk_200M)
@@ -459,6 +468,7 @@ begin
     fsmOut : process(current_state)
     begin
         rstb_rd_s  <= '1';
+        desClr     <= '0';
         holdext    <= '1';
         ck_read    <= '0';
         n_cnv      <= '0';
@@ -499,7 +509,7 @@ begin
             when asrt_rd_low =>
                 null;
             when nxt =>
-                rstb_rd_s  <= '0';
+                desClr <= '1';
             when read_asic =>
                 ck_read <= '1';
             when start_conv =>
