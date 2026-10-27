@@ -9,6 +9,18 @@
 --
 -- Revision:
 -- Revision 0.01 - File Created
+-- Revision 0.02 - selAdc (2 x 32 bit) and the event-number register removed;
+--                 registers:
+--                 regStatus (0)    : status (ro)
+--                 regAcqEn (1)     : [0] acquisition enable; writing 1 while
+--                                    disabled clears the FIFO and restarts
+--                                    the readout; while enabled every valid
+--                                    trigger is acquired (no event limit)
+--                 regFifoCnt (2)   : bytes in the FIFO (ro)
+--                 regTrgCh (3)     : [5:0] trigger channel (T1)
+--                 regHoldDelay (4) : [11:0] external hold delay (5 ns cycles)
+--                 regCmd (5)       : write-only strobes, bit 0 software
+--                                    trigger, bit 1 RADIOROC reset (reads 0)
 ----------------------------------------------------------------------------------
 
 library IEEE;
@@ -38,14 +50,15 @@ port(
     devReady   : out std_logic;
     busy       : out std_logic;
     resetAcq   : out std_logic;
-    startAcq   : out std_logic;
-    endAcq     : in  std_logic;
+    acqEn      : out std_logic;
     rdValid    : in  std_logic;
     rdAcq      : out std_logic;
     rdDataCnt  : in  std_logic_vector(16 downto 0);
     emptyAcq   : in  std_logic;
-    nbAcq      : out std_logic_vector(7 downto 0);
-    selAdc     : out std_logic_vector(63 downto 0);
+    trgCh      : out std_logic_vector(5 downto 0);
+    holdDelay  : out std_logic_vector(11 downto 0);
+    swTrg      : out std_logic;
+    asicRst    : out std_logic;
     doutAcq    : in  std_logic_vector(7 downto 0)
 );
 end dataAcqCtrl;
@@ -57,20 +70,23 @@ architecture Behavioral of dataAcqCtrl is
 type addr is (regStatus,
               regAcqEn,
               regFifoCnt,
-              regAcqNb,
-              regSelAdcMSB,
-              regSelAdcLSB);
+              regTrgCh,
+              regHoldDelay,
+              regCmd);
 
 constant reg : regsRec_t := (
     addr'pos(regStatus)    => (rAddr => 0, rBegin => 31,  rEnd => 0,  rMode => ro),
     addr'pos(regAcqEn)     => (rAddr => 1, rBegin => 31,  rEnd => 0,  rMode => rw),
     addr'pos(regFifoCnt)   => (rAddr => 2, rBegin => 31,  rEnd => 0,  rMode => ro),
-    addr'pos(regAcqNb)     => (rAddr => 3, rBegin => 31,  rEnd => 0,  rMode => rw),
-    addr'pos(regSelAdcMSB) => (rAddr => 4, rBegin => 31,  rEnd => 0,  rMode => rw),
-    addr'pos(regSelAdcLSB) => (rAddr => 5, rBegin => 31,  rEnd => 0,  rMode => rw)
+    addr'pos(regTrgCh)     => (rAddr => 3, rBegin => 31,  rEnd => 0,  rMode => rw),
+    addr'pos(regHoldDelay) => (rAddr => 4, rBegin => 31,  rEnd => 0,  rMode => rw),
+    addr'pos(regCmd)       => (rAddr => 5, rBegin => 31,  rEnd => 0,  rMode => rw)
 );
 
 constant regsNum : integer := reg(reg'high).rAddr+1;
+
+-- default external hold delay: 100 cycles = 500 ns
+constant holdDelayDef : std_logic_vector(31 downto 0) := std_logic_vector(to_unsigned(100, 32));
 
 signal   rData   : regsData_t(regsNum-1 downto 0);
 
@@ -78,7 +94,6 @@ signal   rData   : regsData_t(regsNum-1 downto 0);
 
 type state_t is (idle,
                  execute,
-                 sendStartAcq,
                  readFifo,
                  waitBrstSent,
                  sendData,
@@ -100,21 +115,18 @@ signal dAddr,
        lastAddr    : integer;
 
 signal rstAcqSig,
-       strtAcqSig,
        rdAcqSig,
        loadDataOut,
        loadReg,
        devBrstSig,
+       swTrgSig,
+       asicRstSig,
        locRst      : std_logic;
-
-signal nbAcqSig    : std_logic_vector(7 downto 0);
 
 begin
 
 dAddr    <= devAddrToInt(devAddr);
-nbAcq    <= nbAcqSig;
 resetAcq <= rstAcqSig;
-startAcq <= strtAcqSig;
 rdAcq    <= rdAcqSig and not devBrstSnd;
 
 locRstProc: process(clk100M)
@@ -142,7 +154,9 @@ begin
     if rising_edge(clk100M) then
         if locRst = '1' then
             rData <= (others => (others => '0'));
-        elsif loadReg = '1' then
+
+            rData(addr'pos(regHoldDelay)) <= holdDelayDef;
+        elsif loadReg = '1' and lastAddr /= addr'pos(regCmd) then
             rData(lastAddr) <= devDataToSlv(lastData);
         else
             rData(addr'pos(regFifoCnt)) <= std_logic_vector(resize(unsigned(rdDataCnt), regsLen));
@@ -150,14 +164,20 @@ begin
     end if;
 end process;
 
-selAdcProc: process(clk100M)
+swTrg   <= swTrgSig;
+asicRst <= asicRstSig;
+
+acqCfgProc: process(clk100M)
 begin
     if rising_edge(clk100M) then
         if locRst = '1' then
-            selAdc <= (others => '0');
+            acqEn     <= '0';
+            trgCh     <= (others => '0');
+            holdDelay <= holdDelayDef(holdDelay'range);
         else
-            selAdc <= rData(addr'pos(regSelAdcMSB)) &
-                      rData(addr'pos(regSelAdcLSB)); 
+            acqEn     <= rData(addr'pos(regAcqEn))(0);
+            trgCh     <= rData(addr'pos(regTrgCh))(5 downto 0);
+            holdDelay <= rData(addr'pos(regHoldDelay))(11 downto 0);
         end if;
     end if;
 end process;
@@ -171,11 +191,11 @@ begin
             loadDataOut <= '0';
             loadReg     <= '0';
             rstAcqSig   <= '1';
-            strtAcqSig  <= '0';
             rdAcqSig    <= '0';
-            nbAcqSig    <= (others => '0');
             devBrstRst  <= '0';
             devBrstSig  <= '0';
+            swTrgSig    <= '0';
+            asicRstSig  <= '0';
             lastAddr    <= 0;
             lastData    <= (others => (others => '0'));
 
@@ -187,9 +207,10 @@ begin
                     loadDataOut <= '0';
                     loadReg     <= '0';
                     rstAcqSig   <= '0';
-                    strtAcqSig  <= '0';
                     devBrstSig  <= devBrst;
                     busy        <= '0';
+                    swTrgSig    <= '0';
+                    asicRstSig  <= '0';
 
                     state       <= idle;
 
@@ -229,19 +250,14 @@ begin
 
                     state   <= idle;
 
-                    if lastAddr = addr'pos(regAcqEn) and lastData(0)(0) = '1' then
+                    -- rData still holds the previous value here
+                    if lastAddr = addr'pos(regAcqEn) and lastData(0)(0) = '1' and
+                       rData(addr'pos(regAcqEn))(0) = '0' then
                         rstAcqSig <= '1';
-
-                        state     <= sendStartAcq;
-                    elsif lastAddr = addr'pos(regAcqNb) then
-                        nbAcqSig <= devDataToSlv(lastData)(nbAcqSig'range);
+                    elsif lastAddr = addr'pos(regCmd) then
+                        swTrgSig   <= lastData(0)(0);
+                        asicRstSig <= lastData(0)(1);
                     end if;
-
-                when sendStartAcq =>
-                    rstAcqSig  <= '0';
-                    strtAcqSig <= '1';
-
-                    state      <= idle;
 
                 when readFifo =>
                     devReady      <= rdValid;
@@ -276,15 +292,10 @@ begin
                     end if;
 
                 when acqEnd =>
-                    busy      <= '0';
-                    rstAcqSig <= '0';
-                    devReady  <= '0';
+                    busy     <= '0';
+                    devReady <= '0';
 
-                    state     <= idle;                    
-
-                    if emptyAcq = '1' then
-                        rstAcqSig <= '1';
-                    end if;
+                    state    <= idle;
 
                 when errAddr =>
                     devReady <= '0';

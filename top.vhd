@@ -38,9 +38,6 @@ entity radioroc_fw is
 		sc_outd_probe : in    std_logic;
 		sc_holdext    : out   std_logic;
 		sc_trigext    : out   std_logic;
-		sc_NORT2      : in    std_logic;
-		sc_NORT1      : in    std_logic;
-		sc_NORTQ      : in    std_logic;
 
 		T_1           : in std_logic_vector(63 downto 0);
 		T_2           : in std_logic_vector(63 downto 0);
@@ -82,8 +79,7 @@ end entity;
 architecture arch of radioroc_fw is
 
     -- LVDS
-	signal ADC_SCKHG, ADC_SCKLG, ADC_HG, ADC_LG, 
-	       sc_NORT1Sync, sc_NORT2Sync, sc_NORTQSync : std_logic;
+	signal ADC_SCKHG, ADC_SCKLG, ADC_HG, ADC_LG : std_logic;
 	signal T_1Buf, T_2Buf,
 	       T_1Sync, T_2Sync,
 	       tEdge1, tEdge2 : std_logic_vector(63 downto 0);
@@ -96,10 +92,12 @@ architecture arch of radioroc_fw is
     signal en_clki2c : std_logic;
 
 	--ADC Acquisition
-	signal reset_acq, start_acq, rd_acq, adc_sck, adcSckBuf, end_acq, empty_acq, rstn_read_acq, reset_n_acq, trig_out : std_logic;
-	signal nb_acq, dout_acq : std_logic_vector(7 downto 0);
+	signal reset_acq, acq_en, rd_acq, adc_sck, adcSckBuf, empty_acq, rstn_read_acq, reset_n_acq : std_logic;
+	signal dout_acq : std_logic_vector(7 downto 0);
 	signal rd_data_count_acq : std_logic_vector(16 downto 0);
-	signal sel_adc : std_logic_vector(63 downto 0);
+	signal trg_ch     : std_logic_vector(5 downto 0);
+	signal hold_delay : std_logic_vector(11 downto 0);
+	signal sw_trg, asic_rst : std_logic;
 
 -- CONSTANTS for deviceInterface, tmpCtrl and PulseGentCtrl
 
@@ -209,7 +207,7 @@ signal readRq,
        sclkSync,
        mosiSync  : std_logic;
 
-signal endAcq, rdValid : std_logic;
+signal rdValid : std_logic;
 
 signal clkCnt : unsigned(7 downto 0); -- MSB = overflow
 
@@ -400,48 +398,6 @@ port map(
     dest_out => T_2Sync
 );
 
-NORT1SyncInst: xpm_cdc_single
-generic map(
-    DEST_SYNC_FF   => 2,
-    INIT_SYNC_FF   => 0,
-    SIM_ASSERT_CHK => 0,
-    SRC_INPUT_REG  => 0
-)
-port map(
-    src_clk  => '0',
-    dest_clk => clk_200M,
-    src_in   => sc_NORT1,
-    dest_out => sc_NORT1Sync
-);
-
-NORT2SyncInst: xpm_cdc_single
-generic map(
-    DEST_SYNC_FF   => 2,
-    INIT_SYNC_FF   => 0,
-    SIM_ASSERT_CHK => 0,
-    SRC_INPUT_REG  => 0
-)
-port map(
-    src_clk  => '0',
-    dest_clk => clk_200M,
-    src_in   => sc_NORT2,
-    dest_out => sc_NORT2Sync
-);
-
-NORTQSyncInst: xpm_cdc_single
-generic map(
-    DEST_SYNC_FF   => 2,
-    INIT_SYNC_FF   => 0,
-    SIM_ASSERT_CHK => 0,
-    SRC_INPUT_REG  => 0
-)
-port map(
-    src_clk  => '0',
-    dest_clk => clk_200M,
-    src_in   => sc_NORTQ,
-    dest_out => sc_NORTQSync
-);
-
 idSyncInst: xpm_cdc_array_single
 generic map(
     DEST_SYNC_FF   => 2,
@@ -524,6 +480,8 @@ port map(
 extTrgFF  <= '0';
 extTrgSig <= '0';
 
+sc_trigext <= '0'; -- external hold only, TRIGEXT not used
+
 extTrg <= miso;
 --extTrgSync: process(clk_200M)
 --begin
@@ -600,17 +558,16 @@ generic map(
 port map(
     rst 	 => reset_acq,
     clk_200M => clk_200M,
-    start    => start_acq,
+    acqEn    => acq_en,
     sdo_hg	 => ADC_HG,
     sdo_lg	 => ADC_LG,
-    NORT1	 => sc_NORT1Sync,
-    NORT2 	 => sc_NORT2Sync,
-    NORTQ    => sc_NORTQSync,
-    nb_acq   => nb_acq,
     id       => boardID,
     tStamp   => tStamp,
     t		 => T_1Sync,
-    sel_adc => sel_adc,
+    trgCh     => trg_ch,
+    holdDelay => hold_delay,
+    swTrg     => sw_trg,
+    asicRst   => asic_rst,
     rd_en 	 => rd_acq,
     dout 	 => dout_acq,
     reset_n    => reset_n_acq,
@@ -619,16 +576,9 @@ port map(
     n_cnv 	 => nCNV,
     adc_sck  => adc_sck,
     empty_acq => empty_acq,
-    end_multi_acq => end_acq,
     rd_data_count_acq => rd_data_count_acq,
     hold_ext => sc_holdext,
-    trig_ext => sc_trigext,
-    trig_out => trig_out,
     evtTrigger => evtTrigger,
-    pulsing => pulsingSig,
-    pulse => pulseSig,
-    extTrg => extTrgSig,
-    endAcq => endAcq,
     rdValid => rdValid
 );
 
@@ -709,14 +659,15 @@ port map(
     devReady    => devReadyAcq,
     busy        => devBusyAcq,
     resetAcq    => reset_acq,
-    startAcq    => start_acq,
-    endAcq      => endAcq,
+    acqEn       => acq_en,
     rdValid     => rdValid,
     rdAcq       => rd_acq,
     rdDataCnt   => rd_data_count_acq,
     emptyAcq    => empty_acq,
-    nbAcq       => nb_acq,
-    selAdc      => sel_adc,
+    trgCh       => trg_ch,
+    holdDelay   => hold_delay,
+    swTrg       => sw_trg,
+    asicRst     => asic_rst,
     doutAcq     => dout_acq
 );
 
