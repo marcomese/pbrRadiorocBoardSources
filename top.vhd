@@ -162,6 +162,7 @@ signal   devReadyPGen,
          pulseSig,
          pulsingSig,
          evtTrigger     : std_logic;
+signal   trig_ext_acq   : std_logic;
 signal   devAddr        : devAddr_t;
 
 -- SIGNALS FOR spiSlave --
@@ -210,6 +211,7 @@ signal readRq,
 signal rdValid : std_logic;
 
 signal clkCnt : unsigned(7 downto 0); -- MSB = overflow
+signal clkSmStop : std_logic; -- clk_sm_i2c stopped during the acquisition
 
 begin
 
@@ -267,13 +269,23 @@ begin
     end if;
 end process;
 
+-- clk_sm_i2c stopped while the acquisition is enabled (no edges near the
+-- inputs while acquiring), unless an I2C transfer to the ASIC is running.
+-- The clock stops only after a complete high phase (no runt pulses) and
+-- starts again with a full high phase
+clkSmStop <= acq_en and not i2cBusyRad;
+
 clk2MProc: process(clk_200M)
 begin
     if rising_edge(clk_200M) then
         if reset = '1' or en_clki2c = '0' then
             clk2MSig <= '0';
         elsif clkCnt(clkCnt'left) = '1' then
-            clk2MSig <= not clk2MSig;
+            if clk2MSig = '1' then
+                clk2MSig <= '0';
+            elsif clkSmStop = '0' then
+                clk2MSig <= '1';
+            end if;
         end if;
     end if;
 end process;
@@ -480,7 +492,7 @@ port map(
 extTrgFF  <= '0';
 extTrgSig <= '0';
 
-sc_trigext <= '0'; -- external hold only, TRIGEXT not used
+sc_trigext <= trig_ext_acq; -- acquisition trigger of the ASIC driven by the FPGA
 
 extTrg <= miso;
 --extTrgSync: process(clk_200M)
@@ -578,6 +590,7 @@ port map(
     empty_acq => empty_acq,
     rd_data_count_acq => rd_data_count_acq,
     hold_ext => sc_holdext,
+    trig_ext => trig_ext_acq,
     evtTrigger => evtTrigger,
     rdValid => rdValid
 );

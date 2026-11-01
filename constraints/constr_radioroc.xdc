@@ -38,6 +38,17 @@ set_property IOSTANDARD LVCMOS12 [get_ports sc_sda]
 set_property IOSTANDARD LVCMOS12 [get_ports sc_trigext]
 set_property IOSTANDARD LVCMOS12 [get_ports sc_val_evt]
 
+# TRIGEXT (AD11) and HOLDEXT (AD9) are next to in<0> (AD7) on the RADIOROC2:
+# minimum drive and slow slew to reduce the coupling of their edges
+# (LVCMOS12: DRIVE 4/8/12 mA, default 12)
+set_property DRIVE 4 [get_ports {sc_trigext sc_holdext}]
+set_property SLEW SLOW [get_ports {sc_trigext sc_holdext}]
+
+# all the other FPGA -> RADIOROC2 / ADC single ended outputs: all slow
+# (clk_sm_i2c 2 MHz free running, ck_read 100 ns pulses, resets, I2C)
+set_property DRIVE 4 [get_ports {sc_clk_sm sc_ck_read sc_rstn_read sc_reset_n sc_rstb_sc sc_rstb_probe sc_rstb_i2c sc_val_evt sc_scl sc_sda nCNV nCMOS}]
+set_property SLEW SLOW [get_ports {sc_clk_sm sc_ck_read sc_rstn_read sc_reset_n sc_rstb_sc sc_rstb_probe sc_rstb_i2c sc_val_evt sc_scl sc_sda nCNV nCMOS}]
+
 # Package pins
 # Clock capable pins (MRCC / SRCC)
 set_property PACKAGE_PIN V4 [get_ports sysClk_p]

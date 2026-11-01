@@ -15,7 +15,19 @@
 --      previous conversion): read register advanced by ck_read, AMUX sampled
 --      by the LTC2311 (n_cnv, 16 adc_sck), HG/LG packed in one 32-bit word
 --   5. CRC and footer
---   6. RESET_N pulse (peak detectors and delay cell), then back to idle
+--   6. end of event: hold released, HOLD_TO_RST cycles later RESET_N and
+--      RSTN_READ asserted together for RST_CYCLES (datasheet DAQ example,
+--      fig. 27), then back to idle. RSTN_READ is asserted also at the start
+--      of each event (step 2); RESET_N is not, it would clear the peak
+--      detectors while the signal is being acquired
+--   TRIGEXT (acquisition trigger of the ASIC, used when 65/12 selTrig = 0000
+--   or ORed with the global trigger otherwise): driven by the FSM, high in wrHeader
+--   (one cycle, 5 ns, right after the accepted trigger). The peak
+--   detectors go from track to peak sensing on its rising edge and back to
+--   track with RESET_N (datasheet fig. 23)
+--   Trigger blanking: the release of RESET_N can produce an edge on T1
+--   (~35 ns later, measured), so triggers are ignored for TRG_BLANK cycles
+--   after every RESET_N (end of event, init, asicRst command)
 --
 -- Single clock domain (clk_200M). adc_sck = clk_200M / 2.
 ----------------------------------------------------------------------------------
@@ -59,6 +71,7 @@ port(
     empty_acq         : out std_logic;
     rd_data_count_acq : out std_logic_vector(16 downto 0);
     hold_ext          : out std_logic;
+    trig_ext          : out std_logic;
     evtTrigger        : out std_logic;
     rdValid           : out std_logic
 );
@@ -103,6 +116,8 @@ architecture Behavioral of adc is
     constant CONV_CYCLES     : natural := 26;   -- n_cnv high (LTC2311 conversion)
     constant HOLD_MIN        : natural := 5;    -- trigger + header + timestamps + 1
     constant RST_CYCLES      : natural := 8;    -- RESET_N after every event (>= 20 ns)
+    constant HOLD_TO_RST     : natural := 4;    -- hold released before RESET_N (20 ns)
+    constant TRG_BLANK       : natural := 40;   -- triggers ignored after RESET_N (200 ns)
 
     constant FIFO_BYTES      : natural := 65536;
     constant EVT_BYTES       : natural := 276;  -- 69 words
@@ -132,6 +147,8 @@ architecture Behavioral of adc is
                 return CK_READ_LOW - 1;
             when start_conv =>
                 return CONV_CYCLES - 1;
+            when finish =>
+                return HOLD_TO_RST - 1;
             when rst_asic =>
                 return RST_CYCLES - 1;
             when others =>
@@ -173,11 +190,15 @@ architecture Behavioral of adc is
     signal hitFF                  : std_logic;
     signal trgEdge                : std_logic;
     signal holdext                : std_logic;
+    signal trigExt                : std_logic;
 
     signal asicRstCnt             : natural range 0 to ASIC_RST_CYCLES;
     signal asicRstN               : std_logic;
     signal rdValidSig             : std_logic;
     signal locRst                 : std_logic;
+    signal resetNSig              : std_logic;
+    signal blankCounter           : natural range 0 to TRG_BLANK;
+    signal trgBlank               : std_logic;
     signal crcRst                 : std_logic;
 
     signal dHeader,
@@ -226,14 +247,30 @@ begin
         end if;
     end process;
 
-    trgAccept <= (trgEdge or swTrg) and acqEn and fifoRoom when current_state = idle else '0';
+    -- triggers ignored while RESET_N is low and for TRG_BLANK cycles after
+    blankProc : process(clk_200M)
+    begin
+        if rising_edge(clk_200M) then
+            if locRst = '1' or resetNSig = '0' then
+                blankCounter <= TRG_BLANK;
+            elsif blankCounter > 0 then
+                blankCounter <= blankCounter - 1;
+            end if;
+        end if;
+    end process;
+
+    trgBlank <= '1' when blankCounter > 0 else '0';
+
+    trgAccept <= (trgEdge or swTrg) and acqEn and fifoRoom and not trgBlank when current_state = idle else '0';
 
     ---------------------------------------------------------------------------
     -- RADIOROC control
     ---------------------------------------------------------------------------
     hold_ext   <= holdext;
+    trig_ext   <= trigExt;
     rstb_rd    <= rstb_rd_s;
-    reset_n    <= rst_n and asicRstN;
+    resetNSig  <= rst_n and asicRstN;
+    reset_n    <= resetNSig;
 
     -- wait_hold lasts holdDelay - 4 cycles (trigger, header and timestamps
     -- take the other 4), so that hold_ext rises holdDelay cycles after the
@@ -572,7 +609,11 @@ begin
                 next_state <= finish;
 
             when finish =>
-                next_state <= rst_asic;
+                if waitDone = '1' then
+                    next_state <= rst_asic;
+                else
+                    next_state <= finish;
+                end if;
 
             when rst_asic =>
                 if waitDone = '1' then
@@ -599,6 +640,7 @@ begin
         crcRst     <= '0';
         dinSel     <= ACQDATA;
         rst_n      <= '1';
+        trigExt    <= '0';
 
         case current_state is
             when init =>
@@ -610,7 +652,9 @@ begin
                 holdext <= '0';
 
             -- header/timestamps: hold not yet asserted, read register reset
+            -- TRIGEXT: acquisition trigger of the ASIC (peak sensing)
             when wrHeader =>
+                trigExt   <= '1';
                 rstb_rd_s <= '0';
                 holdext   <= '0';
                 wr_en     <= '1';
@@ -662,13 +706,15 @@ begin
                 dinSel <= FOOTER;
                 wr_en  <= '1';
 
+            -- hold released HOLD_TO_RST cycles before RESET_N / RSTN_READ
             when finish =>
                 crcRst  <= '1';
                 holdext <= '0';
 
             when rst_asic =>
-                holdext <= '0';
-                rst_n   <= '0';
+                holdext   <= '0';
+                rst_n     <= '0';
+                rstb_rd_s <= '0';
 
             when others =>
                 null;
